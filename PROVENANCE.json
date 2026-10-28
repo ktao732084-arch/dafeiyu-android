@@ -41,7 +41,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "c8f611ccf426e6b120d6ea5e355f37b06c223350caa5aae982a6bdeec34f2d8f"
+      "sha256": "5b50bf5b5432bf47c7647604b5f1d6185f7e996f035789920db80f827396583d"
     },
     {
       "path": "LICENSE",
@@ -68,7 +68,7 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "18b0f52af9f5c59cf9b39800a5fd600b0c3d9effd88e07fabd4e4f67fb6695d5",
+      "sha256": "a07e3eb5c4dc535b62a56d80e07ff0a03a7738b329b5104e96c97bc41e1b1020",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
@@ -1188,7 +1188,7 @@
       "path": "assets/personas.json",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "447ac27859688e85326ec1602a3b25dcf56950f763ddc163e3daa14f8279aaca",
+      "sha256": "b2984f75d1104cbd227ebfb7115b19e2f2d1fbb2443ed3702985314588ae9159",
       "design_reference": "Five newly written styles; shared character style informed by dafeiyu-persona. Not five upstream plugins."
     },
     {
@@ -1234,7 +1234,7 @@
       "path": "instrumentation/AgentInstrumentation.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "2849efe40835d3d2772d9f6a14947a2721ce6a76b5d6ca01434a2558ea1c8efc"
+      "sha256": "26e4d59e6c70b910dee37797008078013e6fb57dd77d53b7408c649ae7e33c75"
     },
     {
       "path": "instrumentation/AndroidManifest.xml",
@@ -1673,31 +1673,31 @@
       "path": "src/com/xiaoxiao/pet/AgentPanel.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "ad610f04df4885f5de59ffb885cd352f0532e777dc4abbb5ea9e99d4545a22b3"
+      "sha256": "3d14ce1f653e5b367e248a662a50c7ccaa14f55172c69de9e85a2ed1ba2fd167"
     },
     {
       "path": "src/com/xiaoxiao/pet/AgentPolicy.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "e2fb573084de335d9695ccf53e63d814e4e286715cd8ee718ff552bbc9e6c73d"
+      "sha256": "8cf5138e50171568c7680b45e81361fc0e880e24857eb2a757010cec58f2b098"
     },
     {
       "path": "src/com/xiaoxiao/pet/AgentReply.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "7d9c5a49f0f1989b8c4bda3940dbe8beac3e3c29134c36c9f287441f4ad6dba2"
+      "sha256": "d0ccf0e11d31f01920a86f0fd04577cbf7661044f65502a02932ab469dab75df"
     },
     {
       "path": "src/com/xiaoxiao/pet/AgentRuntime.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "3d3491abad783bb610c5ff3da8eaa98ac4eee03e5a46adb8ed26903a74175fb0"
+      "sha256": "179fe203a720394e86f34676e81db8b992907f24077a0ca58ddc4cf1cb480bec"
     },
     {
       "path": "src/com/xiaoxiao/pet/AgentStore.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "212647cb2367848f7a488554f2103f13a5cf86edce391811a3dba7ea1ca12b8d"
+      "sha256": "e089cdb9ed2595b447ace5de238e4cbe6a875ab5af672ebe320b05641c801660"
     },
     {
       "path": "src/com/xiaoxiao/pet/AgentTransport.java",
@@ -1841,7 +1841,7 @@
       "path": "src/com/xiaoxiao/pet/MemoryPanel.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "c5e54c3ff1f9a0bf35b993106168ce76b38b533b38018271d145716ada221acf"
+      "sha256": "f0919fb2b124941c6407696364b36c6c916a7f89713992f255d303ac9264981e"
     },
     {
       "path": "src/com/xiaoxiao/pet/ModelSettings.java",
@@ -1871,7 +1871,7 @@
       "path": "src/com/xiaoxiao/pet/PersonaManager.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "505556683e29438f1567d03321208b63bd444e6a1be624540e811e7c1206e163"
+      "sha256": "9c2b6348b7812fd48a18de97f32b4d3e0894e25acbf85cae65ec99cb83dbc729"
     },
     {
       "path": "src/com/xiaoxiao/pet/PersonaPanel.java",
@@ -1905,6 +1905,12 @@
       "source_blob": "5c73b157ffe4aeea8e68eb69b2c25ed31cb2502f",
       "sha256": "47ce15ec8e2c909a6ebcd8895b558e377c69113838177de5e895241f3e6a54f8",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/PromptBuilder.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "6f97b90e67d2c3a04dfeabbc3d51e817937d97feb8f055ea08492b86de6ba4b7"
     },
     {
       "path": "src/com/xiaoxiao/pet/SizePanel.java",
@@ -1961,7 +1967,7 @@
       "path": "tests/com/xiaoxiao/pet/AgentCoreTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "76c871346f0d8d4b0f39ce4e349378ae2ca52205562c4c3bcf42e02091f6de5e"
+      "sha256": "3235fc92a86e2acabd4464146fea6064ce8773f4d4698a6224bc66500db3a056"
     },
     {
       "path": "tests/com/xiaoxiao/pet/ApiEndpointTest.java",
@@ -2036,7 +2042,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/UiTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "61a8d0cb5cfec6cdab0a5e260485ad83791ee74fd30ffa2385104209796077de"
+      "sha256": "e5246b385f026b31644a426ed2a63553dd69a113f57ed3a86f629f53ec25ebbf"
     },
     {
       "path": "tests/robolectric/validation-result.json",

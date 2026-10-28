@@ -1,5 +1,5 @@
 package com.xiaoxiao.pet;
-import org.json.*;import java.io.*;import java.nio.file.*;
+import org.json.*;import java.io.*;import java.nio.file.*;import java.util.List;
 
 /** Real filesystem persistence and policy regression tests; run with org.json on the JVM. */
 public final class AgentCoreTest {
@@ -103,6 +103,50 @@ public final class AgentCoreTest {
   check(MemoryBridge.recallOnly(warm)&&MemoryBridge.recallTimeout(warm)==MemoryBridge.WARMUP_TIMEOUT,"first semantic lookup may build the vector cache");
   warm.getJSONObject("state").put("vector_cache",new JSONObject().put("x",1));check(MemoryBridge.recallTimeout(warm)==MemoryBridge.RECALL_TIMEOUT,"later lookups must answer in seconds");
   check(!MemoryBridge.recallOnly(new JSONObject().put("incoming",new JSONArray().put(1))),"writes keep the long timeout");
+  // Persona consistency: her own statements, relationship stage, drift reminders, compression, cacheable window.
+  String said="哼，我最爱吃小鱼干了。你要不要也来一点？";
+  check(AgentPolicy.validSelf(said,"我最爱吃小鱼干了")&&!AgentPolicy.validSelf(said,"我最爱吃草莓")&&!AgentPolicy.validSelf(said,"你要不要也来一点")&&!AgentPolicy.validSelf(said,"我最"),"self statements are verbatim, about her, not about the user");
+  long day=86_400_000L,base=1_700_000_000_000L;
+  check(AgentPolicy.relationship(base,base+2*day,2,10).contains("第3天")&&AgentPolicy.relationship(base,base+2*day,2,10).contains("刚认识"),"new acquaintance");
+  check(AgentPolicy.relationship(base,base+40*day,8,80).contains("已经熟悉")&&AgentPolicy.relationship(base,base+200*day,30,400).contains("老朋友"),"familiar, then old friends, by days actually talked");
+  check(AgentPolicy.relationship(0,base,0,0).isEmpty(),"no stage before the first meeting");
+  List<String> drift=java.util.Arrays.asList("才不是呢，我只是路过。","才不是担心你（扭头）。","才不是想你了（小声）。","才不是啦（叉腰）。");
+  List<String> notes=AgentPolicy.styleNotes(drift);
+  check(notes.toString().contains("「才不」")&&notes.toString().contains("才不是")&&notes.toString().contains("括号"),"repeated opener, catchphrase and stage directions are flagged: "+notes);
+  check(AgentPolicy.styleNotes(java.util.Arrays.asList("今天下雨了。","那就在家看书吧。","好呀，晚安。","明天见！")).isEmpty(),"varied replies get no reminder");
+  check("先说结论。".equals(AgentPolicy.compressReply("先说结论。后面还有很长的解释和例子。"))&&AgentPolicy.compressReply("没有标点的一段很长很长的话".repeat(10)).length()==60,"older replies keep their first sentence");
+  int prev=-1,moves=0;for(int total=9;total<=40;total++){int start=AgentPolicy.windowStart(total,total);int size=total-start;check(size>=8&&size<=11,"window holds 8-11 turns: "+size);if(prev>=0&&start!=prev)moves++;prev=start;}
+  check(moves==8,"window advances four turns at a time, not every turn: "+moves);
+  check(AgentPolicy.windowStart(160,500)+340==AgentPolicy.windowStart(160,501)+341&&AgentPolicy.windowStart(5,5)==0,"anchored to the lifetime count once old turns are trimmed");
+  AgentStore persona=new AgentStore(new File(root,"persona"));
+  persona.commit(persona.epoch(),"你最喜欢吃什么？",said,"happy",null,true,false,null,null,null,0,new JSONArray().put("我最爱吃小鱼干了").put("我最爱吃草莓"));
+  persona.commit(persona.epoch(),"","早呀。","calm",null,true,true,null,null,null,0,null);
+  JSONObject ps=persona.snapshot();
+  check(ps.getJSONArray("self").length()==1&&"我最爱吃小鱼干了".equals(AgentStore.selfContext(ps,"小鱼干").getString(0)),"only her verbatim self statement is kept and recalled");
+  check(ps.optInt("turnCount")==2&&ps.optInt("userTurns")==1&&ps.optInt("chatDays")==1,"lifetime counters: proactive turns count for the window, not the relationship");
+  persona.clearSelf();check(persona.snapshot().getJSONArray("self").length()==0,"her self statements can be cleared");
+  // The assembled request: a stable cacheable prefix, compressed history, per-turn details last.
+  JSONObject chat=AgentStore.empty(0);MemoryLedger.migrate(chat);JSONArray hist=chat.getJSONArray("turns");
+  for(int i=0;i<14;i++)hist.put(new JSONObject().put("id","t"+i).put("at",1000L*i).put("user","第"+i+"句话").put("reply","回复"+i+"的第一句。后面是更长的第二句话。").put("proactive",false));
+  chat.put("turnCount",14).put("userTurns",14).put("chatDays",4).put("lastUser",13000L);
+  MemoryLedger.addLocal(chat,MemoryLedger.record("m1","我对花生过敏","t0",true,1000L));
+  PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona="你是大肥鱼。";in.guidance="你自己的固定设定：爱吃小鱼干。";in.nickname="小船长";in.mood="happy";in.timeZone="Asia/Shanghai";in.now=1_700_000_000_000L;in.initializedAt=in.now-10*86_400_000L;in.remember=true;in.lastEvent="用户轻轻碰了碰你";in.lastEventAt=in.now-1000;
+  JSONArray req=PromptBuilder.build(in,"推荐个零食",false,chat,null);
+  String sys=req.getJSONObject(0).getString("content"),tail=req.getJSONObject(req.length()-1).getString("content");
+  check("system".equals(req.getJSONObject(0).getString("role"))&&sys.contains("你是大肥鱼")&&sys.contains("爱吃小鱼干")&&sys.contains("小船长"),"stable persona, traits and nickname in the system message");
+  check(!sys.contains("设备本地时间")&&!sys.contains("花生")&&!sys.contains("相识第"),"nothing that changes per turn in the system message");
+  check(tail.startsWith("<背景>")&&tail.endsWith("推荐个零食")&&tail.contains("设备本地时间")&&tail.contains("相识第11天")&&tail.contains("花生过敏")&&tail.contains("碰了碰你"),"per-turn details lead the final user message");
+  boolean alternates=true;for(int i=1;i<req.length();i++)alternates&=req.getJSONObject(i).getString("role").equals(i%2==1?"user":"assistant");
+  check(alternates&&req.length()%2==0,"one system message, then strict user/assistant alternation ending with the user");
+  int pairs=(req.length()-2)/2;check(pairs>=8&&pairs<=11,"8-11 history turns: "+pairs);
+  check(req.getJSONObject(2).getString("content").equals("回复"+(14-pairs)+"的第一句。")&&req.getJSONObject(req.length()-2).getString("content").contains("第二句话"),"older replies compressed, the last three verbatim");
+  hist.put(new JSONObject().put("id","t14").put("at",14000L).put("user","第14句话").put("reply","回复14。").put("proactive",false));chat.put("turnCount",15);
+  JSONArray next=PromptBuilder.build(in,"再推荐一个",false,chat,null);int same=0;while(same<Math.min(req.length(),next.length())-1&&req.getJSONObject(same).toString().equals(next.getJSONObject(same).toString()))same++;
+  check(same>=6,"consecutive requests share a cacheable prefix of "+same+" messages");
+  in.remember=false;check(!PromptBuilder.build(in,"推荐个零食",false,chat,null).getJSONObject(req.length()-1).toString().contains("花生"),"memory off keeps memories out");in.remember=true;
+  check(PromptBuilder.build(in,"",true,chat,null).toString().contains("主动陪伴事件")&&!PromptBuilder.build(in,"",true,chat,null).getJSONObject(1).getString("role").equals("system"),"proactive request uses a user-role event");
+  for(int i=0;i<4;i++)hist.put(new JSONObject().put("id","d"+i).put("at",20000L+i).put("user","嗯").put("reply","才不是呢（扭头），我只是路过"+i+"。").put("proactive",false));chat.put("turnCount",19);
+  check(PromptBuilder.build(in,"你好",false,chat,null).toString().contains("风格提醒"),"drift reminder reaches the prompt");
   System.out.println("PASS: "+checks+" core checks");
  }
 }
