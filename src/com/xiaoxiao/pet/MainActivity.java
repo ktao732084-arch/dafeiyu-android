@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
   TextView line=text(PersonaManager.isInitialized("main")?"我在呢，有话就慢慢说。":"先和她打个招呼，决定她的性格吧。",14);line.setTextColor(Apple.SECONDARY);line.setGravity(Gravity.CENTER);line.setPadding(0,dp(8),0,dp(6));hero.addView(line);
   Button chat=button(hero,"和她聊聊",v->openChat());Apple.button(chat,true);chat.setTextSize(16);chat.getLayoutParams().height=dp(50);((LinearLayout.LayoutParams)chat.getLayoutParams()).topMargin=dp(12);
   boolean visible=PetService.instance!=null&&PetService.instance.pets.get("main")!=null&&PetService.instance.pets.get("main").visible;
-  LinearLayout pair=new LinearLayout(this);hero.addView(pair);Button history=button(pair,"聊天记录",v->openChat());Button desk=button(pair,visible?"请她回来歇会":"让她住到屏幕上",v->{send(visible?"hideAll":"show","main");handler.postDelayed(this::render,300);});
+  LinearLayout pair=new LinearLayout(this);hero.addView(pair);Button history=button(pair,"她的小动作",v->manage());Button desk=button(pair,visible?"请她回来歇会":"让她住到屏幕上",v->{send(visible?"hideAll":"show","main");handler.postDelayed(this::render,300);});
   for(Button b:new Button[]{history,desk}){LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(46),1);p.topMargin=dp(10);if(b==desk)p.leftMargin=dp(10);b.setLayoutParams(p);b.setBackground(Apple.shape(this,Apple.PANEL,14));}
   recent();
   if(!Settings.canDrawOverlays(this)){View hint=PermissionsPanel.hint(this);LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.topMargin=dp(16);content.addView(hint,p);}
@@ -39,7 +39,6 @@ public class MainActivity extends Activity {
   GroupedList.row(life,PersonaManager.isInitialized("main")?"她的性格 · "+PersonaManager.label("main"):"初次相遇 · 确定性格",GroupedList.HEART,GroupedList.PINK,v->PersonaPanel.show(this,"main"));
   GroupedList.row(life,"名字与称呼",GroupedList.TAG,GroupedList.VIOLET,v->ProfilePage.show(this,"main"));
   GroupedList.row(life,"陪伴设置",GroupedList.SLIDERS,GroupedList.MINT,v->AgentPanel.settings(this));
-  GroupedList.row(life,"动作和大小",GroupedList.PLAY,GroupedList.TEAL,v->manage());
   GroupedList.section(content,"关于");LinearLayout more=GroupedList.group(content);GroupedList.row(more,"关于与开源来源",GroupedList.INFO,GroupedList.GREY,v->about());
   TextView footer=text("大肥鱼 "+version()+" · 非官方社区二创\n记忆只存在这台手机里",12);footer.setTextColor(Apple.SECONDARY);footer.setGravity(Gravity.CENTER);footer.setLineSpacing(dp(3),1);footer.setPadding(0,dp(28),0,0);content.addView(footer);
  }

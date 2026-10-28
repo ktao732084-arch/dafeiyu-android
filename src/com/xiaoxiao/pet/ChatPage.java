@@ -7,7 +7,7 @@ final class ChatPage {
     static final long STAMP_GAP=5*60*1000L;
     static java.lang.ref.WeakReference<ChatPage> current=new java.lang.ref.WeakReference<>(null);
     final Context c;final String role,id;final boolean overlay;final Dialog dialog;final Handler handler=new Handler(Looper.getMainLooper());
-    final LinearLayout rows;final ScrollView scroll;final EditText input;TextView status;final TextView presence,filter,setup;final Button send,older,jump;final int bubbleWidth;
+    final LinearLayout rows;final ScrollView scroll;final EditText input;TextView status;final TextView presence,filter,setup;final Button send,older,jump;final FrameLayout stage;final int bubbleWidth,listHeight;int lifted;
     final SpeechQueue speech;final Runnable interrupt,refresh;JSONArray records=new JSONArray();boolean sending,paged,nearBottom=true;String draft="",turnId,lastDay;long from=Long.MIN_VALUE,to=Long.MAX_VALUE,lastStamp;View typing;
     ChatPage(Context context,String role,String id){
         this.c=context;this.role=role;this.id=id;overlay=!(c instanceof Activity);dialog=overlay?CompactPanel.create(c):ClientPage.create(c);
@@ -26,7 +26,7 @@ final class ChatPage {
         LinearLayout list=column();list.setPadding(dp(12),dp(6),dp(12),dp(12));
         older=new Button(c);older.setText("查看更早的消息");Apple.button(older,false);older.setTextSize(13);older.setBackground(null);older.setOnClickListener(v->loadOlder());list.addView(older,new LinearLayout.LayoutParams(-1,dp(40)));
         rows=column();list.addView(rows);scroll=new SpringScrollView(c);scroll.setFillViewport(true);scroll.setBackgroundColor(Apple.FILL);scroll.addView(list);
-        FrameLayout stage=new FrameLayout(c);stage.addView(scroll,new FrameLayout.LayoutParams(-1,-1));box.addView(stage,new LinearLayout.LayoutParams(-1,overlay?dp(240):0,overlay?0:1));
+        listHeight=overlay?dp(240):0;stage=new FrameLayout(c);stage.addView(scroll,new FrameLayout.LayoutParams(-1,-1));box.addView(stage,new LinearLayout.LayoutParams(-1,listHeight,overlay?0:1));
         // Scrolled up to read? A small chip brings you back to the newest message.
         jump=new Button(c);jump.setText("↓ 最新消息");Apple.button(jump,false);jump.setTextSize(13);jump.setMinHeight(dp(34));jump.setPadding(dp(14),0,dp(14),0);jump.setElevation(dp(3));jump.setVisibility(View.GONE);jump.setOnClickListener(v->scroll.fullScroll(View.FOCUS_DOWN));
         GradientDrawable chip=Apple.shape(c,Apple.PANEL,17);jump.setBackground(new RippleDrawable(ColorStateList.valueOf((Apple.BLUE&0xffffff)|0x24000000),chip,null));
@@ -61,7 +61,7 @@ final class ChatPage {
         ChatPage open=current.get();if(open!=null&&open.c==c&&open.id.equals(id)&&open.dialog.isShowing()){open.loadLatest();return;}AgentRuntime.interruptProactive();if(AgentRuntime.busy()){Toast.makeText(c,"她还在回上一句，先停下当前回复吧",0).show();return;}
         Chat.interruptPresentation(id);new ChatPage(c,role,id).open();
     }
-    void open(){current=new java.lang.ref.WeakReference<>(this);Chat.presentations.put(id,interrupt);Chat.historyViews.put(id,refresh);if(overlay){Chat.petChats.put(id,dialog);CompactPanel.showComposer(dialog,c,pet(),"大肥鱼-对话");}else ClientPage.show(dialog,"大肥鱼-聊天");loadLatest();}
+    void open(){current=new java.lang.ref.WeakReference<>(this);Chat.presentations.put(id,interrupt);Chat.historyViews.put(id,refresh);if(overlay){Chat.petChats.put(id,dialog);CompactPanel.showComposer(dialog,c,pet(),"大肥鱼-对话");dialog.getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(this::keyboard);}else ClientPage.show(dialog,"大肥鱼-聊天");loadLatest();}
     PetService.Pet pet(){return PetService.instance==null?null:PetService.instance.pets.get(id);}
     void idle(){presence.setText("在线 · "+AgentRuntime.moodLabel());presence.setTextColor(Apple.SECONDARY);}
     /** Tracks whether the newest message is on screen, and shows the jump chip when it is not. */
@@ -69,6 +69,33 @@ final class ChatPage {
     void connect(){
         if(c instanceof Activity){ModelSetup.show((Activity)c);return;}
         dialog.dismiss();c.startActivity(new Intent(c,MainActivity.class).putExtra("openModel",true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP));
+    }
+    /**
+     * The pet's chat window floats beside her, so the keyboard can cover it. Whatever part the keyboard
+     * still covers after the system's own adjustment is measured from the window's insets: a bottom panel
+     * moves up by that much, and the list shrinks if the panel would otherwise run off the top. Self-correcting:
+     * once nothing is covered it stops, and everything returns when the keyboard closes.
+     */
+    void keyboard(){
+        if(!overlay||Build.VERSION.SDK_INT<30||!dialog.isShowing())return;
+        Window w=dialog.getWindow();WindowInsets insets=w.getDecorView().getRootWindowInsets();if(insets==null)return;
+        WindowManager.LayoutParams a=w.getAttributes();LinearLayout.LayoutParams list=(LinearLayout.LayoutParams)stage.getLayoutParams();
+        if(!insets.isVisible(WindowInsets.Type.ime())){
+            if(lifted!=0||list.height!=listHeight){a.y-=lifted;lifted=0;w.setAttributes(a);list.height=listHeight;stage.setLayoutParams(list);}
+            return;
+        }
+        int covered=insets.getInsets(WindowInsets.Type.ime()).bottom;if(covered<=0)return;
+        int y=a.y,height=list.height;
+        if((a.gravity&Gravity.VERTICAL_GRAVITY_MASK)==Gravity.BOTTOM){
+            WindowMetrics metrics=c.getSystemService(WindowManager.class).getMaximumWindowMetrics();
+            android.graphics.Insets bars=metrics.getWindowInsets().getInsetsIgnoringVisibility(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());
+            int frame=metrics.getBounds().height()-bars.top-bars.bottom;
+            y+=covered;int overflow=y+w.getDecorView().getHeight()-(frame-dp(12));
+            if(overflow>0){height=Math.max(dp(96),height-overflow);y-=overflow-(list.height-height);}
+        }else height=Math.max(dp(96),height-covered);
+        // Only act on a real change, so a keyboard that still covers the minimum panel cannot cause a layout loop.
+        if(y>a.y){lifted+=y-a.y;a.y=y;w.setAttributes(a);}
+        if(height!=list.height){list.height=height;stage.setLayoutParams(list);}
     }
     void sendState(){send.setAlpha(sending||input.getText().toString().trim().length()>0?1f:.45f);}
     void menu(View anchor){

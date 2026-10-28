@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "cf3b7305eb20e0884c2a2370ad23780c8a7dd68793dd08aa97433940e0cc8757"
+      "sha256": "dbf04cfc414ebcafd19fdae1eff925109b6e66110a6eb118be2c58bdde3b1376"
     },
     {
       "path": "LICENSE",
@@ -78,7 +78,7 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "600f267ccd523570f222950db9a9c901f329ca52bcf382a20c97a54b8876504a",
+      "sha256": "84e78ea0941b0c0f86b341f7d14f575dcf2f579199b7eb8bc42105626ad68c70",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
@@ -1855,7 +1855,7 @@
       "path": "src/com/xiaoxiao/pet/ChatPage.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "ffc1995b225ffb87e3dda146012748e5872f767a85d8eb2fb7a333a39310b86c"
+      "sha256": "b0845d52610021a1006862abcfdaca387793c66752a6c55ae8e3b66a5c5d5bc7"
     },
     {
       "path": "src/com/xiaoxiao/pet/ClientPage.java",
@@ -1954,7 +1954,7 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/MainActivity.java",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "af07db10487b980c0125c71a694f6ed46c68f26e",
-      "sha256": "29d21ca41261b8205dd8aaf6f5f0cedc7f705e508f6e0ea6307799de5df4d13c",
+      "sha256": "ce57862756c27d40a82f93610a06963aaad8cb1bd98d54f342db2a444acd87fe",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
