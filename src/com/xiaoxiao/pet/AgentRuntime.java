@@ -12,7 +12,7 @@ import java.io.IOException;
 
 /** An independent on-device orchestrator: events -> recall -> model -> validate -> commit -> act. */
 final class AgentRuntime {
-    interface Listener {void partial(String text);void done(String text,String emotion);void error(String message);}
+    interface Listener {default void saved(String turnId){} void partial(String text);void done(String text,String emotion);void error(String message);}
     interface Model {String generate(JSONArray messages,AgentTransport.Token token,AgentTransport.Progress progress)throws Exception;}
     static Model model=AgentTransport::request;
     static AgentStore memory;
@@ -43,7 +43,8 @@ final class AgentRuntime {
         case "curious":return "东张西望";case "concerned":return "碎碎念-对屏碎碎念";
         case "playful":return "鲸鱼吐泡泡特效";case "sleepy":return "原地小憩沉眠";default:return "碎碎念-发呆碎碎念";
     }}
-    static void express(String instance,String emotion,String reply){PetService s=PetService.instance;if(s==null)return;PetService.Pet p=s.pets.get(instance);if(p!=null&&p.visible&&!p.docked){if(!p.dragging&&!p.moving)p.play(p.plan.emotion(AgentPolicy.emotion(emotion),action(emotion),Data.random));p.reply(reply);}}
+    static void express(String instance,String emotion,String reply){express(instance,emotion,reply,null);}
+    static void express(String instance,String emotion,String reply,String turnId){PetService s=PetService.instance;if(s==null)return;PetService.Pet p=s.pets.get(instance);if(p!=null&&p.visible&&!p.docked){if(!p.dragging&&!p.moving)p.play(p.plan.emotion(AgentPolicy.emotion(emotion),action(emotion),Data.random));p.speak(reply,turnId);}}
     static JSONArray context(String user,boolean proactive)throws Exception {
         return context(user,proactive,store().snapshot(),null);
     }
@@ -55,13 +56,14 @@ final class AgentRuntime {
         return PromptBuilder.build(in,user,proactive,s,hits);
     }
     static boolean send(String user,boolean proactive,Listener listener) {
-        final AgentTransport.Token token; synchronized(AgentRuntime.class){if(active!=null)return false;token=new AgentTransport.Token();active=token;activeListener=listener;activeProactive=proactive;}
+        final long receivedAt=System.currentTimeMillis();final AgentTransport.Token token; synchronized(AgentRuntime.class){if(active!=null)return false;token=new AgentTransport.Token();active=token;activeListener=listener;activeProactive=proactive;}
+        if(!proactive){if(Looper.myLooper()==Looper.getMainLooper())Chat.interruptPresentation("main");else main.post(()->Chat.interruptPresentation("main"));}
         // Wake a dozing pet before the prompt is built, so the reply can sound freshly woken.
         if(!proactive&&PetService.instance!=null){if(Looper.myLooper()==Looper.getMainLooper())PetService.instance.heard("main");else main.post(()->{if(PetService.instance!=null)PetService.instance.heard("main");});}
         worker.execute(()->{
             try {
                 token.check();if(!PersonaManager.ensureInitialized("main"))throw new IOException("请先在首页完成初次相遇，确定她的性格");
-                AgentStore db=store();long epoch=db.epoch(),observed=System.currentTimeMillis();String turnId=UUID.randomUUID().toString();token.check();
+                AgentStore db=store();long epoch=db.epoch(),observed=receivedAt;String turnId=UUID.randomUUID().toString();token.check();
                 MemoryBridge.Config memoryConfig=rememberEnabled()?MemoryBridge.read():new MemoryBridge.Config(false,null,"",false,false);
                 MemoryBridge.Result memoryPlan=null;JSONObject contextState=db.snapshot();JSONArray recallHits=null;
                 String explicit=null;if(!proactive&&(user.startsWith("记住：")||user.startsWith("记住:")))explicit=user.substring(3).trim();
@@ -84,8 +86,8 @@ final class AgentRuntime {
                         // Recheck after the network wait, before saving a message the user won't see.
                         if(!canSpeakNow()){release(token);return;}
                         try{
-                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,false,true)){release(token);return;}}
-                            release(token);listener.done(output.reply,output.emotion);
+                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,false,true,null,null,turnId,observed,null,true)){release(token);return;}}
+                            release(token);listener.saved(turnId);listener.done(output.reply,output.emotion);
                         }catch(Exception e){release(token);listener.error("主动消息未能保存");}
                     });return;
                 }
@@ -97,8 +99,8 @@ final class AgentRuntime {
                 token.check();
                 final AgentReply output=result;final long completedEpoch=epoch;
                 final java.util.concurrent.atomic.AtomicBoolean delivered=new java.util.concurrent.atomic.AtomicBoolean();
-                Runnable completion=()->{if(!delivered.compareAndSet(false,true))return;release(token);if(db.epoch()!=completedEpoch){listener.error("记录已修改，本次已完成的回复不再显示");return;}listener.done(output.reply,output.emotion);};
-                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");token.completed=completion;}
+                Runnable completion=()->{if(!delivered.compareAndSet(false,true))return;release(token);if(db.epoch()!=completedEpoch){listener.error("记录已修改，本次已完成的回复不再显示");return;}listener.saved(turnId);listener.done(output.reply,output.emotion);};
+                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");token.completed=completion;}
                 main.post(completion);
             }catch(Exception e){String msg=e instanceof java.net.SocketTimeoutException?"等模型回复超时了，消息还在，可以重试。":e.getMessage();main.post(()->{if(current(token)){release(token);listener.error(msg==null?"连接失败，请检查网络和模型配置":msg);}});}
         });return true;
@@ -122,8 +124,8 @@ final class AgentRuntime {
             boolean focus=Data.prefs().getLong("agent.focusUntil",0)>now;
             if(!AgentPolicy.mayInitiate(now,Math.max(db.lastUser(),lastTouch),db.lastAttempt(),n,Calendar.getInstance().get(Calendar.HOUR_OF_DAY),true,service.screenOn,visible,focus,busy()))return;
             db.reserveAttempt(day,now);
-            send("",true,new Listener(){public void partial(String t){}public void done(String t,String e){
-                if(PetService.instance==service&&service.screenOn&&pet.visible&&!pet.docked&&!MainActivity.active&&(lock==null||!lock.isKeyguardLocked())&&!AgentPolicy.quiet(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))&&(nm==null||nm.getCurrentInterruptionFilter()==NotificationManager.INTERRUPTION_FILTER_ALL)&&Data.prefs().getBoolean("agent.proactive",false)&&Data.prefs().getLong("agent.focusUntil",0)<=System.currentTimeMillis())express("main",e,t);
+            send("",true,new Listener(){String turn;public void saved(String id){turn=id;}public void partial(String t){}public void done(String t,String e){
+                if(PetService.instance==service&&service.screenOn&&pet.visible&&!pet.docked&&!MainActivity.active&&(lock==null||!lock.isKeyguardLocked())&&!AgentPolicy.quiet(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))&&(nm==null||nm.getCurrentInterruptionFilter()==NotificationManager.INTERRUPTION_FILTER_ALL)&&Data.prefs().getBoolean("agent.proactive",false)&&Data.prefs().getLong("agent.focusUntil",0)<=System.currentTimeMillis())express("main",e,t,turn);
             }public void error(String error){Data.log("main","主动陪伴请求未完成");}});
         }catch(Exception e){Data.log("main","主动陪伴暂不可用");}
     }

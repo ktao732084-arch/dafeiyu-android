@@ -3,9 +3,11 @@ import android.app.*;import android.os.*;import android.content.*;import android
 
 public class MainActivity extends Activity {
  static boolean active;LinearLayout content;final Handler handler=new Handler(Looper.getMainLooper());
- public void onCreate(Bundle b){Data.init(this);Apple.load();setTheme(Apple.dark?com.dafeiyu.companion.R.style.AppThemeDark:com.dafeiyu.companion.R.style.AppTheme);super.onCreate(b);try{if(!PersonaManager.ensureInitialized("main"))handler.post(()->PersonaPanel.show(this,"main"));}catch(Exception e){AgentPanel.fail(this,e);}render();}
+ public void onCreate(Bundle b){Data.init(this);Apple.load();setTheme(Apple.dark?com.dafeiyu.companion.R.style.AppThemeDark:com.dafeiyu.companion.R.style.AppTheme);super.onCreate(b);try{if(!PersonaManager.ensureInitialized("main"))handler.post(()->PersonaPanel.show(this,"main"));}catch(Exception e){AgentPanel.fail(this,e);}render();consumeChatIntent();}
+ public void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);consumeChatIntent();}
+ void consumeChatIntent(){if(getIntent()!=null&&getIntent().getBooleanExtra("openChat",false)){getIntent().removeExtra("openChat");handler.post(()->openChat());}}
  public void onResume(){super.onResume();active=true;AgentRuntime.interruptProactive();Apple.load();render();PermissionsPanel.refresh();if(PetService.instance!=null)PetService.instance.control(true);}
- public void onPause(){active=false;if(PetService.instance!=null)PetService.instance.control(false);super.onPause();}
+ public void onPause(){Chat.interruptPresentation("main");active=false;if(PetService.instance!=null)PetService.instance.control(false);super.onPause();}
  public void onDestroy(){DialogLifecycle.close(this);handler.removeCallbacksAndMessages(null);super.onDestroy();}
  public void onConfigurationChanged(android.content.res.Configuration c){super.onConfigurationChanged(c);Apple.load();render();}
  int dp(int v){return Apple.dp(this,v);}TextView text(String s,int size){return Apple.label(this,s,size,false);}
@@ -18,7 +20,7 @@ public class MainActivity extends Activity {
   TextView eyebrow=text("一只鲸鱼，住进日常",13);eyebrow.setTextColor(Apple.BLUE);content.addView(eyebrow);TextView title=Apple.label(this,"大肥鱼",34,true);title.setPadding(0,dp(8),0,0);content.addView(title);TextView sub=text("有话就说，没话也陪着。",15);sub.setTextColor(Apple.SECONDARY);sub.setPadding(0,dp(6),0,0);content.addView(sub);
   LinearLayout hero=panel();GradientDrawable bg=new GradientDrawable(GradientDrawable.Orientation.TL_BR,Apple.dark?new int[]{0xff183248,0xff202c3d}:new int[]{0xffe2f2ff,0xfff1f8ff});bg.setCornerRadius(dp(24));hero.setBackground(bg);TextView mood=text("●  "+AgentRuntime.moodLabel(),13);mood.setTextColor(Apple.BLUE);hero.addView(mood);
   ImageView portrait=new ImageView(this);portrait.setContentDescription("蓝色鲸鱼娘大肥鱼");portrait.setScaleType(ImageView.ScaleType.FIT_CENTER);try{portrait.setImageBitmap(BitmapFactory.decodeStream(getAssets().open(Data.role("main").optString("portrait"))));}catch(Exception ignored){}hero.addView(portrait,new LinearLayout.LayoutParams(-1,dp(170)));
-  TextView line=Apple.label(this,"我在呢。\n有话就慢慢说。",18,true);line.setGravity(Gravity.CENTER);line.setLineSpacing(dp(4),1);hero.addView(line);Button chat=button(hero,"和她聊聊",v->openChat());Apple.button(chat,true);
+  TextView line=Apple.label(this,"我在呢。\n有话就慢慢说。",18,true);line.setGravity(Gravity.CENTER);line.setLineSpacing(dp(4),1);hero.addView(line);Button chat=button(hero,"和她聊聊",v->openChat());button(hero,"聊天记录",v->openChat());Apple.button(chat,true);
   boolean visible=PetService.instance!=null&&PetService.instance.pets.get("main")!=null&&PetService.instance.pets.get("main").visible;
   button(hero,visible?"收起桌宠":"让她住到屏幕上",v->{send(visible?"hideAll":"show","main");handler.postDelayed(this::render,300);});
   if(!Settings.canDrawOverlays(this))content.addView(PermissionsPanel.hint(this));

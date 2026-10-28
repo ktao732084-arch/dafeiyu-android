@@ -11,8 +11,10 @@ product="$root/build/compile-check/classes"
 out="$root/build/core-tests"
 tests="$root/tests/com/xiaoxiao/pet"
 mkdir -p "$out"
-javac -encoding UTF-8 -cp "$product:$json" -d "$out" "$tests/ApiEndpointTest.java" "$tests/AgentCoreTest.java" "$tests/MotionEngineTest.java" "$tests/ActionPlanTest.java"
+javac -encoding UTF-8 -cp "$product:$json" -d "$out" "$tests/ApiEndpointTest.java" "$tests/AgentCoreTest.java" "$tests/MotionEngineTest.java" "$tests/ActionPlanTest.java" "$tests/ReplyHistoryTest.java"
 java -cp "$product:$out:$json" com.xiaoxiao.pet.AgentCoreTest "$out/state-$(date +%s)-$$"
 java -cp "$product:$out" com.xiaoxiao.pet.MotionEngineTest
 java -cp "$product:$out" com.xiaoxiao.pet.ApiEndpointTest
 java -cp "$product:$out" com.xiaoxiao.pet.ActionPlanTest
+
+java -cp "$product:$out:$json" com.xiaoxiao.pet.ReplyHistoryTest

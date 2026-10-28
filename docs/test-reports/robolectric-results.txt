@@ -1,4 +1,4 @@
-Android 14/API34 Robolectric: 58 passed; includes 14 one-key model setup scenarios.
+Android 14/API34 Robolectric: 67 passed; 9 conversation/history scenarios.
 PASS com.xiaoxiao.pet.UiTest.manualPersonaOnboardingAndReadOnlyUI
 PASS com.xiaoxiao.pet.UiTest.chatUIRunsPromptRecallStreamingAndCommitsControlledModelReply
 PASS com.xiaoxiao.pet.UiTest.openingManualChatInterruptsPendingProactiveRequest
@@ -57,3 +57,12 @@ PASS com.xiaoxiao.pet.ModelSetupTest.balanceParserKeepsCurrenciesSeparateAndReje
 PASS com.xiaoxiao.pet.ModelSetupTest.closingDuringProbePreventsLateSave
 PASS com.xiaoxiao.pet.ModelSetupTest.insufficientFundsShowsActualZeroAndDoesNotSaveUnusableModel
 PASS com.xiaoxiao.pet.ModelSetupTest.flashDisablesThinkingWithoutChangingOtherProviders
+PASS com.xiaoxiao.pet.ConversationTest.newMessageCancelsOldSegmentsWithoutLosingCompleteRecord
+PASS com.xiaoxiao.pet.ConversationTest.dateRangeIsStableAcrossDisplayTimezoneChanges
+PASS com.xiaoxiao.pet.ConversationTest.explicitFullReplyViewMarksUnshownPartsAndKeepsTimestamp
+PASS com.xiaoxiao.pet.ConversationTest.bubbleHistoryIntentOpensExplicitConversationEntry
+PASS com.xiaoxiao.pet.ConversationTest.undeliveredSelfStatementsDoNotBecomeSpokenMemories
+PASS com.xiaoxiao.pet.ConversationTest.historyPageLoadsEarlierTurnsWithDateTimeAndCopy
+PASS com.xiaoxiao.pet.ConversationTest.oneModelCallCreatesProgressiveSegmentsAndDisplayedTimestamps
+PASS com.xiaoxiao.pet.ConversationTest.closingChatAlsoClearsItsPetBubble
+PASS com.xiaoxiao.pet.ConversationTest.closingPageStopsScheduledSegments

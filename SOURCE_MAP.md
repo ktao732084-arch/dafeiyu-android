@@ -114,3 +114,9 @@
 DeepSeek地址、模型别名、Key入口、非思考参数和错误码依据2026-10-28查阅的官方文档：[首次调用](https://api-docs.deepseek.com/zh-cn/)、[模型说明](https://api-docs.deepseek.com/zh-cn/quick_start/pricing/)、[思考开关](https://api-docs.deepseek.com/zh-cn/guides/thinking_mode/)、[错误码](https://api-docs.deepseek.com/zh-cn/quick_start/error_codes/)。没有复制第三方SDK或服务端代码。`deepseek-flash` 对应官方当前 DeepSeek V4.1 Flash，App展示名与请求名分别使用；后续服务商更新可能需调整预设。
 
 `DeepSeekBalance.java` 是本轮新增的只读HTTP客户端、金额解析与本机显示缓存，依据[DeepSeek官方余额接口](https://api-docs.deepseek.com/zh-cn/api/get-user-balance/)；仅支持官方HTTPS来源与Bearer Key，不向DeepSeek发送其他服务商凭据。总额、充值余额、赠金分别取官方字段，未复制SDK。
+
+## 0.4.4 分段与聊天历史
+
+ReplySegments、SpeechQueue、ChatArchive、ChatPage与新增测试由本项目编写，负责本地无损断句、可取消的展示队列、按轮归档与时间范围查询、Android聊天界面。
+
+交互思路参考既有微信客服的split_message / typing_delay / send_message_split（按句意拆分、串行发送、短暂停顿），并查阅 [AstrBot分段配置](https://github.com/AstrBotDevs/AstrBot/blob/master/docs/zh/dev/astrbot-config.md)。未复制AstrBot的AGPL代码，也未引入其Python框架、微信桌面自动化、客户数据或配置。Android实现、归档、毫秒时间戳和未展示状态与记忆整合在本项目完成；桌宠底座及素材归属保持原标注。

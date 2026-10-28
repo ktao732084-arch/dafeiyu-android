@@ -74,12 +74,12 @@ final class MemoryLedger {
         rows.sort((a,b)->Double.compare(AgentPolicy.relevance(query,b.optString("text")),AgentPolicy.relevance(query,a.optString("text"))));
         for(int i=0;i<Math.min(5,rows.size());i++){JSONObject r=rows.get(i);out.put(new JSONObject().put("quote",r.optString("text")).put("observed_at",r.optLong("at")).put("status","历史记录，不能当作当前事实"));}return out;
     }
-    static void forget(JSONObject s,String id)throws Exception {
+    static Set<String> forget(JSONObject s,String id)throws Exception {
         migrate(s);Set<String> ids=new HashSet<>(),sources=new HashSet<>();ids.add(id);boolean changed;
         do{changed=false;for(String pool:new String[]{"memories","archive"}){JSONArray rows=s.getJSONArray(pool);for(int i=0;i<rows.length();i++){JSONObject r=rows.getJSONObject(i),e=r.optJSONObject("engine");String by=e==null?"":e.optString("superseded_by",e.optString("downgrade_reason"));if(ids.contains(r.optString("id"))||(!by.isEmpty()&&ids.contains(by))){if(ids.add(r.optString("id")))changed=true;if(!by.isEmpty()&&ids.add(by))changed=true;JSONArray a=sources(r);for(int j=0;j<a.length();j++)sources.add(a.optString(j));}}}}while(changed);
         for(String pool:new String[]{"memories","archive"}){JSONArray rows=s.getJSONArray(pool);for(int i=rows.length()-1;i>=0;i--)if(ids.contains(rows.getJSONObject(i).optString("id")))rows.remove(i);}
         JSONArray turns=s.getJSONArray("turns");for(int i=turns.length()-1;i>=0;i--)if(sources.contains(turns.getJSONObject(i).optString("id")))turns.remove(i);
         JSONArray audit=s.getJSONArray("audit");for(int i=audit.length()-1;i>=0;i--){JSONObject e=audit.getJSONObject(i);if(ids.contains(e.optString("id"))||ids.contains(e.optString("by"))||ids.contains(e.optString("from")))audit.remove(i);}
-        s.put("vector_cache",new JSONObject());
+        s.put("vector_cache",new JSONObject());return sources;
     }
 }
