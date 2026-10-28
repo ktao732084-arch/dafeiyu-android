@@ -41,7 +41,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "5b50bf5b5432bf47c7647604b5f1d6185f7e996f035789920db80f827396583d"
+      "sha256": "d358fdd17d5f562e9c72c125b95c94f4f26bd6f2e8bfe59f53f2e55000019d7e"
     },
     {
       "path": "LICENSE",
@@ -68,7 +68,7 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "a07e3eb5c4dc535b62a56d80e07ff0a03a7738b329b5104e96c97bc41e1b1020",
+      "sha256": "379431daf99bec69849414580c90623f7907f712b4ace4ed1ea6f9410399746b",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
@@ -1691,13 +1691,13 @@
       "path": "src/com/xiaoxiao/pet/AgentRuntime.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "179fe203a720394e86f34676e81db8b992907f24077a0ca58ddc4cf1cb480bec"
+      "sha256": "0d0bebf7cb52631d5a78564815790c05222c56f9611e6eaea46e62f1f65aed2c"
     },
     {
       "path": "src/com/xiaoxiao/pet/AgentStore.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "e089cdb9ed2595b447ace5de238e4cbe6a875ab5af672ebe320b05641c801660"
+      "sha256": "8f97900a31455ebbf7697de731205e9a75b188dd802a5ec25dda53e8b80ab49b"
     },
     {
       "path": "src/com/xiaoxiao/pet/AgentTransport.java",
@@ -1835,7 +1835,7 @@
       "path": "src/com/xiaoxiao/pet/MemoryLedger.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "4fa2327392e977abffaa9137a371ff7f4bfb6ab6ec579c44f798547ecb25597e"
+      "sha256": "cd6de0004a76175e6ac82e79481bea057c8bca1cc08dae448e9631f75919ccce"
     },
     {
       "path": "src/com/xiaoxiao/pet/MemoryPanel.java",
@@ -1910,7 +1910,7 @@
       "path": "src/com/xiaoxiao/pet/PromptBuilder.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "6f97b90e67d2c3a04dfeabbc3d51e817937d97feb8f055ea08492b86de6ba4b7"
+      "sha256": "b5fa68b0d34231c09e2788a63c7459f9bd5220b996a97a63535f2b4ccac79f5a"
     },
     {
       "path": "src/com/xiaoxiao/pet/SizePanel.java",
@@ -1940,6 +1940,12 @@
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
+      "path": "src/com/xiaoxiao/pet/TimeGround.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "d2f965e825799f96fddbf69b482da63077fdc5b76c8c94ee62a3587cf886449f"
+    },
+    {
       "path": "src/com/xiaoxiao/pet/UiMotion.java",
       "relationship": "adapted",
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/UiMotion.java",
@@ -1967,7 +1973,7 @@
       "path": "tests/com/xiaoxiao/pet/AgentCoreTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "3235fc92a86e2acabd4464146fea6064ce8773f4d4698a6224bc66500db3a056"
+      "sha256": "60711153093dff54759d01a01a0e67c91fa7f6c1f225f007ffd5c12ef501e417"
     },
     {
       "path": "tests/com/xiaoxiao/pet/ApiEndpointTest.java",

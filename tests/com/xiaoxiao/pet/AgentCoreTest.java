@@ -147,6 +147,24 @@ public final class AgentCoreTest {
   check(PromptBuilder.build(in,"",true,chat,null).toString().contains("主动陪伴事件")&&!PromptBuilder.build(in,"",true,chat,null).getJSONObject(1).getString("role").equals("system"),"proactive request uses a user-role event");
   for(int i=0;i<4;i++)hist.put(new JSONObject().put("id","d"+i).put("at",20000L+i).put("user","嗯").put("reply","才不是呢（扭头），我只是路过"+i+"。").put("proactive",false));chat.put("turnCount",19);
   check(PromptBuilder.build(in,"你好",false,chat,null).toString().contains("风格提醒"),"drift reminder reaches the prompt");
+  // Date grounding ported from temporal.py (its own self-test cases), due events and one-time follow-ups.
+  java.time.LocalDate obs=java.time.LocalDate.of(2026,10,28);
+  String[][] tg={{"我下周三有个重要考试","我下周三（2026-11-04）有个重要考试","2026-11-04"},{"明天下午开会","明天（2026-10-29）下午开会","2026-10-29"},{"大后天出发","大后天（2026-10-31）出发","2026-10-31"},
+   {"我昨天去了北京","我昨天（2026-10-27）去了北京","2026-10-27"},{"下个月15号交论文","下个月15号（2026-11-15）交论文","2026-11-15"},{"我每周三去健身","我每周三去健身",null},
+   {"下周要搬家","下周（2026-11-02 当周）要搬家",null},{"明年准备考研","明年（2027年）准备考研",null},{"我对花生过敏","我对花生过敏",null},{"明天（2026-10-29）开会","明天（2026-10-29）开会",null}};
+  for(String[] c:tg){TimeGround.Result g=TimeGround.ground(c[0],obs);check(g.text.equals(c[1])&&String.valueOf(g.event).equals(String.valueOf(c[2])),"temporal.py case: "+c[0]+" -> "+g.text);}
+  long spoke=java.time.LocalDateTime.of(2026,10,28,20,0).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+  JSONObject plan=AgentStore.empty(0);MemoryLedger.migrate(plan);
+  MemoryLedger.addLocal(plan,MemoryLedger.record("exam","我明天有面试","t1",false,spoke));MemoryLedger.addLocal(plan,MemoryLedger.record("move","下个月15号搬家","t2",false,spoke));MemoryLedger.addLocal(plan,MemoryLedger.record("blue","我喜欢蓝色","t3",false,spoke));
+  JSONObject exam=plan.getJSONArray("memories").getJSONObject(0);
+  check("我明天（2026-10-29）有面试".equals(exam.getJSONObject("engine").getString("content"))&&"2026-10-29".equals(exam.getJSONObject("engine").getString("event_date"))&&"我明天有面试".equals(exam.getString("text")),"local memories keep the quote and gain the engine's resolved date");
+  check(!plan.getJSONArray("memories").getJSONObject(2).has("engine")&&MemoryLedger.current(exam,spoke+5*86_400_000L),"undated memories untouched; no local expiry");
+  check(MemoryLedger.dueEvents(plan,obs).getJSONObject(0).getString("when").equals("明天")&&MemoryLedger.dueEvents(plan,obs).length()==1,"the interview is tomorrow's plan");
+  check(MemoryLedger.followUps(plan,obs).length()==0&&MemoryLedger.followUps(plan,obs.plusDays(1)).length()==1&&MemoryLedger.followUps(plan,obs.plusDays(2)).length()==1&&MemoryLedger.followUps(plan,obs.plusDays(3)).length()==0,"follow up on the day and the day after only");
+  AgentStore follow=new AgentStore(new File(root,"follow"));follow.markFollowed(MemoryLedger.followUps(plan,obs.plusDays(1)));JSONObject fs=follow.snapshot();fs.put("memories",plan.getJSONArray("memories"));
+  check(MemoryLedger.followUps(fs,obs.plusDays(1)).length()==0,"asked once, not again");
+  in.remember=true;in.now=spoke+86_400_000L;JSONObject pc=AgentStore.empty(0);MemoryLedger.migrate(pc);pc.put("memories",plan.getJSONArray("memories"));
+  check(PromptBuilder.build(in,"",true,pc,null).toString().contains("今天：我明天（2026-10-29）有面试")&&PromptBuilder.build(in,"早",false,pc,null).toString().contains("近期安排"),"proactive turn may ask how the interview went; chat knows the schedule");
   System.out.println("PASS: "+checks+" core checks");
  }
 }

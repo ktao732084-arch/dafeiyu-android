@@ -64,6 +64,7 @@ final class AgentRuntime {
                 AgentStore db=store();long epoch=db.epoch(),observed=System.currentTimeMillis();String turnId=UUID.randomUUID().toString();token.check();
                 MemoryBridge.Config memoryConfig=rememberEnabled()?MemoryBridge.read():new MemoryBridge.Config(false,null,"",false,false);
                 MemoryBridge.Result memoryPlan=null;JSONObject contextState=db.snapshot();JSONArray recallHits=null;
+                final JSONArray offered=proactive&&rememberEnabled()?MemoryLedger.followUps(contextState,java.time.LocalDate.now()):null;
                 String explicit=null;if(!proactive&&(user.startsWith("记住：")||user.startsWith("记住:")))explicit=user.substring(3).trim();
                 AgentReply result;
                 if(explicit!=null){
@@ -84,7 +85,7 @@ final class AgentRuntime {
                         // Recheck after the network wait, before saving a message the user won't see.
                         if(!canSpeakNow()){release(token);return;}
                         try{
-                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,false,true)){release(token);return;}}
+                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,false,true)){release(token);return;}db.markFollowed(offered);}
                             release(token);listener.done(output.reply,output.emotion);
                         }catch(Exception e){release(token);listener.error("主动消息未能保存");}
                     });return;
