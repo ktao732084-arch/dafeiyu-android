@@ -14,7 +14,7 @@
       "path": ".github/workflows/check.yml",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "fc49453813d48e76196afd084cd26b1cb1ea97b49f85e2884118d0de9b5fef31"
+      "sha256": "32288b575ed119a69d737955f8c1eefec219c89fcf7bcdab6aca5eb95147b3d0"
     },
     {
       "path": ".gitignore",
@@ -68,7 +68,7 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "fa6b604d8889b53c8f2093075836a76cca66e1c5308f2dfddddb6e36e230d0bd",
+      "sha256": "cba20cc5cdb8e34bafa9feb7ec6318c67880be4faccb3a43a7cb338de4619938",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
@@ -1982,7 +1982,7 @@
       "path": "tests/compile-check.sh",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "d2c81e1535e8f2ced08d3c1973b18f1ad7eb0c620cc83d7580ded82a83d49f6d"
+      "sha256": "b0599f8e99e76347bded7f44e3169321b15803e2db599673ecf1a6b9faa6a02b"
     },
     {
       "path": "tests/robolectric/README.md",
@@ -2054,7 +2054,7 @@
       "path": "tests/run-core.sh",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "6c6b2e05ad782c4d9ecc6f5d2bd5ceedcb4523b7926cb9d3408ff6610df03d4e"
+      "sha256": "f58ee242028288feef1a3368c083be663f698e6b8250af23d3e8cb962590a29a"
     },
     {
       "path": "tools/sync-memory-service.py",

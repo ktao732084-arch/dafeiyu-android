@@ -66,7 +66,7 @@ JVM 核心检查使用 `org.json:json:20240303`（只用于测试，不进入 AP
 ./tests/run-core.ps1 -Jdk 'C:/Program Files/Java/jdk-17' -JsonJar 'D:/test-libs/json.jar'
 ```
 
-Linux/macOS：`tests/run-core.sh path/to/json.jar`。另有 `tests/compile-check.sh path/to/android-all.jar`，用 Maven Central 上 Robolectric 的 Android 14 框架类编译全部源码，无需 Android SDK；它只检查 Java/API 编译，不生成 APK。GitHub Actions（`.github/workflows/check.yml`）在每次推送时运行这两项。
+Linux/macOS：`tests/run-core.sh path/to/json.jar path/to/android-all.jar`。它先用 Maven Central 上 Robolectric 的 Android 14 框架类以 Java 8 级别编译全部源码（`tests/compile-check.sh`，无需 Android SDK，不生成 APK），再像 Windows 脚本一样对产品类运行核心检查。GitHub Actions（`.github/workflows/check.yml`）每次推送时运行它，并运行记忆服务的 Python 测试、核对84场景结果与 `protocol-baseline.json` 一致。
 
 Android 运行时端到端测试放在 `instrumentation/`，使用受控模型验证真实 Android Handler、Keystore、记忆和调度；不冒充真实云模型测试。先构建主 APK，再运行 `instrumentation/build-tests.ps1`，用 adb 安装主 APK 和测试 APK，然后：
 

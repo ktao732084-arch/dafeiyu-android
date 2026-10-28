@@ -10,5 +10,5 @@ rm -rf "$out" && mkdir -p "$out/stub/com/dafeiyu/companion" "$out/classes"
 # aapt2 normally generates R; a stub with the referenced style ids is enough for javac.
 styles=$(grep -oh 'com\.dafeiyu\.companion\.R\.style\.[A-Za-z_]*' "$root"/src/com/xiaoxiao/pet/*.java | sed 's/.*\.//' | sort -u | awk '{printf "%s%s=%d", (NR>1?",":""), $0, NR}')
 printf 'package com.dafeiyu.companion;\npublic final class R { public static final class style { public static final int %s; } }\n' "$styles" > "$out/stub/com/dafeiyu/companion/R.java"
-javac -encoding UTF-8 --release 17 -nowarn -cp "$android" -d "$out/classes" "$out/stub/com/dafeiyu/companion/R.java" "$root"/src/com/xiaoxiao/pet/*.java
-echo "PASS: app sources compile against Android 14"
+javac -encoding UTF-8 --release 8 -nowarn -cp "$android" -d "$out/classes" "$out/stub/com/dafeiyu/companion/R.java" "$root"/src/com/xiaoxiao/pet/*.java
+echo "PASS: app sources compile against Android 14 at Java 8 level"
