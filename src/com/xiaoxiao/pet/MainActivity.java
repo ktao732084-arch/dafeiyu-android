@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
   boolean visible=PetService.instance!=null&&PetService.instance.pets.get("main")!=null&&PetService.instance.pets.get("main").visible;
   button(hero,visible?"收起桌宠":"让她住到屏幕上",v->{send(visible?"hideAll":"show","main");handler.postDelayed(this::render,300);});
   if(!Settings.canDrawOverlays(this))content.addView(PermissionsPanel.hint(this));
-  LinearLayout connection=panel();connection.addView(Apple.label(this,AgentRuntime.configured()?"模型已配置":"先接通她的声音",18,true));TextView hint=text(AgentRuntime.configured()?"聊天内容会发往你设置的模型服务商。":"填写你自己的模型接口和 Key，就能开始 AI 对话。",13);hint.setTextColor(Apple.SECONDARY);hint.setPadding(0,dp(8),0,dp(4));connection.addView(hint);button(connection,"模型连接",v->Chat.settings(this));
+  LinearLayout connection=panel();connection.addView(Apple.label(this,AgentRuntime.configured()?"模型已配置":"先接通她的声音",18,true));TextView hint=text(AgentRuntime.configured()?"聊天内容会发往你设置的模型服务商。":"推荐 DeepSeek：去官网获取 API Key，粘贴后就能连接。",13);hint.setTextColor(Apple.SECONDARY);hint.setPadding(0,dp(8),0,dp(4));connection.addView(hint);button(connection,"模型连接",v->Chat.settings(this));
   LinearLayout life=panel();life.addView(Apple.label(this,"我们的日常",18,true));button(life,"记忆手账",v->AgentPanel.memories(this));button(life,PersonaManager.isInitialized("main")?"她的性格 · "+PersonaManager.label("main"):"初次相遇 · 确定性格",v->PersonaPanel.show(this,"main"));button(life,"名字与称呼",v->ProfilePage.show(this,"main"));button(life,"陪伴设置",v->AgentPanel.settings(this));button(life,"动作和大小",v->manage());
   TextView footer=text("独立安卓 AI 桌宠 · 体验版 0.2.0\n非官方社区二创 · 本地保存记忆",12);footer.setTextColor(Apple.SECONDARY);footer.setGravity(Gravity.CENTER);footer.setPadding(0,dp(26),0,0);content.addView(footer);button(content,"关于与开源来源",v->about());
  }

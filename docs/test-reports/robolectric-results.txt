@@ -1,4 +1,4 @@
-Android 14/API34 Robolectric: 44 passed (37 existing + 7 merge integration scenarios).
+Android 14/API34 Robolectric: 52 passed; includes 8 one-key model setup scenarios.
 PASS com.xiaoxiao.pet.UiTest.manualPersonaOnboardingAndReadOnlyUI
 PASS com.xiaoxiao.pet.UiTest.chatUIRunsPromptRecallStreamingAndCommitsControlledModelReply
 PASS com.xiaoxiao.pet.UiTest.openingManualChatInterruptsPendingProactiveRequest
@@ -43,3 +43,11 @@ PASS com.xiaoxiao.pet.CompanionBehaviorTest.clearSelfInvalidatesInFlightTurnAndP
 PASS com.xiaoxiao.pet.CompanionBehaviorTest.chatWakesVisibleSleepingPetAndReachesPrompt
 PASS com.xiaoxiao.pet.CompanionBehaviorTest.filteredStreamIsRejectedEvenWhenDoneMarkerFollows
 PASS com.xiaoxiao.pet.CompanionBehaviorTest.screenAndKeyguardGateAnimationWithoutPretendingToBeInteraction
+PASS com.xiaoxiao.pet.ModelSetupTest.legacyCustomConfigurationIsNotReplacedByPreset
+PASS com.xiaoxiao.pet.ModelSetupTest.providerSwitchNeverReusesOtherProvidersSavedOrTypedKey
+PASS com.xiaoxiao.pet.ModelSetupTest.pastedKeyTestsThenSavesPresetAtomically
+PASS com.xiaoxiao.pet.ModelSetupTest.failedConnectionKeepsPreviousConfigAndMasksEnteredKey
+PASS com.xiaoxiao.pet.ModelSetupTest.timeoutAllowsRetryButCannotSaveLateResult
+PASS com.xiaoxiao.pet.ModelSetupTest.firstRunOnlyShowsKeyAndOfficialLinks
+PASS com.xiaoxiao.pet.ModelSetupTest.closingDuringProbePreventsLateSave
+PASS com.xiaoxiao.pet.ModelSetupTest.flashDisablesThinkingWithoutChangingOtherProviders

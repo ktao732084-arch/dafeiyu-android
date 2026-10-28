@@ -30,9 +30,9 @@ final class AgentTransport {
             else con.setRequestProperty("Authorization","Bearer "+secret);
             boolean stream=streaming;
             JSONObject payload=new JSONObject().put("model",model).put("messages",messages).put("stream",stream).put("max_tokens",thinking?Math.max(maxTokens,8192):maxTokens);
-            if("api.xiaomimimo.com".equals(url.getHost()))payload.put("thinking",new JSONObject().put("type","disabled"));
+            ModelPresets.apply(url.getHost(),model,payload);
             try(OutputStream out=con.getOutputStream()){out.write(payload.toString().getBytes(StandardCharsets.UTF_8));}
-            int code=con.getResponseCode();if(code<200||code>=300)throw new IOException("模型返回 HTTP "+code+errorDetail(con.getErrorStream(),secret)+"。请检查接口、模型名称、Key 和额度；若接口不支持流式，可在陪伴设置关闭。");
+            int code=con.getResponseCode();if(code<200||code>=300)throw new IOException("模型返回 HTTP "+code+errorDetail(con.getErrorStream(),secret)+"。"+ModelPresets.httpError(code));
             String type=con.getContentType();
             if(type!=null&&type.toLowerCase(java.util.Locale.ROOT).contains("text/event-stream")) {
                 StringBuilder answer=new StringBuilder();long start=System.currentTimeMillis();long last=0;boolean ended=false;int received=0;
