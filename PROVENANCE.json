@@ -17,6 +17,12 @@
       "sha256": "f2da222401c2c8515b06120c4d0215ea2ed62de1fa0ec710988fb54f8ec28412"
     },
     {
+      "path": "AGENTS.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "4c44c18871741b8abe7debc451220cb665c6241b473cd1e834ddd10bbda219f5"
+    },
+    {
       "path": "ASSET_LICENSE.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -62,7 +68,7 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "9d7f11193bd7163de605db0fceca6b6f80784fb14e2af8a89d6d22779f8453a8",
+      "sha256": "871894b51dd603e11a442f0c1a1741955c5b3a94209f5e6bc46e13605dbdc866",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {

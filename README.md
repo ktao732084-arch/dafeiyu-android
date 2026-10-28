@@ -2,6 +2,8 @@
 
 [下载 APK](https://github.com/ktao732084-arch/dafeiyu-android/releases/tag/v0.4.0) · [来源清单](SOURCE_MAP.md) · [逐文件溯源](PROVENANCE.json) · [验证记录](VALIDATION.md)
 
+版本号与发布节奏遵循根目录的 [项目协作约定](AGENTS.md)。
+
 记忆引擎已移植为安卓原生代码并打进 APK。存储、过滤、时间解析、去重、更正、归档和检索都由手机进程执行，默认启用；不需要电脑、Python 服务或 ADB。
 
 模型辅助理解直接复用手机「模型连接」里已有的接口、模型和 Key。它用于理解同义表达、隐含变化与相关记忆，每轮可能增加模型请求；没有模型或网络时继续使用本机规则。这里没有内置一个离线大语言模型。
