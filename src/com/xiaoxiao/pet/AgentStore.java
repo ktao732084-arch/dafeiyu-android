@@ -15,6 +15,8 @@ final class AgentStore {
     private final File file;
     private final ChatArchive transcript;
     private JSONObject state;
+    // Whole-conversation recall index; built on first use from the archive and recent turns, then kept in step.
+    private EpisodeIndex episodes;
     AgentStore(File dir) throws Exception {
         if(!dir.exists()&&!dir.mkdirs())throw new IOException("无法创建记忆目录");
         file=new File(dir,"companion-v1.json");transcript=new ChatArchive(dir);
@@ -102,18 +104,20 @@ final class AgentStore {
             if(!remember||proactive)throw new IOException("当前不能写入记忆");
             if(explicit.trim().isEmpty()||explicit.length()>240||!user.contains(explicit))throw new IOException("记忆请填写 1–240 个字");
             if(AgentPolicy.sensitive(explicit))throw new IOException("请不要把密码、密钥或证件号码保存为记忆");
-            if(plan==null){if(next.getJSONArray("memories").length()>=120)throw new IOException("记忆已满，请先删除几条");addMemory(next,explicit,tid,true,now);}
+            if(plan==null){if(next.getJSONArray("memories").length()>=MemoryLedger.MAX_ACTIVE)throw new IOException("记忆已满，请先删除几条");addMemory(next,explicit,tid,true,now);}
         }
         JSONArray turns=next.getJSONArray("turns");
         // Presentation may advance while the model works on an older memory snapshot.
         JSONArray live=state.getJSONArray("turns");Map<String,JSONObject> presentation=new HashMap<>();for(int i=0;i<live.length();i++)presentation.put(ChatArchive.id(live.getJSONObject(i)),live.getJSONObject(i));
         for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i),current=presentation.get(ChatArchive.id(t));if(current!=null)for(String field:new String[]{"displayed","displayedAt","lastDisplayedAt","segmentDisplayedAt","displayTimeZone"})if(current.has(field))t.put(field,current.get(field));}
         JSONArray pendingSelf=next.optJSONArray("self"),liveSelf=state.optJSONArray("self");if(pendingSelf!=null&&liveSelf!=null)for(int i=0;i<pendingSelf.length();i++)for(int j=0;j<liveSelf.length();j++){JSONObject pending=pendingSelf.getJSONObject(i),current=liveSelf.getJSONObject(j);if(pending.optString("source").equals(current.optString("source"))&&pending.optString("text").equals(current.optString("text"))&&current.optBoolean("shown",true))pending.put("shown",true);}
+        // The diary is written beside chat by its own thread; the live state's copy is the current one.
+        if(state.has("diary"))next.put("diary",state.getJSONArray("diary"));else next.remove("diary");
         // Lifetime counters: turnCount anchors the prompt's history window, the others the relationship stage.
         next.put("turnCount",next.optInt("turnCount",turns.length())+1);
         java.time.ZoneId zone=java.time.ZoneId.systemDefault();
         JSONObject turn=new JSONObject().put("id",tid).put("at",now).put("receivedAt",now).put("repliedAt",System.currentTimeMillis()).put("timeZone",zone.getId()).put("utcOffsetMinutes",zone.getRules().getOffset(java.time.Instant.ofEpochMilli(now)).getTotalSeconds()/60).put("user",user).put("reply",reply).put("proactive",proactive);
-        if(awaitingDisplay)turn.put("displayed",0);turns.put(turn);
+        if(awaitingDisplay)turn.put("displayed",0);turns.put(turn);final JSONObject added=turn;
         while(turns.length()>160)turns.remove(0);
         next.put("emotion",AgentPolicy.emotion(emotion)).put("emotionAt",now);
         if(!proactive){
@@ -125,7 +129,7 @@ final class AgentStore {
         if(plan==null&&remember&&!proactive&&quotes!=null)for(int i=0;i<Math.min(3,quotes.length());i++) {
             String quote=quotes.optString(i,"");if(AgentPolicy.validEvidence(user,quote))addMemory(next,quote,tid,false,now);
         }
-        save(next);return true;
+        save(next);if(episodes!=null)episodes.add(added);return true;
     }
     static final int MAX_SELF=40;
     /** What she has said about herself, verbatim from her replies, so she stays consistent ("我最爱吃小鱼干"). */
@@ -158,32 +162,60 @@ final class AgentStore {
     synchronized void remember(String text,boolean pinned)throws Exception {
         if(text.trim().isEmpty()||text.length()>240)throw new IOException("记忆请填写 1–240 个字");
         if(AgentPolicy.sensitive(text))throw new IOException("请不要把密码、密钥或证件号码保存为记忆");
-        JSONObject next=snapshot();if(next.getJSONArray("memories").length()>=120)throw new IOException("记忆已满，请先删除几条");
+        JSONObject next=snapshot();if(next.getJSONArray("memories").length()>=MemoryLedger.MAX_ACTIVE)throw new IOException("记忆已满，请先删除几条");
         addMemory(next,text.trim(),"你手动保存",pinned,System.currentTimeMillis());next.put("epoch",epoch()+1);save(next);
     }
     synchronized void editMemory(String id,String text,boolean pinned)throws Exception {
         if(text.trim().isEmpty()||text.length()>240||AgentPolicy.sensitive(text))throw new IOException("请填写 1–240 字，不含密码或证件号码");
-        JSONObject next=snapshot();transcript.forget(MemoryLedger.forget(next,id));MemoryLedger.addLocal(next,MemoryLedger.record(id,text.trim(),"你手动修改",pinned,System.currentTimeMillis()));
+        JSONObject next=snapshot();Set<String> removed=MemoryLedger.forget(next,id);transcript.forget(removed);if(episodes!=null)episodes.remove(removed);Diary.dropSources(next,removed);MemoryLedger.addLocal(next,MemoryLedger.record(id,text.trim(),"你手动修改",pinned,System.currentTimeMillis()));
         next.put("epoch",epoch()+1);save(next,false);purgeBackup();
     }
     private static void removeSourceTurn(JSONObject next,String source)throws Exception {
         JSONArray turns=next.getJSONArray("turns");for(int j=turns.length()-1;j>=0;j--)if(source.equals(turns.getJSONObject(j).optString("id")))turns.remove(j);
     }
     synchronized void forget(String id)throws Exception {
-        JSONObject next=snapshot();transcript.forget(MemoryLedger.forget(next,id));
+        JSONObject next=snapshot();Set<String> removed=MemoryLedger.forget(next,id);transcript.forget(removed);if(episodes!=null)episodes.remove(removed);Diary.dropSources(next,removed);
         next.put("epoch",epoch()+1);save(next,false);purgeBackup();
     }
     synchronized void clear(boolean all)throws Exception {
-        transcript.clear(state.getJSONArray("turns"));
-        JSONObject next=all?empty(epoch()+1):snapshot().put("turns",new JSONArray()).put("epoch",epoch()+1);
+        transcript.clear(state.getJSONArray("turns"));if(episodes!=null)episodes.clear();
+        // The diary is made from chats, so clearing chats clears it too.
+        JSONObject next=all?empty(epoch()+1):snapshot().put("turns",new JSONArray()).put("diary",new JSONArray()).put("epoch",epoch()+1);
         MemoryLedger.migrate(next);save(next,false);purgeBackup();
     }
     synchronized JSONArray historyPage(String before,int limit)throws Exception {return transcript.page(state.getJSONArray("turns"),before,Math.max(1,Math.min(limit,40)));}
     synchronized JSONArray historyRange(long fromInclusive,long toExclusive,String before,int limit)throws Exception {return transcript.page(state.getJSONArray("turns"),before,Math.max(1,Math.min(limit,40)),fromInclusive,toExclusive);}
     synchronized void shown(String id,int count)throws Exception {
         if(id==null||transcript.deleted(id))return;JSONObject next=snapshot();JSONArray turns=next.getJSONArray("turns");
-        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(id.equals(ChatArchive.id(t))){int n=Math.min(count,ReplySegments.count(t));if(t.has("displayed")&&n>t.optInt("displayed")){ChatArchive.markShown(t,n);JSONArray self=next.optJSONArray("self");if(self!=null)for(int j=0;j<self.length();j++){JSONObject row=self.getJSONObject(j);if(id.equals(row.optString("source"))&&ReplySegments.visible(t).contains(row.optString("text")))row.put("shown",true);}save(next,false);}return;}}
+        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(id.equals(ChatArchive.id(t))){int n=Math.min(count,ReplySegments.count(t));if(t.has("displayed")&&n>t.optInt("displayed")){ChatArchive.markShown(t,n);if(episodes!=null)episodes.update(t);JSONArray self=next.optJSONArray("self");if(self!=null)for(int j=0;j<self.length();j++){JSONObject row=self.getJSONObject(j);if(id.equals(row.optString("source"))&&ReplySegments.visible(t).contains(row.optString("text")))row.put("shown",true);}save(next,false);}return;}}
         transcript.shown(id,count);
+    }
+    private EpisodeIndex index()throws Exception {
+        if(episodes!=null)return episodes;EpisodeIndex built=new EpisodeIndex();
+        for(File f:transcript.files()){try{JSONObject t=transcript.read(f);if(!transcript.deleted(ChatArchive.id(t)))built.add(t);}catch(Exception unreadable){/* one damaged file must not hide the rest */}}
+        JSONArray turns=state.getJSONArray("turns");for(int i=0;i<turns.length();i++)built.add(turns.getJSONObject(i));
+        return episodes=built;
+    }
+    /** All turns of one local day, recent and archived, oldest first (at most 120), for the diary. */
+    synchronized List<JSONObject> dayTurns(java.time.LocalDate day,java.time.ZoneId zone)throws Exception {
+        long from=day.atStartOfDay(zone).toInstant().toEpochMilli(),to=day.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli();
+        List<JSONObject> out=new ArrayList<>();String before=null;
+        while(out.size()<120){JSONArray page=transcript.page(state.getJSONArray("turns"),before,40,from,to);if(page.length()==0)break;
+            for(int i=page.length()-1;i>=0;i--)out.add(page.getJSONObject(i));before=page.getJSONObject(0).getString("pageKey");if(page.length()<40)break;}
+        Collections.reverse(out);return out;
+    }
+    /** Stores a diary entry unless memories or chats changed while it was written (epoch) or a source was deleted. */
+    synchronized boolean addDiary(long writtenAtEpoch,JSONObject entry)throws Exception {
+        if(writtenAtEpoch!=epoch())return false;JSONArray sources=entry.optJSONArray("sources");
+        if(sources!=null)for(int i=0;i<sources.length();i++)if(transcript.deleted(sources.optString(i)))return false;
+        JSONObject next=snapshot();if(!Diary.add(next,entry))return false;save(next);return true;
+    }
+    synchronized void clearDiary()throws Exception {JSONObject next=snapshot();next.put("diary",new JSONArray());save(next,false);purgeBackup();}
+    /** Builds the recall index off the chat path (a background thread at store open), so the first reply does not wait. */
+    synchronized void warm(){try{index();}catch(Exception unavailable){/* built on first use instead */}}
+    /** Past exchanges relevant to this message from the whole conversation; see EpisodeIndex. */
+    synchronized JSONArray episodes(String query,Set<String> exclude,long now)throws Exception {
+        return EpisodeIndex.describe(index().search(query,exclude,now,EpisodeIndex.LIMIT));
     }
     private void purgeBackup()throws Exception {Files.deleteIfExists(new File(file+".bak").toPath());}
     synchronized void reserveAttempt(String day,long now)throws Exception {
