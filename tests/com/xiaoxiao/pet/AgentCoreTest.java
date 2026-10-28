@@ -147,6 +147,21 @@ public final class AgentCoreTest {
   check(PromptBuilder.build(in,"",true,chat,null).toString().contains("主动陪伴事件")&&!PromptBuilder.build(in,"",true,chat,null).getJSONObject(1).getString("role").equals("system"),"proactive request uses a user-role event");
   for(int i=0;i<4;i++)hist.put(new JSONObject().put("id","d"+i).put("at",20000L+i).put("user","嗯").put("reply","才不是呢（扭头），我只是路过"+i+"。").put("proactive",false));chat.put("turnCount",19);
   check(PromptBuilder.build(in,"你好",false,chat,null).toString().contains("风格提醒"),"drift reminder reaches the prompt");
+  // Follow-ups on dated plans, using the dates the native engine writes.
+  java.time.ZoneId zone=java.time.ZoneId.systemDefault();java.time.LocalDate obs=java.time.LocalDate.of(2026,10,28);
+  long spoke=obs.atTime(20,0).atZone(zone).toInstant().toEpochMilli();
+  JSONObject plan=NativeMemoryEngine.evaluate(MemoryLedger.copy(AgentStore.empty(0)),new JSONArray().put(MemoryLedger.record("exam","我明天有面试","t1",false,spoke)).put(MemoryLedger.record("blue","我喜欢蓝色","t2",false,spoke)),"",spoke,zone,null,new AgentTransport.Token()).state;
+  check("2026-10-29".equals(NativeMemoryEngine.find(plan,"exam").getJSONObject("engine").optString("event_date")),"native engine dates the interview");
+  check(MemoryLedger.dueEvents(plan,obs).length()==1&&"明天".equals(MemoryLedger.dueEvents(plan,obs).getJSONObject(0).getString("when")),"the interview is tomorrow's plan");
+  check(MemoryLedger.followUps(plan,obs).length()==0&&MemoryLedger.followUps(plan,obs.plusDays(1)).length()==1&&MemoryLedger.followUps(plan,obs.plusDays(2)).length()==1&&MemoryLedger.followUps(plan,obs.plusDays(3)).length()==0,"follow up on the day and the day after only");
+  long dayAfter=obs.plusDays(2).atTime(9,0).atZone(zone).toInstant().toEpochMilli();
+  JSONObject later=NativeMemoryEngine.evaluate(plan,new JSONArray(),"",dayAfter,zone,null,new AgentTransport.Token()).state;
+  check(MemoryLedger.followUps(later,obs.plusDays(2)).length()==1&&later.getJSONArray("archive").length()==1,"still asked about after the plan expired into the archive");
+  AgentStore follow=new AgentStore(new File(root,"follow"));follow.markFollowed(MemoryLedger.followUps(plan,obs.plusDays(1)));JSONObject fs=follow.snapshot();fs.put("memories",plan.getJSONArray("memories"));
+  check(MemoryLedger.followUps(fs,obs.plusDays(1)).length()==0,"asked once, not again");
+  PromptBuilder.Inputs fin=new PromptBuilder.Inputs();fin.persona="你是大肥鱼。";fin.timeZone="Asia/Shanghai";fin.remember=true;fin.now=spoke+86_400_000L;
+  check(PromptBuilder.build(fin,"",true,plan,null).toString().contains("今天：我明天（2026-10-29）有面试")&&PromptBuilder.build(fin,"早",false,plan,null).toString().contains("近期安排"),"proactive turn may ask how it went; chat knows the schedule");
+  fin.remember=false;check(!PromptBuilder.build(fin,"",true,plan,null).toString().contains("面试"),"memory off: no follow-up");
   System.out.println("PASS: "+checks+" core checks");
  }
 }

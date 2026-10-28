@@ -143,6 +143,11 @@ final class AgentStore {
         for(int i=0;i<Math.min(8,rows.size());i++)out.put(rows.get(i).optString("text"));
         return out;
     }
+    /** Due events a proactive turn has already offered, so she asks about each one once. */
+    synchronized void markFollowed(JSONArray events)throws Exception {
+        if(events==null||events.length()==0)return;JSONObject next=snapshot();JSONArray f=next.optJSONArray("followedUp");if(f==null)next.put("followedUp",f=new JSONArray());
+        for(int i=0;i<events.length();i++)f.put(events.getJSONObject(i).optString("id"));while(f.length()>50)f.remove(0);save(next);
+    }
     synchronized void clearSelf()throws Exception {JSONObject next=snapshot();next.put("self",new JSONArray()).put("epoch",epoch()+1);save(next);purgeBackup();}
     private static void addMemory(JSONObject next,String text,String source,boolean pinned,long now)throws Exception {
         NativeMemoryEngine.writeRules(next,MemoryLedger.record(UUID.randomUUID().toString(),text,source,pinned,now),now,java.time.ZoneId.systemDefault());

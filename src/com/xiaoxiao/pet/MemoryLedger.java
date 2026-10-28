@@ -42,6 +42,24 @@ final class MemoryLedger {
         if(a.length()>=MAX_ACTIVE){int remove=-1;for(int i=0;i<a.length();i++)if(!a.getJSONObject(i).optBoolean("pinned")){remove=i;break;}if(remove<0)throw new java.io.IOException("记忆已满，请先删除几条");a.remove(remove);}
         a.put(record);event(s,"ADD",record.optString("id"),record.optLong("at"));s.put("vector_cache",new JSONObject());
     }
+    /** Dated things from yesterday to tomorrow, active or expired (not corrected), for her to keep in mind or ask about. */
+    static JSONArray dueEvents(JSONObject s,LocalDate today)throws Exception {
+        JSONArray out=new JSONArray();
+        for(String pool:new String[]{"memories","archive"}){JSONArray rows=s.optJSONArray(pool);if(rows==null)continue;for(int i=0;i<rows.length();i++){
+            JSONObject r=rows.getJSONObject(i),e=r.optJSONObject("engine");if(e==null||e.optString("event_date").isEmpty()||"superseded".equals(e.optString("archived_reason")))continue;
+            LocalDate day;try{day=LocalDate.parse(e.optString("event_date"));}catch(Exception bad){continue;}
+            long offset=java.time.temporal.ChronoUnit.DAYS.between(today,day);if(offset<-1||offset>1)continue;
+            out.put(new JSONObject().put("id",r.optString("id")).put("quote",e.optString("content",r.optString("text"))).put("when",offset<0?"昨天":offset==0?"今天":"明天"));
+        }}
+        return out;
+    }
+    /** Due events from today or yesterday she has not asked about yet; a proactive turn may follow up on one. */
+    static JSONArray followUps(JSONObject s,LocalDate today)throws Exception {
+        JSONArray due=dueEvents(s,today),out=new JSONArray();Set<String> done=new HashSet<>();JSONArray f=s.optJSONArray("followedUp");
+        if(f!=null)for(int i=0;i<f.length();i++)done.add(f.optString(i));
+        for(int i=0;i<due.length();i++){JSONObject d=due.getJSONObject(i);if(!"明天".equals(d.optString("when"))&&!done.contains(d.optString("id")))out.put(d);}
+        return out;
+    }
     static JSONArray candidates(String user,JSONArray quotes,String explicit,String turn,long now)throws Exception {
         JSONArray a=new JSONArray();if(explicit!=null){if(explicit.trim().isEmpty()||explicit.length()>240||!user.contains(explicit)||AgentPolicy.sensitive(explicit))throw new java.io.IOException("请填写 1–240 字，不含密码或证件号码");a.put(record(UUID.randomUUID().toString(),explicit,turn,true,now));}
         else if(quotes!=null)for(int i=0;i<Math.min(3,quotes.length());i++){String q=quotes.optString(i,"");if(AgentPolicy.validEvidence(user,q))a.put(record(UUID.randomUUID().toString(),q,turn,false,now));}return a;
