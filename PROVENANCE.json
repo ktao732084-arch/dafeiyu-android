@@ -14,7 +14,7 @@
       "path": ".github/workflows/check.yml",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "8ce0cd180a2baf55ce452112fcd30f980172397b8035bd1c1d4e262da6d775f7"
+      "sha256": "fc49453813d48e76196afd084cd26b1cb1ea97b49f85e2884118d0de9b5fef31"
     },
     {
       "path": ".gitignore",
