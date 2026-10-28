@@ -27,7 +27,7 @@ final class AgentStore {
         } else if(new File(file+".bak").exists()){
             state=read(new File(file+".bak"));state.put("recovered",true);save(state);
         } else state=empty(0);
-        MemoryLedger.migrate(state);MemoryLedger.expire(state,System.currentTimeMillis());
+        NativeMemoryEngine.prepare(state,System.currentTimeMillis(),java.time.ZoneId.systemDefault());
         if(state.toString().getBytes(StandardCharsets.UTF_8).length>MAX_FILE_BYTES)save(state);
     }
     static JSONObject empty(long epoch)throws Exception {
@@ -99,7 +99,7 @@ final class AgentStore {
         save(next);return true;
     }
     private static void addMemory(JSONObject next,String text,String source,boolean pinned,long now)throws Exception {
-        MemoryLedger.addLocal(next,MemoryLedger.record(UUID.randomUUID().toString(),text,source,pinned,now));
+        NativeMemoryEngine.writeRules(next,MemoryLedger.record(UUID.randomUUID().toString(),text,source,pinned,now),now,java.time.ZoneId.systemDefault());
     }
     synchronized void remember(String text)throws Exception {
         remember(text,true);

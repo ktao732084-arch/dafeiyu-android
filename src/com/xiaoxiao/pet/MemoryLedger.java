@@ -19,7 +19,7 @@ final class MemoryLedger {
     }
     static JSONArray sources(JSONObject r){JSONArray a=r.optJSONArray("sources");return a==null?new JSONArray().put(r.optString("source")):a;}
     static long timestamp(String value){try{return OffsetDateTime.parse(value).toInstant().toEpochMilli();}catch(Exception e){return 0;}}
-    static boolean current(JSONObject r,long now){JSONObject e=r.optJSONObject("engine");if(e==null)return true;long expires=timestamp(e.optString("expires_at"));return e.optString("invalid_at").isEmpty()&&!e.optBoolean("conflict_downgraded")&&(expires==0||expires>now);}
+    static boolean current(JSONObject r,long now){JSONObject e=r.optJSONObject("engine");if(e==null)return true;long expires=timestamp(e.optString("expires_at"));return (e.isNull("invalid_at")||e.optString("invalid_at").isEmpty())&&!e.optBoolean("conflict_downgraded")&&(expires==0||expires>now);}
     static void event(JSONObject state,String op,String id,long now)throws Exception {
         JSONArray a=state.getJSONArray("audit");a.put(new JSONObject().put("op",op).put("id",id).put("at",now));while(a.length()>MAX_AUDIT)a.remove(0);
     }

@@ -1,92 +1,55 @@
-# 大肥鱼 · 独立安卓陪伴版 0.3.0
-[下载 0.3.0 体验 APK](https://github.com/ktao732084-arch/dafeiyu-android/releases/tag/v0.3.0) · [逐模块来源](SOURCE_MAP.md) · [逐文件溯源](PROVENANCE.json) · [验证记录](VALIDATION.md)
+# 大肥鱼 · 手机内置记忆版 0.4.0
 
-> 这是基于社区项目整合的独立安卓版，不是全部从零原创，也不是 DeepSeek 官方产品。代码和第三方素材采用不同许可：代码见 [LICENSE](LICENSE)，动画与角色资源见 [ASSET_LICENSE.md](ASSET_LICENSE.md)。当前仅供非商业体验。
+[下载 APK](https://github.com/ktao732084-arch/dafeiyu-android/releases/tag/v0.4.0) · [来源清单](SOURCE_MAP.md) · [逐文件溯源](PROVENANCE.json) · [验证记录](VALIDATION.md)
 
-> 新增完整记忆服务接入与双项目共享评测；测试结果及已知不足见验证记录。尚未完成真机/完整模拟器安装、悬浮动画、系统 Keystore 或真实模型接口验收。具体边界见 [VALIDATION.md](VALIDATION.md)。
+记忆引擎已移植为安卓原生代码并打进 APK。存储、过滤、时间解析、去重、更正、归档和检索都由手机进程执行，默认启用；不需要电脑、Python 服务或 ADB。
 
-基于小小桌宠 Android 源码的非商业体验版本。基础聊天与本地原话记忆可直接连接自己配置的模型接口，无需 DSH。完整拟人记忆通过你自己的 Python 服务接入，需保持该服务可达；[一键启动与手机连接说明](memory-service/README.md)。
+模型辅助理解直接复用手机「模型连接」里已有的接口、模型和 Key。它用于理解同义表达、隐含变化与相关记忆，每轮可能增加模型请求；没有模型或网络时继续使用本机规则。这里没有内置一个离线大语言模型。
 
-## 安装体验
+本项目基于小小桌宠和社区大肥鱼项目整合，不是 DeepSeek 官方产品。代码采用 MIT；角色动画等第三方资源保留非商业约束，见 [ASSET_LICENSE.md](ASSET_LICENSE.md)。
 
-1. 在 Android 8.0 或更新版本的手机打开 `dafeiyu-android-0.3.0.apk`，按系统提示允许来自该来源的安装。
-2. 首次打开「大肥鱼」，从5种初始性格中手动选一种，或选择「交给缘分」随机抽取一次。确认后固定，后期不提供重选或编辑人格入口。随后点「模型连接」，填写 HTTPS OpenAI Chat Completions 兼容接口、模型名称和自己的 API Key，测试连接后保存。测试连接也会产生一次模型请求。
-3. 点「和她聊聊」可在应用内对话，不需要先授予悬浮权限。
-4. 点「让她住到屏幕上」，按提示允许显示在其他应用上层和通知，再回到应用点击开启。离开主界面后宠物显示。
-5. 轻触有动作反馈；拖动可移动，快速甩动会弹跳；长按打开对话、动作和大小菜单。拖到屏幕边缘可以收起。
+## 安装与使用
 
-首次可试：`记住：我喜欢下雨天。` → 打开「记忆手账」查看 → 重新打开 App 后再询问。显式记忆命令不用联网；普通 AI 聊天需要模型接口。未配置模型时会明确提示，不用预设台词冒充模型回复。
+1. 在 Android 8.0+ 安装 `dafeiyu-android-0.4.0.apk`。与0.2/0.3沿用同一体验签名，可覆盖安装保留数据。
+2. 初次相遇时，手动选择一种性格或随机一次。确认后固定，后期没有重选人格入口。
+3. 「模型连接」填写自己的 HTTPS Chat Completions 兼容接口、模型名称和 Key，即可聊天。模型测试与聊天会使用自己的额度。
+4. 「记忆手账」查看、编辑、固定或忘记记忆；「共同经历与记忆变化」查看历史。无需额外设置记忆服务器。
+5. 可先不配置模型，用 `记住：我喜欢海边散步` 测试手机本地记忆。时间解析、明确更正和归档离线可用。
+6. 想悬浮显示时，开启显示在其他应用上层和通知权限，再点「让她住到屏幕上」。
 
-升级0.1版时，已有聊天/记忆或自定义人设会沿用并冻结原人格，不强行重选。清空聊天或手账不改变已确定的性格。
+从0.3升级时，旧电脑服务地址不会自动激活。手机内置引擎是默认运行路径；人格与已保存的记忆保持原有数据。
 
-## 运行时
+## 手机端能力
 
-- **人格**：默认人设改编自 MIT 的 dafeiyu-persona，提供经典傲娇、温柔陪伴、元气搭子、冷静可靠、古灵精怪5种本版新增风格；只在初次相遇手选或随机一次，冻结完整人设，之后只能改名字与称呼；口吻自然，不虚构实际权限或经历。
-- **一轮执行**：真实用户/定时事件 → 近期对话与相关记忆 → 模型请求 → 校验回复结构 → 原子保存 → 情绪动画与气泡。运行时不执行模型输出的任意代码或设备指令。
-- **流式输出**：只展示 JSON `reply` 字段，隐藏情绪与记忆元数据；兼容非流式、普通文本回复。支持停止、超时、HTTP 错误和截断处理，不自动重试付费请求。
-- **长期记忆**：模型仅可建议逐字摘录本轮用户原话，执行端核验来源、去重并过滤明显密钥/证件类内容；不把推测直接当事实。模型判断仍可能不准，手账可查看、编辑、固定、删除。
-- **检索与容量**：最多120条长期记忆，自动记录满额时替换最早的非固定条目；本地模式按相关度、固定标记和时效选最多10条；完整模式使用服务返回的检索结果，支持关键词与可选语义检索。保留最多160轮对话，总状态以4MiB UTF-8字节限额为准，超出时整轮淘汰最旧记录；发送最近最多8轮（合计不超过约10000字符）和最多3条相关旧对话用户原话。完整记忆模式另保留最多240条归档、512条整理事件和可复用向量缓存；不承诺无限记忆。
-- **一致性**：聊天、情绪和自动记忆一次落盘；原子替换和上一版备份；修改/清空记忆会使旧请求失效。删除记忆时同步清除关联历史版本、直接来源轮次、对应整理记录、向量缓存和备份；独立重复提及仍可通过清空全部记录去除。
-- **表现**：平静、开心、害羞、好奇、关切、俏皮和困倦七种表达映射到现有动画。情绪20分钟后回到平静；角色动画是演绎，不代表真实意识。
-- **主动互动**：默认关闭。开启后只在屏幕亮起、未锁定、宠物可见、主界面/聊天关闭时考虑；距最近对话或交互至少30分钟，请求间隔至少90分钟，每个本地日期最多3次尝试（失败也计入）。23:00–08:00、系统勿扰和手动安静时段不发起。没有适合的话题时允许保持安静。
-- **数据**：App 私有目录本地存储；关闭系统备份；Key 用 Android Keystore AES-GCM 加密。手账导出不含 Key。用户消息、选中的对话与记忆会发往用户配置的模型服务商；启用完整记忆时，记忆快照和查询还会发送给你配置的 Python 服务。聊天 Key 不转发到记忆服务，手账导出不含服务令牌；无开发者托管的中转服务器。
+- **本机运行**：`NativeMemoryEngine` / `NativeMemoryTime` / `NativeMemoryRules` 执行原生记忆处理，不启动 Python、不调用本地电脑端口。
+- **依据与时间**：保留用户原话与直接来源，解析文本另存；按说话时的日期与时区解释相对时间，事件结束后归档。
+- **变化与历史**：明确更正使旧记录失效，重复信息合并并保留来源；历史不作为当前事实，明确询问过去时才带历史标记引用。
+- **模型辅助**：`NativeMemoryIntelligence` 默认复用已有聊天模型，选择相关记忆 ID，或判断新增/重复/取代。不能自行编造记忆原文、ID或设备操作；一批判断校验通过才应用，失败退回本机规则。
+- **语义检索**：手机版默认使用当前聊天模型按含义选择记忆，不要求另配向量服务。关键词检索始终可在本机运行。Python/ONNX 向量方案保留用于可选开发对照，不是手机运行条件。
+- **一致性**：聊天、记忆和情绪原子保存。取消、修改配置或清空记忆后，迟到结果不能写回。删除记忆清理关联版本、直接来源对话、相关整理记录、缓存和备份。
+- **容量**：最多120条活跃记忆、240条历史归档、512条整理事件、160轮对话；状态以4MiB UTF-8限额控制，不承诺无限记忆。
+- **人格与表现**：5种初始化性格，7种情绪映射到动画；名字和称呼可改，冻结的人格不会被记忆判断改写。
+- **主动陪伴**：默认关闭；开启后遵守亮屏、可见、勿扰、23:00–08:00安静时间、至少30分钟间隔及每天最多3次等限制。后台被系统结束后需手动重新开启。
 
-## 完整记忆引擎
+「陪伴设置 → 记忆引擎」默认展示手机内置能力和模型辅助开关。可选的 Python 对照入口放在「开发联调」中，说明见 [memory-service/README.md](memory-service/README.md)。
 
-通过「陪伴设置 → 记忆引擎」连接 `agent-anthropomorphic-memory`。支持原话与解析时间分离、更正失效、历史归档、去重、来源追踪、可选 OpenAI 兼容 embeddings / 本地 ONNX、LLM 新增/重复/取代判断；服务失败保留本地能力。已失效来源不再进入日常上下文，明确询问过去时才提供带历史标记的记录。人格仍只在初始化确定。
+## 数据与边界
 
-完整流程、Python 配置和共享测试见 [memory-service/README.md](memory-service/README.md)。其中 ONNX 运行在服务端，不是手机端内置模型；也不自动同步你已有的其他 Agent 用户档案。
+记忆和对话保存在 App 私有目录，关闭系统备份，Key 使用 Android Keystore AES-GCM 加密。启用模型辅助时会将查询和相关记忆发给你配置的模型服务商；无开发者中转服务器。手账导出不含 Key。自行导出的文件和模型服务商的数据不由 App 删除。
 
-## 本版边界
+不包含语音、跨 App 读取、设备自动操作或人格自主训练。仍需真机安装、浮窗、视频解码、系统Keystore和耗电验收。Robolectric、离线规则评测与受控模型测试的边界见 [VALIDATION.md](VALIDATION.md)。
 
-本版包含单只大肥鱼、文字对话、可追溯记忆、情绪动作和有限主动陪伴。暂不包含语音输入/合成、联网搜索、跨 App 读取、手机自动操作、云同步、人格自主训练、工具市场或自动升级。后台被系统清理后需手动重新开启；不同厂商的悬浮和后台策略需要真机确认。
+## 构建与复现
 
-采用独立应用 ID `com.dafeiyu.companion`，不会覆盖原版小小桌宠。体验签名保存在开发工作区；源码包不含签名私钥。后续覆盖安装需保持应用 ID 和签名一致。
-
-## 构建
-
-需要 JDK 17、Android SDK Platform 34、Build Tools 36.0.0、PowerShell 7。无需 Gradle。先用 `keytool` 创建自己的签名，然后：
+JDK17、Android SDK Platform34、Build Tools36.0.0、PowerShell7；无需 Gradle。签名私钥不随源码分发：
 
 ```powershell
-$env:XIAOXIAO_STORE_PASS = '你的签名密码'
+$env:XIAOXIAO_STORE_PASS='你的签名密码'
 ./build.ps1 -Sdk 'D:/Android/Sdk' -Jdk 'C:/Program Files/Java/jdk-17' -KeyStore 'D:/Keys/fish.keystore'
-```
-
-产物：`build/dafeiyu-0.3.0.apk`。脚本仅打包 `assets/main` 与角色目录、人设；其他角色不打包。用自己的签名构建的 APK 不能直接覆盖本次体验签名版本。
-
-## 检查
-
-JVM 核心检查使用 `org.json:json:20240303`（只用于测试，不进入 APK）：
-
-```powershell
 ./tests/run-core.ps1 -Jdk 'C:/Program Files/Java/jdk-17' -JsonJar 'D:/test-libs/json.jar'
+./tests/robolectric/run-tests.ps1 -AndroidRoot '.' -Sdk 'D:/Android/Sdk' -Jdk 'C:/Program Files/Java/jdk-17'
 ```
 
-Android 运行时端到端测试放在 `instrumentation/`，使用受控模型验证真实 Android Handler、Keystore、记忆和调度；不冒充真实云模型测试。先构建主 APK，再运行 `instrumentation/build-tests.ps1`，用 adb 安装主 APK 和测试 APK，然后：
+产物为 `build/dafeiyu-0.4.0.apk`。原生规则由 `tools/generate-native-memory-rules.py` 从已固定的上游源码 AST 生成，不执行 Python 引擎；生成后的 Java 常量随 APK 编译。
 
-```powershell
-adb shell am instrument -w com.dafeiyu.companion.tests/com.xiaoxiao.pet.AgentInstrumentation
-```
-
-Android 界面与运行时测试、真实 Python HTTP 联调、84场景跨端重放的结果见 [VALIDATION.md](VALIDATION.md)。Robolectric 是 JVM Android 测试环境，不是完整模拟器；聊天模型与 Android Keystore 使用受控测试替身。原话/归档/检索的服务流程则调用真实 Python 引擎。
-
-## 文件入口
-
-`AgentRuntime.java`：请求生命周期、上下文、定时互动、动作映射。
-`AgentPolicy.java`：可独立测试的检索、节奏、记忆过滤及流式字段提取。
-`AgentStore.java`：原子持久化、记忆管理、历史检索、版本隔离。
-`AgentTransport.java`：HTTPS、SSE、超时、停止和兼容接口。
-`AgentReply.java`：模型输出校验。
-`AgentPanel.java`：记忆手账和陪伴设置。
-`PersonaManager.java` / `PersonaPanel.java`：一次性人格初始化、冻结、旧数据迁移及只读展示。
-`ModelSettings.java` / `ApiEndpoint.java`：配置原子保存、每请求一致快照、统一地址校验。
-`DialogLifecycle.java`：Activity销毁时关闭所属对话窗口。
-`MainActivity.java` / `Chat.java`：主界面、模型配置与聊天。
-`PetService.java` / `AlphaVideo.java`：上游悬浮窗口与透明动画实现。
-
-## 来源与许可
-
-详见 [SOURCE_MAP.md](SOURCE_MAP.md)、[NOTICE-DAFEIYU.md](NOTICE-DAFEIYU.md) 和 [PROVENANCE.json](PROVENANCE.json)。代码 MIT 不等于动画和角色形象可商用，此 APK 供非商业体验。
-
-`MemoryBridge.java` / `MemoryLedger.java` / `MemoryPanel.java`：完整引擎协议、手机数据所有权、来源与历史、设置和联调。
-`memory-service/upstream`：固定提交的 Python 源码与 MIT 许可；`UPSTREAM.json` 记录逐文件哈希。
+`NativeMemoryTest` 在不启动Python服务的条件下运行84个共享场景，并覆盖默认设置、旧版升级、离线更正、模型配置复用、非法输出回退、批量原子性、时区和删除竞态。`MemoryIntegrationTest` 另保留Python HTTP对照；普通用户运行App不需要这些测试依赖。

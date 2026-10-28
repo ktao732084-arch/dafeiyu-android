@@ -22,7 +22,7 @@ final class MemoryBridge {
         Config(boolean enabled,Address address,String secret,boolean semantic,boolean judge){this.enabled=enabled;this.address=address;this.secret=secret;this.semantic=semantic;this.judge=judge;}
     }
     static Config read()throws Exception {
-        Map<String,?> p=Data.prefs().getAll();boolean enabled=ModelSettings.flag(p,"memory.service.enabled",false);
+        Map<String,?> p=Data.prefs().getAll();boolean enabled="python-debug".equals(ModelSettings.value(p,"memory.mode"))&&ModelSettings.flag(p,"memory.service.enabled",false);
         if(!enabled)return new Config(false,null,"",false,false);
         Address address=new Address(ModelSettings.value(p,"memory.service.url"));
         if(!address.origin.equals(ModelSettings.value(p,"memory.service.origin")))throw new IOException("记忆服务地址与凭据不匹配，请重新保存");
@@ -30,7 +30,7 @@ final class MemoryBridge {
         return new Config(true,address,secret,ModelSettings.flag(p,"memory.service.semantic",true),ModelSettings.flag(p,"memory.service.judge",true));
     }
     static void save(boolean enabled,String url,String entered,boolean semantic,boolean judge)throws Exception {
-        if(!enabled){AgentRuntime.cancel();if(!Data.prefs().edit().putBoolean("memory.service.enabled",false).commit())throw new IOException("保存失败");return;}
+        if(!enabled){AgentRuntime.cancel();if(!Data.prefs().edit().putString("memory.mode","native").putBoolean("memory.service.enabled",false).commit())throw new IOException("保存失败");return;}
         Address address=new Address(url);String secret=entered.trim();
         if(secret.isEmpty()){
             if(!address.origin.equals(Data.prefs().getString("memory.service.origin","")))throw new IOException("更换记忆服务时请重新填写访问令牌");
@@ -38,11 +38,11 @@ final class MemoryBridge {
         }
         ApiEndpoint.validateSecret(secret);if(secret.length()<32||secret.matches("(?s).*\\s.*"))throw new IOException("访问令牌至少 32 位，不能含空白");
         String encrypted=Chat.encrypt(secret);AgentRuntime.cancel();
-        if(!Data.prefs().edit().putBoolean("memory.service.enabled",true).putString("memory.service.url",address.base).putString("memory.service.origin",address.origin).putString("memory.service.secret",encrypted).putBoolean("memory.service.semantic",semantic).putBoolean("memory.service.judge",judge).commit())throw new IOException("保存失败");
+        if(!Data.prefs().edit().putString("memory.mode","python-debug").putBoolean("memory.service.enabled",true).putString("memory.service.url",address.base).putString("memory.service.origin",address.origin).putString("memory.service.secret",encrypted).putBoolean("memory.service.semantic",semantic).putBoolean("memory.service.judge",judge).commit())throw new IOException("保存失败");
     }
     interface Client {JSONObject call(Config config,String path,JSONObject body,AgentTransport.Token token)throws Exception;}
     static Client client=MemoryBridge::http;
-    static volatile String lastStatus="手机本地记忆";
+    static volatile String lastStatus="手机内置记忆 · 默认运行";
     static JSONObject http(Config config,String path,JSONObject payload,AgentTransport.Token token)throws Exception {
         token.check();HttpURLConnection con=(HttpURLConnection)new URL(config.address.base+path).openConnection();token.connection=con;
         try {
@@ -69,8 +69,9 @@ final class MemoryBridge {
             if(response.optBoolean("degraded"))status+=" · 部分组件失败，已用规则补充";
             lastStatus=status;return new Result(state,response.getJSONArray("hits"),true,status,response.optJSONArray("rejected"));
         }catch(Exception failure){token.check();lastStatus="记忆服务暂不可用，本轮使用手机本地记忆";}
-        for(int i=0;i<incoming.length();i++)MemoryLedger.addLocal(state,incoming.getJSONObject(i));
-        String status=config.enabled?lastStatus:"手机本地记忆";lastStatus=status;return new Result(state,null,false,status,new JSONArray());
+        NativeMemoryEngine.Intelligence intelligence=null;try{intelligence=NativeMemoryIntelligence.configured();}catch(Exception unavailable){token.check();}
+        Result result=NativeMemoryEngine.evaluate(state,incoming,query,now,java.time.ZoneId.systemDefault(),intelligence,token);
+        String status=(config.enabled?"联调服务不可用 · ":"")+result.status;lastStatus=status;return new Result(result.state,result.hits,false,status,result.rejected);
     }
     static void validate(JSONObject response,JSONObject previous,JSONArray incoming)throws Exception {
         if(response.optInt("protocol")!=1)throw new IOException("不兼容的记忆服务协议");

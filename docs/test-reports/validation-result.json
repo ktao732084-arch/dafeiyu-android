@@ -1,32 +1,35 @@
 {
-  "version": "0.3.0",
-  "apk_sha256": "b9552608d863204c8785c8f60c7ac5db9c7d60a413cda1a2a04f93a450a2244c",
-  "memory_source": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
-  "reviewed_engine": "9862c930b367bbb0b5fa4b2c751914604cd0b548",
+  "version": "0.4.0",
+  "apk_sha256": "9a800ea0697d372118b8425ac0874a42bcc5d4b2dde111501c0b325f164158d9",
+  "default_memory_runtime": "Android-native in APK; no Python/PC/ADB required",
   "android_framework_tests": {
-    "passed": 26,
+    "passed": 37,
     "failed": 0,
-    "persona_subchecks": 33,
-    "environment": "Robolectric Android 14/API34; not an installed APK"
+    "skipped": 0,
+    "native_memory_scenarios": 11,
+    "persona_subchecks": 33
+  },
+  "native_offline_replay": {
+    "scenarios": 84,
+    "expectations": 166,
+    "passed": 145,
+    "known_unmet": 21,
+    "python_started": false,
+    "network_calls": false
+  },
+  "optional_python_protocol_replay": {
+    "scenarios": 84,
+    "passed": 145,
+    "total": 166
   },
   "core_checks": 48,
   "endpoint_checks": 13,
   "physics": "passed",
-  "python_service_checks": 16,
-  "python_llm_regressions": 9,
-  "shared_scenarios": 84,
-  "expectation_results": {
-    "passed": 145,
-    "total": 166,
-    "known_unmet": 21,
-    "mode": "rules, no external models",
-    "cross_runtime_parity": true
-  },
-  "unverified": [
+  "model_tests": "controlled model responses; verify reuse of existing endpoint/model/key and rejection of invented IDs",
+  "not_verified": [
     "physical-device installation and overlay",
     "device Android Keystore",
-    "real cloud model calls in this integration run",
-    "real ONNX weights",
-    "OEM battery/background behavior"
+    "real cloud model quality",
+    "battery and OEM background behavior"
   ]
 }

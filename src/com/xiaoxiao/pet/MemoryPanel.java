@@ -5,8 +5,19 @@ final class MemoryPanel {
     static Switch toggle(MainActivity a,LinearLayout l,String label,boolean value){Switch s=new Switch(a);s.setText(label);s.setTextColor(Apple.INK);s.setChecked(value);l.addView(s);return s;}
     static void settings(MainActivity a){
         LinearLayout l=a.column();l.setPadding(a.dp(18),a.dp(8),a.dp(18),a.dp(18));
+        l.addView(a.text("记忆引擎已内置在手机里。时间解析、去重、更正、归档与查找都在本机运行，不需要电脑或另外部署服务。",14));
+        GroupedList.toggle(l,"用当前模型辅助理解记忆",Data.prefs().getBoolean("memory.smart",true),(v,on)->{AgentRuntime.cancel();Data.prefs().edit().putBoolean("memory.smart",on).apply();});
+        l.addView(a.text("默认开启。直接使用「模型连接」里已有的模型和 Key，理解换种说法、偏好变化等；可能增加模型请求。没有网络或模型不可用时使用本地规则，已有记忆仍保存在手机。",12));
+        l.addView(a.text("上次整理："+MemoryBridge.lastStatus,12));
+        a.button(l,"共同经历与记忆变化",v->history(a));
+        a.button(l,"开发联调（可选）",v->serviceSettings(a));
+        a.button(l,"使用手机内置引擎",v->{try{MemoryBridge.save(false,"","",false,false);MemoryBridge.lastStatus="手机内置记忆 · 默认运行";Toast.makeText(a,"已使用手机内置记忆",Toast.LENGTH_SHORT).show();}catch(Exception e){AgentPanel.fail(a,e);}});
+        ScrollView scroll=new SpringScrollView(a);scroll.addView(l);new Apple.Builder(a).setTitle("手机记忆").setView(scroll).setPositiveButton("完成",null).show();
+    }
+    static void serviceSettings(MainActivity a){
+        LinearLayout l=a.column();l.setPadding(a.dp(18),a.dp(8),a.dp(18),a.dp(18));
         l.addView(a.text("连接后，她可以整理记忆的变化、理解时间并按意思回忆。记忆仍保存在手机。服务收到本轮查询和手账快照；如果服务配置了模型，也会向该模型发送相关内容。",13));
-        Switch enabled=toggle(a,l,"连接完整记忆引擎",Data.prefs().getBoolean("memory.service.enabled",false));
+        Switch enabled=toggle(a,l,"连接 Python 联调引擎","python-debug".equals(Data.prefs().getString("memory.mode","native"))&&Data.prefs().getBoolean("memory.service.enabled",false));
         EditText url=Chat.field(a,l,"记忆服务地址",Data.prefs().getString("memory.service.url","http://127.0.0.1:8787"),false);
         EditText key=Chat.field(a,l,"访问令牌（已保存时留空）","",true);
         Switch semantic=toggle(a,l,"按意思回忆",Data.prefs().getBoolean("memory.service.semantic",true));

@@ -1,4 +1,6 @@
-# 大肥鱼 × Agent 拟人记忆：双项目联调
+# 大肥鱼 × Agent 拟人记忆：可选开发联调
+
+**0.4.0 起，记忆引擎已内置在手机，普通使用不需要本服务。** 本页保留Python对照方式；高级入口为「陪伴设置 → 记忆引擎 → 开发联调」。下文0.3.0启动方法适用于开发对照，不能再当作当前版本的前置安装要求。
 
 0.3.0 将 `agent-anthropomorphic-memory` 的真实 Python 引擎接入 Android runtime。不是另一套仿写规则，也不是在 APK 中安装 Python。完整引擎运行在你自己的电脑或 HTTPS 服务上；Android 保持独立，不依赖 DSH / OpenClaw。
 

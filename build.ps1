@@ -29,9 +29,9 @@ $D8Args=@('-cp',"$Bt\lib\d8.jar",'com.android.tools.r8.D8','--lib',$Jar,'--min-a
 $ArgFile=Join-Path $Root 'build\d8.args'
 [IO.File]::WriteAllLines($ArgFile,($D8Args | ForEach-Object {'"'+$_.Replace('\','/')+'"'}),[Text.UTF8Encoding]::new($false))
 RunChecked "$Jdk\bin\java.exe" @("@$ArgFile")
-RunChecked "$Bt\aapt.exe" @('package','-f','-M',"$Root\AndroidManifest.xml",'-I',$Jar,'-A',"$Root\fish-assets",'-S',"$Root\res",'-0','mp4','-F',"$Root\build\unsigned.apk",'--version-code','3','--version-name','0.3.0')
+RunChecked "$Bt\aapt.exe" @('package','-f','-M',"$Root\AndroidManifest.xml",'-I',$Jar,'-A',"$Root\fish-assets",'-S',"$Root\res",'-0','mp4','-F',"$Root\build\unsigned.apk",'--version-code','4','--version-name','0.4.0')
 Push-Location "$Root\build\dex"
 try {RunChecked "$Bt\aapt.exe" @('add',"$Root\build\unsigned.apk",'classes.dex')} finally {Pop-Location}
 RunChecked "$Bt\zipalign.exe" @('-f','4',"$Root\build\unsigned.apk", "$Root\build\aligned.apk")
-RunChecked "$Bt\apksigner.bat" @('sign','--ks',$KeyStore,'--ks-pass',"pass:$StorePass",'--out',"$Root\build\dafeiyu-0.3.0.apk", "$Root\build\aligned.apk")
-RunChecked "$Bt\apksigner.bat" @('verify','--verbose',"$Root\build\dafeiyu-0.3.0.apk")
+RunChecked "$Bt\apksigner.bat" @('sign','--ks',$KeyStore,'--ks-pass',"pass:$StorePass",'--out',"$Root\build\dafeiyu-0.4.0.apk", "$Root\build\aligned.apk")
+RunChecked "$Bt\apksigner.bat" @('verify','--verbose',"$Root\build\dafeiyu-0.4.0.apk")

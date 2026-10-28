@@ -79,3 +79,15 @@
 | `MemoryIntegrationTest.java`、`MemoryReplay.java` | 本项目新增；实际启动 Python HTTP 服务，复用未经修改的84场景。 |
 
 记忆项目自身说明借鉴 mem0 的写入判断与相对时间、Graphiti 的时间失效等思路；本项目的直接代码来源是上述固定快照，没有另行复制这些项目的实现。该来源不改变角色动画的非商业许可要求。
+
+## 0.4.0 安卓原生移植
+
+| 部分 | 来源与改动 |
+|---|---|
+| `NativeMemoryRules.java` | 从已固定的记忆项目 `memory.py`、`noise_filter.py` 的 AST 提取规则表生成；Python的Unicode正则转为Java表达，来源文件哈希见 `docs/native-rules-source.json`。 |
+| `NativeMemoryTime.java` | 将上游 `temporal.py` 的中文相对日期算法移植为 `java.time`，按手机观察时区落地，原话与解析文本分离。 |
+| `NativeMemoryEngine.java` | 移植上游过滤、重要性、bigram比较、更正/去重和时间失效流程；在Android JSON存储上实现原子判断、历史、来源和检索。规则回归复用原始84场景。 |
+| `NativeMemoryIntelligence.java` | 本项目新增手机模型适配：复用现有聊天配置，按ID进行语义召回和批量写入判断。参考上游LLM写入决策思路；手机默认未移植ONNX运行库或向量权重。 |
+| `NativeMemoryTest.java` | 本项目新增原生执行测试，不启动Python；模型能力使用受控接口测试，不声称独立复现上游真实模型分数。 |
+
+原生移植沿用记忆项目MIT许可，原许可保留于 `memory-service/upstream/LICENSE`。Python服务仍可作为开发对照，但手机版默认路径不依赖它。

@@ -7,6 +7,7 @@ final class MemoryReplay {
     static boolean matches(String text,JSONArray keywords){String lower=text.toLowerCase(Locale.ROOT);for(int i=0;i<keywords.length();i++)if(!lower.contains(keywords.optString(i).toLowerCase(Locale.ROOT)))return false;return true;}
     static void check(JSONArray out,JSONObject c,int day,String metric,boolean passed)throws Exception {out.put(new JSONObject().put("case",c.getString("id")).put("day",day).put("metric",metric).put("passed",passed));}
     static MemoryBridge.Result call(MemoryBridge.Config config,JSONObject state,JSONArray incoming,String query,long now)throws Exception {
+        if(config==null)return NativeMemoryEngine.evaluate(state,incoming,query,now,ZoneOffset.UTC,null,new AgentTransport.Token());
         MemoryBridge.Result result=MemoryBridge.evaluate(config,state,incoming,query,now,new AgentTransport.Token());assertTrue("real service call must succeed: "+result.status,result.remote);return result;
     }
     static void run(MemoryBridge.Config config)throws Exception {
@@ -27,8 +28,8 @@ final class MemoryReplay {
                 }
             }
         }}
-        Files.write(new File("target/memory-replay-android.json").toPath(),results.toString(2).getBytes("UTF-8"));JSONArray baseline=new JSONArray(new String(Files.readAllBytes(new File(root,"protocol-baseline.json").toPath()),"UTF-8"));assertEquals(84,cases);assertEquals(baseline.length(),results.length());int passed=0;
-        for(int i=0;i<results.length();i++){JSONObject actual=results.getJSONObject(i),expected=baseline.getJSONObject(i);for(String key:new String[]{"case","day","metric","passed"})assertEquals(actual.toString()+" / "+key,expected.get(key),actual.get(key));if(actual.getBoolean("passed"))passed++;}
-        System.out.println("Shared memory scenarios: "+cases+"; product expectations: "+passed+"/"+results.length()+"; exact Python/Android protocol parity confirmed.");
+        Files.write(new File(config==null?"target/memory-replay-native.json":"target/memory-replay-android.json").toPath(),results.toString(2).getBytes("UTF-8"));JSONArray baseline=new JSONArray(new String(Files.readAllBytes(new File(root,"protocol-baseline.json").toPath()),"UTF-8"));assertEquals(84,cases);assertEquals(baseline.length(),results.length());int passed=0;List<String> regressions=new ArrayList<>();
+        for(int i=0;i<results.length();i++){JSONObject actual=results.getJSONObject(i),expected=baseline.getJSONObject(i);for(String key:new String[]{"case","day","metric"})assertEquals(actual.toString()+" / "+key,expected.get(key),actual.get(key));if(config!=null)assertEquals(actual.toString(),expected.getBoolean("passed"),actual.getBoolean("passed"));else if(expected.getBoolean("passed")&&!actual.getBoolean("passed"))regressions.add(actual.toString());if(actual.getBoolean("passed"))passed++;}
+        System.out.println("Shared memory scenarios: "+cases+"; product expectations: "+passed+"/"+results.length()+"; mode="+(config==null?"native/offline":"Python HTTP"));assertTrue("Regressions versus reviewed rules: "+regressions,regressions.isEmpty());
     }
 }

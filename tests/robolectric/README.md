@@ -42,3 +42,10 @@ Review `target/surefire-reports/com.xiaoxiao.pet.UiTest.txt` and `TEST-com.xiaox
 The replay executes the unchanged 84 upstream scenarios through Android's actual `MemoryBridge` and compares all 166 expectation outcomes with the independently produced Python baseline. Currently 145 expectations are satisfied and 21 remain known engine limitations: a passing parity test does not label all product expectations as satisfied. Per-assertion output is `target/memory-replay-android.json`.
 
 The additional tests require Python 3.10+ on PATH; optional Maven properties `memory.python` and `memory.service.script` override executable/script paths. They do not need an external model key. Use `-Offline` with a previously bootstrapped, verified dependency cache to avoid re-downloading dependencies. The test fixtures explicitly drain the runtime worker and use a paused main looper to keep asynchronous tests isolated.
+
+
+## 0.4.0 native memory
+
+`NativeMemoryTest` executes the memory engine inside the Android test process without starting Python or calling a memory service. It runs the unchanged 84 scenarios in native/offline mode, plus default/upgrade behavior, offline corrections, reuse of existing phone model settings, semantic ID selection, invalid model outputs, atomic batches, timezone handling, cancellation, deletion races and restart/forget behavior. Controlled model transports do not measure real-cloud quality.
+
+The optional `MemoryIntegrationTest` still starts Python for development comparison. This test-only dependency is not a product runtime requirement. Native per-assertion results are written to `target/memory-replay-native.json`.
