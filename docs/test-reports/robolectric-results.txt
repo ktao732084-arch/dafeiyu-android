@@ -1,4 +1,4 @@
-Android 14/API34 Robolectric: 67 passed; 9 conversation/history scenarios.
+Android 14/API34 Robolectric: 75 passed; includes 8 automatic temporal-history scenarios.
 PASS com.xiaoxiao.pet.UiTest.manualPersonaOnboardingAndReadOnlyUI
 PASS com.xiaoxiao.pet.UiTest.chatUIRunsPromptRecallStreamingAndCommitsControlledModelReply
 PASS com.xiaoxiao.pet.UiTest.openingManualChatInterruptsPendingProactiveRequest
@@ -66,3 +66,11 @@ PASS com.xiaoxiao.pet.ConversationTest.historyPageLoadsEarlierTurnsWithDateTimeA
 PASS com.xiaoxiao.pet.ConversationTest.oneModelCallCreatesProgressiveSegmentsAndDisplayedTimestamps
 PASS com.xiaoxiao.pet.ConversationTest.closingChatAlsoClearsItsPetBubble
 PASS com.xiaoxiao.pet.ConversationTest.closingPageStopsScheduledSegments
+PASS com.xiaoxiao.pet.HistoryRecallIntegrationTest.offlineLookupShowsOriginalExcerptsWithoutPretendingToSummarize
+PASS com.xiaoxiao.pet.HistoryRecallIntegrationTest.deletionWhileAnswerIsPendingPreventsLateCommit
+PASS com.xiaoxiao.pet.HistoryRecallIntegrationTest.oldQuotesAreNotWrittenBackAsCurrentFacts
+PASS com.xiaoxiao.pet.HistoryRecallIntegrationTest.vagueRangeAsksForDateWithoutInventingMemory
+PASS com.xiaoxiao.pet.HistoryRecallIntegrationTest.clearedHistoryCannotBeRecalled
+PASS com.xiaoxiao.pet.HistoryRecallIntegrationTest.explicitHistoryRequestStillWorksWithAutomaticMemoryDisabled
+PASS com.xiaoxiao.pet.HistoryRecallIntegrationTest.emptyRangeAnswersHonestlyWithoutCallingModel
+PASS com.xiaoxiao.pet.HistoryRecallIntegrationTest.archivedLastWeekReachesModelAndUsesOneGenerationCall

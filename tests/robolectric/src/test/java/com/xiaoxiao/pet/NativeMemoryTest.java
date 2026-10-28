@@ -52,7 +52,11 @@ public class NativeMemoryTest {
         NativeMemoryIntelligence.transport=(c,m,t)->{entered.countDown();release.await(5,TimeUnit.SECONDS);return "{\"decisions\":[]}";};UiTest.Counter listener=new UiTest.Counter();AgentRuntime.send("记住：我现在住在上海浦东了",false,listener);try{assertTrue(entered.await(3,TimeUnit.SECONDS));AgentRuntime.store().clear(true);}finally{release.countDown();}UiTest.awaitIdle();assertEquals(0,listener.done);assertEquals(1,listener.errors);assertEquals(0,AgentRuntime.store().snapshot().getJSONArray("memories").length());
     }
     @Test public void localModelCancellationDoesNotBecomeRuleFallback()throws Exception {
-        long now=System.currentTimeMillis();JSONObject s=run(state(),new JSONArray().put(row("a","我喜欢蓝色",now)),"",now,null).state;AgentTransport.Token token=new AgentTransport.Token();try{NativeMemoryEngine.evaluate(s,new JSONArray(),"喜欢",now,ZoneOffset.UTC,(op,data,t)->{t.cancel();throw new IOException("cancelled");},token);fail();}catch(IOException expected){assertTrue(token.cancelled);}
+        AgentRuntime.store().remember("我喜欢蓝色");
+        // Exercise the model branch after the recall-budget optimization; small stores intentionally skip it.
+        for(String fact:new String[]{"我养了一只橘猫","我每天跑步五公里","我最爱吃火锅","我的生日在三月","我住在杭州西湖边","我会弹吉他","我在学日语","我喜欢下雨天","我妈妈是老师","我每周去游泳","我收藏邮票","我讨厌香菜","我开电动车","我喜欢科幻小说","我早上喝咖啡"})AgentRuntime.store().remember(fact);
+        JSONObject s=AgentRuntime.store().snapshot();long now=System.currentTimeMillis();assertTrue(MemoryLedger.currentCount(s,now)>MemoryLedger.CORE+10);AgentTransport.Token token=new AgentTransport.Token();AtomicInteger calls=new AtomicInteger();
+        try{NativeMemoryEngine.evaluate(s,new JSONArray(),"我喜欢哪些东西",now,ZoneOffset.UTC,(op,data,t)->{calls.incrementAndGet();t.cancel();throw new IOException("cancelled");},token);fail();}catch(IOException expected){assertTrue(token.cancelled);assertEquals(1,calls.get());}
     }
     @Test public void phoneMemorySurvivesRestartAndForgetPurgesHistory()throws Exception {
         File dir=Files.createTempDirectory("native-restart").toFile();AgentStore db=new AgentStore(dir);db.remember("我对花生过敏");db.remember("更正，我对花生不过敏了");db=new AgentStore(dir);assertEquals(1,db.snapshot().getJSONArray("archive").length());db.forget(db.snapshot().getJSONArray("memories").getJSONObject(0).getString("id"));db=new AgentStore(dir);assertEquals(0,db.snapshot().getJSONArray("memories").length());assertEquals(0,db.snapshot().getJSONArray("archive").length());assertFalse(new File(dir,"companion-v1.json.bak").exists());

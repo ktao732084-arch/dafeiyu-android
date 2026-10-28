@@ -35,6 +35,23 @@ final class ChatArchive {
         }
         Collections.reverse(selected);return new JSONArray(selected);
     }
+    HistoryRecall.Scan search(JSONArray recent,HistoryRecall.Plan plan,AgentTransport.Token token)throws Exception{
+        token.check();TreeMap<String,Object> index=new TreeMap<>();for(File f:files())index.put(f.getName().replace(".json",""),f);
+        for(int i=0;i<recent.length();i++){JSONObject t=recent.getJSONObject(i);index.put(key(t),t);}
+        List<Map.Entry<String,Object>> matches=new ArrayList<>();
+        for(Map.Entry<String,Object> entry:index.entrySet()){
+            token.check();long at=Long.parseLong(entry.getKey().substring(0,19));
+            if(at>=plan.from&&at<plan.to&&!new File(dir,"deleted-"+entry.getKey().substring(20)).exists())matches.add(entry);
+        }
+        HistoryRecall.Scan scan=new HistoryRecall.Scan();scan.total=matches.size();int count=Math.min(HistoryRecall.MAX_SCAN,matches.size());scan.limited=count<matches.size();long bytes=0;
+        for(int i=0;i<count;i++){
+            token.check();Object value=matches.get(count==1?0:(int)((long)i*(matches.size()-1)/(count-1))).getValue();scan.examined++;
+            long size=value instanceof File?((File)value).length():value.toString().getBytes(StandardCharsets.UTF_8).length;
+            if(size>HistoryRecall.MAX_SCAN_BYTES-bytes){scan.limited=true;continue;}bytes+=size;
+            try{JSONObject t=value instanceof File?read((File)value):(JSONObject)value;if(!deleted(id(t)))scan.rows.add(t);}catch(IOException|JSONException invalid){scan.unreadable++;}
+        }
+        token.check();return scan;
+    }
     void forget(Set<String> ids)throws Exception{
         Set<String> hashes=new HashSet<>();for(String id:ids){String h=hash(id);hashes.add(h);write(new File(dir,"deleted-"+h),new byte[0]);}
         // Tombstones are written first: a crash or an old main-file backup cannot resurrect these turns.

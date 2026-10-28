@@ -180,6 +180,12 @@ final class AgentStore {
     }
     synchronized JSONArray historyPage(String before,int limit)throws Exception {return transcript.page(state.getJSONArray("turns"),before,Math.max(1,Math.min(limit,40)));}
     synchronized JSONArray historyRange(long fromInclusive,long toExclusive,String before,int limit)throws Exception {return transcript.page(state.getJSONArray("turns"),before,Math.max(1,Math.min(limit,40)),fromInclusive,toExclusive);}
+    synchronized HistoryRecall.Result recallHistory(HistoryRecall.Plan plan,AgentTransport.Token token)throws Exception{
+        if(plan==null)return null;token.check();
+        if(!plan.valid())return HistoryRecall.build(plan,new HistoryRecall.Scan());
+        try{return HistoryRecall.build(plan,transcript.search(state.getJSONArray("turns"),plan,token));}
+        catch(IOException failure){token.check();return new HistoryRecall.Result(plan,new JSONObject().put("status","error").put("range",plan.label).put("records",new JSONArray()));}
+    }
     synchronized void shown(String id,int count)throws Exception {
         if(id==null||transcript.deleted(id))return;JSONObject next=snapshot();JSONArray turns=next.getJSONArray("turns");
         for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(id.equals(ChatArchive.id(t))){int n=Math.min(count,ReplySegments.count(t));if(t.has("displayed")&&n>t.optInt("displayed")){ChatArchive.markShown(t,n);JSONArray self=next.optJSONArray("self");if(self!=null)for(int j=0;j<self.length();j++){JSONObject row=self.getJSONObject(j);if(id.equals(row.optString("source"))&&ReplySegments.visible(t).contains(row.optString("text")))row.put("shown",true);}save(next,false);}return;}}

@@ -1,18 +1,19 @@
 {
-  "version": "0.4.4",
-  "version_code": 8,
-  "apk_sha256": "5554e643c4260c89cd7b600a06f9371c08b92aff2ee3fbde6ec216ddb3a5a4df",
+  "version": "0.4.5",
+  "version_code": 9,
+  "apk_sha256": "cee389adcdf3aad5a3e3e341eb75d2c7b876bf96176b2c2ecde8b37976c86a8f",
   "merged_branch_commit": "8e34e3322565b4c5769133a1f3e3f11604e44c2a",
   "default_memory_runtime": "Android-native in APK; no Python/PC/ADB required",
   "android_framework_tests": {
-    "passed": 67,
+    "passed": 75,
     "failed": 0,
     "skipped": 0,
     "native_memory_scenarios": 11,
     "merge_integration_scenarios": 7,
     "persona_subchecks": 33,
     "model_setup_scenarios": 14,
-    "conversation_scenarios": 9
+    "conversation_scenarios": 9,
+    "history_recall_scenarios": 8
   },
   "native_offline_replay": {
     "scenarios": 84,
@@ -27,12 +28,12 @@
     "passed": 145,
     "total": 166
   },
-  "core_checks": 124,
+  "core_checks": 137,
   "endpoint_checks": 13,
   "action_plan_assertions": 10708,
   "physics": "passed",
-  "instrumentation_apk": "Not recompiled or executed for 0.4.3; previous 0.4.1 device test build recorded in historical validation",
-  "model_tests": "controlled responses and local HTTP server; native non-streaming override, reasoning budget and content-filter rejection verified",
+  "instrumentation_apk": "Device harness not executed; this release uses JVM Android 14 framework validation",
+  "model_tests": "Controlled payload capture confirms archived sources beyond 160 turns, date isolation, display-state exclusion and one answer-model call; real cloud summaries not evaluated",
   "not_verified": [
     "physical-device installation and overlay",
     "video decoding on device",
@@ -43,5 +44,13 @@
   "model_setup": "Official DeepSeek V4.1 Flash preset; one key field, official links, test-before-save, failure isolation, provider key isolation, cancellation and timeout guards; controlled model only",
   "model_balance": "Official GET /user/balance; total/top-up/granted by currency, timestamped cache, manual refresh, strict credential origin, failed query means unknown; controlled fixture tests",
   "history_segment_timestamp_checks": 556,
-  "conversation": "Paged archive separate from 160-turn model state; millisecond send/completion/segment-display timestamps and zones; lossless local 1-3 part presentation, cancellation, unseen-content context exclusion and deletion tombstones"
+  "conversation": "Paged archive separate from 160-turn model state; millisecond send/completion/segment-display timestamps and zones; lossless local 1-3 part presentation, cancellation, unseen-content context exclusion and deletion tombstones",
+  "temporal_history_recall_checks": 38,
+  "history_recall": "Explicit dated questions automatically read local recent and archived transcripts; bounded dated evidence reaches the current answer model; no extra recall model or Python service",
+  "history_recall_limits": {
+    "max_scan_turns": 1000,
+    "max_scan_bytes": 8388608,
+    "max_evidence_turns": 24,
+    "max_evidence_chars": 14000
+  }
 }

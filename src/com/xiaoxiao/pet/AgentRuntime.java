@@ -49,7 +49,11 @@ final class AgentRuntime {
         return context(user,proactive,store().snapshot(),null);
     }
     static JSONArray context(String user,boolean proactive,JSONObject s,JSONArray hits)throws Exception {
-        PromptBuilder.Inputs in=new PromptBuilder.Inputs();
+        HistoryRecall.Plan plan=proactive?null:HistoryRecall.plan(user,System.currentTimeMillis(),java.time.ZoneId.systemDefault());
+        return context(user,proactive,s,hits,store().recallHistory(plan,new AgentTransport.Token()));
+    }
+    static JSONArray context(String user,boolean proactive,JSONObject s,JSONArray hits,HistoryRecall.Result history)throws Exception {
+        PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.historyRecall=history==null?null:history.evidence;
         in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.nickname=Data.prefs().getString("agent.nickname","");
         in.mood=mood();in.timeZone=TimeZone.getDefault().getID();in.now=System.currentTimeMillis();in.initializedAt=PersonaManager.initializedAt("main");
         if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}in.remember=rememberEnabled();
@@ -64,18 +68,23 @@ final class AgentRuntime {
             try {
                 token.check();if(!PersonaManager.ensureInitialized("main"))throw new IOException("请先在首页完成初次相遇，确定她的性格");
                 AgentStore db=store();long epoch=db.epoch(),observed=receivedAt;String turnId=UUID.randomUUID().toString();token.check();
-                MemoryBridge.Config memoryConfig=rememberEnabled()?MemoryBridge.read():new MemoryBridge.Config(false,null,"",false,false);
                 MemoryBridge.Result memoryPlan=null;JSONObject contextState=db.snapshot();JSONArray recallHits=null;
                 final JSONArray offered=proactive&&rememberEnabled()?MemoryLedger.followUps(contextState,java.time.LocalDate.now()):null;
                 String explicit=null;if(!proactive&&(user.startsWith("记住：")||user.startsWith("记住:")))explicit=user.substring(3).trim();
+                HistoryRecall.Plan historyQuery=!proactive&&explicit==null?HistoryRecall.plan(user,observed,java.time.ZoneId.systemDefault()):null;
+                final HistoryRecall.Result history=db.recallHistory(historyQuery,token);
+                token.check();if(db.epoch()!=epoch)throw new IOException("聊天记录已修改，请重新查询");
+                MemoryBridge.Config memoryConfig=rememberEnabled()&&history==null?MemoryBridge.read():new MemoryBridge.Config(false,null,"",false,false);
                 AgentReply result;
-                if(explicit!=null){
+                if(history!=null&&(history.fallback()!=null||!configured())){
+                    result=new AgentReply();result.reply=history.fallback()!=null?history.fallback():history.offline();
+                }else if(explicit!=null){
                     if(!rememberEnabled())throw new IOException("记忆已关闭，可在陪伴设置开启后再保存");
                     result=new AgentReply();result.reply="记下啦。以后聊到这件事，我会记得；想改的时候，到「记忆手账」里告诉我就好。";result.emotion="happy";
                 }else{
                     if(!configured())throw new IOException("我已经住进手机啦。去「模型连接」填好接口和 Key，我们就能真正聊天了。也可以先试试：记住：我喜欢蓝色。");
-                    if(rememberEnabled()){memoryPlan=MemoryBridge.evaluate(memoryConfig,contextState,new JSONArray(),user,observed,token);contextState=memoryPlan.state;recallHits=memoryPlan.hits;}
-                    String raw=model.generate(context(user,proactive,contextState,recallHits),token,partial->{String text=AgentPolicy.streamPreview(partial);if(!text.isEmpty())main.post(()->{if(current(token))listener.partial(text);});});
+                    if(rememberEnabled()&&history==null){memoryPlan=MemoryBridge.evaluate(memoryConfig,contextState,new JSONArray(),user,observed,token);contextState=memoryPlan.state;recallHits=memoryPlan.hits;}
+                    String raw=model.generate(context(user,proactive,contextState,recallHits,history),token,partial->{String text=AgentPolicy.streamPreview(partial);if(!text.isEmpty())main.post(()->{if(current(token))listener.partial(text);});});
                     result=AgentReply.parse(raw);
                 }
                 token.check();
@@ -92,12 +101,13 @@ final class AgentRuntime {
                         }catch(Exception e){release(token);listener.error("主动消息未能保存");}
                     });return;
                 }
-                if(rememberEnabled()){
+                if(rememberEnabled()&&history==null){
                     JSONArray incoming=MemoryLedger.candidates(user,result.memories,explicit,turnId,observed);
                     if(incoming.length()>0)memoryPlan=MemoryBridge.evaluate(memoryConfig,contextState,incoming,user,observed,token);
                     if(explicit!=null&&memoryPlan!=null&&memoryPlan.rejected!=null&&memoryPlan.rejected.length()>0){result.reply="这句话没有作为长期记忆保存。可以在记忆手账里手动写下你希望我记得的事。";result.emotion="calm";}
                 }
                 token.check();
+                if(history!=null){result.memories=new JSONArray();result.self=new JSONArray();}
                 final AgentReply output=result;final long completedEpoch=epoch;
                 final java.util.concurrent.atomic.AtomicBoolean delivered=new java.util.concurrent.atomic.AtomicBoolean();
                 Runnable completion=()->{if(!delivered.compareAndSet(false,true))return;release(token);if(db.epoch()!=completedEpoch){listener.error("记录已修改，本次已完成的回复不再显示");return;}listener.saved(turnId);listener.done(output.reply,output.emotion);};
