@@ -31,6 +31,20 @@ public final class AgentCoreTest {
   boolean malformed=false;try{AgentReply.parse("{\"reply\":\"broken");}catch(IOException e){malformed=true;}check(malformed,"truncated JSON rejected");
   malformed=false;try{AgentReply.parse("{\"reply\":[1,2]}");}catch(IOException e){malformed=true;}check(malformed,"typed reply required");
   check("你好".equals(AgentReply.parse("<think>internal</think>{\"reply\":\"你好\"}").reply),"reasoning not displayed");
+  check("你好呀".equals(AgentReply.parse("好的～\n{\"reply\":\"你好呀\",\"emotion\":\"happy\",\"memories\":[]}").reply),"JSON after a preface is not shown raw");
+  check("嗨".equals(AgentReply.parse("好的\n```json\n{\"reply\":\"嗨\"}\n```").reply),"fenced JSON after a preface");
+  check("用{}表示空对象".equals(AgentReply.parse("用{}表示空对象").reply),"braces in plain text stay plain");
+  check("今天天气不错".equals(AgentPolicy.streamPreview("今天天气不错")),"plain text streams");
+  check("".equals(AgentPolicy.streamPreview("<think>还在想")),"unfinished reasoning not streamed");
+  check("你".equals(AgentPolicy.streamPreview("好的～\n{\"reply\":\"你")),"preface hidden once JSON starts");
+  check("".equals(AgentPolicy.streamPreview("{\"emotion\":\"happy\",")),"stream preview hides metadata");
+  check(AgentPolicy.relevance("猫","我喜欢猫")>.12&&AgentPolicy.relevance("猫","我喜欢狗")==0,"single CJK character recall");
+  check(AgentPolicy.relevance("a","banana")==0,"single ASCII letter is not a substring match");
+  check(AgentPolicy.reasoningModel("deepseek-reasoner")&&AgentPolicy.reasoningModel("DeepSeek-R1-Distill")&&!AgentPolicy.reasoningModel("deepseek-chat"),"reasoning model detection");
+  check("：Model Not Exist".equals(AgentPolicy.providerError("{\"error\":{\"message\":\"Model Not Exist\",\"type\":\"invalid_request_error\"}}","sk-secret")),"OpenAI error message surfaced");
+  check("：bad key *** rejected".equals(AgentPolicy.providerError("{\"message\":\"bad key sk-secret\\nrejected\"}","sk-secret")),"key masked, newlines flattened");
+  check("".equals(AgentPolicy.providerError("<html><body>502</body></html>","sk-secret")),"HTML error pages not shown");
+  check(AgentPolicy.providerError("x".repeat(500),null).length()<=202,"error detail bounded");
   AgentStore db=new AgentStore(new File(root,"primary"));
   check(db.commit(0,"我喜欢蓝色，密码是abc","记下了","happy",new JSONArray().put("我喜欢蓝色").put("我喜欢红色").put("密码是abc"),true,false),"transaction committed");
   check(db.snapshot().getJSONArray("memories").length()==1,"only evidenced nonsecret memory");
@@ -55,6 +69,7 @@ public final class AgentCoreTest {
   check(!db.memoryContext("小狗").contains("小狗")&&db.memoryContext("小熊").contains("小熊"),"edit replaces actual stored fact");
   boolean secretDenied=false;try{db.remember("我的密码是1234");}catch(IOException expected){secretDenied=true;}check(secretDenied,"manual secret rejected");
   db.reserveAttempt("2026-10-28",now);db.reserveAttempt("2026-10-28",now+1);check(db.snapshot().optInt("attempts")==2,"daily attempts persist");
+  check(db.attempts("2026-10-28")==2&&db.attempts("2026-10-27")==0&&db.lastAttempt()==now+1,"cheap heartbeat reads match snapshot");
   db.reserveAttempt("2026-10-29",now+2);check(db.snapshot().optInt("attempts")==1,"new local date resets budget");
   for(int i=0;i<170;i++)db.commit(db.epoch(),"turn "+i,"answer","calm",null,false,false);
   check(db.snapshot().getJSONArray("turns").length()==160,"bounded history");

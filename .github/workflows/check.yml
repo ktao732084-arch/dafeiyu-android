@@ -1,0 +1,51 @@
+name: check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src
+            tests
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Fetch test libraries
+        run: |
+          mkdir -p "$RUNNER_TEMP/libs"
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/libs/json.jar" https://repo1.maven.org/maven2/org/json/json/20240303/json-20240303.jar
+      - name: Core checks
+        run: tests/run-core.sh "$RUNNER_TEMP/libs/json.jar"
+
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src
+            tests
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/cache@v4
+        with:
+          path: ~/android-all
+          key: android-all-14-robolectric-10818077
+      - name: Fetch Android 14 framework classes
+        run: |
+          mkdir -p ~/android-all
+          [ -f ~/android-all/android-all.jar ] || curl -fsSL --retry 3 -o ~/android-all/android-all.jar https://repo1.maven.org/maven2/org/robolectric/android-all/14-robolectric-10818077/android-all-14-robolectric-10818077.jar
+      - name: Compile app sources
+        run: tests/compile-check.sh ~/android-all/android-all.jar

@@ -7,8 +7,9 @@ final class AgentReply {
  static AgentReply parse(String raw)throws Exception{
   AgentReply result=new AgentReply();String text=raw.replaceAll("(?s)<think>.*?</think>","").trim();
   if(text.startsWith("```")){int nl=text.indexOf('\n'),end=text.lastIndexOf("```");if(nl>=0&&end>nl)text=text.substring(nl+1,end).trim();}
-  if(text.startsWith("{")){
-   JSONObject o;try{o=new JSONObject(text);}catch(JSONException e){throw new IOException("模型返回的回复格式不完整，请重试");}
+  String json=AgentPolicy.envelope(text);
+  if(json!=null){
+   JSONObject o;try{o=new JSONObject(json);}catch(JSONException e){throw new IOException("模型返回的回复格式不完整，请重试");}
    Object reply=o.opt("reply");if(!(reply instanceof String))throw new IOException("模型回复格式不正确，请重试");
    result.reply=(String)reply;result.emotion=AgentPolicy.emotion(o.optString("emotion"));JSONArray m=o.optJSONArray("memories");if(m!=null)result.memories=m;
   }else result.reply=text;

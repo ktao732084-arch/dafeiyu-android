@@ -42,6 +42,11 @@ final class AgentStore {
     }
     synchronized JSONObject snapshot()throws Exception {return new JSONObject(state.toString());}
     synchronized long epoch(){return state.optLong("epoch");}
+    // Cheap reads for the 30 s heartbeat and the home screen; snapshot() copies the whole (up to 4 MiB) state.
+    synchronized long lastUser(){return state.optLong("lastUser");}
+    synchronized long lastAttempt(){return state.optLong("lastAttempt");}
+    synchronized int attempts(String day){return day.equals(state.optString("attemptDay"))?state.optInt("attempts"):0;}
+    synchronized String emotion(long now,long ttl){return now-state.optLong("emotionAt")<ttl?AgentPolicy.emotion(state.optString("emotion")):"calm";}
     synchronized JSONArray history() {
         JSONArray h=new JSONArray();JSONArray turns=state.optJSONArray("turns");
         try {for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(!t.optString("user").isEmpty())h.put(new JSONObject().put("role","user").put("content",t.getString("user")));h.put(new JSONObject().put("role","assistant").put("content",t.getString("reply")));}}catch(Exception ignored){}
