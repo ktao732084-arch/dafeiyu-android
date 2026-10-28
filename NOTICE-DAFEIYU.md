@@ -1,5 +1,7 @@
 # 来源与许可
 
+- 0.3.0 完整记忆引擎：[agent-anthropomorphic-memory](https://github.com/ktao732084-arch/agent-anthropomorphic-memory)，MIT。固定提交和逐文件来源见 `memory-service/UPSTREAM.json`，许可原文为 `memory-service/upstream/LICENSE`。服务适配器及部分校验增强为本次集成新增，已回提 PR #4。
+
 - Android 底座：[yshuang722-spec/xiaoxiao-zhuochong](https://github.com/yshuang722-spec/xiaoxiao-zhuochong)，保留原 MIT 声明，见 `THIRD-PARTY-LICENSE.txt`。本次修改包括独立应用身份、主界面、人格、记忆、网络流式和运行时。
 - 桌宠引擎与蓝毛动画上游：[PC2005-cloud/dsh-pet](https://github.com/PC2005-cloud/dsh-pet)。其声明区分：代码 MIT；动画、提示词与源视频允许开源使用、禁止商用。公开二创应附原仓库地址。
 - 透明视频实现路线参考（由安卓底座标注）：[OTFiles/dsh-pet-inAndroid](https://github.com/OTFiles/dsh-pet-inAndroid)。

@@ -21,4 +21,5 @@ tests/robolectric/repository/
 tests/robolectric/android-runtime/
 tests/robolectric/apache-maven-*/
 tests/robolectric/settings.xml
+tests/robolectric/*.aar
 tests/robolectric/src/test/resources/com/android/tools/test_config.properties

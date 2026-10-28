@@ -1,4 +1,29 @@
--------------------------------------------------------------------------------
-Test set: com.xiaoxiao.pet.UiTest
--------------------------------------------------------------------------------
-Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 41.39 s -- in com.xiaoxiao.pet.UiTest
+Android 14/API34 Robolectric: 26 tests, 0 failures, 0 errors, 0 skipped.
+com.xiaoxiao.pet.UiTest: 14
+PASS manualPersonaOnboardingAndReadOnlyUI
+PASS chatUIRunsPromptRecallStreamingAndCommitsControlledModelReply
+PASS openingManualChatInterruptsPendingProactiveRequest
+PASS activityCreatesAndRenders
+PASS activityDestructionCancelsPendingConversation
+PASS randomChoiceOccursOnlyAtInitialization
+PASS personaPersistenceMigrationAndLockChecks
+PASS failedModelRestoresDraftAndDoesNotCommit
+PASS companionSwitchesPersistAndMemoryFocusControlsAffectRuntime
+PASS memoryEditorPersistsAndForgetsFromUI
+PASS explicitMemoryAndItsSourceDisappearTogether
+PASS nameAndNicknameUISaveIntoPromptWithoutChangingPersonality
+PASS modelSettingsUIValidatesSavesAndKeepsAtomicConfiguration
+PASS cancelAfterCommittedReplyCompletesExactlyOnce
+com.xiaoxiao.pet.MemoryIntegrationTest: 12
+PASS inFlightResultCannotResurrectUserDeletion
+PASS oldSchemaAndDeleteClearArchiveIndexAndBackup
+PASS settingsUiEncryptsTokenAndBindsOrigin
+PASS correctedSourceExcludedFromBothRecentAndLongTermContext
+PASS fabricatedResponseFailsClosedToLocal
+PASS failedServiceKeepsLocalQuoteAndDoesNotInventSuccess
+PASS historicalEntryIsReadOnlyAndCannotRestoreAnOldFact
+PASS actualHttpCaptureCorrectionAndRestart
+PASS onlyLoopbackAllowsHttp
+PASS disabledMemoryMakesNoServiceRequests
+PASS unchanged84ScenarioProtocolReplayMatchesPython
+PASS cancellationDoesNotFallBackAndCommit

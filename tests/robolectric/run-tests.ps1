@@ -1,12 +1,17 @@
-param([Parameter(Mandatory=$true)][string]$AndroidRoot,[Parameter(Mandatory=$true)][string]$Sdk,[Parameter(Mandatory=$true)][string]$Jdk,[string]$Maven='')
+param([Parameter(Mandatory=$true)][string]$AndroidRoot,[Parameter(Mandatory=$true)][string]$Sdk,[Parameter(Mandatory=$true)][string]$Jdk,[string]$Maven='',[switch]$Offline)
 $ErrorActionPreference='Stop'
 $root=$PSScriptRoot
 $AndroidRoot=(Resolve-Path -LiteralPath $AndroidRoot).Path.Replace('\','/')
 $Sdk=(Resolve-Path -LiteralPath $Sdk).Path.Replace('\','/')
 $Jdk=(Resolve-Path -LiteralPath $Jdk).Path
 if(!(Test-Path -LiteralPath "$AndroidRoot/build/unsigned.apk")){throw 'Build the product first; binary resources and matching compiled classes are required.'}
-if($Maven){$Maven=(Resolve-Path -LiteralPath $Maven).Path;python "$root/bootstrap.py" --skip-maven}else{python "$root/bootstrap.py";$Maven=Join-Path $root 'apache-maven-3.9.9/bin/mvn.cmd'}
-if($LASTEXITCODE -ne 0){throw 'Dependency bootstrap failed'}
+if($Offline){
+ foreach($required in @('libs/monitor.jar','libs/espresso.jar','android-runtime/android-all-instrumented-14-robolectric-10818077-i6.jar')){if(!(Test-Path -LiteralPath (Join-Path $root $required))){throw "Cached dependency missing: $required. Run without -Offline first."}}
+ if($Maven){$Maven=(Resolve-Path -LiteralPath $Maven).Path}else{$Maven=Join-Path $root 'apache-maven-3.9.9/bin/mvn.cmd'}
+}else{
+ if($Maven){$Maven=(Resolve-Path -LiteralPath $Maven).Path;python "$root/bootstrap.py" --skip-maven}else{python "$root/bootstrap.py";$Maven=Join-Path $root 'apache-maven-3.9.9/bin/mvn.cmd'}
+ if($LASTEXITCODE -ne 0){throw 'Dependency bootstrap failed'}
+}
 & "$Jdk/bin/jar.exe" cf "$root/libs/app.jar" -C "$AndroidRoot/build/classes" .
 if($LASTEXITCODE -ne 0){throw 'Cannot snapshot app classes'}
 New-Item -ItemType Directory -Force -Path "$root/src/test/resources/com/android/tools" | Out-Null
@@ -21,4 +26,4 @@ $repository=(Join-Path $root 'repository').Replace('\','/')
 "@ | Set-Content -LiteralPath "$root/settings.xml" -Encoding ascii
 $env:JAVA_HOME=$Jdk
 Push-Location -LiteralPath $root
-try {& $Maven -B -s settings.xml "-Dandroid.sdk=$Sdk" test;if($LASTEXITCODE -ne 0){throw 'Robolectric checks failed; inspect target/surefire-reports'}}finally{Pop-Location}
+try {$mavenArgs=@('-B','-s','settings.xml',"-Dandroid.sdk=$Sdk",'test');if($Offline){$mavenArgs+=('-o')}; & $Maven @mavenArgs;if($LASTEXITCODE -ne 0){throw 'Robolectric checks failed; inspect target/surefire-reports'}}finally{Pop-Location}

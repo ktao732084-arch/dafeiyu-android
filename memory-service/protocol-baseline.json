@@ -1,0 +1,1872 @@
+[
+  {
+    "case": "basic-01",
+    "category": "basic",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['林晓']",
+    "active": [
+      "我叫林晓，是协和医学院大三的学生"
+    ]
+  },
+  {
+    "case": "basic-01",
+    "category": "basic",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['协和']",
+    "active": [
+      "我叫林晓，是协和医学院大三的学生"
+    ]
+  },
+  {
+    "case": "basic-01",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "学生",
+    "active": [
+      "我叫林晓，是协和医学院大三的学生"
+    ]
+  },
+  {
+    "case": "basic-01",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "林晓",
+    "active": [
+      "我叫林晓，是协和医学院大三的学生"
+    ]
+  },
+  {
+    "case": "basic-02",
+    "category": "basic",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['青霉素', '过敏']",
+    "active": [
+      "记住，我对青霉素过敏"
+    ]
+  },
+  {
+    "case": "basic-02",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "过敏",
+    "active": [
+      "记住，我对青霉素过敏"
+    ]
+  },
+  {
+    "case": "basic-03",
+    "category": "basic",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['香菜']",
+    "active": [
+      "我不吃香菜，一点都不能有"
+    ]
+  },
+  {
+    "case": "basic-03",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "香菜",
+    "active": [
+      "我不吃香菜，一点都不能有"
+    ]
+  },
+  {
+    "case": "basic-04",
+    "category": "basic",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['苏晴']",
+    "active": [
+      "我女朋友叫苏晴，在杭州做设计"
+    ]
+  },
+  {
+    "case": "basic-04",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "女朋友",
+    "active": [
+      "我女朋友叫苏晴，在杭州做设计"
+    ]
+  },
+  {
+    "case": "basic-05",
+    "category": "basic",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['年糕']",
+    "active": [
+      "我养了一只橘猫叫年糕"
+    ]
+  },
+  {
+    "case": "basic-05",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "橘猫",
+    "active": [
+      "我养了一只橘猫叫年糕"
+    ]
+  },
+  {
+    "case": "basic-06",
+    "category": "basic",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['王建国']",
+    "active": [
+      "我的导师是王建国教授，研究方向是神经内科"
+    ]
+  },
+  {
+    "case": "basic-06",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "导师",
+    "active": [
+      "我的导师是王建国教授，研究方向是神经内科"
+    ]
+  },
+  {
+    "case": "basic-06",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "研究方向",
+    "active": [
+      "我的导师是王建国教授，研究方向是神经内科"
+    ]
+  },
+  {
+    "case": "basic-07",
+    "category": "basic",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['氨氯地平']",
+    "active": [
+      "我有高血压，每天早上吃一片氨氯地平"
+    ]
+  },
+  {
+    "case": "basic-07",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "血压",
+    "active": [
+      "我有高血压，每天早上吃一片氨氯地平"
+    ]
+  },
+  {
+    "case": "basic-08",
+    "category": "basic",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['埃塞俄比亚']",
+    "active": [
+      "我喜欢喝手冲咖啡，尤其是埃塞俄比亚的豆子"
+    ]
+  },
+  {
+    "case": "basic-08",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "咖啡",
+    "active": [
+      "我喜欢喝手冲咖啡，尤其是埃塞俄比亚的豆子"
+    ]
+  },
+  {
+    "case": "basic-09",
+    "category": "basic",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['python']",
+    "active": [
+      "我平时用 MacBook Pro 写代码，主力语言是 Python"
+    ]
+  },
+  {
+    "case": "basic-09",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "Python",
+    "active": [
+      "我平时用 MacBook Pro 写代码，主力语言是 Python"
+    ]
+  },
+  {
+    "case": "basic-10",
+    "category": "basic",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['八月十五']",
+    "active": [
+      "我妈妈的生日是农历八月十五",
+      "我爸爸喜欢下象棋"
+    ]
+  },
+  {
+    "case": "basic-10",
+    "category": "basic",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['象棋']",
+    "active": [
+      "我妈妈的生日是农历八月十五",
+      "我爸爸喜欢下象棋"
+    ]
+  },
+  {
+    "case": "basic-10",
+    "category": "basic",
+    "day": 2,
+    "metric": "top1",
+    "passed": true,
+    "detail": "妈妈生日",
+    "active": [
+      "我妈妈的生日是农历八月十五",
+      "我爸爸喜欢下象棋"
+    ]
+  },
+  {
+    "case": "basic-10",
+    "category": "basic",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "爸爸",
+    "active": [
+      "我妈妈的生日是农历八月十五",
+      "我爸爸喜欢下象棋"
+    ]
+  },
+  {
+    "case": "basic-11",
+    "category": "basic",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['周明']",
+    "active": [
+      "我叫周明，28岁，在深圳做嵌入式开发，老家是湖南长沙的"
+    ]
+  },
+  {
+    "case": "basic-11",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "老家",
+    "active": [
+      "我叫周明，28岁，在深圳做嵌入式开发，老家是湖南长沙的"
+    ]
+  },
+  {
+    "case": "basic-11",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "开发",
+    "active": [
+      "我叫周明，28岁，在深圳做嵌入式开发，老家是湖南长沙的"
+    ]
+  },
+  {
+    "case": "basic-12",
+    "category": "basic",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['北医', '博士']",
+    "active": [
+      "我的目标是三年内考上北医的神经病学博士"
+    ]
+  },
+  {
+    "case": "basic-12",
+    "category": "basic",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "博士",
+    "active": [
+      "我的目标是三年内考上北医的神经病学博士"
+    ]
+  },
+  {
+    "case": "correction-01",
+    "category": "correction",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['芒果']",
+    "active": [
+      "记住，我对花生过敏",
+      "之前说错了，我对花生不过敏，是对芒果过敏"
+    ]
+  },
+  {
+    "case": "correction-01",
+    "category": "correction",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "过敏",
+    "active": [
+      "记住，我对花生过敏",
+      "之前说错了，我对花生不过敏，是对芒果过敏"
+    ]
+  },
+  {
+    "case": "correction-01",
+    "category": "correction",
+    "day": 2,
+    "metric": "stale",
+    "passed": true,
+    "detail": "过敏",
+    "active": [
+      "记住，我对花生过敏",
+      "之前说错了，我对花生不过敏，是对芒果过敏"
+    ]
+  },
+  {
+    "case": "correction-02",
+    "category": "correction",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['上海']",
+    "active": [
+      "我住在北京海淀区",
+      "我现在住在上海浦东了，上个月（2026-02）搬的"
+    ]
+  },
+  {
+    "case": "correction-02",
+    "category": "correction",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "住在",
+    "active": [
+      "我住在北京海淀区",
+      "我现在住在上海浦东了，上个月（2026-02）搬的"
+    ]
+  },
+  {
+    "case": "correction-02",
+    "category": "correction",
+    "day": 2,
+    "metric": "stale",
+    "passed": false,
+    "detail": "住在",
+    "active": [
+      "我住在北京海淀区",
+      "我现在住在上海浦东了，上个月（2026-02）搬的"
+    ]
+  },
+  {
+    "case": "correction-03",
+    "category": "correction",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['字节']",
+    "active": [
+      "我在腾讯做后端开发",
+      "我已经从腾讯离职了，现在在字节跳动做后端"
+    ]
+  },
+  {
+    "case": "correction-03",
+    "category": "correction",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "后端",
+    "active": [
+      "我在腾讯做后端开发",
+      "我已经从腾讯离职了，现在在字节跳动做后端"
+    ]
+  },
+  {
+    "case": "correction-03",
+    "category": "correction",
+    "day": 2,
+    "metric": "stale",
+    "passed": false,
+    "detail": "后端",
+    "active": [
+      "我在腾讯做后端开发",
+      "我已经从腾讯离职了，现在在字节跳动做后端"
+    ]
+  },
+  {
+    "case": "correction-04",
+    "category": "correction",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['喝茶']",
+    "active": [
+      "我每天要喝三杯咖啡",
+      "我不再喝咖啡了，改喝茶"
+    ]
+  },
+  {
+    "case": "correction-04",
+    "category": "correction",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "咖啡",
+    "active": [
+      "我每天要喝三杯咖啡",
+      "我不再喝咖啡了，改喝茶"
+    ]
+  },
+  {
+    "case": "correction-04",
+    "category": "correction",
+    "day": 2,
+    "metric": "stale",
+    "passed": false,
+    "detail": "咖啡",
+    "active": [
+      "我每天要喝三杯咖啡",
+      "我不再喝咖啡了，改喝茶"
+    ]
+  },
+  {
+    "case": "correction-05",
+    "category": "correction",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['5月13']",
+    "active": [
+      "不对，我生日其实是5月13号"
+    ]
+  },
+  {
+    "case": "correction-05",
+    "category": "correction",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "生日",
+    "active": [
+      "不对，我生日其实是5月13号"
+    ]
+  },
+  {
+    "case": "correction-05",
+    "category": "correction",
+    "day": 2,
+    "metric": "stale",
+    "passed": true,
+    "detail": "生日",
+    "active": [
+      "不对，我生日其实是5月13号"
+    ]
+  },
+  {
+    "case": "correction-06",
+    "category": "correction",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['烤肉']",
+    "active": [
+      "开玩笑的，我不是素食主义者，我最爱吃烤肉"
+    ]
+  },
+  {
+    "case": "correction-06",
+    "category": "correction",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "素食",
+    "active": [
+      "开玩笑的，我不是素食主义者，我最爱吃烤肉"
+    ]
+  },
+  {
+    "case": "correction-06",
+    "category": "correction",
+    "day": 2,
+    "metric": "stale",
+    "passed": true,
+    "detail": "素食",
+    "active": [
+      "开玩笑的，我不是素食主义者，我最爱吃烤肉"
+    ]
+  },
+  {
+    "case": "correction-07",
+    "category": "correction",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['研二']",
+    "active": [
+      "更正一下，我现在读研二"
+    ]
+  },
+  {
+    "case": "correction-07",
+    "category": "correction",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "读研",
+    "active": [
+      "更正一下，我现在读研二"
+    ]
+  },
+  {
+    "case": "correction-07",
+    "category": "correction",
+    "day": 2,
+    "metric": "stale",
+    "passed": true,
+    "detail": "读研",
+    "active": [
+      "更正一下，我现在读研二"
+    ]
+  },
+  {
+    "case": "correction-08",
+    "category": "correction",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['比亚迪']",
+    "active": [
+      "我的车换成黑色的比亚迪汉了"
+    ]
+  },
+  {
+    "case": "correction-08",
+    "category": "correction",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "我的车",
+    "active": [
+      "我的车换成黑色的比亚迪汉了"
+    ]
+  },
+  {
+    "case": "correction-08",
+    "category": "correction",
+    "day": 2,
+    "metric": "stale",
+    "passed": true,
+    "detail": "我的车",
+    "active": [
+      "我的车换成黑色的比亚迪汉了"
+    ]
+  },
+  {
+    "case": "correction-09",
+    "category": "correction",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['虾过敏']",
+    "active": [
+      "我对海鲜过敏",
+      "哦不对，是对虾过敏，其他海鲜没事"
+    ]
+  },
+  {
+    "case": "correction-09",
+    "category": "correction",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "过敏",
+    "active": [
+      "我对海鲜过敏",
+      "哦不对，是对虾过敏，其他海鲜没事"
+    ]
+  },
+  {
+    "case": "correction-09",
+    "category": "correction",
+    "day": 1,
+    "metric": "stale",
+    "passed": true,
+    "detail": "过敏",
+    "active": [
+      "我对海鲜过敏",
+      "哦不对，是对虾过敏，其他海鲜没事"
+    ]
+  },
+  {
+    "case": "correction-10",
+    "category": "correction",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['武汉大学']",
+    "active": [
+      "我妹妹在读高三",
+      "我妹妹已经上大学了，在武汉大学"
+    ]
+  },
+  {
+    "case": "correction-10",
+    "category": "correction",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "妹妹",
+    "active": [
+      "我妹妹在读高三",
+      "我妹妹已经上大学了，在武汉大学"
+    ]
+  },
+  {
+    "case": "correction-10",
+    "category": "correction",
+    "day": 2,
+    "metric": "stale",
+    "passed": false,
+    "detail": "妹妹",
+    "active": [
+      "我妹妹在读高三",
+      "我妹妹已经上大学了，在武汉大学"
+    ]
+  },
+  {
+    "case": "correction-11",
+    "category": "correction",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['go']",
+    "active": [
+      "我现在最喜欢的编程语言变成 Go 了"
+    ]
+  },
+  {
+    "case": "correction-11",
+    "category": "correction",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "编程语言",
+    "active": [
+      "我现在最喜欢的编程语言变成 Go 了"
+    ]
+  },
+  {
+    "case": "correction-11",
+    "category": "correction",
+    "day": 2,
+    "metric": "stale",
+    "passed": true,
+    "detail": "编程语言",
+    "active": [
+      "我现在最喜欢的编程语言变成 Go 了"
+    ]
+  },
+  {
+    "case": "correction-12",
+    "category": "correction",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['独生子']",
+    "active": [
+      "我有一个双胞胎哥哥",
+      "逗你的，我是独生子，没有双胞胎哥哥"
+    ]
+  },
+  {
+    "case": "correction-12",
+    "category": "correction",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "哥哥",
+    "active": [
+      "我有一个双胞胎哥哥",
+      "逗你的，我是独生子，没有双胞胎哥哥"
+    ]
+  },
+  {
+    "case": "correction-12",
+    "category": "correction",
+    "day": 2,
+    "metric": "stale",
+    "passed": true,
+    "detail": "哥哥",
+    "active": [
+      "我有一个双胞胎哥哥",
+      "逗你的，我是独生子，没有双胞胎哥哥"
+    ]
+  },
+  {
+    "case": "correction-13",
+    "category": "correction",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['178']",
+    "active": [
+      "我身高175",
+      "搞错了，我身高是178"
+    ]
+  },
+  {
+    "case": "correction-13",
+    "category": "correction",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "身高",
+    "active": [
+      "我身高175",
+      "搞错了，我身高是178"
+    ]
+  },
+  {
+    "case": "correction-13",
+    "category": "correction",
+    "day": 2,
+    "metric": "stale",
+    "passed": true,
+    "detail": "身高",
+    "active": [
+      "我身高175",
+      "搞错了，我身高是178"
+    ]
+  },
+  {
+    "case": "dedup-01",
+    "category": "dedup",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['花生']",
+    "active": [
+      "我花生过敏的事你要记住"
+    ]
+  },
+  {
+    "case": "dedup-01",
+    "category": "dedup",
+    "day": 1,
+    "metric": "unique",
+    "passed": true,
+    "detail": "['花生'] 最多 1 条，实际 1 条",
+    "active": [
+      "我花生过敏的事你要记住"
+    ]
+  },
+  {
+    "case": "dedup-02",
+    "category": "dedup",
+    "day": 2,
+    "metric": "unique",
+    "passed": true,
+    "detail": "['林晓'] 最多 1 条，实际 1 条",
+    "active": [
+      "我叫林晓"
+    ]
+  },
+  {
+    "case": "dedup-03",
+    "category": "dedup",
+    "day": 2,
+    "metric": "unique",
+    "passed": false,
+    "detail": "['年糕'] 最多 1 条，实际 2 条: ['我养了一只橘猫叫年糕', '我家年糕是只橘猫']",
+    "active": [
+      "我养了一只橘猫叫年糕",
+      "我家年糕是只橘猫"
+    ]
+  },
+  {
+    "case": "dedup-04",
+    "category": "dedup",
+    "day": 1,
+    "metric": "unique",
+    "passed": false,
+    "detail": "['协和'] 最多 1 条，实际 2 条: ['我在协和医学院读书', '我是协和的学生']",
+    "active": [
+      "我在协和医学院读书",
+      "我是协和的学生"
+    ]
+  },
+  {
+    "case": "dedup-05",
+    "category": "dedup",
+    "day": 3,
+    "metric": "unique",
+    "passed": true,
+    "detail": "['香菜'] 最多 1 条，实际 1 条",
+    "active": [
+      "我不吃香菜"
+    ]
+  },
+  {
+    "case": "dedup-06",
+    "category": "dedup",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['每周跑三次']",
+    "active": [
+      "我喜欢跑步，每周跑三次"
+    ]
+  },
+  {
+    "case": "dedup-06",
+    "category": "dedup",
+    "day": 2,
+    "metric": "unique",
+    "passed": true,
+    "detail": "['跑步'] 最多 1 条，实际 1 条",
+    "active": [
+      "我喜欢跑步，每周跑三次"
+    ]
+  },
+  {
+    "case": "entity-01",
+    "category": "multi_entity",
+    "day": 1,
+    "metric": "top1",
+    "passed": true,
+    "detail": "李娜",
+    "active": [
+      "我同事张伟喜欢打羽毛球",
+      "我同事李娜喜欢游泳"
+    ]
+  },
+  {
+    "case": "entity-01",
+    "category": "multi_entity",
+    "day": 1,
+    "metric": "top1",
+    "passed": true,
+    "detail": "张伟",
+    "active": [
+      "我同事张伟喜欢打羽毛球",
+      "我同事李娜喜欢游泳"
+    ]
+  },
+  {
+    "case": "entity-02",
+    "category": "multi_entity",
+    "day": 1,
+    "metric": "top1",
+    "passed": true,
+    "detail": "姐姐",
+    "active": [
+      "我哥哥在广州做律师",
+      "我姐姐在成都当老师"
+    ]
+  },
+  {
+    "case": "entity-02",
+    "category": "multi_entity",
+    "day": 1,
+    "metric": "top1",
+    "passed": true,
+    "detail": "哥哥",
+    "active": [
+      "我哥哥在广州做律师",
+      "我姐姐在成都当老师"
+    ]
+  },
+  {
+    "case": "entity-03",
+    "category": "multi_entity",
+    "day": 1,
+    "metric": "top1",
+    "passed": true,
+    "detail": "我的狗",
+    "active": [
+      "我的狗叫豆豆，是柯基",
+      "我的猫叫咪咪，是布偶"
+    ]
+  },
+  {
+    "case": "entity-03",
+    "category": "multi_entity",
+    "day": 1,
+    "metric": "top1",
+    "passed": true,
+    "detail": "我的猫",
+    "active": [
+      "我的狗叫豆豆，是柯基",
+      "我的猫叫咪咪，是布偶"
+    ]
+  },
+  {
+    "case": "entity-04",
+    "category": "multi_entity",
+    "day": 1,
+    "metric": "top1",
+    "passed": true,
+    "detail": "项目B",
+    "active": [
+      "项目A的截止日期是4月1号",
+      "项目B的负责人是老王"
+    ]
+  },
+  {
+    "case": "entity-04",
+    "category": "multi_entity",
+    "day": 1,
+    "metric": "top1",
+    "passed": true,
+    "detail": "项目A",
+    "active": [
+      "项目A的截止日期是4月1号",
+      "项目B的负责人是老王"
+    ]
+  },
+  {
+    "case": "entity-05",
+    "category": "multi_entity",
+    "day": 1,
+    "metric": "top1",
+    "passed": true,
+    "detail": "奶奶",
+    "active": [
+      "我爸喜欢钓鱼",
+      "我妈喜欢跳广场舞",
+      "我奶奶喜欢打麻将"
+    ]
+  },
+  {
+    "case": "entity-05",
+    "category": "multi_entity",
+    "day": 1,
+    "metric": "top1",
+    "passed": true,
+    "detail": "我妈",
+    "active": [
+      "我爸喜欢钓鱼",
+      "我妈喜欢跳广场舞",
+      "我奶奶喜欢打麻将"
+    ]
+  },
+  {
+    "case": "entity-06",
+    "category": "multi_entity",
+    "day": 1,
+    "metric": "top1",
+    "passed": true,
+    "detail": "药理",
+    "active": [
+      "王老师教我们病理学",
+      "刘老师教我们药理学"
+    ]
+  },
+  {
+    "case": "entity-06",
+    "category": "multi_entity",
+    "day": 1,
+    "metric": "top1",
+    "passed": true,
+    "detail": "王老师",
+    "active": [
+      "王老师教我们病理学",
+      "刘老师教我们药理学"
+    ]
+  },
+  {
+    "case": "noconflict-01",
+    "category": "no_conflict",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['岳阳']",
+    "active": [
+      "我老家是湖南岳阳的",
+      "我在长沙买了房，打算定居"
+    ]
+  },
+  {
+    "case": "noconflict-01",
+    "category": "no_conflict",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['长沙']",
+    "active": [
+      "我老家是湖南岳阳的",
+      "我在长沙买了房，打算定居"
+    ]
+  },
+  {
+    "case": "noconflict-01",
+    "category": "no_conflict",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "老家",
+    "active": [
+      "我老家是湖南岳阳的",
+      "我在长沙买了房，打算定居"
+    ]
+  },
+  {
+    "case": "noconflict-02",
+    "category": "no_conflict",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['苹果']",
+    "active": [
+      "我喜欢吃苹果",
+      "我喜欢看电影"
+    ]
+  },
+  {
+    "case": "noconflict-02",
+    "category": "no_conflict",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['电影']",
+    "active": [
+      "我喜欢吃苹果",
+      "我喜欢看电影"
+    ]
+  },
+  {
+    "case": "noconflict-03",
+    "category": "no_conflict",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['成都']",
+    "active": [
+      "我从小在成都长大",
+      "我现在在北京工作"
+    ]
+  },
+  {
+    "case": "noconflict-03",
+    "category": "no_conflict",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['北京']",
+    "active": [
+      "我从小在成都长大",
+      "我现在在北京工作"
+    ]
+  },
+  {
+    "case": "noconflict-03",
+    "category": "no_conflict",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "成都",
+    "active": [
+      "我从小在成都长大",
+      "我现在在北京工作"
+    ]
+  },
+  {
+    "case": "noconflict-04",
+    "category": "no_conflict",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['骑车']",
+    "active": [
+      "我每天从家骑车到学校",
+      "我每天从学校走路回家"
+    ]
+  },
+  {
+    "case": "noconflict-04",
+    "category": "no_conflict",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['走路']",
+    "active": [
+      "我每天从家骑车到学校",
+      "我每天从学校走路回家"
+    ]
+  },
+  {
+    "case": "noconflict-05",
+    "category": "no_conflict",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['张三']",
+    "active": [
+      "张三喜欢打篮球",
+      "李四喜欢打篮球"
+    ]
+  },
+  {
+    "case": "noconflict-05",
+    "category": "no_conflict",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['李四']",
+    "active": [
+      "张三喜欢打篮球",
+      "李四喜欢打篮球"
+    ]
+  },
+  {
+    "case": "noconflict-06",
+    "category": "no_conflict",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['记账']",
+    "active": [
+      "我在做一个记账 App",
+      "我不是程序员，我是产品经理"
+    ]
+  },
+  {
+    "case": "noconflict-06",
+    "category": "no_conflict",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['产品经理']",
+    "active": [
+      "我在做一个记账 App",
+      "我不是程序员，我是产品经理"
+    ]
+  },
+  {
+    "case": "noconflict-07",
+    "category": "no_conflict",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['妈妈']",
+    "active": [
+      "我妈妈是医生",
+      "我爸爸是医生"
+    ]
+  },
+  {
+    "case": "noconflict-07",
+    "category": "no_conflict",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['爸爸']",
+    "active": [
+      "我妈妈是医生",
+      "我爸爸是医生"
+    ]
+  },
+  {
+    "case": "noconflict-08",
+    "category": "no_conflict",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['花生']",
+    "active": [
+      "我对花生过敏",
+      "我对花粉过敏"
+    ]
+  },
+  {
+    "case": "noconflict-08",
+    "category": "no_conflict",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['花粉']",
+    "active": [
+      "我对花生过敏",
+      "我对花粉过敏"
+    ]
+  },
+  {
+    "case": "noise-01",
+    "category": "noise",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['哈哈']",
+    "active": []
+  },
+  {
+    "case": "noise-01",
+    "category": "noise",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['嗯嗯']",
+    "active": []
+  },
+  {
+    "case": "noise-01",
+    "category": "noise",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['收到']",
+    "active": []
+  },
+  {
+    "case": "noise-02",
+    "category": "noise",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['陈默']",
+    "active": [
+      "我叫陈默"
+    ]
+  },
+  {
+    "case": "noise-02",
+    "category": "noise",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['天气']",
+    "active": [
+      "我叫陈默"
+    ]
+  },
+  {
+    "case": "noise-03",
+    "category": "noise",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['128']",
+    "active": []
+  },
+  {
+    "case": "noise-04",
+    "category": "noise",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['翻译']",
+    "active": []
+  },
+  {
+    "case": "noise-05",
+    "category": "noise",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['火锅店']",
+    "active": []
+  },
+  {
+    "case": "noise-06",
+    "category": "noise",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['定时']",
+    "active": []
+  },
+  {
+    "case": "noise-07",
+    "category": "noise",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['usmle']",
+    "active": [
+      "我在准备 USMLE Step 1 考试"
+    ]
+  },
+  {
+    "case": "noise-07",
+    "category": "noise",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['谢谢']",
+    "active": [
+      "我在准备 USMLE Step 1 考试"
+    ]
+  },
+  {
+    "case": "noise-08",
+    "category": "noise",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['rust']",
+    "active": []
+  },
+  {
+    "case": "noise-09",
+    "category": "noise",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['猫毛']",
+    "active": [
+      "我对猫毛过敏"
+    ]
+  },
+  {
+    "case": "noise-09",
+    "category": "noise",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['随便聊聊']",
+    "active": [
+      "我对猫毛过敏"
+    ]
+  },
+  {
+    "case": "noise-10",
+    "category": "noise",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['没问题']",
+    "active": []
+  },
+  {
+    "case": "noise-11",
+    "category": "noise",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['英里']",
+    "active": []
+  },
+  {
+    "case": "paraphrase-01",
+    "category": "paraphrase",
+    "day": 1,
+    "metric": "hit",
+    "passed": false,
+    "detail": "坚果",
+    "active": [
+      "我对花生过敏"
+    ]
+  },
+  {
+    "case": "paraphrase-02",
+    "category": "paraphrase",
+    "day": 1,
+    "metric": "hit",
+    "passed": false,
+    "detail": "忌口",
+    "active": [
+      "我不吃香菜"
+    ]
+  },
+  {
+    "case": "paraphrase-03",
+    "category": "paraphrase",
+    "day": 1,
+    "metric": "hit",
+    "passed": false,
+    "detail": "对象",
+    "active": [
+      "我女朋友叫苏晴"
+    ]
+  },
+  {
+    "case": "paraphrase-04",
+    "category": "paraphrase",
+    "day": 1,
+    "metric": "hit",
+    "passed": false,
+    "detail": "学校",
+    "active": [
+      "我在协和医学院读大三"
+    ]
+  },
+  {
+    "case": "paraphrase-05",
+    "category": "paraphrase",
+    "day": 1,
+    "metric": "hit",
+    "passed": false,
+    "detail": "健康状况",
+    "active": [
+      "我有高血压"
+    ]
+  },
+  {
+    "case": "paraphrase-06",
+    "category": "paraphrase",
+    "day": 1,
+    "metric": "hit",
+    "passed": false,
+    "detail": "宠物",
+    "active": [
+      "我养了一只橘猫叫年糕"
+    ]
+  },
+  {
+    "case": "paraphrase-07",
+    "category": "paraphrase",
+    "day": 1,
+    "metric": "hit",
+    "passed": false,
+    "detail": "工作",
+    "active": [
+      "我在深圳做嵌入式开发"
+    ]
+  },
+  {
+    "case": "paraphrase-08",
+    "category": "paraphrase",
+    "day": 1,
+    "metric": "hit",
+    "passed": false,
+    "detail": "家乡",
+    "active": [
+      "我老家是湖南岳阳的"
+    ]
+  },
+  {
+    "case": "paraphrase-09",
+    "category": "paraphrase",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "你还记得我对什么过敏吗",
+    "active": [
+      "我对花生过敏",
+      "我叫林晓"
+    ]
+  },
+  {
+    "case": "paraphrase-09",
+    "category": "paraphrase",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "我叫什么名字来着",
+    "active": [
+      "我对花生过敏",
+      "我叫林晓"
+    ]
+  },
+  {
+    "case": "paraphrase-10",
+    "category": "paraphrase",
+    "day": 1,
+    "metric": "hit",
+    "passed": false,
+    "detail": "peanut allergy",
+    "active": [
+      "我对花生过敏"
+    ]
+  },
+  {
+    "case": "shift-01",
+    "category": "preference_shift",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "咖啡",
+    "active": [
+      "我最喜欢喝拿铁咖啡",
+      "最近改喝美式咖啡了"
+    ]
+  },
+  {
+    "case": "shift-01",
+    "category": "preference_shift",
+    "day": 2,
+    "metric": "stale",
+    "passed": false,
+    "detail": "咖啡",
+    "active": [
+      "我最喜欢喝拿铁咖啡",
+      "最近改喝美式咖啡了"
+    ]
+  },
+  {
+    "case": "shift-02",
+    "category": "preference_shift",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "苏晴",
+    "active": [
+      "我女朋友叫苏晴",
+      "我和苏晴分手了"
+    ]
+  },
+  {
+    "case": "shift-02",
+    "category": "preference_shift",
+    "day": 2,
+    "metric": "stale",
+    "passed": false,
+    "detail": "苏晴",
+    "active": [
+      "我女朋友叫苏晴",
+      "我和苏晴分手了"
+    ]
+  },
+  {
+    "case": "shift-03",
+    "category": "preference_shift",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "减肥",
+    "active": [
+      "我在减肥，晚上不吃饭",
+      "减肥结束了，现在正常吃晚饭"
+    ]
+  },
+  {
+    "case": "shift-03",
+    "category": "preference_shift",
+    "day": 2,
+    "metric": "stale",
+    "passed": false,
+    "detail": "减肥",
+    "active": [
+      "我在减肥，晚上不吃饭",
+      "减肥结束了，现在正常吃晚饭"
+    ]
+  },
+  {
+    "case": "shift-04",
+    "category": "preference_shift",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "健身",
+    "active": [
+      "我每周三晚上去健身房",
+      "健身卡到期了，现在在家跑步"
+    ]
+  },
+  {
+    "case": "shift-04",
+    "category": "preference_shift",
+    "day": 2,
+    "metric": "stale",
+    "passed": false,
+    "detail": "健身",
+    "active": [
+      "我每周三晚上去健身房",
+      "健身卡到期了，现在在家跑步"
+    ]
+  },
+  {
+    "case": "shift-05",
+    "category": "preference_shift",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "iPhone",
+    "active": [
+      "我在用 iPhone 13",
+      "新买了一台华为 Mate 70，iPhone 送给我妈了"
+    ]
+  },
+  {
+    "case": "shift-05",
+    "category": "preference_shift",
+    "day": 2,
+    "metric": "stale",
+    "passed": false,
+    "detail": "iPhone",
+    "active": [
+      "我在用 iPhone 13",
+      "新买了一台华为 Mate 70，iPhone 送给我妈了"
+    ]
+  },
+  {
+    "case": "privacy-01",
+    "category": "privacy",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['860312']",
+    "active": []
+  },
+  {
+    "case": "privacy-02",
+    "category": "privacy",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['sk-proj']",
+    "active": []
+  },
+  {
+    "case": "privacy-03",
+    "category": "privacy",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['110101199003071234']",
+    "active": []
+  },
+  {
+    "case": "temporal-01",
+    "category": "temporal",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['面试', '2026-03-11']",
+    "active": [
+      "我下周三（2026-03-11）有一场很重要的面试"
+    ]
+  },
+  {
+    "case": "temporal-01",
+    "category": "temporal",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "面试",
+    "active": [
+      "我下周三（2026-03-11）有一场很重要的面试"
+    ]
+  },
+  {
+    "case": "temporal-01",
+    "category": "temporal",
+    "day": 2,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['面试']",
+    "active": []
+  },
+  {
+    "case": "temporal-02",
+    "category": "temporal",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['复查', '2026-03-05']",
+    "active": [
+      "明天（2026-03-05）下午三点要去医院复查"
+    ]
+  },
+  {
+    "case": "temporal-02",
+    "category": "temporal",
+    "day": 2,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['复查']",
+    "active": []
+  },
+  {
+    "case": "temporal-03",
+    "category": "temporal",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['论文', '2026-03-03']",
+    "active": [
+      "我昨天（2026-03-03）把毕业论文投出去了"
+    ]
+  },
+  {
+    "case": "temporal-03",
+    "category": "temporal",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['论文']",
+    "active": [
+      "我昨天（2026-03-03）把毕业论文投出去了"
+    ]
+  },
+  {
+    "case": "temporal-04",
+    "category": "temporal",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['答辩', '2026-04-15']",
+    "active": [
+      "下个月15号（2026-04-15）是我的硕士答辩"
+    ]
+  },
+  {
+    "case": "temporal-04",
+    "category": "temporal",
+    "day": 1,
+    "metric": "hit",
+    "passed": true,
+    "detail": "答辩",
+    "active": [
+      "下个月15号（2026-04-15）是我的硕士答辩"
+    ]
+  },
+  {
+    "case": "temporal-05",
+    "category": "temporal",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['每周三', '组会']",
+    "active": [
+      "我每周三晚上有组会"
+    ]
+  },
+  {
+    "case": "temporal-05",
+    "category": "temporal",
+    "day": 1,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['组会', '（2026']",
+    "active": [
+      "我每周三晚上有组会"
+    ]
+  },
+  {
+    "case": "temporal-06",
+    "category": "temporal",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['读博', '2027']",
+    "active": [
+      "我明年（2027年）要去美国读博"
+    ]
+  },
+  {
+    "case": "temporal-07",
+    "category": "temporal",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['杭州', '2026-03-06']",
+    "active": [
+      "我后天（2026-03-06）要去杭州出差"
+    ]
+  },
+  {
+    "case": "temporal-07",
+    "category": "temporal",
+    "day": 2,
+    "metric": "forget",
+    "passed": true,
+    "detail": "不应记住 ['出差']",
+    "active": []
+  },
+  {
+    "case": "temporal-08",
+    "category": "temporal",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['科目二', '2026-02-25']",
+    "active": [
+      "我上周三（2026-02-25）刚考完驾照科目二"
+    ]
+  },
+  {
+    "case": "temporal-09",
+    "category": "temporal",
+    "day": 1,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['实验报告', '2026-03-06']",
+    "active": [
+      "这周五（2026-03-06）我要交实验报告"
+    ]
+  },
+  {
+    "case": "temporal-09",
+    "category": "temporal",
+    "day": 2,
+    "metric": "hit",
+    "passed": true,
+    "detail": "实验报告",
+    "active": [
+      "这周五（2026-03-06）我要交实验报告",
+      "实验报告已经提前交完了"
+    ]
+  },
+  {
+    "case": "temporal-09",
+    "category": "temporal",
+    "day": 2,
+    "metric": "stale",
+    "passed": false,
+    "detail": "实验报告",
+    "active": [
+      "这周五（2026-03-06）我要交实验报告",
+      "实验报告已经提前交完了"
+    ]
+  },
+  {
+    "case": "temporal-10",
+    "category": "temporal",
+    "day": 2,
+    "metric": "remember",
+    "passed": true,
+    "detail": "应记住 ['戒烟']",
+    "active": [
+      "我从明天（2026-03-05）开始戒烟"
+    ]
+  }
+]

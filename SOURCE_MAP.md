@@ -66,3 +66,16 @@
 | 构建平台 | JDK17、[Android SDK](https://developer.android.com/tools) 与系统 Android APIs；不是本项目原创平台实现 |
 
 新增业务代码、预设与测试由本次开发通过 AI 辅助编写。引用第三方接口或设计路线不等于复制其整个实现；没有实际使用的项目不列作代码来源。若有来源标注不准确，可提交 Issue 指出具体文件，我们将按可核实证据修正。
+
+## 0.3.0 新增记忆引擎来源
+
+| 模块 | 来源与实际使用方式 |
+|---|---|
+| `memory-service/upstream/src/*.py` | 直接随包分发 `ktao732084-arch/agent-anthropomorphic-memory` 的固定源码快照；提交与逐文件 SHA-256 见 `memory-service/UPSTREAM.json`，MIT 原文保留。不是自行重写的替代引擎。 |
+| `companion_api.py`、`run_companion_eval.py` 与服务专项测试 | 本次为两个项目新增的无状态 API 适配、来源映射和共享评测；已提交回记忆项目 [PR #4](https://github.com/ktao732084-arch/agent-anthropomorphic-memory/pull/4)。 |
+| `llm_judge.py` | 上游实现基础上增加最终答案门控、截断/容量/候选编号验证；保留上游最新可配置 token 预算修复。 |
+| `MemoryBridge.java` | 本项目新增 Android HTTP 客户端、独立凭据配置、响应来源校验与降级；不加载 DSH 或 Python 到 APK。 |
+| `MemoryLedger.java`、`MemoryPanel.java` | 本项目新增手机侧来源、历史、删除语义与界面。核心去重、时间推理、语义与写入判断由 Python 上游执行。 |
+| `MemoryIntegrationTest.java`、`MemoryReplay.java` | 本项目新增；实际启动 Python HTTP 服务，复用未经修改的84场景。 |
+
+记忆项目自身说明借鉴 mem0 的写入判断与相对时间、Graphiti 的时间失效等思路；本项目的直接代码来源是上述固定快照，没有另行复制这些项目的实现。该来源不改变角色动画的非商业许可要求。

@@ -1,20 +1,26 @@
 {
   "schema": 1,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "android_base_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
-  "scope": "Initial publication inventory; generated publication documentation may not list itself. Text files use LF so checksums match repository contents.",
+  "scope": "Publication inventory, excluding this self-referential manifest and ignored build/user files. Text SHA-256 uses Git LF-normalized contents.",
   "files": [
     {
       "path": ".gitattributes",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "031b52c001659c2b5167ddea60d4f0402e8caffb3d508aa9f3e4b3e8b1a37179"
+      "sha256": "917535508726abbe6359f6e82cdb94923868a0e93cb5ecf535c4a24d928c489e"
     },
     {
       "path": ".gitignore",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "a1018ad11230bce84d86f92fd41a2cef21c0d4ab9ed149a075ea6fbe296d9e98"
+      "sha256": "f2da222401c2c8515b06120c4d0215ea2ed62de1fa0ec710988fb54f8ec28412"
+    },
+    {
+      "path": "ASSET_LICENSE.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "3bdf8415be9d95d07feef760cf74c131c3e846e71bf4c144963a507c7e504807"
     },
     {
       "path": "AndroidManifest.xml",
@@ -22,14 +28,69 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/AndroidManifest.xml",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "02572e8467fa401e36d49ac1288feee1fbd7bf04",
-      "sha256": "96582d6fb8c9495e12147e4033eec844bf00467c5382432f3c98b2323b355ee8",
+      "sha256": "368ef29eda47b93fe5e24612ff285aefef78685067414d175624902ca99c30ba",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
-      "path": "ASSET_LICENSE.md",
+      "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "3bdf8415be9d95d07feef760cf74c131c3e846e71bf4c144963a507c7e504807"
+      "sha256": "85ed6ec131a78e6768445fa80aa18f15627e26b6202be5bdf65b13ea91926134"
+    },
+    {
+      "path": "LICENSE",
+      "relationship": "preserved-license",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/LICENSE",
+      "sha256": "22757dc9c895b2729a2fc684d227cadfb54d5af3dd300029926839e8c4e269ce"
+    },
+    {
+      "path": "NOTICE-DAFEIYU.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "30ccea079cdd00c54f0ca2e24f144dabe3b80ee98735560b2681697d18189466"
+    },
+    {
+      "path": "PERSONA-UPSTREAM.md",
+      "relationship": "archived-reference",
+      "direct_source": "https://github.com/ERUIHNIYHBKBNF/dafeiyu-persona/blob/5b08af8353fcfcc1378ea73f33686d669d61703f/dafeiyu/SKILL.md",
+      "sha256": "8a0c8b0a1c862cb7ddb023f431a93b2ea2321c37343c016506f2ac3b9f7f8da4",
+      "source_commit": "5b08af8353fcfcc1378ea73f33686d669d61703f"
+    },
+    {
+      "path": "README.md",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
+      "sha256": "572041f08b44bba45cd545ca009b5142c8e38a9fb13c99aade9bb0478726547e",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "SOURCE_MAP.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "17e096e2fa96c6c48570eefc7e36f642e9d9a26ee077ebedb67ca12fe7e87686"
+    },
+    {
+      "path": "THIRD-PARTY-LICENSE.txt",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/THIRD-PARTY-LICENSE.txt",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "7d87632065ae9bbebe4fb7a275f38f3cd1c30c41",
+      "sha256": "22757dc9c895b2729a2fc684d227cadfb54d5af3dd300029926839e8c4e269ce",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "UPSTREAM.txt",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "0290666148af828052bd0af4738c87204e9c820bb8565288a59275f6610f1857"
+    },
+    {
+      "path": "VALIDATION.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "628c64930f424eddfccddfec3133ed119902b96149313894ead48aefbc9941cd"
     },
     {
       "path": "assets/catalog.json",
@@ -1130,32 +1191,38 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/build.ps1",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "dfb18a59464d1e81ffc0b6f99417008b510ba707",
-      "sha256": "67f833bec0bc5c418a7342489ea735ec36f7900cec19962dde941757080a86e7",
+      "sha256": "645ba594fe498e0b837a121eacfb90a01c9048bafb6add473a87ce1dafef5dab",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
-      "path": "CHANGELOG.md",
+      "path": "docs/VALIDATION-0.2.0.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "df97ee0c44eacc3591ed4b0aff74f712705b1b170c579756b476caa1f2f405cd"
+      "sha256": "86d4749588494464e4d7ab5ccf45790b435b35704df5fdc4253a4e2111c644be"
+    },
+    {
+      "path": "docs/test-reports/memory-replay-android.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "df3383c1645951834f226b161d1a3611bc56dbe2de69110b9bf230e639cb8835"
     },
     {
       "path": "docs/test-reports/robolectric-results.txt",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "cb94ba1357cc4fae6a5662093ce220302510a69e621b289726e7ac2aebdf711f"
+      "sha256": "776700a9f1f7f179785381784a433172224ce334a711393318dc325e9dee9b73"
     },
     {
       "path": "docs/test-reports/robolectric-results.xml",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "6cc0090429df084d9c379598e2e2b2e9dd82ee83ac6b1dda8368f5756e5d2e01"
+      "sha256": "8e34be32fa718b07945319e9830ad0746631c7bd415e5ba6c09c75a96050fa6c"
     },
     {
       "path": "docs/test-reports/validation-result.json",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "970e094324cf4e1df35cae2a0da4aa23971378988a79a658b04943d3b0ae659a"
+      "sha256": "bfd0eb211206e3d9715b9e411f3e2ffa518e2a1da591538477f6f0679f323db7"
     },
     {
       "path": "instrumentation/AgentInstrumentation.java",
@@ -1170,44 +1237,296 @@
       "sha256": "d4eacc85b321f7612777b9d9add3c68e21f506c0d3832cc64cca59c572575587"
     },
     {
-      "path": "instrumentation/build-tests.ps1",
-      "relationship": "project-added",
-      "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "0451187ff937bd47b8c2f0dc0e00bffa2d4d7f5221f6f1136b2fb6ce568f6bc1"
-    },
-    {
       "path": "instrumentation/PersonaChecks.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "fef24c197679915926182fab2e4ea1c0e7315236b45732f9985b65138ef74a50"
     },
     {
-      "path": "LICENSE",
-      "relationship": "preserved-license",
-      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/LICENSE",
-      "sha256": "22757dc9c895b2729a2fc684d227cadfb54d5af3dd300029926839e8c4e269ce"
-    },
-    {
-      "path": "NOTICE-DAFEIYU.md",
+      "path": "instrumentation/build-tests.ps1",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "4c3cdf082c3ecedc800da787cf9c895aea8d2c4ada3986a8450eae4e3cf8d288"
+      "sha256": "0451187ff937bd47b8c2f0dc0e00bffa2d4d7f5221f6f1136b2fb6ce568f6bc1"
     },
     {
-      "path": "PERSONA-UPSTREAM.md",
-      "relationship": "archived-reference",
-      "direct_source": "https://github.com/ERUIHNIYHBKBNF/dafeiyu-persona/blob/5b08af8353fcfcc1378ea73f33686d669d61703f/dafeiyu/SKILL.md",
-      "sha256": "8a0c8b0a1c862cb7ddb023f431a93b2ea2321c37343c016506f2ac3b9f7f8da4",
-      "source_commit": "5b08af8353fcfcc1378ea73f33686d669d61703f"
+      "path": "memory-service/README.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "8fd76692239df3e7c65472ae11dfda70a1091b7afe31fd5685c393e1f2e107c4"
     },
     {
-      "path": "README.md",
-      "relationship": "adapted",
-      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
-      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
-      "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "3d34702284c690b1716fea1a3d4e4c017deb612570808e8a3cff8d12012e79d3",
-      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+      "path": "memory-service/UPSTREAM.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "9e6aa251c837c989428755e477fb0afacb7115c9b9fdb11bb0bb50c0b83850a6"
+    },
+    {
+      "path": "memory-service/protocol-baseline.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "616285d01ff33625669207d870a551bd212ac946ab2c1749c4baa5b530cad305"
+    },
+    {
+      "path": "memory-service/start.ps1",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "50ba229690e231090d79671d448ff7cf9e89862d1875184a57808b32109d15af"
+    },
+    {
+      "path": "memory-service/upstream/LICENSE",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/LICENSE",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "1126322e2cc8d165adc4c792eeb195717de2bcc7b39be1ce77959d78e87ef685"
+    },
+    {
+      "path": "memory-service/upstream/eval/README.md",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/eval/README.md",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "8ae7de4971b96fe586e75aa991a09b7d19abd7061376692f620277c68c1a6697"
+    },
+    {
+      "path": "memory-service/upstream/eval/cases/basic.json",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/eval/cases/basic.json",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "26d8bab8a0eb23ffd5b94d10b60cd52cc4899ba457075deea4ee8fd607efbb4b"
+    },
+    {
+      "path": "memory-service/upstream/eval/cases/correction.json",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/eval/cases/correction.json",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "5ff0eab0290d17da979204ec2251ff79c1b5ee17598f409d8470133874415d1c"
+    },
+    {
+      "path": "memory-service/upstream/eval/cases/dedup.json",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/eval/cases/dedup.json",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "e9ce2f595afc28d7dfeb49454ab7ea2ee42e7ce629a776969308ffe9d20ed493"
+    },
+    {
+      "path": "memory-service/upstream/eval/cases/multi_entity.json",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/eval/cases/multi_entity.json",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "260b6242b6b1417936e2e6dd66310c5cc0240f9c2278ab7099d1cd0c3a4480f8"
+    },
+    {
+      "path": "memory-service/upstream/eval/cases/no_conflict.json",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/eval/cases/no_conflict.json",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "e6dc47c6b0008d4738f81a6280e373edb736f375a52b028b8e62c8fe5c269acf"
+    },
+    {
+      "path": "memory-service/upstream/eval/cases/noise.json",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/eval/cases/noise.json",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "06fdf47299789fa21ba0fe8076d04a3f9525893094f80ad4643dcda0ffe82e98"
+    },
+    {
+      "path": "memory-service/upstream/eval/cases/paraphrase.json",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/eval/cases/paraphrase.json",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "4b1a91d1cbdbe86b3f97d10f559e550246192cb398c09731d2a0c4de66bc4410"
+    },
+    {
+      "path": "memory-service/upstream/eval/cases/preference_shift.json",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/eval/cases/preference_shift.json",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "c251980a675bbb4cb1fc288763d1508b95cf564c50e3c90b49e26baad1d82b2f"
+    },
+    {
+      "path": "memory-service/upstream/eval/cases/privacy.json",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/eval/cases/privacy.json",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "f7197e8ae3ef7542ee63b1a9c0e8b18fb85ae2f9eb7b74dbb961b237f3bb7163"
+    },
+    {
+      "path": "memory-service/upstream/eval/cases/temporal.json",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/eval/cases/temporal.json",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "0e082eb03ab8b15d8a6c55be228e15de86a0789f259b0132237e035b50b6d875"
+    },
+    {
+      "path": "memory-service/upstream/eval/run_companion_eval.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/eval/run_companion_eval.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "6a6329e141fab6f5cc4102e212dbfa7d08c33087c3a20e86c7df98747ac125a0"
+    },
+    {
+      "path": "memory-service/upstream/eval/run_eval.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/eval/run_eval.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "e6b7c32107e51fa7c072a156f4c89d456b0358bfb32ea8a6f295811e73d9a746"
+    },
+    {
+      "path": "memory-service/upstream/src/backend_adapter.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/backend_adapter.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "8adb30d4057b7821e3e3d44449945c7da491e3c9086a2fd262404d8f2b2d040f"
+    },
+    {
+      "path": "memory-service/upstream/src/benchmark.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/benchmark.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "fb8a4fbbb48ee83d59881d1c681f04aad4cbc55d93390bb49a79729b85391045"
+    },
+    {
+      "path": "memory-service/upstream/src/collect_from_sessions.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/collect_from_sessions.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "9b863d63ee39d00ad98f95f121eb9df5c5f4a577600c835c9192afab9eb6badc"
+    },
+    {
+      "path": "memory-service/upstream/src/companion_api.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/companion_api.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "b87326ef53cc4ceddb50de4771b82cdad4b39c7f60b2a0dad1c05e3b284e31e2"
+    },
+    {
+      "path": "memory-service/upstream/src/conflict_resolver.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/conflict_resolver.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "071cc59db98d919e858967bf0ab615d438593044ef116d539adbaa9f24de0084"
+    },
+    {
+      "path": "memory-service/upstream/src/embeddings.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/embeddings.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "e3b23df728f1f6f4426db49fde1e47dc146ca598c15c3fd2dea17d054b87eea2"
+    },
+    {
+      "path": "memory-service/upstream/src/llm_judge.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/llm_judge.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "296e431c3e53859f7e49292cabaed334ecb8fc9d4e875cae505c7a82b933aa14"
+    },
+    {
+      "path": "memory-service/upstream/src/memory.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/memory.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "a159cbfb150acd125be6e2616647ff0df292c943ce247c7399dda7fd24c2842b"
+    },
+    {
+      "path": "memory-service/upstream/src/memory_operator.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/memory_operator.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "fd9f107d962286b829da9d65b176da54aa3a46f0650f6a63fe3cbd0b83d9e32c"
+    },
+    {
+      "path": "memory-service/upstream/src/noise_filter.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/noise_filter.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "60c062346f630960164bb9878a08036f591d21c284c0e844eefb7c5547e086d7"
+    },
+    {
+      "path": "memory-service/upstream/src/schema_v1_3_0.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/schema_v1_3_0.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "64cb88a32e5fe171ebbb8abbec534b5fe6cfa95101e1ec84dcfd60a683cbbabc"
+    },
+    {
+      "path": "memory-service/upstream/src/sqlite_backend.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/sqlite_backend.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "21c3aa0ac21cf09ccce56d0a6606f2a4338eee6a4ab92504473b7e2092d7faaf"
+    },
+    {
+      "path": "memory-service/upstream/src/temporal.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/temporal.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "2a1d1755fa910362c22c65d7facf7efc3a70892b9daf733416a6006937244a51"
+    },
+    {
+      "path": "memory-service/upstream/tests/test_agent_features.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/tests/test_agent_features.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "80fb77302eab14aa070654719ce3b0f4b8657e36ca39af38bcc6e84cb3ca1008"
+    },
+    {
+      "path": "memory-service/upstream/tests/test_companion_api.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/tests/test_companion_api.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "6ecfa9464b6e836fab384467f7af3edb32934f3affedb5bee4cfbe258c5c3d65"
+    },
+    {
+      "path": "memory-service/upstream/tests/test_dedup_regression.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/tests/test_dedup_regression.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "f19c86103b75e675c36c849b97fbe1d3ba3630b3cdcc0b0d5962be7516c991e7"
+    },
+    {
+      "path": "memory-service/upstream/tests/test_embeddings.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/tests/test_embeddings.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "3824ef4309ef249753c24912eb1b5dd51aff15cfe400194860fdc0d2a6032975"
+    },
+    {
+      "path": "memory-service/upstream/tests/test_llm_judge.py",
+      "relationship": "vendored",
+      "source_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+      "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/tests/test_llm_judge.py",
+      "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
+      "sha256": "49dcc59dfed0ef9788e6fd82ca252916759145a62a5f5106d2bbb85507dfc394"
     },
     {
       "path": "res/anim/panel_enter.xml",
@@ -1288,21 +1607,21 @@
       "sha256": "c4bb9d81d5394d37479d9825a198fd00fa1bd528124548792e106ded395602d4"
     },
     {
-      "path": "res/mipmap-anydpi/ic_launcher.xml",
-      "relationship": "copied",
-      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/mipmap-anydpi/ic_launcher.xml",
-      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
-      "source_blob": "d8ceb3d54058586c31399a1e5ab33eec6e45c576",
-      "sha256": "9fae19da11b0ac16c8e9e82fd949280c82de5676474f4d33805bc4ae6f1173ed",
-      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
-    },
-    {
       "path": "res/mipmap-anydpi-v26/ic_launcher.xml",
       "relationship": "adapted",
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/mipmap-anydpi-v26/ic_launcher.xml",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "64510ee5a056436bef32d0f65c00bfed555d9fdd",
       "sha256": "6d4fac0b720e9a9a7984e8035203d253c8fbf045c54911753d45f6d9445eba93",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "res/mipmap-anydpi/ic_launcher.xml",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/mipmap-anydpi/ic_launcher.xml",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "d8ceb3d54058586c31399a1e5ab33eec6e45c576",
+      "sha256": "9fae19da11b0ac16c8e9e82fd949280c82de5676474f4d33805bc4ae6f1173ed",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
@@ -1324,10 +1643,10 @@
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
-      "path": "SOURCE_MAP.md",
+      "path": "res/xml/network_security_config.xml",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "edf0755a7437eccb2662db253a5e592fe4ec061838dfbb050aaa5227045c09d0"
+      "sha256": "8156d8026ac08ec46155aacfe771291fe6d7f885589a96295b75e908e54d5488"
     },
     {
       "path": "src/com/xiaoxiao/pet/ActionSheet.java",
@@ -1342,7 +1661,7 @@
       "path": "src/com/xiaoxiao/pet/AgentPanel.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "cc9731ca7c40b5cb155069890d17ecdf7fe6c271f31f8051d6dfaf209fd83146"
+      "sha256": "ad610f04df4885f5de59ffb885cd352f0532e777dc4abbb5ea9e99d4545a22b3"
     },
     {
       "path": "src/com/xiaoxiao/pet/AgentPolicy.java",
@@ -1360,13 +1679,13 @@
       "path": "src/com/xiaoxiao/pet/AgentRuntime.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "6fe81a310b1d1b5b960c5553ed51db5908efa93f8011b7cacd550aaecf4f02e5"
+      "sha256": "2e501e778a83ba7005c39c5859a900b02a44255fc8655ce456a2b1484fee9e5e"
     },
     {
       "path": "src/com/xiaoxiao/pet/AgentStore.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "56593ba41bfb82e5258806aed8eb11d3df5ee3762cbea4b392f10d4dad2043a1"
+      "sha256": "96117f9d01b0751adcc52e4e184f261693fd84e5118860db4da923d05d9a3392"
     },
     {
       "path": "src/com/xiaoxiao/pet/AgentTransport.java",
@@ -1493,6 +1812,24 @@
       "source_blob": "af07db10487b980c0125c71a694f6ed46c68f26e",
       "sha256": "f22a5f79844babe4702767711173f3adb3e5181b2238fcaa9a343d6ede23c2d7",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/MemoryBridge.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "9ed158da969adf8537768b90815dd716e72865befbfa0865be2b5834ff33811b"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/MemoryLedger.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "94c88636aff2b01c7faca5119b07454c8467db3cb499bd0272dae8e72c315101"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/MemoryPanel.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "c5e54c3ff1f9a0bf35b993106168ce76b38b533b38018271d145716ada221acf"
     },
     {
       "path": "src/com/xiaoxiao/pet/ModelSettings.java",
@@ -1624,6 +1961,12 @@
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
+      "path": "tests/robolectric/README.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "6b3be85c5f11fcbd3637ad71e3927beef96ee44d96b5f8b83ba0059c339f73c7"
+    },
+    {
       "path": "tests/robolectric/bootstrap.py",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1636,16 +1979,22 @@
       "sha256": "a3167efcc826080a780dafb037cff9135b566b55e51ecbda9890532649d2d79a"
     },
     {
-      "path": "tests/robolectric/README.md",
-      "relationship": "project-added",
-      "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "8fc298c6f5f8ad6c614c8806129d9fe1c39d3f59ffa542167f86e98aedcb4507"
-    },
-    {
       "path": "tests/robolectric/run-tests.ps1",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "c20b3b99ce784764f5df8e2ab44ed1f1b30f259602e6e9947ce7243b763b8a31"
+      "sha256": "908dc43cec9856f00ea63a329a7bac8d4132a285095215ea6efaf387820155c6"
+    },
+    {
+      "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/MemoryIntegrationTest.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "fa54c5a4edcc99bb70fbbc522c9e0d968759e16785cac0672dec7be12df64bb0"
+    },
+    {
+      "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/MemoryReplay.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "dea4f8d065736cba69049fe59a7c4dfb243c712abb128b29995914e9b85a31bd"
     },
     {
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/PersonaChecks.java",
@@ -1675,28 +2024,20 @@
       "path": "tests/run-core.ps1",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "762a1833a35a50538598145105c8d7d71007637af1d6c526765819939a8ed003"
+      "sha256": "b28fa524b087c6f586462a593c9a214ea075fc35705fce3069f061e50e417629"
     },
     {
-      "path": "THIRD-PARTY-LICENSE.txt",
-      "relationship": "copied",
-      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/THIRD-PARTY-LICENSE.txt",
-      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
-      "source_blob": "7d87632065ae9bbebe4fb7a275f38f3cd1c30c41",
-      "sha256": "22757dc9c895b2729a2fc684d227cadfb54d5af3dd300029926839e8c4e269ce",
-      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
-    },
-    {
-      "path": "UPSTREAM.txt",
+      "path": "tools/sync-memory-service.py",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "0290666148af828052bd0af4738c87204e9c820bb8565288a59275f6610f1857"
+      "sha256": "945cb46d4ded83ba921155cfca1bbb94f0ba538eb67c09cf4c4a12d36faef1dd"
     },
     {
-      "path": "VALIDATION.md",
+      "path": "tools/update-provenance.py",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "86d4749588494464e4d7ab5ccf45790b435b35704df5fdc4253a4e2111c644be"
+      "sha256": "45ef80747b51d5ea61f6ee65eea355e2ecacb42d258c87175c538599a740a231"
     }
-  ]
+  ],
+  "memory_engine_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a"
 }

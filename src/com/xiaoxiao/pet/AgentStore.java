@@ -27,6 +27,7 @@ final class AgentStore {
         } else if(new File(file+".bak").exists()){
             state=read(new File(file+".bak"));state.put("recovered",true);save(state);
         } else state=empty(0);
+        MemoryLedger.migrate(state);MemoryLedger.expire(state,System.currentTimeMillis());
         if(state.toString().getBytes(StandardCharsets.UTF_8).length>MAX_FILE_BYTES)save(state);
     }
     static JSONObject empty(long epoch)throws Exception {
@@ -75,36 +76,30 @@ final class AgentStore {
         return commit(epoch,user,reply,emotion,quotes,remember,proactive,null);
     }
     synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit)throws Exception {
+        return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,null,null,0);
+    }
+    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed)throws Exception {
         if(epoch!=epoch())return false;
-        JSONObject next=snapshot();long now=System.currentTimeMillis();String tid=UUID.randomUUID().toString();
+        JSONObject next=plan==null?snapshot():MemoryLedger.copy(plan.state);long now=observed>0?observed:System.currentTimeMillis();String tid=turnId==null?UUID.randomUUID().toString():turnId;
+        MemoryLedger.migrate(next);if(plan!=null)next.put("memoryStatus",plan.status);
         if(explicit!=null){
             if(!remember||proactive)throw new IOException("当前不能写入记忆");
             if(explicit.trim().isEmpty()||explicit.length()>240||!user.contains(explicit))throw new IOException("记忆请填写 1–240 个字");
             if(AgentPolicy.sensitive(explicit))throw new IOException("请不要把密码、密钥或证件号码保存为记忆");
-            if(next.getJSONArray("memories").length()>=120)throw new IOException("记忆已满，请先删除几条");
-            addMemory(next,explicit,tid,true,now);
+            if(plan==null){if(next.getJSONArray("memories").length()>=120)throw new IOException("记忆已满，请先删除几条");addMemory(next,explicit,tid,true,now);}
         }
         JSONArray turns=next.getJSONArray("turns");
         turns.put(new JSONObject().put("id",tid).put("at",now).put("user",user).put("reply",reply).put("proactive",proactive));
         while(turns.length()>160)turns.remove(0);
         next.put("emotion",AgentPolicy.emotion(emotion)).put("emotionAt",now);
         if(!proactive)next.put("lastUser",now);
-        if(remember&&!proactive&&quotes!=null)for(int i=0;i<Math.min(3,quotes.length());i++) {
+        if(plan==null&&remember&&!proactive&&quotes!=null)for(int i=0;i<Math.min(3,quotes.length());i++) {
             String quote=quotes.optString(i,"");if(AgentPolicy.validEvidence(user,quote))addMemory(next,quote,tid,false,now);
         }
         save(next);return true;
     }
     private static void addMemory(JSONObject next,String text,String source,boolean pinned,long now)throws Exception {
-        JSONArray a=next.getJSONArray("memories");
-        for(int i=0;i<a.length();i++)if(text.equals(a.getJSONObject(i).optString("text"))){
-            if(pinned)a.getJSONObject(i).put("source",source).put("pinned",true).put("at",now);
-            return;
-        }
-        if(a.length()>=120) {
-            int remove=-1;for(int i=0;i<a.length();i++)if(!a.getJSONObject(i).optBoolean("pinned")){remove=i;break;}
-            if(remove<0)return;a.remove(remove);
-        }
-        a.put(new JSONObject().put("id",UUID.randomUUID().toString()).put("text",text).put("source",source).put("pinned",pinned).put("at",now));
+        MemoryLedger.addLocal(next,MemoryLedger.record(UUID.randomUUID().toString(),text,source,pinned,now));
     }
     synchronized void remember(String text)throws Exception {
         remember(text,true);
@@ -117,24 +112,19 @@ final class AgentStore {
     }
     synchronized void editMemory(String id,String text,boolean pinned)throws Exception {
         if(text.trim().isEmpty()||text.length()>240||AgentPolicy.sensitive(text))throw new IOException("请填写 1–240 字，不含密码或证件号码");
-        JSONObject next=snapshot();JSONArray a=next.getJSONArray("memories");
-        for(int i=0;i<a.length();i++){JSONObject m=a.getJSONObject(i);if(id.equals(m.optString("id"))){
-            String oldSource=m.optString("source");removeSourceTurn(next,oldSource);
-            m.put("text",text.trim()).put("pinned",pinned).put("source","你手动修改").put("at",System.currentTimeMillis());
-        }}
+        JSONObject next=snapshot();MemoryLedger.forget(next,id);MemoryLedger.addLocal(next,MemoryLedger.record(id,text.trim(),"你手动修改",pinned,System.currentTimeMillis()));
         next.put("epoch",epoch()+1);save(next);purgeBackup();
     }
     private static void removeSourceTurn(JSONObject next,String source)throws Exception {
         JSONArray turns=next.getJSONArray("turns");for(int j=turns.length()-1;j>=0;j--)if(source.equals(turns.getJSONObject(j).optString("id")))turns.remove(j);
     }
     synchronized void forget(String id)throws Exception {
-        JSONObject next=snapshot();JSONArray a=next.getJSONArray("memories");
-        for(int i=a.length()-1;i>=0;i--)if(id.equals(a.getJSONObject(i).optString("id"))){removeSourceTurn(next,a.getJSONObject(i).optString("source"));a.remove(i);}
+        JSONObject next=snapshot();MemoryLedger.forget(next,id);
         next.put("epoch",epoch()+1);save(next);purgeBackup();
     }
     synchronized void clear(boolean all)throws Exception {
         JSONObject next=all?empty(epoch()+1):snapshot().put("turns",new JSONArray()).put("epoch",epoch()+1);
-        save(next);purgeBackup();
+        MemoryLedger.migrate(next);save(next);purgeBackup();
     }
     private void purgeBackup()throws Exception {Files.deleteIfExists(new File(file+".bak").toPath());}
     synchronized void reserveAttempt(String day,long now)throws Exception {
@@ -142,18 +132,15 @@ final class AgentStore {
         next.put("attemptDay",day).put("attempts",n+1).put("lastAttempt",now);save(next);
     }
     synchronized String memoryContext(String query)throws Exception {
-        JSONArray memories=state.getJSONArray("memories");List<JSONObject> ranked=new ArrayList<>();
-        for(int i=0;i<memories.length();i++)ranked.add(memories.getJSONObject(i));
-        ranked.sort((a,b)->Double.compare(score(query,b),score(query,a)));
-        StringBuilder out=new StringBuilder();for(int i=0;i<Math.min(10,ranked.size());i++){
-            JSONObject m=ranked.get(i);out.append("\n").append(new java.text.SimpleDateFormat("MM-dd",Locale.ROOT).format(new Date(m.optLong("at")))).append(m.optBoolean("pinned")?" [用户固定] ":" [用户原话] ").append(m.optString("text"));
-        }
-        return out.toString();
+        return MemoryLedger.context(state,query,null);
     }
     private static double score(String q,JSONObject m){return AgentPolicy.relevance(q,m.optString("text"))*5+(m.optBoolean("pinned")?2:0)+Math.max(0,1-(System.currentTimeMillis()-m.optLong("at"))/(30.0*86400000));}
     synchronized String recall(String query)throws Exception {
-        JSONArray a=state.getJSONArray("turns");List<JSONObject> hits=new ArrayList<>();
-        for(int i=0;i<Math.max(0,a.length()-8);i++){JSONObject t=a.getJSONObject(i);if(AgentPolicy.relevance(query,t.optString("user"))>.12)hits.add(t);}
+        return recall(state,query);
+    }
+    static String recall(JSONObject snapshot,String query)throws Exception {
+        JSONArray a=snapshot.getJSONArray("turns");List<JSONObject> hits=new ArrayList<>();Set<String> stale=MemoryLedger.staleSources(snapshot,System.currentTimeMillis());
+        for(int i=0;i<Math.max(0,a.length()-8);i++){JSONObject t=a.getJSONObject(i);if(!stale.contains(t.optString("id"))&&AgentPolicy.relevance(query,t.optString("user"))>.12)hits.add(t);}
         hits.sort((x,y)->Double.compare(AgentPolicy.relevance(query,y.optString("user")),AgentPolicy.relevance(query,x.optString("user"))));
         StringBuilder out=new StringBuilder();for(int i=0;i<Math.min(3,hits.size());i++){JSONObject t=hits.get(i);out.append("\n").append(new java.text.SimpleDateFormat("MM-dd HH:mm",Locale.ROOT).format(new Date(t.optLong("at")))).append(" 用户曾说：").append(AgentPolicy.clip(t.optString("user"),300));}
         return out.toString();

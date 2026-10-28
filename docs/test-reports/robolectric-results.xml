@@ -1,64 +1,33 @@
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.xiaoxiao.pet.UiTest" time="41.391" tests="14" errors="0" skipped="0" failures="0">
-  <testcase name="manualPersonaOnboardingAndReadOnlyUI" classname="com.xiaoxiao.pet.UiTest" time="14.414">
-    <system-out>DEBUG: Shadow provider: org.robolectric.Shadows
-DEBUG: Using a LocalDependencyResolver, dependencyDir=[workspace]\work\robolectric/android-runtime
-DEBUG: Manifest file location: [workspace]\work\dafeiyu-android\android\AndroidManifest.xml
-DEBUG: Manifest doc location:
-[workspace]\work\dafeiyu-android\android\AndroidManifest.xml
-com.xiaoxiao.pet.UiTest.manualPersonaOnboardingAndReadOnlyUI: sdk=34; resources=BINARY
-</system-out>
-  </testcase>
-  <testcase name="chatUIRunsPromptRecallStreamingAndCommitsControlledModelReply" classname="com.xiaoxiao.pet.UiTest" time="3.763">
-    <system-out>com.xiaoxiao.pet.UiTest.chatUIRunsPromptRecallStreamingAndCommitsControlledModelReply: sdk=34; resources=BINARY
-</system-out>
-  </testcase>
-  <testcase name="openingManualChatInterruptsPendingProactiveRequest" classname="com.xiaoxiao.pet.UiTest" time="2.051">
-    <system-out>com.xiaoxiao.pet.UiTest.openingManualChatInterruptsPendingProactiveRequest: sdk=34; resources=BINARY
-</system-out>
-  </testcase>
-  <testcase name="activityCreatesAndRenders" classname="com.xiaoxiao.pet.UiTest" time="1.16">
-    <system-out>com.xiaoxiao.pet.UiTest.activityCreatesAndRenders: sdk=34; resources=BINARY
-</system-out>
-  </testcase>
-  <testcase name="activityDestructionCancelsPendingConversation" classname="com.xiaoxiao.pet.UiTest" time="2.124">
-    <system-out>com.xiaoxiao.pet.UiTest.activityDestructionCancelsPendingConversation: sdk=34; resources=BINARY
-</system-out>
-  </testcase>
-  <testcase name="randomChoiceOccursOnlyAtInitialization" classname="com.xiaoxiao.pet.UiTest" time="2.171">
-    <system-out>com.xiaoxiao.pet.UiTest.randomChoiceOccursOnlyAtInitialization: sdk=34; resources=BINARY
-</system-out>
-  </testcase>
-  <testcase name="personaPersistenceMigrationAndLockChecks" classname="com.xiaoxiao.pet.UiTest" time="0.652">
-    <system-out>com.xiaoxiao.pet.UiTest.personaPersistenceMigrationAndLockChecks: sdk=34; resources=BINARY
-PASS: 33 isolated persona checks
-</system-out>
-  </testcase>
-  <testcase name="failedModelRestoresDraftAndDoesNotCommit" classname="com.xiaoxiao.pet.UiTest" time="2.034">
-    <system-out>com.xiaoxiao.pet.UiTest.failedModelRestoresDraftAndDoesNotCommit: sdk=34; resources=BINARY
-</system-out>
-  </testcase>
-  <testcase name="companionSwitchesPersistAndMemoryFocusControlsAffectRuntime" classname="com.xiaoxiao.pet.UiTest" time="2.759">
-    <system-out>com.xiaoxiao.pet.UiTest.companionSwitchesPersistAndMemoryFocusControlsAffectRuntime: sdk=34; resources=BINARY
-</system-out>
-  </testcase>
-  <testcase name="memoryEditorPersistsAndForgetsFromUI" classname="com.xiaoxiao.pet.UiTest" time="2.878">
-    <system-out>com.xiaoxiao.pet.UiTest.memoryEditorPersistsAndForgetsFromUI: sdk=34; resources=BINARY
-</system-out>
-  </testcase>
-  <testcase name="explicitMemoryAndItsSourceDisappearTogether" classname="com.xiaoxiao.pet.UiTest" time="1.245">
-    <system-out>com.xiaoxiao.pet.UiTest.explicitMemoryAndItsSourceDisappearTogether: sdk=34; resources=BINARY
-</system-out>
-  </testcase>
-  <testcase name="nameAndNicknameUISaveIntoPromptWithoutChangingPersonality" classname="com.xiaoxiao.pet.UiTest" time="1.893">
-    <system-out>com.xiaoxiao.pet.UiTest.nameAndNicknameUISaveIntoPromptWithoutChangingPersonality: sdk=34; resources=BINARY
-</system-out>
-  </testcase>
-  <testcase name="modelSettingsUIValidatesSavesAndKeepsAtomicConfiguration" classname="com.xiaoxiao.pet.UiTest" time="2.436">
-    <system-out>com.xiaoxiao.pet.UiTest.modelSettingsUIValidatesSavesAndKeepsAtomicConfiguration: sdk=34; resources=BINARY
-</system-out>
-  </testcase>
-  <testcase name="cancelAfterCommittedReplyCompletesExactlyOnce" classname="com.xiaoxiao.pet.UiTest" time="1.327">
-    <system-out>com.xiaoxiao.pet.UiTest.cancelAfterCommittedReplyCompletesExactlyOnce: sdk=34; resources=BINARY
-</system-out>
-  </testcase>
-</testsuite>
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites tests="26" failures="0" errors="0" skipped="0">
+  <testsuite name="com.xiaoxiao.pet.UiTest" tests="14" failures="0" errors="0" skipped="0" time="21.997">
+    <testcase name="manualPersonaOnboardingAndReadOnlyUI" classname="com.xiaoxiao.pet.UiTest" time="1.798" />
+    <testcase name="chatUIRunsPromptRecallStreamingAndCommitsControlledModelReply" classname="com.xiaoxiao.pet.UiTest" time="2.393" />
+    <testcase name="openingManualChatInterruptsPendingProactiveRequest" classname="com.xiaoxiao.pet.UiTest" time="2.315" />
+    <testcase name="activityCreatesAndRenders" classname="com.xiaoxiao.pet.UiTest" time="1.052" />
+    <testcase name="activityDestructionCancelsPendingConversation" classname="com.xiaoxiao.pet.UiTest" time="2.438" />
+    <testcase name="randomChoiceOccursOnlyAtInitialization" classname="com.xiaoxiao.pet.UiTest" time="1.877" />
+    <testcase name="personaPersistenceMigrationAndLockChecks" classname="com.xiaoxiao.pet.UiTest" time="0.942" />
+    <testcase name="failedModelRestoresDraftAndDoesNotCommit" classname="com.xiaoxiao.pet.UiTest" time="1.669" />
+    <testcase name="companionSwitchesPersistAndMemoryFocusControlsAffectRuntime" classname="com.xiaoxiao.pet.UiTest" time="2.224" />
+    <testcase name="memoryEditorPersistsAndForgetsFromUI" classname="com.xiaoxiao.pet.UiTest" time="1.509" />
+    <testcase name="explicitMemoryAndItsSourceDisappearTogether" classname="com.xiaoxiao.pet.UiTest" time="0.602" />
+    <testcase name="nameAndNicknameUISaveIntoPromptWithoutChangingPersonality" classname="com.xiaoxiao.pet.UiTest" time="1.076" />
+    <testcase name="modelSettingsUIValidatesSavesAndKeepsAtomicConfiguration" classname="com.xiaoxiao.pet.UiTest" time="1.379" />
+    <testcase name="cancelAfterCommittedReplyCompletesExactlyOnce" classname="com.xiaoxiao.pet.UiTest" time="0.702" />
+  </testsuite>
+  <testsuite name="com.xiaoxiao.pet.MemoryIntegrationTest" tests="12" failures="0" errors="0" skipped="0" time="213.538">
+    <testcase name="inFlightResultCannotResurrectUserDeletion" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="21.76" />
+    <testcase name="oldSchemaAndDeleteClearArchiveIndexAndBackup" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.191" />
+    <testcase name="settingsUiEncryptsTokenAndBindsOrigin" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="3.903" />
+    <testcase name="correctedSourceExcludedFromBothRecentAndLongTermContext" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="2.844" />
+    <testcase name="fabricatedResponseFailsClosedToLocal" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.126" />
+    <testcase name="failedServiceKeepsLocalQuoteAndDoesNotInventSuccess" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.117" />
+    <testcase name="historicalEntryIsReadOnlyAndCannotRestoreAnOldFact" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="1.605" />
+    <testcase name="actualHttpCaptureCorrectionAndRestart" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="1.387" />
+    <testcase name="onlyLoopbackAllowsHttp" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.111" />
+    <testcase name="disabledMemoryMakesNoServiceRequests" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="1.655" />
+    <testcase name="unchanged84ScenarioProtocolReplayMatchesPython" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="179.12" />
+    <testcase name="cancellationDoesNotFallBackAndCommit" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.314" />
+  </testsuite>
+</testsuites>

@@ -11,6 +11,7 @@ final class AgentPanel {
   GroupedList.toggle(l,"偶尔主动和我说话",Data.prefs().getBoolean("agent.proactive",false),(v,on)->{if(!on)AgentRuntime.cancel();Data.prefs().edit().putBoolean("agent.proactive",on).apply();});
   TextView proactive=a.text("只在亮屏、桌宠可见且没有聊天时触发；聊过之后至少等30分钟，两次请求至少间隔90分钟，每天最多3次。23:00–08:00和系统勿扰时保持安静。不会在后台刷网页。",12);proactive.setTextColor(Apple.SECONDARY);l.addView(proactive);
   GroupedList.toggle(l,"边生成边显示",Data.prefs().getBoolean("agent.stream",true),(v,on)->Data.prefs().edit().putBoolean("agent.stream",on).apply());
+  a.button(l,"记忆引擎",v->MemoryPanel.settings(a));
   a.button(l,"安静陪伴 1 小时",v->{Data.prefs().edit().putLong("agent.focusUntil",System.currentTimeMillis()+3600000).apply();AgentRuntime.cancel();Toast.makeText(a,"这一小时她不会主动开口",0).show();});a.button(l,"结束安静陪伴",v->{Data.prefs().edit().putLong("agent.focusUntil",0).apply();Toast.makeText(a,"恢复原有陪伴设置",0).show();});
   a.button(l,"切换明暗外观",v->{Data.prefs().edit().putString("appearance.mode",Apple.dark?"day":"night").apply();Apple.load();a.render();});a.button(l,"手机悬浮权限",v->PermissionsPanel.show(a));
   ScrollView scroll=new SpringScrollView(a);scroll.addView(l);new Apple.Builder(a).setTitle("陪伴设置").setView(scroll).setPositiveButton("完成",(d,w)->Data.prefs().edit().putString("agent.nickname",nickname.getText().toString().trim()).apply()).show();
@@ -18,6 +19,7 @@ final class AgentPanel {
  static void memories(MainActivity a){try{
   JSONObject snapshot=AgentRuntime.store().snapshot();JSONArray entries=snapshot.getJSONArray("memories");LinearLayout l=a.column();l.setPadding(a.dp(18),a.dp(8),a.dp(18),a.dp(18));TextView info=a.text("她记得的，是你亲口说过的事。\n点开可修改、固定或忘记。删除也会移除直接来源的那轮对话；其他对话如有重复提及，可清空聊天记录。",13);info.setTextColor(Apple.SECONDARY);l.addView(info);
   if(snapshot.optBoolean("recovered"))l.addView(a.text("上次数据异常，已从本地备份恢复。建议导出手账。",13));
+  l.addView(a.text(snapshot.optString("memoryStatus",MemoryBridge.lastStatus),12));a.button(l,"共同经历与记忆变化",v->MemoryPanel.history(a));
   if(entries.length()==0){TextView empty=a.text("还没有写下共同记忆。\n试着说：记住：我喜欢下雨天。",17);empty.setPadding(0,a.dp(24),0,a.dp(24));l.addView(empty);}
   final AlertDialog[] dialog=new AlertDialog[1];for(int i=entries.length()-1;i>=0;i--){JSONObject m=entries.getJSONObject(i);String id=m.getString("id");Button row=a.button(l,(m.optBoolean("pinned")?"★ ":"")+m.getString("text"),v->{dialog[0].dismiss();edit(a,m,id);});row.setSingleLine(false);row.setMaxLines(3);row.getLayoutParams().height=a.dp(84);}
   a.button(l,"写下一条记忆",v->{dialog[0].dismiss();edit(a,null,null);});a.button(l,"导出手账与对话",v->a.startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/json").putExtra(Intent.EXTRA_TITLE,"大肥鱼-手账.json"),42));a.button(l,"清空聊天记录，保留记忆",v->confirmClear(a,false,dialog[0]));Button reset=a.button(l,"忘记全部对话和记忆",v->confirmClear(a,true,dialog[0]));reset.setTextColor(Apple.DANGER);

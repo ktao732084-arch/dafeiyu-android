@@ -1,0 +1,136 @@
+{
+  "repository": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory",
+  "revision": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
+  "reviewed_engine_revision": "9862c930b367bbb0b5fa4b2c751914604cd0b548",
+  "note": "Adapter and shared replay harness are integration additions; source snapshot hashes include them.",
+  "files": [
+    {
+      "path": "eval/cases/basic.json",
+      "sha256": "26d8bab8a0eb23ffd5b94d10b60cd52cc4899ba457075deea4ee8fd607efbb4b"
+    },
+    {
+      "path": "eval/cases/correction.json",
+      "sha256": "5ff0eab0290d17da979204ec2251ff79c1b5ee17598f409d8470133874415d1c"
+    },
+    {
+      "path": "eval/cases/dedup.json",
+      "sha256": "e9ce2f595afc28d7dfeb49454ab7ea2ee42e7ce629a776969308ffe9d20ed493"
+    },
+    {
+      "path": "eval/cases/multi_entity.json",
+      "sha256": "260b6242b6b1417936e2e6dd66310c5cc0240f9c2278ab7099d1cd0c3a4480f8"
+    },
+    {
+      "path": "eval/cases/no_conflict.json",
+      "sha256": "e6dc47c6b0008d4738f81a6280e373edb736f375a52b028b8e62c8fe5c269acf"
+    },
+    {
+      "path": "eval/cases/noise.json",
+      "sha256": "06fdf47299789fa21ba0fe8076d04a3f9525893094f80ad4643dcda0ffe82e98"
+    },
+    {
+      "path": "eval/cases/paraphrase.json",
+      "sha256": "4b1a91d1cbdbe86b3f97d10f559e550246192cb398c09731d2a0c4de66bc4410"
+    },
+    {
+      "path": "eval/cases/preference_shift.json",
+      "sha256": "c251980a675bbb4cb1fc288763d1508b95cf564c50e3c90b49e26baad1d82b2f"
+    },
+    {
+      "path": "eval/cases/privacy.json",
+      "sha256": "f7197e8ae3ef7542ee63b1a9c0e8b18fb85ae2f9eb7b74dbb961b237f3bb7163"
+    },
+    {
+      "path": "eval/cases/temporal.json",
+      "sha256": "0e082eb03ab8b15d8a6c55be228e15de86a0789f259b0132237e035b50b6d875"
+    },
+    {
+      "path": "eval/README.md",
+      "sha256": "8ae7de4971b96fe586e75aa991a09b7d19abd7061376692f620277c68c1a6697"
+    },
+    {
+      "path": "eval/run_companion_eval.py",
+      "sha256": "6a6329e141fab6f5cc4102e212dbfa7d08c33087c3a20e86c7df98747ac125a0"
+    },
+    {
+      "path": "eval/run_eval.py",
+      "sha256": "e6b7c32107e51fa7c072a156f4c89d456b0358bfb32ea8a6f295811e73d9a746"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "1126322e2cc8d165adc4c792eeb195717de2bcc7b39be1ce77959d78e87ef685"
+    },
+    {
+      "path": "src/backend_adapter.py",
+      "sha256": "8adb30d4057b7821e3e3d44449945c7da491e3c9086a2fd262404d8f2b2d040f"
+    },
+    {
+      "path": "src/benchmark.py",
+      "sha256": "fb8a4fbbb48ee83d59881d1c681f04aad4cbc55d93390bb49a79729b85391045"
+    },
+    {
+      "path": "src/collect_from_sessions.py",
+      "sha256": "9b863d63ee39d00ad98f95f121eb9df5c5f4a577600c835c9192afab9eb6badc"
+    },
+    {
+      "path": "src/companion_api.py",
+      "sha256": "b87326ef53cc4ceddb50de4771b82cdad4b39c7f60b2a0dad1c05e3b284e31e2"
+    },
+    {
+      "path": "src/conflict_resolver.py",
+      "sha256": "071cc59db98d919e858967bf0ab615d438593044ef116d539adbaa9f24de0084"
+    },
+    {
+      "path": "src/embeddings.py",
+      "sha256": "e3b23df728f1f6f4426db49fde1e47dc146ca598c15c3fd2dea17d054b87eea2"
+    },
+    {
+      "path": "src/llm_judge.py",
+      "sha256": "296e431c3e53859f7e49292cabaed334ecb8fc9d4e875cae505c7a82b933aa14"
+    },
+    {
+      "path": "src/memory.py",
+      "sha256": "a159cbfb150acd125be6e2616647ff0df292c943ce247c7399dda7fd24c2842b"
+    },
+    {
+      "path": "src/memory_operator.py",
+      "sha256": "fd9f107d962286b829da9d65b176da54aa3a46f0650f6a63fe3cbd0b83d9e32c"
+    },
+    {
+      "path": "src/noise_filter.py",
+      "sha256": "60c062346f630960164bb9878a08036f591d21c284c0e844eefb7c5547e086d7"
+    },
+    {
+      "path": "src/schema_v1_3_0.py",
+      "sha256": "64cb88a32e5fe171ebbb8abbec534b5fe6cfa95101e1ec84dcfd60a683cbbabc"
+    },
+    {
+      "path": "src/sqlite_backend.py",
+      "sha256": "21c3aa0ac21cf09ccce56d0a6606f2a4338eee6a4ab92504473b7e2092d7faaf"
+    },
+    {
+      "path": "src/temporal.py",
+      "sha256": "2a1d1755fa910362c22c65d7facf7efc3a70892b9daf733416a6006937244a51"
+    },
+    {
+      "path": "tests/test_agent_features.py",
+      "sha256": "80fb77302eab14aa070654719ce3b0f4b8657e36ca39af38bcc6e84cb3ca1008"
+    },
+    {
+      "path": "tests/test_companion_api.py",
+      "sha256": "6ecfa9464b6e836fab384467f7af3edb32934f3affedb5bee4cfbe258c5c3d65"
+    },
+    {
+      "path": "tests/test_dedup_regression.py",
+      "sha256": "f19c86103b75e675c36c849b97fbe1d3ba3630b3cdcc0b0d5962be7516c991e7"
+    },
+    {
+      "path": "tests/test_embeddings.py",
+      "sha256": "3824ef4309ef249753c24912eb1b5dd51aff15cfe400194860fdc0d2a6032975"
+    },
+    {
+      "path": "tests/test_llm_judge.py",
+      "sha256": "49dcc59dfed0ef9788e6fd82ca252916759145a62a5f5106d2bbb85507dfc394"
+    }
+  ]
+}
