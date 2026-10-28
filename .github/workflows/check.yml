@@ -16,6 +16,7 @@ jobs:
           sparse-checkout: |
             src
             tests
+            memory-service
       - uses: actions/setup-java@v5
         with:
           distribution: temurin

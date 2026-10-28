@@ -42,6 +42,27 @@ final class MemoryLedger {
         if(a.length()>=MAX_ACTIVE){int remove=-1;for(int i=0;i<a.length();i++)if(!a.getJSONObject(i).optBoolean("pinned")){remove=i;break;}if(remove<0)throw new java.io.IOException("记忆已满，请先删除几条");a.remove(remove);}
         a.put(record);event(s,"ADD",record.optString("id"),record.optLong("at"));s.put("vector_cache",new JSONObject());
     }
+    /** Dated things from yesterday to tomorrow, active or expired (not corrected), for her to keep in mind or ask about. */
+    static JSONArray dueEvents(JSONObject s,LocalDate today)throws Exception {
+        JSONArray out=new JSONArray();
+        for(String pool:new String[]{"memories","archive"}){JSONArray rows=s.optJSONArray(pool);if(rows==null)continue;for(int i=0;i<rows.length();i++){
+            JSONObject r=rows.getJSONObject(i),e=r.optJSONObject("engine");if(e==null||e.optString("event_date").isEmpty()||"superseded".equals(e.optString("archived_reason")))continue;
+            LocalDate day;try{day=LocalDate.parse(e.optString("event_date"));}catch(Exception bad){continue;}
+            long offset=java.time.temporal.ChronoUnit.DAYS.between(today,day);if(offset<-1||offset>1)continue;
+            out.put(new JSONObject().put("id",r.optString("id")).put("quote",e.optString("content",r.optString("text"))).put("when",offset<0?"昨天":offset==0?"今天":"明天"));
+        }}
+        return out;
+    }
+    /** Due events from today or yesterday she has not asked about yet; a proactive turn may follow up on one. */
+    static JSONArray followUps(JSONObject s,LocalDate today)throws Exception {
+        JSONArray due=dueEvents(s,today),out=new JSONArray();Set<String> done=new HashSet<>();JSONArray f=s.optJSONArray("followedUp");
+        // Asked only if that proactive reply reached the screen: a turn still at displayed=0 was never seen.
+        Map<String,JSONObject> turns=new HashMap<>();JSONArray t=s.optJSONArray("turns");if(t!=null)for(int i=0;i<t.length();i++)turns.put(t.getJSONObject(i).optString("id"),t.getJSONObject(i));
+        if(f!=null)for(int i=0;i<f.length();i++){JSONObject entry=f.optJSONObject(i);if(entry==null){done.add(f.optString(i));continue;}
+            JSONObject turn=turns.get(entry.optString("turn"));if(turn==null||!turn.has("displayed")||turn.optInt("displayed")>0)done.add(entry.optString("id"));}
+        for(int i=0;i<due.length();i++){JSONObject d=due.getJSONObject(i);if(!"明天".equals(d.optString("when"))&&!done.contains(d.optString("id")))out.put(d);}
+        return out;
+    }
     static JSONArray candidates(String user,JSONArray quotes,String explicit,String turn,long now)throws Exception {
         JSONArray a=new JSONArray();if(explicit!=null){if(explicit.trim().isEmpty()||explicit.length()>240||!user.contains(explicit)||AgentPolicy.sensitive(explicit))throw new java.io.IOException("请填写 1–240 字，不含密码或证件号码");a.put(record(UUID.randomUUID().toString(),explicit,turn,true,now));}
         else if(quotes!=null)for(int i=0;i<Math.min(3,quotes.length());i++){String q=quotes.optString(i,"");if(AgentPolicy.validEvidence(user,q))a.put(record(UUID.randomUUID().toString(),q,turn,false,now));}return a;
@@ -61,10 +82,15 @@ final class MemoryLedger {
         LinkedHashMap<String,JSONObject> chosen=new LinkedHashMap<>();
         for(JSONObject r:core.subList(0,Math.min(CORE,core.size())))chosen.put(r.optString("id"),r);
         for(JSONObject r:ranked){if(chosen.size()>=CORE+10)break;chosen.putIfAbsent(r.optString("id"),r);}
+        // When everything current fits, retrieval has nothing to choose: a memory sharing no words with the
+        // question (and missed by the rules) still rides along, after the hits.
+        if(hits!=null&&currentCount(s,now)<=CORE+10){List<JSONObject> rest=new ArrayList<>();for(int i=0;i<a.length();i++){JSONObject r=a.getJSONObject(i);if(current(r,now)&&!chosen.containsKey(r.optString("id")))rest.add(r);}
+            rest.sort((x,y)->Double.compare(score(query,y,now),score(query,x,now)));for(JSONObject r:rest)chosen.put(r.optString("id"),r);}
         List<JSONObject> picked=new ArrayList<>(chosen.values());
         JSONArray out=new JSONArray();for(int i=0;i<picked.size();i++){JSONObject r=picked.get(i),e=r.optJSONObject("engine");out.put(new JSONObject().put("quote",r.optString("text")).put("observed_at",r.optLong("at")).put("resolved",e==null?r.optString("text"):e.optString("content",r.optString("text"))).put("pinned",r.optBoolean("pinned")));}return out.toString();
     }
     static final int CORE=5;
+    static int currentCount(JSONObject s,long now)throws Exception{JSONArray a=s.getJSONArray("memories");int n=0;for(int i=0;i<a.length();i++)if(current(a.getJSONObject(i),now))n++;return n;}
     static boolean core(JSONObject r){JSONObject e=r.optJSONObject("engine");return r.optBoolean("pinned")||e!=null&&e.optBoolean("is_identity")||AgentPolicy.critical(r.optString("text"));}
     static double score(String q,JSONObject m,long now){return AgentPolicy.relevance(q,m.optString("text"))*5+(m.optBoolean("pinned")?2:0)+Math.max(0,1-(now-m.optLong("at"))/(30.0*86400000));}
     static JSONArray historicalContext(JSONObject s,String query)throws Exception {

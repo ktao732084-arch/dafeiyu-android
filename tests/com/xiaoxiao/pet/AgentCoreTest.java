@@ -1,5 +1,5 @@
 package com.xiaoxiao.pet;
-import org.json.*;import java.io.*;import java.nio.file.*;import java.util.List;
+import org.json.*;import java.time.ZoneOffset;import java.io.*;import java.nio.file.*;import java.util.List;
 
 /** Real filesystem persistence and policy regression tests; run with org.json on the JVM. */
 public final class AgentCoreTest {
@@ -147,6 +147,35 @@ public final class AgentCoreTest {
   check(PromptBuilder.build(in,"",true,chat,null).toString().contains("主动陪伴事件")&&!PromptBuilder.build(in,"",true,chat,null).getJSONObject(1).getString("role").equals("system"),"proactive request uses a user-role event");
   for(int i=0;i<4;i++)hist.put(new JSONObject().put("id","d"+i).put("at",20000L+i).put("user","嗯").put("reply","才不是呢（扭头），我只是路过"+i+"。").put("proactive",false));chat.put("turnCount",19);
   check(PromptBuilder.build(in,"你好",false,chat,null).toString().contains("风格提醒"),"drift reminder reaches the prompt");
+  // Follow-ups on dated plans, using the dates the native engine writes.
+  java.time.ZoneId zone=java.time.ZoneId.systemDefault();java.time.LocalDate obs=java.time.LocalDate.of(2026,10,28);
+  long spoke=obs.atTime(20,0).atZone(zone).toInstant().toEpochMilli();
+  JSONObject plan=NativeMemoryEngine.evaluate(MemoryLedger.copy(AgentStore.empty(0)),new JSONArray().put(MemoryLedger.record("exam","我明天有面试","t1",false,spoke)).put(MemoryLedger.record("blue","我喜欢蓝色","t2",false,spoke)),"",spoke,zone,null,new AgentTransport.Token()).state;
+  check("2026-10-29".equals(NativeMemoryEngine.find(plan,"exam").getJSONObject("engine").optString("event_date")),"native engine dates the interview");
+  check(MemoryLedger.dueEvents(plan,obs).length()==1&&"明天".equals(MemoryLedger.dueEvents(plan,obs).getJSONObject(0).getString("when")),"the interview is tomorrow's plan");
+  check(MemoryLedger.followUps(plan,obs).length()==0&&MemoryLedger.followUps(plan,obs.plusDays(1)).length()==1&&MemoryLedger.followUps(plan,obs.plusDays(2)).length()==1&&MemoryLedger.followUps(plan,obs.plusDays(3)).length()==0,"follow up on the day and the day after only");
+  long dayAfter=obs.plusDays(2).atTime(9,0).atZone(zone).toInstant().toEpochMilli();
+  JSONObject later=NativeMemoryEngine.evaluate(plan,new JSONArray(),"",dayAfter,zone,null,new AgentTransport.Token()).state;
+  check(MemoryLedger.followUps(later,obs.plusDays(2)).length()==1&&later.getJSONArray("archive").length()==1,"still asked about after the plan expired into the archive");
+  AgentStore follow=new AgentStore(new File(root,"follow"));follow.markFollowed(MemoryLedger.followUps(plan,obs.plusDays(1)),"p1");JSONObject fs=follow.snapshot();fs.put("memories",plan.getJSONArray("memories"));
+  fs.getJSONArray("turns").put(new JSONObject().put("id","p1").put("user","").put("reply","面试怎么样了？").put("proactive",true).put("displayed",0));
+  check(MemoryLedger.followUps(fs,obs.plusDays(1)).length()==1,"a follow-up that never reached the screen may be asked again");
+  fs.getJSONArray("turns").getJSONObject(0).put("displayed",1);check(MemoryLedger.followUps(fs,obs.plusDays(1)).length()==0,"once shown, asked once, not again");
+  PromptBuilder.Inputs fin=new PromptBuilder.Inputs();fin.persona="你是大肥鱼。";fin.timeZone="Asia/Shanghai";fin.remember=true;fin.now=spoke+86_400_000L;
+  check(PromptBuilder.build(fin,"",true,plan,null).toString().contains("今天：我明天（2026-10-29）有面试")&&PromptBuilder.build(fin,"早",false,plan,null).toString().contains("近期安排"),"proactive turn may ask how it went; chat knows the schedule");
+  fin.remember=false;check(!PromptBuilder.build(fin,"",true,plan,null).toString().contains("面试"),"memory off: no follow-up");
+  // Model recall only when it can change the prompt: more memories than it carries, and not for chatter.
+  check(NativeMemoryEngine.casual("哈哈哈")&&NativeMemoryEngine.casual("嗯")&&NativeMemoryEngine.casual("好的！")&&!NativeMemoryEngine.casual("我明天面试有点紧张"),"casual chatter is recognised");
+  int[] recalls={0};NativeMemoryEngine.Intelligence counting=(op,data,token)->{recalls[0]++;return new JSONObject().put("ids",new JSONArray());};
+  long r0=1_772_618_400_000L;JSONObject few=MemoryLedger.copy(AgentStore.empty(0));
+  String[] facts={"我在协和医学院读书","我养了一只橘猫","我每天跑步五公里","我最爱吃火锅","我的生日在三月","我住在杭州西湖边","我会弹吉他","我在学日语","我喜欢下雨天","我妈妈是老师","我每周去游泳","我收藏邮票","我讨厌香菜","我开电动车","我喜欢科幻小说","我早上喝咖啡"};
+  for(int i=0;i<3;i++)few=NativeMemoryEngine.evaluate(few,new JSONArray().put(MemoryLedger.record("f"+i,facts[i],"t"+i,false,r0)),"",r0,ZoneOffset.UTC,null,new AgentTransport.Token()).state;
+  MemoryBridge.Result small=NativeMemoryEngine.evaluate(few,new JSONArray(),"我的学校在哪里",r0,ZoneOffset.UTC,counting,new AgentTransport.Token());
+  check(recalls[0]==0&&MemoryLedger.context(small.state,"我的学校在哪里",small.hits).contains("协和"),"few memories: no recall call, and all of them reach the prompt");
+  JSONObject many=few;for(int i=3;i<facts.length;i++)many=NativeMemoryEngine.evaluate(many,new JSONArray().put(MemoryLedger.record("f"+i,facts[i],"t"+i,false,r0)),"",r0,ZoneOffset.UTC,null,new AgentTransport.Token()).state;
+  check(MemoryLedger.currentCount(many,r0)>MemoryLedger.CORE+10,"sixteen distinct facts are kept");
+  NativeMemoryEngine.evaluate(many,new JSONArray(),"哈哈",r0,ZoneOffset.UTC,counting,new AgentTransport.Token());check(recalls[0]==0,"chatter: no recall call");
+  NativeMemoryEngine.evaluate(many,new JSONArray(),"我的学校在哪里",r0,ZoneOffset.UTC,counting,new AgentTransport.Token());check(recalls[0]==1,"many memories and a real question: one recall call");
   System.out.println("PASS: "+checks+" core checks");
  }
 }

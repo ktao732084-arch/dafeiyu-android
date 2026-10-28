@@ -25,6 +25,9 @@ public class NativeMemoryTest {
     }
     @Test public void semanticRecallSelectsExistingIdsUsingSameModel()throws Exception {
         ModelSettings.save("https://example.invalid/v1","existing-chat-model","test-existing-key",false);AgentRuntime.store().remember("我在协和医学院读书");String id=AgentRuntime.store().snapshot().getJSONArray("memories").getJSONObject(0).getString("id");AtomicInteger count=new AtomicInteger();
+        // More memories than the prompt carries anyway, so model selection has something to choose from.
+        for(String fact:new String[]{"我养了一只橘猫","我每天跑步五公里","我最爱吃火锅","我的生日在三月","我住在杭州西湖边","我会弹吉他","我在学日语","我喜欢下雨天","我妈妈是老师","我每周去游泳","我收藏邮票","我讨厌香菜","我开电动车","我喜欢科幻小说","我早上喝咖啡"})AgentRuntime.store().remember(fact);
+        assertTrue(AgentRuntime.store().snapshot().getJSONArray("memories").length()>MemoryLedger.CORE+10);
         NativeMemoryIntelligence.transport=(c,m,t)->{count.incrementAndGet();JSONObject data=new JSONObject(m.getJSONObject(1).getString("content"));assertEquals("我的学校在哪里",data.getString("query"));return new JSONObject().put("ids",new JSONArray().put(id)).toString();};
         MemoryBridge.Result r=MemoryBridge.evaluate(MemoryBridge.read(),AgentRuntime.store().snapshot(),new JSONArray(),"我的学校在哪里",System.currentTimeMillis(),new AgentTransport.Token());assertFalse(r.remote);assertEquals(id,r.hits.getString(0));assertEquals(1,count.get());
     }

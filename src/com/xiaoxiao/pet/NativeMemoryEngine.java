@@ -7,14 +7,21 @@ final class NativeMemoryEngine {
     interface Intelligence {JSONObject request(String operation,JSONObject data,AgentTransport.Token token)throws Exception;}
     static final JSONObject RULES=NativeMemoryRules.DATA;
     static boolean contains(String text,JSONArray terms){if(terms==null)return false;String t=text.toLowerCase(Locale.ROOT);for(int i=0;i<terms.length();i++)if(t.contains(terms.optString(i).toLowerCase(Locale.ROOT)))return true;return false;}
-    static boolean patterns(String text,JSONArray patterns,boolean start){if(patterns==null)return false;for(int i=0;i<patterns.length();i++){Matcher m=Pattern.compile(patterns.optString(i),Pattern.CASE_INSENSITIVE|Pattern.UNICODE_CASE).matcher(text);if(start?m.lookingAt():m.find())return true;}return false;}
+    // Python's re treats \d \s \w \b as Unicode (full-width digits and spaces from Chinese IMEs); compiled once.
+    private static final Map<String,Pattern> COMPILED=new java.util.concurrent.ConcurrentHashMap<>();
+    static Pattern pattern(String regex,int flags){return COMPILED.computeIfAbsent(flags+":"+regex,k->Pattern.compile(regex,flags|Pattern.UNICODE_CHARACTER_CLASS));}
+    static boolean patterns(String text,JSONArray patterns,boolean start){if(patterns==null)return false;for(int i=0;i<patterns.length();i++){Matcher m=pattern(patterns.optString(i),Pattern.CASE_INSENSITIVE|Pattern.UNICODE_CASE).matcher(text);if(start?m.lookingAt():m.find())return true;}return false;}
+    /** Python's str.strip(): also removes the full-width space U+3000 that trim() keeps. */
+    static String strip(String s){int a=0,b=s.length();while(a<b&&(Character.isWhitespace(s.charAt(a))||Character.isSpaceChar(s.charAt(a))))a++;while(b>a&&(Character.isWhitespace(s.charAt(b-1))||Character.isSpaceChar(s.charAt(b-1))))b--;return s.substring(a,b);}
     static boolean noise(String text){
-        String t=text.trim();if(t.length()<3||AgentPolicy.sensitive(t)||patterns(t,RULES.optJSONArray("SECRET_PATTERNS"),false))return true;
+        String t=strip(text);if(t.codePointCount(0,t.length())<3||AgentPolicy.sensitive(t)||patterns(t,RULES.optJSONArray("SECRET_PATTERNS"),false))return true;
         if(patterns(t,RULES.optJSONArray("NOISE_PATTERNS"),false)||contains(t,RULES.optJSONArray("NOISE_KEYWORDS"))||patterns(t,RULES.optJSONArray("DISTRACTION_PATTERNS"),false))return true;
-        boolean conversational=patterns(t,RULES.optJSONArray("CONVERSATION_NOISE"),false)||Pattern.compile(RULES.optString("QUESTION_PATTERN")).matcher(t).find();
+        boolean conversational=patterns(t,RULES.optJSONArray("CONVERSATION_NOISE"),false)||pattern(RULES.optString("QUESTION_PATTERN"),0).matcher(t).find();
         int index=t.indexOf('我');boolean fact=contains(t,RULES.optJSONArray("FACT_MARKERS"))||(index>=0&&normalize(t.substring(index)).length()>=6);
         if(conversational&&!fact)return true;JSONObject fallback=RULES.optJSONObject("FALLBACK_NOISE");Iterator<String> keys=fallback.keys();while(keys.hasNext())if(patterns(t,fallback.optJSONArray(keys.next()),true))return true;return false;
     }
+    /** Interjections, acknowledgements, emoji and very short messages: the upstream fallback noise patterns. */
+    static boolean casual(String text){String t=strip(text).replaceAll("[\\p{P}\\p{S}\\s]+$","");/* "好的！": upstream allows only half-width ! and ? */JSONObject fallback=RULES.optJSONObject("FALLBACK_NOISE");if(fallback==null)return false;Iterator<String> keys=fallback.keys();while(keys.hasNext())if(patterns(t,fallback.optJSONArray(keys.next()),true))return true;return false;}
     static String category(String text)throws Exception {JSONObject rules=RULES.getJSONObject("IMPORTANCE_RULES");for(String c:new String[]{"identity_health_safety","preference_relation_status","project_task_goal","temporary"})if(contains(text,rules.getJSONObject(c).getJSONArray("keywords")))return c;return "general_fact";}
     static double importance(String text,String category)throws Exception {
         double score=RULES.getJSONObject("IMPORTANCE_RULES").getJSONObject(category).getDouble("score"),boost=0;JSONObject signals=RULES.getJSONObject("EXPLICIT_SIGNALS");
@@ -87,7 +94,9 @@ final class NativeMemoryEngine {
         if(intelligence!=null&&plans.length()>0)try{JSONObject response=intelligence.request("judge",new JSONObject().put("plans",plans),token);token.check();JSONObject checked=MemoryLedger.copy(state);decisions(checked,plans,response,now);state=checked;smart=true;}catch(Exception e){token.check();degraded=true;}
         MemoryLedger.expire(state,now);JSONArray hits=rank(state,query,now);
         // Retrieval uses the same chat model to select grounded IDs by meaning, not an extra vector server.
-        if(intelligence!=null&&incoming.length()==0&&!query.isEmpty()&&state.getJSONArray("memories").length()>0)try{
+        // One extra model round-trip per message only when it can matter: more memories than the prompt carries
+        // anyway (MemoryLedger.context sends them all up to CORE+10), and not for chatter like "哈哈" or "嗯".
+        if(intelligence!=null&&incoming.length()==0&&!query.isEmpty()&&MemoryLedger.currentCount(state,now)>MemoryLedger.CORE+10&&!casual(query))try{
             JSONObject response=intelligence.request("recall",new JSONObject().put("query",query).put("memories",describe(state.getJSONArray("memories"))),token);token.check();JSONArray selected=response.getJSONArray("ids");if(selected.length()>10)throw new IOException("检索过多");Set<String> unique=new HashSet<>();for(int i=0;i<selected.length();i++){Object id=selected.get(i);if(!(id instanceof String)||!unique.add((String)id)||find(state,(String)id)==null)throw new IOException("无依据的检索");}hits=selected;smart=true;
         }catch(Exception e){token.check();degraded=true;}
         for(int i=0;i<hits.length();i++){JSONObject r=find(state,hits.getString(i));if(r!=null){JSONObject e=r.getJSONObject("engine");e.put("last_accessed",Instant.ofEpochMilli(now).toString()).put("access_count",e.optInt("access_count")+1);}}
