@@ -15,6 +15,8 @@ final class AgentStore {
     private final File file;
     private final ChatArchive transcript;
     private JSONObject state;
+    // Whole-conversation recall index; built on first use from the archive and recent turns, then kept in step.
+    private EpisodeIndex episodes;
     AgentStore(File dir) throws Exception {
         if(!dir.exists()&&!dir.mkdirs())throw new IOException("无法创建记忆目录");
         file=new File(dir,"companion-v1.json");transcript=new ChatArchive(dir);
@@ -113,7 +115,7 @@ final class AgentStore {
         next.put("turnCount",next.optInt("turnCount",turns.length())+1);
         java.time.ZoneId zone=java.time.ZoneId.systemDefault();
         JSONObject turn=new JSONObject().put("id",tid).put("at",now).put("receivedAt",now).put("repliedAt",System.currentTimeMillis()).put("timeZone",zone.getId()).put("utcOffsetMinutes",zone.getRules().getOffset(java.time.Instant.ofEpochMilli(now)).getTotalSeconds()/60).put("user",user).put("reply",reply).put("proactive",proactive);
-        if(awaitingDisplay)turn.put("displayed",0);turns.put(turn);
+        if(awaitingDisplay)turn.put("displayed",0);turns.put(turn);final JSONObject added=turn;
         while(turns.length()>160)turns.remove(0);
         next.put("emotion",AgentPolicy.emotion(emotion)).put("emotionAt",now);
         if(!proactive){
@@ -125,7 +127,7 @@ final class AgentStore {
         if(plan==null&&remember&&!proactive&&quotes!=null)for(int i=0;i<Math.min(3,quotes.length());i++) {
             String quote=quotes.optString(i,"");if(AgentPolicy.validEvidence(user,quote))addMemory(next,quote,tid,false,now);
         }
-        save(next);return true;
+        save(next);if(episodes!=null)episodes.add(added);return true;
     }
     static final int MAX_SELF=40;
     /** What she has said about herself, verbatim from her replies, so she stays consistent ("我最爱吃小鱼干"). */
@@ -163,18 +165,18 @@ final class AgentStore {
     }
     synchronized void editMemory(String id,String text,boolean pinned)throws Exception {
         if(text.trim().isEmpty()||text.length()>240||AgentPolicy.sensitive(text))throw new IOException("请填写 1–240 字，不含密码或证件号码");
-        JSONObject next=snapshot();transcript.forget(MemoryLedger.forget(next,id));MemoryLedger.addLocal(next,MemoryLedger.record(id,text.trim(),"你手动修改",pinned,System.currentTimeMillis()));
+        JSONObject next=snapshot();Set<String> removed=MemoryLedger.forget(next,id);transcript.forget(removed);if(episodes!=null)episodes.remove(removed);MemoryLedger.addLocal(next,MemoryLedger.record(id,text.trim(),"你手动修改",pinned,System.currentTimeMillis()));
         next.put("epoch",epoch()+1);save(next,false);purgeBackup();
     }
     private static void removeSourceTurn(JSONObject next,String source)throws Exception {
         JSONArray turns=next.getJSONArray("turns");for(int j=turns.length()-1;j>=0;j--)if(source.equals(turns.getJSONObject(j).optString("id")))turns.remove(j);
     }
     synchronized void forget(String id)throws Exception {
-        JSONObject next=snapshot();transcript.forget(MemoryLedger.forget(next,id));
+        JSONObject next=snapshot();Set<String> removed=MemoryLedger.forget(next,id);transcript.forget(removed);if(episodes!=null)episodes.remove(removed);
         next.put("epoch",epoch()+1);save(next,false);purgeBackup();
     }
     synchronized void clear(boolean all)throws Exception {
-        transcript.clear(state.getJSONArray("turns"));
+        transcript.clear(state.getJSONArray("turns"));if(episodes!=null)episodes.clear();
         JSONObject next=all?empty(epoch()+1):snapshot().put("turns",new JSONArray()).put("epoch",epoch()+1);
         MemoryLedger.migrate(next);save(next,false);purgeBackup();
     }
@@ -182,8 +184,20 @@ final class AgentStore {
     synchronized JSONArray historyRange(long fromInclusive,long toExclusive,String before,int limit)throws Exception {return transcript.page(state.getJSONArray("turns"),before,Math.max(1,Math.min(limit,40)),fromInclusive,toExclusive);}
     synchronized void shown(String id,int count)throws Exception {
         if(id==null||transcript.deleted(id))return;JSONObject next=snapshot();JSONArray turns=next.getJSONArray("turns");
-        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(id.equals(ChatArchive.id(t))){int n=Math.min(count,ReplySegments.count(t));if(t.has("displayed")&&n>t.optInt("displayed")){ChatArchive.markShown(t,n);JSONArray self=next.optJSONArray("self");if(self!=null)for(int j=0;j<self.length();j++){JSONObject row=self.getJSONObject(j);if(id.equals(row.optString("source"))&&ReplySegments.visible(t).contains(row.optString("text")))row.put("shown",true);}save(next,false);}return;}}
+        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(id.equals(ChatArchive.id(t))){int n=Math.min(count,ReplySegments.count(t));if(t.has("displayed")&&n>t.optInt("displayed")){ChatArchive.markShown(t,n);if(episodes!=null)episodes.update(t);JSONArray self=next.optJSONArray("self");if(self!=null)for(int j=0;j<self.length();j++){JSONObject row=self.getJSONObject(j);if(id.equals(row.optString("source"))&&ReplySegments.visible(t).contains(row.optString("text")))row.put("shown",true);}save(next,false);}return;}}
         transcript.shown(id,count);
+    }
+    private EpisodeIndex index()throws Exception {
+        if(episodes!=null)return episodes;EpisodeIndex built=new EpisodeIndex();
+        for(File f:transcript.files()){try{JSONObject t=transcript.read(f);if(!transcript.deleted(ChatArchive.id(t)))built.add(t);}catch(Exception unreadable){/* one damaged file must not hide the rest */}}
+        JSONArray turns=state.getJSONArray("turns");for(int i=0;i<turns.length();i++)built.add(turns.getJSONObject(i));
+        return episodes=built;
+    }
+    /** Builds the recall index off the chat path (a background thread at store open), so the first reply does not wait. */
+    synchronized void warm(){try{index();}catch(Exception unavailable){/* built on first use instead */}}
+    /** Past exchanges relevant to this message from the whole conversation; see EpisodeIndex. */
+    synchronized JSONArray episodes(String query,Set<String> exclude,long now)throws Exception {
+        return EpisodeIndex.describe(index().search(query,exclude,now,EpisodeIndex.LIMIT));
     }
     private void purgeBackup()throws Exception {Files.deleteIfExists(new File(file+".bak").toPath());}
     synchronized void reserveAttempt(String day,long now)throws Exception {

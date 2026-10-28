@@ -24,7 +24,7 @@ final class AgentRuntime {
     static long lastTouch,lastEventAt;
     static boolean touched;
     static String lastEvent="第一次见面";
-    static synchronized AgentStore store()throws Exception{if(memory==null)memory=new AgentStore(new java.io.File(Data.app.getFilesDir(),"agent"));return memory;}
+    static synchronized AgentStore store()throws Exception{if(memory==null){memory=new AgentStore(new java.io.File(Data.app.getFilesDir(),"agent"));final AgentStore opened=memory;Thread warm=new Thread(opened::warm,"recall-index");warm.setDaemon(true);warm.setPriority(Thread.MIN_PRIORITY);warm.start();}return memory;}
     static synchronized boolean busy(){return active!=null;}
     static synchronized void cancel(){if(active!=null){AgentTransport.Token token=active;Listener l=activeListener;active=null;activeListener=null;activeProactive=false;if(token.completed!=null){main.post(token.completed);}else{token.cancel();if(l!=null)main.post(()->l.error("已停止回复"));}}}
     static synchronized void interruptProactive(){if(activeProactive)cancel();}
@@ -53,6 +53,11 @@ final class AgentRuntime {
         in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.nickname=Data.prefs().getString("agent.nickname","");
         in.mood=mood();in.timeZone=TimeZone.getDefault().getID();in.now=System.currentTimeMillis();in.initializedAt=PersonaManager.initializedAt("main");
         if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}in.remember=rememberEnabled();
+        if(in.remember&&!proactive){
+            // Whole-conversation recall, minus what the history window already carries and corrected sources.
+            Set<String> exclude=MemoryLedger.staleSources(s,in.now);JSONArray turns=s.getJSONArray("turns");for(int i=Math.max(0,turns.length()-12);i<turns.length();i++)exclude.add(ChatArchive.id(turns.getJSONObject(i)));
+            in.episodes=store().episodes(user,exclude,in.now);
+        }
         return PromptBuilder.build(in,user,proactive,s,hits);
     }
     static boolean send(String user,boolean proactive,Listener listener) {
