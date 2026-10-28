@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": "0.4.2",
+  "version": "0.4.3",
   "android_base_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
   "scope": "Publication inventory, excluding this self-referential manifest and ignored build/user files. Text SHA-256 uses Git LF-normalized contents.",
   "files": [
@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "d20a1c8a2efc86dc114b0b9736e1580fc66d74306945fee34fbb931bc59d2ac2"
+      "sha256": "78c1cff41a3f2ee620570df91d7cdc90a97c1ec7d0b8bfacf43382190d8104e2"
     },
     {
       "path": "LICENSE",
@@ -78,14 +78,14 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "cd9ed3e949e91a14dad0209e17935bb486d7ac278e6c337cfdb3c13efaff3c8b",
+      "sha256": "3adbd528adda3aa74c6f5a23b7c2739bf4fbf5f070323e3f06100344ed6da21b",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
       "path": "SOURCE_MAP.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "8c2cc92beadf5c6b33f428eaf65f52e0d33584c09893869a258bc2ad0eda0a72"
+      "sha256": "8b12c92b426aebf7e470febe8b4df54674ffd5c30da641ab6b90d0c7369c71c3"
     },
     {
       "path": "THIRD-PARTY-LICENSE.txt",
@@ -106,7 +106,7 @@
       "path": "VALIDATION.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "00b8c1a1f841797a0ea9d1e59328445f55b171fc3d54e3531a7c6289136c98f2"
+      "sha256": "e54e7119f6416279177a99b2662d427c77856ae5f5752eb67f7f9e8d96087b8f"
     },
     {
       "path": "assets/catalog.json",
@@ -1211,7 +1211,7 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/build.ps1",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "dfb18a59464d1e81ffc0b6f99417008b510ba707",
-      "sha256": "4606d0be4ed416b8fb558f9a6363920e8959268b08349618d2558e3dea574730",
+      "sha256": "3bf6020bf8395e5041b36470b12dba07f65cf7a7179b38b5a2d2c5d2f51740e5",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
@@ -1260,19 +1260,19 @@
       "path": "docs/test-reports/robolectric-results.txt",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "c33c48a5574307825ec39c8a111836008d9cea4c0ab99339d440a92746eaea60"
+      "sha256": "5592ff51d64cc3d8e2aa3f285792f6acd7fbc926643d67864c693e8ce3056eb6"
     },
     {
       "path": "docs/test-reports/robolectric-results.xml",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "5ea6425d2fde8bffed5b0e9a6bbaadf2b3deaa76abb3be8cb7d7e745b93f4736"
+      "sha256": "559641acf55b5eaab544a4c01a697a7c2ef2b81f76273472ebe5976c5810c426"
     },
     {
       "path": "docs/test-reports/validation-result.json",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "bed865866dbd720b164f5a1fd318d82b85127b06f8cf3482dd10ace3390d2d93"
+      "sha256": "1d43b4d96db4380d49d7f4e4b5b2368ae2da76020bcf60626f9fc51e36036cc6"
     },
     {
       "path": "instrumentation/AgentInstrumentation.java",
@@ -1868,6 +1868,12 @@
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable."
     },
     {
+      "path": "src/com/xiaoxiao/pet/DeepSeekBalance.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "c9d7357a8c99a9bf4ec2c66006b623c9c063a7d6da0ef17735004551bb43aced"
+    },
+    {
       "path": "src/com/xiaoxiao/pet/DialogLifecycle.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1949,13 +1955,13 @@
       "path": "src/com/xiaoxiao/pet/ModelSettings.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "3e2784a4b078135c27135000a9795c5893d3d4fda6427c1e02c51635601fc61d"
+      "sha256": "ec08363332a68b2a564d4b472a20c6cb1ba87f6b33ae1f90202c0be905f141a6"
     },
     {
       "path": "src/com/xiaoxiao/pet/ModelSetup.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "6c108414740e79426b7212cc4f39a93a9457dd08311dd8d8d87a266278972791"
+      "sha256": "43ba0c4bae9b47de2ff7b2fa23d9cc382e1fdaf371c7dea178a0b95eaa1cce74"
     },
     {
       "path": "src/com/xiaoxiao/pet/MotionEngine.java",
@@ -2210,7 +2216,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/ModelSetupTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "cf9b37e8b4c5e82b11766779a93a47bd3568727ab706467eb5d95097c3200c06"
+      "sha256": "6ca8418d98dd4dae640a50253e362f966ae48e28c96a8f996161f7e6ae143724"
     },
     {
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/NativeMemoryTest.java",
@@ -2282,7 +2288,7 @@
       "path": "tools/update-provenance.py",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "6fe9ecc83fe9b34c8708423c6073ab76b41676db9e580ab769585b96f3f49bd4"
+      "sha256": "0b81b8352643bf6d76e331e15daaaad5edf47e71716e73c9e6d51d63bf8431ba"
     }
   ],
   "memory_engine_commit": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a"

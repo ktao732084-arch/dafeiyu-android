@@ -22,9 +22,12 @@ public class ModelSetupTest {
         AgentRuntime.cancel();AgentRuntime.worker.submit(()->{}).get(10,TimeUnit.SECONDS);
         Data.app=null;Data.roles.clear();Data.init(RuntimeEnvironment.getApplication());Data.prefs().edit().clear().commit();
         TestKeyStore.install();AgentRuntime.memory=null;PetService.instance=null;
+        DeepSeekBalance.client=(c,t)->funds(true,"18.50");
         ModelSetup.probe=(c,t)->{throw new AssertionError("No live model may be called by this test");};activity=UiTest.ready();
     }
-    @After public void cleanup()throws Exception {if(dialog!=null)dialog.dismiss();ShadowLooper.idleMainLooper();ModelSetup.probe=ModelSetup::request;AgentRuntime.cancel();Data.logWriter.submit(()->{}).get(5,TimeUnit.SECONDS);}
+    @After public void cleanup()throws Exception {if(dialog!=null)dialog.dismiss();ShadowLooper.idleMainLooper();ModelSetup.probe=ModelSetup::request;DeepSeekBalance.client=DeepSeekBalance::request;AgentRuntime.cancel();Data.logWriter.submit(()->{}).get(5,TimeUnit.SECONDS);}
+    static DeepSeekBalance.Result funds(boolean available,String total)throws Exception{return DeepSeekBalance.parse(new JSONObject().put("is_available",available).put("balance_infos",new JSONArray().put(new JSONObject().put("currency","CNY").put("total_balance",total).put("topped_up_balance",total).put("granted_balance","0.00"))));}
+    String balance(){return ((TextView)UiTest.description(dialog.getWindow().getDecorView(),"账户余额")).getText().toString();}
     void open(){Chat.settings(activity);dialog=(AlertDialog)UiTest.dialog();}
     EditText field(String name){return (EditText)UiTest.description(dialog.getWindow().getDecorView(),name);}
     String status(){return ((TextView)UiTest.description(dialog.getWindow().getDecorView(),"模型连接状态")).getText().toString();}
@@ -41,6 +44,7 @@ public class ModelSetupTest {
         open();AtomicInteger calls=new AtomicInteger();ModelSetup.probe=(c,t)->{calls.incrementAndGet();assertEquals("https://api.deepseek.com/chat/completions",c.address.endpoint);assertEquals("deepseek-flash",c.model);assertEquals("test-only-key",c.secret);assertFalse(c.keyHeader);assertFalse(ModelSettings.complete());return "连接成功。";};
         field("API Key").setText("  test-only-key  ");dialog.getButton(-1).performClick();drainUntil(()->!dialog.isShowing());
         assertEquals(1,calls.get());assertTrue(ModelSettings.complete());assertEquals("test-only-key",ModelSettings.read().secret);assertFalse(Data.prefs().getString("api.secret","").contains("test-only-key"));
+        assertTrue(UiTest.texts(UiTest.dialog().getWindow().getDecorView()).contains("18.50"));assertTrue(DeepSeekBalance.cached().contains("18.50"));
         open();assertEquals("",field("API Key").getText().toString());assertFalse(field("API 地址").isShown());
     }
     @Test public void failedConnectionKeepsPreviousConfigAndMasksEnteredKey()throws Exception {
@@ -72,5 +76,39 @@ public class ModelSetupTest {
         for(String[] item:new String[][]{{"api.deepseek.com","deepseek-reasoner"},{"other.example","deepseek-flash"}}){JSONObject untouched=new JSONObject();ModelPresets.apply(item[0],item[1],untouched);assertFalse(untouched.has("thinking"));}
         assertTrue(ModelPresets.httpError(401).contains("Key"));assertTrue(ModelPresets.httpError(402).contains("余额不足"));
         assertTrue(ModelPresets.isRecommended(ModelPresets.DEEPSEEK_URL,ModelPresets.DEEPSEEK_MODEL,false));assertFalse(ModelPresets.isRecommended("https://api.deepseek.com.evil.example",ModelPresets.DEEPSEEK_MODEL,false));
+    }
+    @Test public void balanceFailureDoesNotDiscardWorkingModelConnection()throws Exception {
+        open();ModelSetup.probe=(c,t)->"连接成功";DeepSeekBalance.client=(c,t)->{throw new IOException("offline");};
+        field("API Key").setText("test-only-key");dialog.getButton(-1).performClick();drainUntil(()->!dialog.isShowing());assertTrue(ModelSettings.complete());
+        assertTrue(UiTest.texts(UiTest.dialog().getWindow().getDecorView()).contains("余额未知"));assertEquals("余额尚未查询",DeepSeekBalance.cached());
+    }
+    @Test public void refreshBalanceUsesSavedKeyWithoutCallingChatAndClearPurgesCache()throws Exception {
+        ModelSettings.save(ModelPresets.DEEPSEEK_URL,ModelPresets.DEEPSEEK_MODEL,"saved-test-key",false);open();AtomicInteger calls=new AtomicInteger();
+        DeepSeekBalance.client=(c,t)->{assertEquals("saved-test-key",c.secret);calls.incrementAndGet();return funds(true,"32.10");};UiTest.click(dialog,"刷新余额");drainUntil(()->balance().contains("32.10"));
+        assertEquals(1,calls.get());assertTrue(DeepSeekBalance.cached().contains("上次查询"));assertTrue(DeepSeekBalance.cached().contains("32.10"));
+        UiTest.click(dialog,"清除已保存的 Key");assertEquals("余额尚未查询",balance());assertFalse(Data.prefs().contains("api.balance.summary"));
+    }
+    @Test public void foreignProviderNeverCallsDeepSeekBalanceEndpoint()throws Exception {
+        ModelSettings.save("https://other.example/v1","other-model","foreign-key",false);open();DeepSeekBalance.client=(c,t)->{throw new AssertionError("foreign key leaked");};
+        UiTest.click(dialog,"刷新余额");assertTrue(balance().contains("暂不支持"));assertFalse(DeepSeekBalance.supported(ModelSettings.read()));
+        assertFalse(DeepSeekBalance.supported(new ModelSettings.Config("https://api.deepseek.com:8443","deepseek-flash","test-only-key",false,true)));
+    }
+    @Test public void insufficientFundsShowsActualZeroAndDoesNotSaveUnusableModel()throws Exception {
+        open();ModelSetup.probe=(c,t)->{throw new IOException(ModelPresets.httpError(402));};DeepSeekBalance.client=(c,t)->funds(false,"0.00");field("API Key").setText("test-only-key");dialog.getButton(-1).performClick();
+        drainUntil(()->status().contains("余额不足"));assertTrue(balance().contains("¥0.00"));assertTrue(balance().contains("请充值"));assertFalse(ModelSettings.complete());
+    }
+    @Test public void cancelledBalanceCannotPopulateCache()throws Exception {
+        ModelSettings.save(ModelPresets.DEEPSEEK_URL,ModelPresets.DEEPSEEK_MODEL,"saved-test-key",false);open();CountDownLatch entered=new CountDownLatch(1),release=new CountDownLatch(1),returned=new CountDownLatch(1);
+        DeepSeekBalance.client=(c,t)->{entered.countDown();release.await(5,TimeUnit.SECONDS);returned.countDown();return funds(true,"99.00");};UiTest.click(dialog,"刷新余额");
+        try{assertTrue(entered.await(3,TimeUnit.SECONDS));dialog.dismiss();}finally{release.countDown();}
+        assertTrue(returned.await(3,TimeUnit.SECONDS));Chat.executor.submit(()->{}).get(3,TimeUnit.SECONDS);ShadowLooper.idleMainLooper();assertFalse(Data.prefs().contains("api.balance.summary"));
+    }
+    @Test public void balanceParserKeepsCurrenciesSeparateAndRejectsMalformedAmounts()throws Exception {
+        JSONObject usd=new JSONObject().put("currency","USD").put("total_balance","2.5000").put("topped_up_balance","2.00").put("granted_balance","0.5000");
+        JSONObject cny=new JSONObject().put("currency","CNY").put("total_balance","10.25").put("topped_up_balance","10.00").put("granted_balance","0.25");
+        JSONObject payload=new JSONObject().put("is_available",true).put("balance_infos",new JSONArray().put(cny).put(usd));String summary=DeepSeekBalance.parse(payload).summary;
+        assertTrue(summary.contains("人民币 ¥10.25"));assertTrue(summary.contains("美元 $2.5000"));
+        usd.put("total_balance","unknown");try{DeepSeekBalance.parse(payload);fail("malformed amount must not become zero");}catch(IOException expected){}
+        try{DeepSeekBalance.parse(new JSONObject().put("is_available",true).put("balance_infos",new JSONArray()));fail("missing balance must not become zero");}catch(IOException expected){}
     }
 }

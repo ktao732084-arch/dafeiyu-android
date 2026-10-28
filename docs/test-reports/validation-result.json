@@ -1,17 +1,17 @@
 {
-  "version": "0.4.2",
-  "version_code": 6,
-  "apk_sha256": "421e940b42722f9023688d728f2499cb2564b6ff7d9e956ef4f20f1604664b13",
+  "version": "0.4.3",
+  "version_code": 7,
+  "apk_sha256": "79e0a8583cdf6764fc623468aaf4293d6cd70a7943c6d668ca0bfdf6d7c62e97",
   "merged_branch_commit": "8e34e3322565b4c5769133a1f3e3f11604e44c2a",
   "default_memory_runtime": "Android-native in APK; no Python/PC/ADB required",
   "android_framework_tests": {
-    "passed": 52,
+    "passed": 58,
     "failed": 0,
     "skipped": 0,
     "native_memory_scenarios": 11,
     "merge_integration_scenarios": 7,
     "persona_subchecks": 33,
-    "model_setup_scenarios": 8
+    "model_setup_scenarios": 14
   },
   "native_offline_replay": {
     "scenarios": 84,
@@ -30,7 +30,7 @@
   "endpoint_checks": 13,
   "action_plan_assertions": 10708,
   "physics": "passed",
-  "instrumentation_apk": "Not recompiled or executed for 0.4.2; previous 0.4.1 device test build recorded in historical validation",
+  "instrumentation_apk": "Not recompiled or executed for 0.4.3; previous 0.4.1 device test build recorded in historical validation",
   "model_tests": "controlled responses and local HTTP server; native non-streaming override, reasoning budget and content-filter rejection verified",
   "not_verified": [
     "physical-device installation and overlay",
@@ -39,5 +39,6 @@
     "real cloud model quality",
     "battery and OEM background behavior"
   ],
-  "model_setup": "Official DeepSeek V4.1 Flash preset; one key field, official links, test-before-save, failure isolation, provider key isolation, cancellation and timeout guards; controlled model only"
+  "model_setup": "Official DeepSeek V4.1 Flash preset; one key field, official links, test-before-save, failure isolation, provider key isolation, cancellation and timeout guards; controlled model only",
+  "model_balance": "Official GET /user/balance; total/top-up/granted by currency, timestamped cache, manual refresh, strict credential origin, failed query means unknown; controlled fixture tests"
 }

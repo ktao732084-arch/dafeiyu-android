@@ -1,6 +1,6 @@
-# 大肥鱼 · 便捷模型配置版 0.4.2
+# 大肥鱼 · 便捷模型配置版 0.4.3
 
-[下载 APK](https://github.com/ktao732084-arch/dafeiyu-android/releases/tag/v0.4.2) · [来源清单](SOURCE_MAP.md) · [逐文件溯源](PROVENANCE.json) · [验证记录](VALIDATION.md)
+[下载 APK](https://github.com/ktao732084-arch/dafeiyu-android/releases/tag/v0.4.3) · [来源清单](SOURCE_MAP.md) · [逐文件溯源](PROVENANCE.json) · [验证记录](VALIDATION.md)
 
 版本号与发布节奏遵循根目录的 [项目协作约定](AGENTS.md)。
 
@@ -12,7 +12,7 @@
 
 ## 安装与使用
 
-1. 在 Android 8.0+ 安装 `dafeiyu-android-0.4.2.apk`。与0.2/0.3/0.4.0/0.4.1沿用同一体验签名，可覆盖安装保留数据。
+1. 在 Android 8.0+ 安装 `dafeiyu-android-0.4.3.apk`。与0.2/0.3/0.4.0/0.4.1沿用同一体验签名，可覆盖安装保留数据。
 2. 初次相遇时，手动选择一种性格或随机一次。确认后固定，后期没有重选人格入口。
 3. 「模型连接」默认选择 **DeepSeek V4.1 Flash**。点「去 DeepSeek 官网获取 Key」，登录后创建并复制 API Key，回到 App 粘贴，点「连接并保存」即可。地址和模型自动填写，测试成功才保存；API需有可用余额，测试与聊天会使用自己的额度。其他服务商选「其他模型 / 自定义」，旧配置保留。
 4. 「记忆手账」查看、编辑、固定或忘记记忆；「共同经历与记忆变化」查看历史。无需额外设置记忆服务器。
@@ -26,6 +26,8 @@
 官方入口：[创建 API Key](https://platform.deepseek.com/api_keys) · [查看余额/充值](https://platform.deepseek.com/top_up)。这些入口在 App 内也有按钮。
 
 按2026-10-28的[官方文档](https://api-docs.deepseek.com/zh-cn/)预置 `https://api.deepseek.com`、`deepseek-flash`（DeepSeek V4.1 Flash）；日常聊天、连接测试与原生模型记忆统一使用非思考模式。网页聊天免费不代表API免费，收费规则见[官方说明](https://api-docs.deepseek.com/zh-cn/quick_start/pricing/)。
+
+连接时会实际请求一次模型，确认收到文本回复后才保存；随后查询DeepSeek官方余额，成功结果页展示余额并可直接开始聊天。设置页提供「刷新余额」，显示可用总额、充值余额和赠金，人民币和美元分别显示；已缓存结果标注查询时间，不宣称实时。余额查询失败会显示未知，不冒充0余额；模型实测成功时仍可保存使用。其他服务商暂不支持统一余额查询。
 
 新手只填写 Key。连接失败不覆盖旧配置；取消或超时后迟到结果不保存。切换服务商会清空未保存的Key，也不会复用其他服务商的已保存Key。自定义模式仍可独立测试、保存接口。
 
@@ -69,7 +71,7 @@ $env:XIAOXIAO_STORE_PASS='你的签名密码'
 ./tests/robolectric/run-tests.ps1 -AndroidRoot '.' -Sdk 'D:/Android/Sdk' -Jdk 'C:/Program Files/Java/jdk-17'
 ```
 
-产物为 `build/dafeiyu-0.4.2.apk`。原生规则由 `tools/generate-native-memory-rules.py` 从已固定的上游源码 AST 生成，不执行 Python 引擎；生成后的 Java 常量随 APK 编译。
+产物为 `build/dafeiyu-0.4.3.apk`。原生规则由 `tools/generate-native-memory-rules.py` 从已固定的上游源码 AST 生成，不执行 Python 引擎；生成后的 Java 常量随 APK 编译。
 
 `NativeMemoryTest` 在不启动Python服务的条件下运行84个共享场景，并覆盖默认设置、旧版升级、离线更正、模型配置复用、非法输出回退、批量原子性、时区和删除竞态。`MemoryIntegrationTest` 另保留Python HTTP对照；普通用户运行App不需要这些测试依赖。
 

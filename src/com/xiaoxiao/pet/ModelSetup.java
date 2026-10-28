@@ -20,7 +20,7 @@ final class ModelSetup {
     static final class Screen {
         final Activity a;final Handler main=new Handler(Looper.getMainLooper());
         final LinearLayout body,advanced,guide;final RadioGroup providers;final RadioButton deepseek,custom;
-        final EditText url,model,key;final Switch header;final TextView status;final Button test,clear;
+        final EditText url,model,key;final Switch header;final TextView status,balance;final Button test,clear,refreshBalance;
         AlertDialog dialog;AgentTransport.Token active;Runnable deadline;
         Screen(Activity activity){
             a=activity;body=column();body.setPadding(dp(16),dp(8),dp(16),dp(12));
@@ -42,10 +42,14 @@ final class ModelSetup {
             label(body,"Key 加密保存在手机。聊天内容和相关记忆会发给所选模型服务商。",12);
             test=button(body,"测试连接",()->connect(false));
             status=label(body,"连接测试会发送一条简短消息，使用你的 API 额度。",12);status.setContentDescription("模型连接状态");status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+            balance=label(body,DeepSeekBalance.cached(),13);balance.setContentDescription("账户余额");balance.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+            refreshBalance=button(body,"刷新余额",this::queryBalance);
             clear=button(body,"清除已保存的 Key",this::clearKey);clear.setVisibility(Data.prefs().getString("api.secret","").isEmpty()?View.GONE:View.VISIBLE);
             boolean recommended=Data.prefs().getString("api.url","").isEmpty()||ModelPresets.isRecommended(url.getText().toString(),model.getText().toString(),header.isChecked());
             providers.check(recommended?deepseek.getId():custom.getId());
-            providers.setOnCheckedChangeListener((group,id)->{cancel();key.setText("");status.setText("切换服务商后请粘贴对应的 API Key。");mode();});
+            providers.setOnCheckedChangeListener((group,id)->{cancel();key.setText("");balance.setText("余额尚未查询");status.setText("切换服务商后请粘贴对应的 API Key。");mode();});
+            android.text.TextWatcher changed=new android.text.TextWatcher(){public void beforeTextChanged(CharSequence s,int start,int count,int after){}public void onTextChanged(CharSequence s,int start,int before,int count){balance.setText("配置已更改，请刷新余额");}public void afterTextChanged(android.text.Editable s){}};
+            key.addTextChangedListener(changed);url.addTextChangedListener(changed);header.setOnCheckedChangeListener((b,value)->balance.setText("配置已更改，请刷新余额"));
         }
         void show(){
             ScrollView scroll=new SpringScrollView(a);scroll.addView(body);
@@ -59,7 +63,7 @@ final class ModelSetup {
             return new ModelSettings.Config(base,deepseek.isChecked()?ModelPresets.DEEPSEEK_MODEL:model.getText().toString().trim(),ModelSettings.selectedSecret(base,key.getText().toString()),!deepseek.isChecked()&&header.isChecked(),Data.prefs().getBoolean("agent.stream",true));
         }
         void saveCustom(){try{save(config());}catch(Exception e){error(e);}}
-        void clearKey(){cancel();try{ModelSettings.clear();key.setText("");key.setHint("在这里粘贴 API Key");status.setText("已清除 Key，重新粘贴后即可连接。");clear.setVisibility(View.GONE);refresh();}catch(Exception e){error(e);}}
+        void clearKey(){cancel();try{ModelSettings.clear();key.setText("");key.setHint("在这里粘贴 API Key");balance.setText("余额尚未查询");status.setText("已清除 Key，重新粘贴后即可连接。");clear.setVisibility(View.GONE);refresh();}catch(Exception e){error(e);}}
         void save(ModelSettings.Config config)throws Exception {
             ModelSettings.save(config.address.base,config.model,config.secret,config.keyHeader);
             dialog.dismiss();refresh();Toast.makeText(a,"模型设置已保存，可以开始聊天啦",Toast.LENGTH_SHORT).show();
@@ -71,15 +75,35 @@ final class ModelSetup {
             final AgentTransport.Token token=new AgentTransport.Token();active=token;enabled(false);status.setText("正在连接，请稍候…");
             deadline=()->{if(active==token){cancel();status.setText("连接超时，请检查网络后重试。原配置未更改。");}};main.postDelayed(deadline,45000);
             Chat.executor.execute(()->{
-                try{String answer=probe.run(config,token);token.check();if(answer==null||answer.trim().isEmpty())throw new java.io.IOException("模型没有返回文本");
-                    main.post(()->{if(!current(token))return;finish();try{if(saveAfter)save(config);else status.setText("连接成功，可以保存使用。");}catch(Exception e){error(e);}});
-                }catch(Exception e){main.post(()->{if(!current(token))return;finish();error(e);});}
+                Exception failed=null;DeepSeekBalance.Result funds=null;String balanceText="当前服务商暂不支持余额查询";
+                try{String answer=probe.run(config,token);token.check();if(answer==null||answer.trim().isEmpty())throw new java.io.IOException("模型没有返回文本");}catch(Exception e){failed=e;}
+                if(token.cancelled)return;
+                if(DeepSeekBalance.supported(config))try{funds=DeepSeekBalance.client.read(config,token);balanceText=funds.summary;}catch(Exception e){balanceText="余额查询失败，余额未知；可稍后刷新。";}
+                final Exception failure=failed;final DeepSeekBalance.Result result=funds;final String details=balanceText;
+                main.post(()->{if(!current(token))return;finish();balance.setText(details);
+                    if(failure!=null){error(failure);return;}
+                    try{
+                        if(saveAfter){save(config);if(result!=null)DeepSeekBalance.cache(config,result);
+                            new Apple.Builder(a).setTitle("连接成功").setMessage("模型已实际回复，设置已保存。\n\n"+details)
+                                .setNegativeButton("完成",null).setPositiveButton("开始聊天",(d,w)->Chat.show(a,"main","main")).show();
+                        }else{if(result!=null)DeepSeekBalance.cache(config,result);status.setText("连接成功，可以保存使用。");}
+                    }catch(Exception e){error(e);}
+                });
             });
+        }
+        void queryBalance(){
+            if(active!=null)return;final ModelSettings.Config config;
+            try{config=config();if(!DeepSeekBalance.supported(config)){balance.setText("当前服务商暂不支持余额查询，请到该服务商官网查看。");return;}}catch(Exception e){error(e);return;}
+            AgentTransport.Token token=new AgentTransport.Token();active=token;enabled(false);balance.setText("正在查询官方余额…");
+            deadline=()->{if(active==token){cancel();balance.setText("余额查询超时，余额未知；请稍后刷新。");}};main.postDelayed(deadline,20000);
+            Chat.executor.execute(()->{try{DeepSeekBalance.Result result=DeepSeekBalance.client.read(config,token);token.check();
+                main.post(()->{if(!current(token))return;finish();balance.setText(result.summary);DeepSeekBalance.cache(config,result);});
+            }catch(Exception e){main.post(()->{if(!current(token))return;finish();balance.setText("余额查询失败，余额未知；请检查网络和 Key 后刷新。");});}});
         }
         boolean current(AgentTransport.Token token){return active==token&&!token.cancelled&&dialog.isShowing()&&!a.isFinishing()&&!a.isDestroyed();}
         void finish(){if(deadline!=null)main.removeCallbacks(deadline);active=null;enabled(true);}
         void cancel(){if(active!=null)active.cancel();finish();}
-        void enabled(boolean value){key.setEnabled(value);url.setEnabled(value);model.setEnabled(value);header.setEnabled(value);deepseek.setEnabled(value);custom.setEnabled(value);test.setEnabled(value);clear.setEnabled(value);if(dialog!=null)dialog.getButton(-1).setEnabled(value);}
+        void enabled(boolean value){key.setEnabled(value);url.setEnabled(value);model.setEnabled(value);header.setEnabled(value);deepseek.setEnabled(value);custom.setEnabled(value);test.setEnabled(value);clear.setEnabled(value);refreshBalance.setEnabled(value);if(dialog!=null)dialog.getButton(-1).setEnabled(value);}
         void error(Exception e){String message=e.getMessage();String entered=key.getText().toString().trim();if(message==null)message="请检查网络和 API Key 后重试。";if(!entered.isEmpty())message=message.replace(entered,"***");status.setText(message);}
         void open(String address){try{a.startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(address)));}catch(ActivityNotFoundException e){status.setText("未找到浏览器，请用浏览器打开："+address);}}
         int dp(int value){return Apple.dp(a,value);}
