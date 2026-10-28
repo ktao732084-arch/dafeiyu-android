@@ -52,10 +52,20 @@ final class MemoryLedger {
     static String context(JSONObject s,String query,JSONArray hits)throws Exception {
         JSONArray a=s.getJSONArray("memories");List<JSONObject> ranked=new ArrayList<>();long now=System.currentTimeMillis();
         Map<String,Integer> order=new HashMap<>();if(hits!=null)for(int i=0;i<hits.length();i++)order.put(hits.optString(i),i);
-        for(int i=0;i<a.length();i++){JSONObject r=a.getJSONObject(i);if(current(r,now)&&(hits==null||order.containsKey(r.optString("id"))))ranked.add(r);}
+        List<JSONObject> core=new ArrayList<>();
+        for(int i=0;i<a.length();i++){JSONObject r=a.getJSONObject(i);if(!current(r,now))continue;if(hits==null||order.containsKey(r.optString("id")))ranked.add(r);if(core(r))core.add(r);}
         ranked.sort((x,y)->hits==null?Double.compare(score(query,y,now),score(query,x,now)):Integer.compare(order.get(x.optString("id")),order.get(y.optString("id"))));
-        JSONArray out=new JSONArray();for(int i=0;i<Math.min(10,ranked.size());i++){JSONObject r=ranked.get(i),e=r.optJSONObject("engine");out.put(new JSONObject().put("quote",r.optString("text")).put("observed_at",r.optLong("at")).put("resolved",e==null?r.optString("text"):e.optString("content",r.optString("text"))).put("pinned",r.optBoolean("pinned")));}return out.toString();
+        // Safety facts, identity and pinned notes ride along even when retrieval misses them:
+        // "推荐个零食" shares no words with "我对花生过敏". Up to CORE of them, then the ranked hits.
+        core.sort((x,y)->{int c=Boolean.compare(AgentPolicy.critical(y.optString("text")),AgentPolicy.critical(x.optString("text")));return c!=0?c:Double.compare(score(query,y,now),score(query,x,now));});
+        LinkedHashMap<String,JSONObject> chosen=new LinkedHashMap<>();
+        for(JSONObject r:core.subList(0,Math.min(CORE,core.size())))chosen.put(r.optString("id"),r);
+        for(JSONObject r:ranked){if(chosen.size()>=CORE+10)break;chosen.putIfAbsent(r.optString("id"),r);}
+        List<JSONObject> picked=new ArrayList<>(chosen.values());
+        JSONArray out=new JSONArray();for(int i=0;i<picked.size();i++){JSONObject r=picked.get(i),e=r.optJSONObject("engine");out.put(new JSONObject().put("quote",r.optString("text")).put("observed_at",r.optLong("at")).put("resolved",e==null?r.optString("text"):e.optString("content",r.optString("text"))).put("pinned",r.optBoolean("pinned")));}return out.toString();
     }
+    static final int CORE=5;
+    static boolean core(JSONObject r){JSONObject e=r.optJSONObject("engine");return r.optBoolean("pinned")||e!=null&&e.optBoolean("is_identity")||AgentPolicy.critical(r.optString("text"));}
     static double score(String q,JSONObject m,long now){return AgentPolicy.relevance(q,m.optString("text"))*5+(m.optBoolean("pinned")?2:0)+Math.max(0,1-(now-m.optLong("at"))/(30.0*86400000));}
     static JSONArray historicalContext(JSONObject s,String query)throws Exception {
         JSONArray out=new JSONArray();if(!query.matches("(?s).*(以前|曾经|过去|之前|后来|变化|历史).*"))return out;

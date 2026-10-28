@@ -90,6 +90,19 @@ public final class AgentCoreTest {
   bounded.remember("我喜欢海洋");bounded.commit(bounded.epoch(),longUser,longReply,"calm",null,false,false);
   check(largeFile.length()<=AgentStore.MAX_FILE_BYTES&&new File(largeFile+".bak").length()<=AgentStore.MAX_FILE_BYTES,"new long turns keep primary and backup within byte budget");
   bounded=new AgentStore(largeDir);check(bounded.history().length()>0&&bounded.memoryContext("海洋").contains("海洋"),"long conversation and memories survive restart");
+  JSONObject ledger=AgentStore.empty(0);MemoryLedger.migrate(ledger);long t0=System.currentTimeMillis();
+  MemoryLedger.addLocal(ledger,MemoryLedger.record("peanut","我对花生过敏，很严重","turn-a",true,t0-90L*86400000));
+  for(int i=0;i<30;i++)MemoryLedger.addLocal(ledger,MemoryLedger.record("snack"+i,"我喜欢第"+i+"种零食口味",("turn"+i),false,t0-i*1000L));
+  for(int i=0;i<8;i++)MemoryLedger.addLocal(ledger,MemoryLedger.record("pin"+i,"固定的小事第"+i+"件",("pinned"+i),true,t0-i*1000L));
+  String local=MemoryLedger.context(ledger,"推荐个零食",null),remote=MemoryLedger.context(ledger,"推荐个零食",new JSONArray().put("snack1").put("snack2"));
+  check(local.contains("花生过敏")&&remote.contains("花生过敏"),"safety fact survives a retrieval miss in local and engine mode");
+  check(remote.contains("第1种")&&remote.contains("第2种")&&new JSONArray(remote).length()<=MemoryLedger.CORE+10,"engine hits still included, bounded");
+  check(new JSONArray(local).length()<=MemoryLedger.CORE+10&&new JSONArray(remote).getJSONObject(0).getString("quote").contains("花生"),"critical facts lead the core");
+  check(AgentPolicy.critical("我对芒果过敏")&&AgentPolicy.critical("我在吃药")&&!AgentPolicy.critical("我喜欢蓝色"),"critical fact detection");
+  JSONObject warm=new JSONObject().put("incoming",new JSONArray()).put("semantic",true).put("state",new JSONObject().put("memories",new JSONArray().put(1)).put("vector_cache",new JSONObject()));
+  check(MemoryBridge.recallOnly(warm)&&MemoryBridge.recallTimeout(warm)==MemoryBridge.WARMUP_TIMEOUT,"first semantic lookup may build the vector cache");
+  warm.getJSONObject("state").put("vector_cache",new JSONObject().put("x",1));check(MemoryBridge.recallTimeout(warm)==MemoryBridge.RECALL_TIMEOUT,"later lookups must answer in seconds");
+  check(!MemoryBridge.recallOnly(new JSONObject().put("incoming",new JSONArray().put(1))),"writes keep the long timeout");
   System.out.println("PASS: "+checks+" core checks");
  }
 }

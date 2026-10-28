@@ -34,6 +34,10 @@ final class AgentPolicy {
     static boolean sensitive(String text) {
         return text.matches("(?is).*(密码|口令|身份证|银行卡|api.?key|secret|token\\s*[:：=]|sk-[a-z0-9]|\\b\\d{11,}\\b).*" );
     }
+    /** Health and dietary facts the reply must never contradict, whatever the topic. */
+    static boolean critical(String text) {
+        return text.matches("(?s).*(过敏|忌口|不能吃|不吃|吃素|素食|清真|乳糖不耐|糖尿病|高血压|哮喘|心脏病|癫痫|怀孕|孕期|哺乳|在吃药|服药|手术).*");
+    }
     static boolean validEvidence(String user,String quote) {
         return quote!=null && quote.length()>=3 && quote.length()<=240 && user.contains(quote) && !sensitive(quote)
             && !quote.matches("(?s).*[?？].*") && !user.matches("(?s).*(假如|假设|假装|角色扮演|举个例子|例如我).*" );

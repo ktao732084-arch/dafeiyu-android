@@ -41,7 +41,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "e1f62bfddd03f7512783905c4cdab12bc7651e4a3b16a6d71e99b2298ee0d9f0"
+      "sha256": "c8fe32ac95f1d9492752622019e63702cbd9299840001281f5cc8f936e86331c"
     },
     {
       "path": "LICENSE",
@@ -1679,7 +1679,7 @@
       "path": "src/com/xiaoxiao/pet/AgentPolicy.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "39621559556d92327c6c4f4222c1b433e9cc99561408a5f977742bd275dc0c59"
+      "sha256": "e2fb573084de335d9695ccf53e63d814e4e286715cd8ee718ff552bbc9e6c73d"
     },
     {
       "path": "src/com/xiaoxiao/pet/AgentReply.java",
@@ -1829,13 +1829,13 @@
       "path": "src/com/xiaoxiao/pet/MemoryBridge.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "9ed158da969adf8537768b90815dd716e72865befbfa0865be2b5834ff33811b"
+      "sha256": "9f0947864bf9c870bd3d62445140d76b1aa577df14841b1bd6ae173f585cdec7"
     },
     {
       "path": "src/com/xiaoxiao/pet/MemoryLedger.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "94c88636aff2b01c7faca5119b07454c8467db3cb499bd0272dae8e72c315101"
+      "sha256": "4fa2327392e977abffaa9137a371ff7f4bfb6ab6ec579c44f798547ecb25597e"
     },
     {
       "path": "src/com/xiaoxiao/pet/MemoryPanel.java",
@@ -1961,7 +1961,7 @@
       "path": "tests/com/xiaoxiao/pet/AgentCoreTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "a82725a0f640da872c046cde355b2cf4bad0ea8980e80b075b3ecff2cf51a4c5"
+      "sha256": "76c871346f0d8d4b0f39ce4e349378ae2ca52205562c4c3bcf42e02091f6de5e"
     },
     {
       "path": "tests/com/xiaoxiao/pet/ApiEndpointTest.java",
