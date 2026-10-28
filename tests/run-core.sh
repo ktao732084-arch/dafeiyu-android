@@ -8,7 +8,8 @@ out="$root/build/core-tests"
 src="$root/src/com/xiaoxiao/pet"
 tests="$root/tests/com/xiaoxiao/pet"
 mkdir -p "$out"
-javac -encoding UTF-8 -cp "$json" -d "$out" "$src/ApiEndpoint.java" "$src/AgentPolicy.java" "$src/AgentStore.java" "$src/AgentReply.java" "$src/MotionEngine.java" "$tests/ApiEndpointTest.java" "$tests/AgentCoreTest.java" "$tests/MotionEngineTest.java"
+javac -encoding UTF-8 -cp "$json" -d "$out" "$src/ApiEndpoint.java" "$src/AgentPolicy.java" "$src/AgentStore.java" "$src/AgentReply.java" "$src/MotionEngine.java" "$src/ActionPlan.java" "$tests/ApiEndpointTest.java" "$tests/AgentCoreTest.java" "$tests/MotionEngineTest.java" "$tests/ActionPlanTest.java"
 java -cp "$out:$json" com.xiaoxiao.pet.AgentCoreTest "$out/state-$(date +%s)-$$"
 java -cp "$out" com.xiaoxiao.pet.MotionEngineTest
 java -cp "$out" com.xiaoxiao.pet.ApiEndpointTest
+java -cp "$out" com.xiaoxiao.pet.ActionPlanTest

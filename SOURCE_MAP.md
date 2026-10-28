@@ -31,6 +31,7 @@
 | `AmbientBackground.java`、`CompactPanel.java`、`FrostedPanel.java`、`GlassSurface.java`、`GroupedList.java`、`SpringScrollView.java`、`SwitchRow.java` | 沿用小小桌宠界面基础 | 具体是否仅格式差异见逐文件清单 |
 | `ClonePanel.java` | 保留的小小桌宠代码 | 当前主界面不开放分身功能；不把该遗留实现署为新增 |
 | `AgentRuntime.java`、`AgentPolicy.java`、`AgentReply.java` | **本版新增，AI辅助实现** | 独立请求生命周期、上下文组合、规则约束、模型结果校验、情绪动作与主动陪伴门禁 |
+| `ActionPlan.java` | **本版新增，AI辅助实现** | 按时段、工作日/周末、季节和节日安排待机动作；情绪与触摸反应变化。农历表由 `lunardate`（香港天文台数据）生成，2024–2056 年逐日核对 |
 | `AgentStore.java` | **本版新增，AI辅助实现** | 原子持久化、来源可追溯记忆、相关性检索、4MiB容量管理、版本隔离与备份恢复 |
 | `AgentTransport.java` | **本版新增网络模块**，兼容基线原有 Chat Completions 接口约定 | HTTPS/SSE、完整回复校验、取消、超时和长度限制；并非移植一个外部 Agent 框架 |
 | `ApiEndpoint.java`、`ModelSettings.java` | **本版新增**，接续原 App 配置/密钥功能 | 共用URL校验、每请求一致快照、配置与密文Key同事务保存 |

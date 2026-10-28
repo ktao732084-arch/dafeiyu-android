@@ -27,6 +27,7 @@ final class Data {
   log(id,"角色资料已更新（名字与人设，不记录正文）");
  }
  static String idle(String id){return role(id).optString("idle");}
+ static Set<String> actions(String id){Set<String> out=new HashSet<>();JSONObject files=role(id).optJSONObject("files");if(files!=null)for(Iterator<String> k=files.keys();k.hasNext();)out.add(k.next());return out;}
  static String file(String id,String action){return role(id).optJSONObject("files").optString(action,"");}
  static LinkedHashMap<String,String> menuGroups(String id){LinkedHashMap<String,String> out=new LinkedHashMap<>();JSONObject groups=role(id).optJSONObject("groups");for(Iterator<String> k=groups.keys();k.hasNext();){String key=k.next();JSONArray list=groups.optJSONArray(key);if(list==null||list.length()==0)continue;if(key.startsWith("事件·")){if(key.equals("事件·whisper"))out.put("对话动作",key);}else out.put(key,key);}return out;}
  static String pick(String id,String group){JSONArray a=role(id).optJSONObject("groups").optJSONArray(group);return a==null||a.length()==0?idle(id):a.optString(random.nextInt(a.length()),idle(id));}

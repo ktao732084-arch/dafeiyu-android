@@ -44,7 +44,7 @@ final class AgentRuntime {
         case "curious":return "东张西望";case "concerned":return "碎碎念-对屏碎碎念";
         case "playful":return "鲸鱼吐泡泡特效";case "sleepy":return "原地小憩沉眠";default:return "碎碎念-发呆碎碎念";
     }}
-    static void express(String instance,String emotion,String reply){PetService s=PetService.instance;if(s==null)return;PetService.Pet p=s.pets.get(instance);if(p!=null&&p.visible&&!p.docked){if(!p.dragging&&!p.moving)p.play(action(emotion));p.reply(reply);}}
+    static void express(String instance,String emotion,String reply){PetService s=PetService.instance;if(s==null)return;PetService.Pet p=s.pets.get(instance);if(p!=null&&p.visible&&!p.docked){if(!p.dragging&&!p.moving)p.play(p.plan.emotion(AgentPolicy.emotion(emotion),action(emotion),Data.random));p.reply(reply);}}
     static JSONArray context(String user,boolean proactive)throws Exception {
         return context(user,proactive,store().snapshot(),null);
     }
