@@ -8,13 +8,13 @@
       "path": ".gitattributes",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "f5fb5b8f41915a232775d8ff8a29a230b8b4a3731032d8241ed805e55a237083"
+      "sha256": "031b52c001659c2b5167ddea60d4f0402e8caffb3d508aa9f3e4b3e8b1a37179"
     },
     {
       "path": ".gitignore",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "1fd377bcadbaeec528e7f9da2c5e855bb65d8649056d52c35e4955dd51dddfce"
+      "sha256": "a1018ad11230bce84d86f92fd41a2cef21c0d4ab9ed149a075ea6fbe296d9e98"
     },
     {
       "path": "AndroidManifest.xml",
