@@ -7,11 +7,16 @@ final class NativeMemoryEngine {
     interface Intelligence {JSONObject request(String operation,JSONObject data,AgentTransport.Token token)throws Exception;}
     static final JSONObject RULES=NativeMemoryRules.DATA;
     static boolean contains(String text,JSONArray terms){if(terms==null)return false;String t=text.toLowerCase(Locale.ROOT);for(int i=0;i<terms.length();i++)if(t.contains(terms.optString(i).toLowerCase(Locale.ROOT)))return true;return false;}
-    static boolean patterns(String text,JSONArray patterns,boolean start){if(patterns==null)return false;for(int i=0;i<patterns.length();i++){Matcher m=Pattern.compile(patterns.optString(i),Pattern.CASE_INSENSITIVE|Pattern.UNICODE_CASE).matcher(text);if(start?m.lookingAt():m.find())return true;}return false;}
+    // Python's re treats \d \s \w \b as Unicode (full-width digits and spaces from Chinese IMEs); compiled once.
+    private static final Map<String,Pattern> COMPILED=new java.util.concurrent.ConcurrentHashMap<>();
+    static Pattern pattern(String regex,int flags){return COMPILED.computeIfAbsent(flags+":"+regex,k->Pattern.compile(regex,flags|Pattern.UNICODE_CHARACTER_CLASS));}
+    static boolean patterns(String text,JSONArray patterns,boolean start){if(patterns==null)return false;for(int i=0;i<patterns.length();i++){Matcher m=pattern(patterns.optString(i),Pattern.CASE_INSENSITIVE|Pattern.UNICODE_CASE).matcher(text);if(start?m.lookingAt():m.find())return true;}return false;}
+    /** Python's str.strip(): also removes the full-width space U+3000 that trim() keeps. */
+    static String strip(String s){int a=0,b=s.length();while(a<b&&(Character.isWhitespace(s.charAt(a))||Character.isSpaceChar(s.charAt(a))))a++;while(b>a&&(Character.isWhitespace(s.charAt(b-1))||Character.isSpaceChar(s.charAt(b-1))))b--;return s.substring(a,b);}
     static boolean noise(String text){
-        String t=text.trim();if(t.length()<3||AgentPolicy.sensitive(t)||patterns(t,RULES.optJSONArray("SECRET_PATTERNS"),false))return true;
+        String t=strip(text);if(t.codePointCount(0,t.length())<3||AgentPolicy.sensitive(t)||patterns(t,RULES.optJSONArray("SECRET_PATTERNS"),false))return true;
         if(patterns(t,RULES.optJSONArray("NOISE_PATTERNS"),false)||contains(t,RULES.optJSONArray("NOISE_KEYWORDS"))||patterns(t,RULES.optJSONArray("DISTRACTION_PATTERNS"),false))return true;
-        boolean conversational=patterns(t,RULES.optJSONArray("CONVERSATION_NOISE"),false)||Pattern.compile(RULES.optString("QUESTION_PATTERN")).matcher(t).find();
+        boolean conversational=patterns(t,RULES.optJSONArray("CONVERSATION_NOISE"),false)||pattern(RULES.optString("QUESTION_PATTERN"),0).matcher(t).find();
         int index=t.indexOf('我');boolean fact=contains(t,RULES.optJSONArray("FACT_MARKERS"))||(index>=0&&normalize(t.substring(index)).length()>=6);
         if(conversational&&!fact)return true;JSONObject fallback=RULES.optJSONObject("FALLBACK_NOISE");Iterator<String> keys=fallback.keys();while(keys.hasNext())if(patterns(t,fallback.optJSONArray(keys.next()),true))return true;return false;
     }
