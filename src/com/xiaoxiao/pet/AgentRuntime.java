@@ -72,6 +72,8 @@ final class AgentRuntime {
     }
     static boolean send(String user,boolean proactive,Listener listener) {
         final AgentTransport.Token token; synchronized(AgentRuntime.class){if(active!=null)return false;token=new AgentTransport.Token();active=token;activeListener=listener;activeProactive=proactive;}
+        // Wake a dozing pet before the prompt is built, so the reply can sound freshly woken.
+        if(!proactive&&PetService.instance!=null){if(Looper.myLooper()==Looper.getMainLooper())PetService.instance.heard("main");else main.post(()->{if(PetService.instance!=null)PetService.instance.heard("main");});}
         worker.execute(()->{
             try {
                 token.check();if(!PersonaManager.ensureInitialized("main"))throw new IOException("请先在首页完成初次相遇，确定她的性格");

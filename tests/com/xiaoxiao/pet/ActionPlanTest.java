@@ -52,6 +52,23 @@ public final class ActionPlanTest {
   check(day.getOrDefault("@snack",0)==1&&day.getOrDefault("晨间刷牙",0)==1,"one snack time and one toothbrush");
   int fest=day.getOrDefault("@festival",0);check(fest>=4&&fest<=10,"festival clips several times a day, not constantly: "+fest);
   check(day.getOrDefault("@season",0)<=8,"seasonal clips stay occasional: "+day.get("@season"));
+  // Sleep: from midnight she yawns once, then dozes on a loop; a tap wakes her for ten minutes.
+  p=new ActionPlan(all());ActionPlan.Moment night=at(2026,10,29,2,0,9,19);
+  check(ActionPlan.YAWN.equals(p.idle(night,r)),"falls asleep with a yawn");
+  for(int i=0;i<5;i++)check(ActionPlan.DOZE.equals(p.idle(night,r)),"then dozes on a loop");
+  long n0=ActionPlan.epoch(night);check(ActionPlan.WOKEN.equals(p.tap(n0,ActionPlan.DOZE,r)),"tap wakes the sleeper");
+  check(!p.asleep(at(2026,10,29,2,5,9,19))&&p.asleep(at(2026,10,29,2,11,9,19)),"awake ten minutes, then asleep again");
+  check(!p.asleep(at(2026,10,29,9,0,9,19)),"never asleep by day");
+  check(!new ActionPlan(all()).wake(n0,ActionPlan.IDLE)&&new ActionPlan(all()).wake(n0,ActionPlan.DOZE),"only a dozing pet is woken");
+  // Interaction-aware idle: attention right after you, sulking after pokes, wandering when ignored.
+  ActionPlan.Moment noon=at(2026,11,4,14,0,9,26);long t14=ActionPlan.epoch(noon); // an ordinary Wednesday, no festivallong t14=ActionPlan.epoch(noon);
+  int look=0;for(int i=0;i<300;i++){ActionPlan q=new ActionPlan(all());q.interacted(t14-10_000);if(ActionPlan.ATTENTION.contains(q.idle(noon,r)))look++;}check(look>100,"looks your way right after you interact: "+look);
+  int sulk=0;for(int i=0;i<300;i++){ActionPlan q=new ActionPlan(all());for(int k=0;k<4;k++)q.tap(t14-30_000+k*500,ActionPlan.IDLE,r);if(ActionPlan.SULKING.contains(q.idle(noon,r)))sulk++;}check(sulk>110,"grumbles after being poked: "+sulk);
+  int lonely=0,lonelyEarly=0;for(int i=0;i<300;i++){ActionPlan q=new ActionPlan(all());q.interacted(t14-4*3600_000L);if(ActionPlan.LONELY.contains(q.idle(noon,r)))lonely++;ActionPlan e=new ActionPlan(all());e.interacted(t14-20*60_000L);if(ActionPlan.LONELY.contains(e.idle(noon,r)))lonelyEarly++;}
+  check(lonely>lonelyEarly+40,"wanders about after hours alone: "+lonely+" vs "+lonelyEarly);
+  // Being interrupted mid-activity, and what the model hears.
+  check(ActionPlan.CAUGHT.equals(new ActionPlan(all()).tap(0,"吃午餐",r))&&ActionPlan.STARTLED.equals(new ActionPlan(all()).tap(0,"写代码",r)),"caught mid-snack, startled at work");
+  check(ActionPlan.tapNote(ActionPlan.DOZE,ActionPlan.WOKEN).contains("戳醒")&&ActionPlan.tapNote("吃午餐",ActionPlan.CAUGHT).contains("吃着东西")&&ActionPlan.tapNote(ActionPlan.IDLE,ActionPlan.ANNOYED).contains("连续戳")&&ActionPlan.tapNote(ActionPlan.IDLE,"点击回应-开心跃动").contains("碰了碰"),"tap notes for the model");
   // Lunar table spot checks against Hong Kong Observatory dates, including the two New Years android.icu gets wrong.
   check(Arrays.equals(new int[]{1,1,0},ActionPlan.lunar(LocalDate.of(2027,2,6)))&&Arrays.equals(new int[]{1,1,0},ActionPlan.lunar(LocalDate.of(2030,2,3))),"Lunar New Year 2027 and 2030");
   check(ActionPlan.Moment.of(LocalDateTime.of(2027,2,5,20,0)).lunarNewYearEve&&ActionPlan.Moment.of(LocalDateTime.of(2030,2,2,20,0)).lunarNewYearEve&&!ActionPlan.Moment.of(LocalDateTime.of(2027,2,4,20,0)).lunarNewYearEve,"New Year's Eve on 29- and 30-day months");

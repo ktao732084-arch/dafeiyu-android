@@ -62,6 +62,12 @@ final class ActionPlan {
 
     static final String IDLE="待机呼吸休闲", DRAG="被鼠标拖拽悬空反馈", WOKEN="打瞌睡被惊醒", STARTLED="被吓一跳", ANNOYED="点击回应-傲娇生气";
     static final List<String> SLEEP=Arrays.asList("原地小憩沉眠","哈欠连天","打瞌睡被惊醒");
+    static final String DOZE="原地小憩沉眠",YAWN="哈欠连天",CAUGHT="偷吃零食被抓住";
+    // How she reacts to you between clips: looks your way right after you interact, grumbles a while after
+    // being poked too much, and wanders about when nobody has paid attention to her for hours.
+    static final List<String> ATTENTION=Arrays.asList("东张西望","碎碎念-对屏碎碎念","点击回应-元气挥手","小幅度原地360度旋转展示");
+    static final List<String> SULKING=Arrays.asList("碎碎念-对屏碎碎念","用鲸鱼尾巴拍打地面");
+    static final List<String> LONELY=Arrays.asList("碎碎念-发呆碎碎念","工作状态-原地踱步张望","东张西望","碎碎念-擦桌碎碎念");
     static final List<String> TAPS=Arrays.asList("点击回应-开心跃动","点击回应-害羞惊讶","点击回应-挠痒咯咯笑","点击回应-元气挥手");
     // Always fine whatever the hour or season.
     static final List<String> EVERYDAY=Arrays.asList("悠闲哼歌","超大伸懒腰","原地敲击桌面互动","原地重力下蹲压缩","女仆屈膝礼仪","被吓一跳",
@@ -88,6 +94,7 @@ final class ActionPlan {
     static final Set<String> SEASONS=new HashSet<>(Arrays.asList("放风筝","蝴蝶蜜蜂环绕头顶开花","摇扇纳凉","玩水枪","被落叶淹没","堆雪人"));
     static final Set<String> ONCE=new HashSet<>(Arrays.asList("晨间刷牙","是啊，吃什么"));
     static final long MINUTE=60_000L;
+    static final long ATTENTIVE_FOR=90_000L,SULKS_FOR=2*MINUTE,LONELY_AFTER=180*MINUTE,AWAKE_AFTER_WAKING=10*MINUTE;
     static final int RECENT=8;
 
     private final Set<String> available;
@@ -95,6 +102,8 @@ final class ActionPlan {
     private final Map<String,Long> played=new HashMap<>();
     private final ArrayDeque<Long> taps=new ArrayDeque<>();
     private String lastTap="",lastEmotion="";
+    // Wall-clock milliseconds, the same clock as Moment.
+    private volatile long lastInteraction=-1,annoyedAt=-1,awakeUntil=0;
 
     ActionPlan(Collection<String> available){ this.available=new HashSet<>(available); }
 
@@ -159,11 +168,27 @@ final class ActionPlan {
         }
     }
 
-    /** The next idle clip. Late night is sleepy and quiet; daytime mixes the hour, festivals, season and everyday clips. */
+    static long epoch(Moment m){ return m.time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(); }
+    /** From midnight to six she sleeps for real: the doze clip loops until a tap, a lift or a message wakes her. */
+    boolean asleep(Moment m){ return m.night()&&epoch(m)>=awakeUntil; }
+    static boolean dozing(String current){ return SLEEP.contains(current)&&!WOKEN.equals(current); }
+    void interacted(long now){ lastInteraction=now; }
+    /** Wakes her if she is dozing; she then stays up for ten minutes before nodding off again. */
+    boolean wake(long now,String current) {
+        interacted(now);
+        if(!dozing(current))return false;
+        awakeUntil=now+AWAKE_AFTER_WAKING;return true;
+    }
+
+    /** The next idle clip. Late night is sleepy and quiet; daytime mixes the hour, festivals, season, everyday clips and how you have treated her. */
     String idle(Moment m,Random random) {
-        long now=m.time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        long now=epoch(m);if(lastInteraction<0)lastInteraction=now-ATTENTIVE_FOR; // the lonely clock starts; nobody has just touched her
         String pick;
-        if(m.night()) {
+        if(asleep(m)) {
+            // A yawn first, then dozing on a loop.
+            String last=recent.peekLast();pick=(last==null||!SLEEP.contains(last))&&has(YAWN)?YAWN:has(DOZE)?DOZE:null;
+        }
+        else if(m.night()) {
             // Only three sleepy clips exist, so night skips the no-repeat rule: mostly dozing, now and then a yawn.
             List<String> options=new ArrayList<>();for(String a:SLEEP)if(has(a))options.add(a);
             pick=options.isEmpty()?null:options.contains(SLEEP.get(0))&&random.nextInt(10)<6?SLEEP.get(0):options.get(random.nextInt(options.size()));
@@ -174,6 +199,9 @@ final class ActionPlan {
             add(pools,weights,slot(m),m.late()?6:4,now);
             if(m.between(8,0,22,30)) add(pools,weights,season(m),1,now);
             add(pools,weights,m.weekend()||m.between(19,30,22,30)?merge(EVERYDAY,PLAY):EVERYDAY,3,now);
+            if(annoyedAt>=0&&now-annoyedAt<SULKS_FOR) add(pools,weights,SULKING,8,now);
+            else if(now-lastInteraction<ATTENTIVE_FOR) add(pools,weights,ATTENTION,6,now);
+            if(now-lastInteraction>=LONELY_AFTER&&m.between(8,0,22,30)) add(pools,weights,LONELY,4,now);
             pick=null;int total=0;for(int w:weights)total+=w;
             if(total>0){int r=random.nextInt(total);for(int i=0;i<pools.size();i++){r-=weights.get(i);if(r<0){pick=choose(pools.get(i),now,random);break;}}}
             if(pick==null) pick=choose(EVERYDAY,now,random);
@@ -186,15 +214,29 @@ final class ActionPlan {
         if(m.late()) return 60_000+random.nextInt(60_000);
         return 25_000+random.nextInt(30_000);
     }
-    /** A tap: wakes her if she was dozing, annoys her when poked repeatedly, otherwise a varied happy reaction. */
+    /**
+     * A tap (now in wall-clock ms): wakes her if she was dozing, annoys her when poked four times in five
+     * seconds, catches her mid-snack or startles her at work, otherwise a varied happy reaction.
+     */
     String tap(long now,String current,Random random) {
         while(!taps.isEmpty()&&now-taps.peekFirst()>5000)taps.removeFirst();
         taps.addLast(now);
         String pick;
-        if(SLEEP.contains(current)&&!WOKEN.equals(current)) pick=has(WOKEN)?WOKEN:STARTLED;
-        else if(taps.size()>=4&&has(ANNOYED)) {pick=ANNOYED;taps.clear();}
+        if(wake(now,current)) pick=has(WOKEN)?WOKEN:STARTLED;
+        else if(taps.size()>=4&&has(ANNOYED)) {pick=ANNOYED;taps.clear();annoyedAt=now;}
+        else if(eating(current)&&has(CAUGHT)) pick=CAUGHT;
+        else if(WORK.contains(current)&&has(STARTLED)) pick=STARTLED;
         else {List<String> options=new ArrayList<>();for(String a:TAPS)if(has(a)&&!a.equals(lastTap))options.add(a);pick=options.isEmpty()?lastTap:options.get(random.nextInt(options.size()));}
         lastTap=pick;return pick;
+    }
+    static boolean eating(String action){ return action.startsWith("吃")||MEALS.contains(action)||SNACKS.contains(action)||action.equals("涮火锅"); }
+    /** What the model is told about a tap, so her next words can follow from it. */
+    static String tapNote(String before,String reaction) {
+        if(dozing(before)) return "你在打盹时被用户戳醒了，还有点迷糊";
+        if(ANNOYED.equals(reaction)) return "用户连续戳了你好几下";
+        if(eating(before)) return "你正吃着东西，被用户戳了一下";
+        if(WORK.contains(before)) return "你正忙着，被用户戳了一下";
+        return "用户轻轻碰了碰你";
     }
     /** Emotion after a reply: the canonical clip half the time, otherwise a related one, never the same twice running. */
     String emotion(String emotion,String canonical,Random random) {

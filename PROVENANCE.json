@@ -41,7 +41,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "c8fe32ac95f1d9492752622019e63702cbd9299840001281f5cc8f936e86331c"
+      "sha256": "c8f611ccf426e6b120d6ea5e355f37b06c223350caa5aae982a6bdeec34f2d8f"
     },
     {
       "path": "LICENSE",
@@ -68,7 +68,7 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "cba20cc5cdb8e34bafa9feb7ec6318c67880be4faccb3a43a7cb338de4619938",
+      "sha256": "18b0f52af9f5c59cf9b39800a5fd600b0c3d9effd88e07fabd4e4f67fb6695d5",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
@@ -1658,7 +1658,7 @@
       "path": "src/com/xiaoxiao/pet/ActionPlan.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "a3547cf549bc857ae211c5d44592d78ba3afa71a9653193a4eeeee0ae3586bf7"
+      "sha256": "66e4625b5a5688e13427375be71d498d1014c0fda0a59f21ab846c467473aa5d"
     },
     {
       "path": "src/com/xiaoxiao/pet/ActionSheet.java",
@@ -1691,7 +1691,7 @@
       "path": "src/com/xiaoxiao/pet/AgentRuntime.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "2fc2da866a9e5f609da76a2b61d9d6c78f1ac8a6541a9c6392390ff13e94141f"
+      "sha256": "3d3491abad783bb610c5ff3da8eaa98ac4eee03e5a46adb8ed26903a74175fb0"
     },
     {
       "path": "src/com/xiaoxiao/pet/AgentStore.java",
@@ -1894,7 +1894,7 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/PetService.java",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "d07c4c284c5ce664dc28768d11499529d80a50cb",
-      "sha256": "7960e82a21d2df83c95de17c6a09059c38426c32bd0024ee0a178c0a06383376",
+      "sha256": "984586ef5a7ed2cc7e67a87428cd0f97b9c7640eff29f98c9a334af8665bee61",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
@@ -1955,7 +1955,7 @@
       "path": "tests/com/xiaoxiao/pet/ActionPlanTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "86eb4ac2227d6b35b2cdaa6eabd569b54140352cbf89931a508d40592682f02e"
+      "sha256": "319af6966e559d9d5afadddbee2aaac0cd1cb5c8610470e28811a003c462a94c"
     },
     {
       "path": "tests/com/xiaoxiao/pet/AgentCoreTest.java",
