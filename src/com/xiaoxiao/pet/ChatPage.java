@@ -70,9 +70,15 @@ final class ChatPage {
         for(int i=0;i<records.length();i++){
             JSONObject t=records.getJSONObject(i);long at=t.optLong("at"),replied=t.optLong("repliedAt",at);
             if(!t.optString("user").isEmpty()){stamp(t,at);message(t.optString("user"),true,null,false);}
-            String visible=ReplySegments.visible(t),label=ReplySegments.label(t);stamp(t,replied);
-            message(visible.isEmpty()?"回复已经保存好了，点开看看全文吧。":visible,false,label.isEmpty()?null:t,t.optBoolean("proactive"));
+            stamp(t,replied);segments(t);
         }
+    }
+    /** Each shown segment is its own bubble, like several short messages in a row; the rest waits behind the full-text pill. */
+    void segments(JSONObject t){
+        List<String> parts=ReplySegments.split(t.optString("reply"));int shown=t.has("displayed")?Math.min(parts.size(),t.optInt("displayed")):parts.size();
+        JSONObject pending=ReplySegments.label(t).isEmpty()?null:t;boolean proactive=t.optBoolean("proactive");
+        if(shown==0){message("回复已经保存好了，点开看看全文吧。",false,pending,proactive);return;}
+        for(int i=0;i<shown;i++){boolean last=i==shown-1;message(parts.get(i).trim(),false,last?pending:null,last&&proactive);}
     }
     void empty(){
         LinearLayout hello=column();hello.setGravity(Gravity.CENTER_HORIZONTAL);hello.setPadding(dp(24),dp(overlay?12:56),dp(24),dp(24));
