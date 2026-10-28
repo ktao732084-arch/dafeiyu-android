@@ -87,7 +87,7 @@ final class AgentRuntime {
                         // Recheck after the network wait, before saving a message the user won't see.
                         if(!canSpeakNow()){release(token);return;}
                         try{
-                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,false,true,null,null,turnId,observed,null,true)){release(token);return;}db.markFollowed(offered);}
+                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,false,true,null,null,turnId,observed,null,true)){release(token);return;}db.markFollowed(offered,turnId);}
                             release(token);listener.saved(turnId);listener.done(output.reply,output.emotion);
                         }catch(Exception e){release(token);listener.error("主动消息未能保存");}
                     });return;
