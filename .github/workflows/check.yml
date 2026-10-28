@@ -1,0 +1,57 @@
+name: check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            src
+            tests
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/cache@v5
+        with:
+          path: ~/test-libs
+          key: test-libs-json-20240303-android-all-14-robolectric-10818077
+      - name: Fetch test libraries
+        run: |
+          mkdir -p ~/test-libs
+          [ -f ~/test-libs/json.jar ] || curl -fsSL --retry 3 -o ~/test-libs/json.jar https://repo1.maven.org/maven2/org/json/json/20240303/json-20240303.jar
+          [ -f ~/test-libs/android-all.jar ] || curl -fsSL --retry 3 -o ~/test-libs/android-all.jar https://repo1.maven.org/maven2/org/robolectric/android-all/14-robolectric-10818077/android-all-14-robolectric-10818077.jar
+      - name: Compile app sources and run core checks
+        run: tests/run-core.sh ~/test-libs/json.jar ~/test-libs/android-all.jar
+
+  memory-service:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: memory-service
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Companion API tests
+        run: python -X utf8 memory-service/upstream/tests/test_companion_api.py
+      - name: Shared scenarios match the recorded baseline
+        run: |
+          python -X utf8 memory-service/upstream/eval/run_companion_eval.py --json "$RUNNER_TEMP/protocol.json" > /dev/null
+          python - "$RUNNER_TEMP/protocol.json" memory-service/protocol-baseline.json <<'PY'
+          import json, sys
+          key = lambda r: (r['case'], r['day'], r['metric'], r['detail'])
+          now, base = ({key(r): r['passed'] for r in json.load(open(p, encoding='utf-8'))} for p in sys.argv[1:])
+          changed = sorted(k for k in now.keys() | base.keys() if now.get(k) != base.get(k))
+          print(f"{sum(now.values())}/{len(now)} passed; baseline {sum(base.values())}/{len(base)}")
+          for k in changed: print('changed:', k, base.get(k), '->', now.get(k))
+          sys.exit(1 if changed else 0)
+          PY

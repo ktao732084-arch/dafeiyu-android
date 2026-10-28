@@ -15,13 +15,17 @@ final class PersonaManager {
     static final String MANUAL = "manual", RANDOM = "random", CUSTOM = "custom", LEGACY = "legacy";
     static final String DEFAULT_ID = "classic";
     private static List<Persona> loaded;
-    private static String sharedPrompt;
+    private static String sharedPrompt, selfCanon;
 
     static final class Persona {
         final String id, name, description, prompt;
+        final List<String[]> examples = new ArrayList<>();
         Persona(JSONObject value) throws Exception {
             id = value.getString("id");name = value.getString("name");
             description = value.getString("description");prompt = value.getString("prompt");
+            JSONArray pairs = value.optJSONArray("examples");
+            if (pairs != null) for (int i = 0; i < pairs.length(); i++)
+                examples.add(new String[]{pairs.getJSONArray(i).getString(0), pairs.getJSONArray(i).getString(1)});
             if (!id.matches("[a-z][a-z0-9_-]{0,39}") || name.trim().isEmpty() || prompt.trim().isEmpty())
                 throw new IOException("人格预设格式不正确");
         }
@@ -35,6 +39,7 @@ final class PersonaManager {
             JSONObject resource = new JSONObject(Data.read(Data.app.getAssets().open("personas.json")));
             if (resource.getInt("schemaVersion") != 1) throw new IOException("人格预设版本不支持");
             sharedPrompt = resource.getString("sharedPrompt");
+            selfCanon = resource.optString("selfCanon", "");
             JSONArray values = resource.getJSONArray("presets");
             ArrayList<Persona> result = new ArrayList<>();
             java.util.HashSet<String> ids = new java.util.HashSet<>();
@@ -55,6 +60,24 @@ final class PersonaManager {
         for (Persona item : presets()) if (item.id.equals(id)) return item;
         return null;
     }
+
+    /**
+     * Her fixed traits and the active style's example dialogues. Unlike the frozen prompt these are read at
+     * request time, so companions initialized before they existed get them too; a custom persona gets neither.
+     */
+    static String guidance(String role) {
+        presets();
+        if (!isInitialized(role) || CUSTOM.equals(mode(role))) return "";
+        StringBuilder out = new StringBuilder(selfCanon);
+        Persona item = find(activeId(role));
+        if (item != null && !item.examples.isEmpty()) {
+            out.append(out.length() > 0 ? "\n\n" : "").append("更多口吻参考（体会语气，不要照抄）：");
+            for (String[] pair : item.examples) out.append("\n用户：").append(pair[0]).append("\n你：").append(pair[1]);
+        }
+        return out.toString();
+    }
+
+    static long initializedAt(String role) { return Data.prefs().getLong(key(role, "initializedAt"), 0); }
 
     static boolean isInitialized(String role) { return Data.prefs().getBoolean(key(role, "locked"), false); }
 

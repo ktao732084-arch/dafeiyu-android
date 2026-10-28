@@ -31,6 +31,7 @@
 | `AmbientBackground.java`、`CompactPanel.java`、`FrostedPanel.java`、`GlassSurface.java`、`GroupedList.java`、`SpringScrollView.java`、`SwitchRow.java` | 沿用小小桌宠界面基础 | 具体是否仅格式差异见逐文件清单 |
 | `ClonePanel.java` | 保留的小小桌宠代码 | 当前主界面不开放分身功能；不把该遗留实现署为新增 |
 | `AgentRuntime.java`、`AgentPolicy.java`、`AgentReply.java` | **本版新增，AI辅助实现** | 独立请求生命周期、上下文组合、规则约束、模型结果校验、情绪动作与主动陪伴门禁 |
+| `ActionPlan.java` | **本版新增，AI辅助实现** | 按时段、工作日/周末、季节和节日安排待机动作；情绪与触摸反应变化。农历表由 `lunardate`（香港天文台数据）生成，内置2024–2056年历表 |
 | `AgentStore.java` | **本版新增，AI辅助实现** | 原子持久化、来源可追溯记忆、相关性检索、4MiB容量管理、版本隔离与备份恢复 |
 | `AgentTransport.java` | **本版新增网络模块**，兼容基线原有 Chat Completions 接口约定 | HTTPS/SSE、完整回复校验、取消、超时和长度限制；并非移植一个外部 Agent 框架 |
 | `ApiEndpoint.java`、`ModelSettings.java` | **本版新增**，接续原 App 配置/密钥功能 | 共用URL校验、每请求一致快照、配置与密文Key同事务保存 |
@@ -91,3 +92,17 @@
 | `NativeMemoryTest.java` | 本项目新增原生执行测试，不启动Python；模型能力使用受控接口测试，不声称独立复现上游真实模型分数。 |
 
 原生移植沿用记忆项目MIT许可，原许可保留于 `memory-service/upstream/LICENSE`。Python服务仍可作为开发对照，但手机版默认路径不依赖它。
+
+## 0.4.1 Claude 优化分支合并
+
+合并本仓库 `fix/power-and-model-compat` 的7个提交，终点为 [8e34e33](https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a)。Git 保留原提交与合并父节点，下面这些改进来自该分支的 Claude 辅助开发，不能全部归为本轮原创。
+
+| 部分 | 来源和合并适配 |
+|---|---|
+| `ActionPlan.java`、`PetService.java`、`AlphaVideo.java` | Claude 分支的时段/季节/节日动作、睡眠唤醒、互动反应、解码暂停与服务恢复。沿用原动画素材；本轮增加真实素材目录匹配与服务唤醒/锁屏框架测试。农历表生成工具按分支记录为 [lunardate](https://github.com/lidaobing/python-lunardate)，本包不引入其 Python 运行库；表数据与边界说明保留在代码。 |
+| `PromptBuilder.java`、`AgentPolicy.java`、`PersonaManager.java`、`assets/personas.json` | Claude 分支的提示词重排、口吻示例、固定自我设定、关系阶段与重复风格检测。本轮明确历史自我陈述不能覆盖初始化人格。 |
+| `AgentStore.java`、`AgentReply.java`、`MemoryPanel.java` | Claude 分支的自我陈述提取、落盘与查看/清空。本轮保留原生记忆事务，并修复清空时的迟到请求与备份恢复问题。 |
+| `AgentTransport.java`、`MemoryBridge.java`、`MemoryLedger.java` | Claude 分支的推理模型预算、服务错误提示、可选Python检索等待与关键记忆上下文；本轮合并保留手机原生非流式参数和内容截断保护。 |
+| `.github/workflows/check.yml`、`tests/run-core.sh`、`tests/compile-check.sh`、`ActionPlanTest.java` | Claude 分支新增跨平台检查与动作回归；`CompanionBehaviorTest.java` 是本轮新增的整合测试，模型请求使用本地受控HTTP服务。 |
+
+逐文件清单额外记录 `integration_sources`，保留原有底座、人格、记忆项目和资源的来源归属。本轮没有修改这些来源的许可范围。

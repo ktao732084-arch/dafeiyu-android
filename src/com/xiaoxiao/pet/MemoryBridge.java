@@ -46,12 +46,21 @@ final class MemoryBridge {
     static JSONObject http(Config config,String path,JSONObject payload,AgentTransport.Token token)throws Exception {
         token.check();HttpURLConnection con=(HttpURLConnection)new URL(config.address.base+path).openConnection();token.connection=con;
         try {
-            token.check();con.setInstanceFollowRedirects(false);con.setConnectTimeout(5000);con.setReadTimeout(payload==null?10000:90000);
+            token.check();con.setInstanceFollowRedirects(false);con.setConnectTimeout(payload!=null&&recallOnly(payload)?3000:5000);con.setReadTimeout(payload==null?10000:recallOnly(payload)?recallTimeout(payload):90000);
             con.setRequestProperty("Authorization","Bearer "+config.secret);con.setRequestProperty("Accept","application/json");
             if(payload!=null){byte[] data=payload.toString().getBytes(StandardCharsets.UTF_8);if(data.length>3*1024*1024)throw new IOException("记忆请求超过容量限制");con.setRequestMethod("POST");con.setDoOutput(true);con.setRequestProperty("Content-Type","application/json; charset=utf-8");con.setFixedLengthStreamingMode(data.length);try(OutputStream out=con.getOutputStream()){out.write(data);}}
             int code=con.getResponseCode();token.check();if(code!=200)throw new IOException("记忆服务 HTTP "+code);
             JSONObject result=new JSONObject(AgentTransport.boundedRead(con.getInputStream(),3*1024*1024));token.check();return result;
         } finally {token.connection=null;con.disconnect();}
+    }
+    // The lookup before each reply blocks the chat, so it gets seconds, not the 90 s a write may need for an
+    // LLM judgement; on timeout evaluate() answers from the phone's own memory. The first semantic lookup
+    // also builds the vector cache, so it may take longer once.
+    static final int RECALL_TIMEOUT=8000,WARMUP_TIMEOUT=45000;
+    static boolean recallOnly(JSONObject payload){JSONArray incoming=payload.optJSONArray("incoming");return incoming!=null&&incoming.length()==0;}
+    static int recallTimeout(JSONObject payload){
+        JSONObject state=payload.optJSONObject("state");JSONObject cache=state==null?null:state.optJSONObject("vector_cache");JSONArray rows=state==null?null:state.optJSONArray("memories");
+        return payload.optBoolean("semantic")&&rows!=null&&rows.length()>0&&(cache==null||cache.length()==0)?WARMUP_TIMEOUT:RECALL_TIMEOUT;
     }
     static final class Result {
         final JSONObject state;final JSONArray hits;final boolean remote;final String status;final JSONArray rejected;

@@ -1,4 +1,4 @@
-Android 14/API34 Robolectric: 37 passed; includes 11 native memory scenarios.
+Android 14/API34 Robolectric: 44 passed (37 existing + 7 merge integration scenarios).
 PASS com.xiaoxiao.pet.UiTest.manualPersonaOnboardingAndReadOnlyUI
 PASS com.xiaoxiao.pet.UiTest.chatUIRunsPromptRecallStreamingAndCommitsControlledModelReply
 PASS com.xiaoxiao.pet.UiTest.openingManualChatInterruptsPendingProactiveRequest
@@ -36,3 +36,10 @@ PASS com.xiaoxiao.pet.NativeMemoryTest.localModelCancellationDoesNotBecomeRuleFa
 PASS com.xiaoxiao.pet.NativeMemoryTest.nativeIsDefaultForNewAndUpgradedInstall
 PASS com.xiaoxiao.pet.NativeMemoryTest.offlineConversationCorrectsAndArchivesOnPhone
 PASS com.xiaoxiao.pet.NativeMemoryTest.phoneMemorySurvivesRestartAndForgetPurgesHistory
+PASS com.xiaoxiao.pet.CompanionBehaviorTest.transportKeepsNativeNonStreamingOverrideAndReasoningBudget
+PASS com.xiaoxiao.pet.CompanionBehaviorTest.scheduledChoicesExistInBundledCharacterCatalog
+PASS com.xiaoxiao.pet.CompanionBehaviorTest.selfStatementsNeverReplaceFrozenPersonaAndCanBeDisabled
+PASS com.xiaoxiao.pet.CompanionBehaviorTest.clearSelfInvalidatesInFlightTurnAndPurgesBackup
+PASS com.xiaoxiao.pet.CompanionBehaviorTest.chatWakesVisibleSleepingPetAndReachesPrompt
+PASS com.xiaoxiao.pet.CompanionBehaviorTest.filteredStreamIsRejectedEvenWhenDoneMarkerFollows
+PASS com.xiaoxiao.pet.CompanionBehaviorTest.screenAndKeyguardGateAnimationWithoutPretendingToBeInteraction

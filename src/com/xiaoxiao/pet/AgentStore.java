@@ -42,6 +42,11 @@ final class AgentStore {
     }
     synchronized JSONObject snapshot()throws Exception {return new JSONObject(state.toString());}
     synchronized long epoch(){return state.optLong("epoch");}
+    // Cheap reads for the 30 s heartbeat and the home screen; snapshot() copies the whole (up to 4 MiB) state.
+    synchronized long lastUser(){return state.optLong("lastUser");}
+    synchronized long lastAttempt(){return state.optLong("lastAttempt");}
+    synchronized int attempts(String day){return day.equals(state.optString("attemptDay"))?state.optInt("attempts"):0;}
+    synchronized String emotion(long now,long ttl){return now-state.optLong("emotionAt")<ttl?AgentPolicy.emotion(state.optString("emotion")):"calm";}
     synchronized JSONArray history() {
         JSONArray h=new JSONArray();JSONArray turns=state.optJSONArray("turns");
         try {for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(!t.optString("user").isEmpty())h.put(new JSONObject().put("role","user").put("content",t.getString("user")));h.put(new JSONObject().put("role","assistant").put("content",t.getString("reply")));}}catch(Exception ignored){}
@@ -79,6 +84,9 @@ final class AgentStore {
         return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,null,null,0);
     }
     synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed)throws Exception {
+        return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,null);
+    }
+    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self)throws Exception {
         if(epoch!=epoch())return false;
         JSONObject next=plan==null?snapshot():MemoryLedger.copy(plan.state);long now=observed>0?observed:System.currentTimeMillis();String tid=turnId==null?UUID.randomUUID().toString():turnId;
         MemoryLedger.migrate(next);if(plan!=null)next.put("memoryStatus",plan.status);
@@ -89,15 +97,39 @@ final class AgentStore {
             if(plan==null){if(next.getJSONArray("memories").length()>=120)throw new IOException("记忆已满，请先删除几条");addMemory(next,explicit,tid,true,now);}
         }
         JSONArray turns=next.getJSONArray("turns");
+        // Lifetime counters: turnCount anchors the prompt's history window, the others the relationship stage.
+        next.put("turnCount",next.optInt("turnCount",turns.length())+1);
         turns.put(new JSONObject().put("id",tid).put("at",now).put("user",user).put("reply",reply).put("proactive",proactive));
         while(turns.length()>160)turns.remove(0);
         next.put("emotion",AgentPolicy.emotion(emotion)).put("emotionAt",now);
-        if(!proactive)next.put("lastUser",now);
+        if(!proactive){
+            next.put("lastUser",now).put("userTurns",next.optInt("userTurns")+1);
+            String day=java.time.Instant.ofEpochMilli(now).atZone(java.time.ZoneId.systemDefault()).toLocalDate().toString();
+            if(!day.equals(next.optString("lastChatDay")))next.put("lastChatDay",day).put("chatDays",next.optInt("chatDays")+1);
+        }
+        if(remember&&self!=null)for(int i=0;i<Math.min(2,self.length());i++){String quote=self.optString(i,"");if(AgentPolicy.validSelf(reply,quote))addSelf(next,quote.trim(),tid,now);}
         if(plan==null&&remember&&!proactive&&quotes!=null)for(int i=0;i<Math.min(3,quotes.length());i++) {
             String quote=quotes.optString(i,"");if(AgentPolicy.validEvidence(user,quote))addMemory(next,quote,tid,false,now);
         }
         save(next);return true;
     }
+    static final int MAX_SELF=40;
+    /** What she has said about herself, verbatim from her replies, so she stays consistent ("我最爱吃小鱼干"). */
+    private static void addSelf(JSONObject next,String text,String turn,long now)throws Exception {
+        JSONArray a=next.optJSONArray("self");if(a==null)next.put("self",a=new JSONArray());
+        for(int i=a.length()-1;i>=0;i--)if(text.equals(a.getJSONObject(i).optString("text")))a.remove(i);
+        a.put(new JSONObject().put("text",text).put("source",turn).put("at",now));
+        while(a.length()>MAX_SELF)a.remove(0);
+    }
+    /** Up to eight of her own past statements, most relevant to this turn first, then the most recent. */
+    static JSONArray selfContext(JSONObject snapshot,String query)throws Exception {
+        JSONArray a=snapshot.optJSONArray("self"),out=new JSONArray();if(a==null)return out;
+        List<JSONObject> rows=new ArrayList<>();for(int i=0;i<a.length();i++)rows.add(a.getJSONObject(i));
+        rows.sort((x,y)->{int c=Double.compare(AgentPolicy.relevance(query,y.optString("text")),AgentPolicy.relevance(query,x.optString("text")));return c!=0?c:Long.compare(y.optLong("at"),x.optLong("at"));});
+        for(int i=0;i<Math.min(8,rows.size());i++)out.put(rows.get(i).optString("text"));
+        return out;
+    }
+    synchronized void clearSelf()throws Exception {JSONObject next=snapshot();next.put("self",new JSONArray()).put("epoch",epoch()+1);save(next);purgeBackup();}
     private static void addMemory(JSONObject next,String text,String source,boolean pinned,long now)throws Exception {
         NativeMemoryEngine.writeRules(next,MemoryLedger.record(UUID.randomUUID().toString(),text,source,pinned,now),now,java.time.ZoneId.systemDefault());
     }

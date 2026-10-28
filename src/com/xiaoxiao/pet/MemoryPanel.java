@@ -41,6 +41,15 @@ final class MemoryPanel {
         l.addView(a.text("最近的整理记录",15));for(int i=audit.length()-1;i>=Math.max(0,audit.length()-30);i--){JSONObject e=audit.getJSONObject(i);String op=e.optString("op");String label="ADD".equals(op)?"写下记忆":"MERGE".equals(op)?"合并重复":"ARCHIVE".equals(op)?"收入历史":"INVALIDATE".equals(op)||"DOWNGRADE".equals(op)?"更新旧说法":"重复表达";l.addView(a.text(new java.text.SimpleDateFormat("MM-dd HH:mm",java.util.Locale.CHINA).format(new java.util.Date(e.optLong("at")))+" · "+label,12));}
         ScrollView scroll=new SpringScrollView(a);scroll.addView(l);new Apple.Builder(a).setTitle("共同经历与记忆变化").setView(scroll).setPositiveButton("关闭",null).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}
+    /** What she has said about herself, kept so she stays consistent; read-only, clearable as a whole. */
+    static void self(MainActivity a){try{
+        JSONArray rows=AgentRuntime.store().snapshot().optJSONArray("self");LinearLayout l=a.column();l.setPadding(a.dp(18),0,a.dp(18),a.dp(18));
+        l.addView(a.text("这是她在聊天里亲口说过的关于自己的话（喜好、习惯），之后聊天会尽量保持一致。只是角色设定，不是你的记忆。",13));
+        if(rows==null||rows.length()==0)l.addView(a.text("还没有。聊到她喜欢什么时会慢慢记下。",15));
+        else for(int i=rows.length()-1;i>=0;i--)l.addView(a.text("· "+rows.getJSONObject(i).optString("text"),15));
+        ScrollView scroll=new SpringScrollView(a);scroll.addView(l);
+        new Apple.Builder(a).setTitle("她说过的自己").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->{try{AgentRuntime.cancel();AgentRuntime.store().clearSelf();}catch(Exception e){AgentPanel.fail(a,e);}}).show();
+    }catch(Exception e){AgentPanel.fail(a,e);}}
     static void historicalEntry(MainActivity a,JSONObject r){
         String at=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm",java.util.Locale.CHINA).format(new java.util.Date(r.optLong("at")));
         new Apple.Builder(a).setTitle("历史记忆").setMessage(r.optString("text")+"\n\n记录于 "+at+"\n这条记录已过期或被更新，不作为当前事实。").setNegativeButton("关闭",null).setPositiveButton("忘记相关版本",(d,w)->new Apple.Builder(a).setMessage("忘记这件事的当前与历史版本，以及直接来源对话？").setNegativeButton("取消",null).setPositiveButton("忘记",(dd,ww)->{try{AgentRuntime.cancel();AgentRuntime.store().forget(r.optString("id"));history(a);}catch(Exception e){AgentPanel.fail(a,e);}}).show()).show();
