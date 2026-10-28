@@ -14,7 +14,7 @@
       "path": ".github/workflows/check.yml",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "32288b575ed119a69d737955f8c1eefec219c89fcf7bcdab6aca5eb95147b3d0"
+      "sha256": "647737ace571806a62edabd053c36ec2462dcc27e28707987caf770061736906"
     },
     {
       "path": ".gitignore",
@@ -41,7 +41,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "d358fdd17d5f562e9c72c125b95c94f4f26bd6f2e8bfe59f53f2e55000019d7e"
+      "sha256": "f43e6df8cb09d615a6385af7de5b606b9dd9a6cb074795a6a08980566f98df74"
     },
     {
       "path": "LICENSE",
@@ -68,14 +68,14 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "379431daf99bec69849414580c90623f7907f712b4ace4ed1ea6f9410399746b",
+      "sha256": "d3ed5f403e07fc41ce5d9f7983b2e29062b10a41289d6578b9f7fb340e65c427",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
       "path": "SOURCE_MAP.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "7aadf8903fb911059cd68c93b36d56523552d0cfad89e1b48a0eaf7c587f306b"
+      "sha256": "35e5abcd5b470f2a32fe68467e27563c4b92e12ba76a730c3ff26dd86cf2169a"
     },
     {
       "path": "THIRD-PARTY-LICENSE.txt",
@@ -1258,7 +1258,7 @@
       "path": "memory-service/README.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "8fd76692239df3e7c65472ae11dfda70a1091b7afe31fd5685c393e1f2e107c4"
+      "sha256": "8545e8df02349c90371e104864266c0d554df9ab5d640d330b2c733d2986f6f7"
     },
     {
       "path": "memory-service/UPSTREAM.json",
@@ -1817,6 +1817,12 @@
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
+      "path": "src/com/xiaoxiao/pet/LocalEngine.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "e9ed04539257f1ee0b7f9e6a56219b40fbaa00fd5f45bf6f8aa7964237a2e52f"
+    },
+    {
       "path": "src/com/xiaoxiao/pet/MainActivity.java",
       "relationship": "adapted",
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/MainActivity.java",
@@ -1829,19 +1835,25 @@
       "path": "src/com/xiaoxiao/pet/MemoryBridge.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "9f0947864bf9c870bd3d62445140d76b1aa577df14841b1bd6ae173f585cdec7"
+      "sha256": "3c507ce5d56b76637015fd3d0006627887900e1bc1ada35317ef6f6c05431bd3"
     },
     {
       "path": "src/com/xiaoxiao/pet/MemoryLedger.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "cd6de0004a76175e6ac82e79481bea057c8bca1cc08dae448e9631f75919ccce"
+      "sha256": "fcb1a99f23e2890024c6b55ede0f6c8730c97b90c7fa82a401484bd1b61fcc71"
     },
     {
       "path": "src/com/xiaoxiao/pet/MemoryPanel.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "f0919fb2b124941c6407696364b36c6c916a7f89713992f255d303ac9264981e"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/MemoryRules.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "73b649c799728b28a811725fc456e9456167a989df586f1c09b7838e6608175a"
     },
     {
       "path": "src/com/xiaoxiao/pet/ModelSettings.java",
@@ -1973,13 +1985,19 @@
       "path": "tests/com/xiaoxiao/pet/AgentCoreTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "60711153093dff54759d01a01a0e67c91fa7f6c1f225f007ffd5c12ef501e417"
+      "sha256": "076e06f3ed7287b1bbb8da6fb9b7a8ec725d2cc63a6a41c4753bb00fc08040f9"
     },
     {
       "path": "tests/com/xiaoxiao/pet/ApiEndpointTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "763ef3e7915367bf2bc363cda0d0aed5de49f90c068cc6cd7f03b6d3a94362f0"
+    },
+    {
+      "path": "tests/com/xiaoxiao/pet/LocalEngineReplay.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "44e36a8c1406635a1cb8eedf119773d341c178a5c45077b6fcb218d9dcbc9918"
     },
     {
       "path": "tests/com/xiaoxiao/pet/MotionEngineTest.java",
@@ -1995,6 +2013,18 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "b0599f8e99e76347bded7f44e3169321b15803e2db599673ecf1a6b9faa6a02b"
+    },
+    {
+      "path": "tests/local-engine/replay.py",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "7c26c0aec50477482f8038976cbacd569399f9f56405158659105172b982b34e"
+    },
+    {
+      "path": "tests/local-engine/run.sh",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "f9e89d8ad20e4442dacda8e5ace5ae8873acad57366f1eb5727a6ab6286dd85a"
     },
     {
       "path": "tests/robolectric/README.md",
@@ -2067,6 +2097,12 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "f58ee242028288feef1a3368c083be663f698e6b8250af23d3e8cb962590a29a"
+    },
+    {
+      "path": "tools/export-memory-rules.py",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "9b37a2517c803c10187af992bf75330c45adac67a329bec86e39986fe2afc3c7"
     },
     {
       "path": "tools/sync-memory-service.py",

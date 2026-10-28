@@ -75,6 +75,6 @@ Android 测试：构建 APK 后运行仓库 `tests/robolectric/run-tests.ps1`。
 python tools/sync-memory-service.py --source '../agent-anthropomorphic-memory'
 ```
 
-随后重跑 Python、Android 的共享场景和生命周期回归，再更新基线与来源清单。不要为了让测试通过修改原始场景的预期。
+然后运行 `python tools/export-memory-rules.py` 重新生成手机离线引擎的规则表（`MemoryRules.java`），并用 `tests/local-engine/run.sh` 确认 Java 离线引擎与 Python 在共享场景上仍逐字段一致。随后重跑 Python、Android 的共享场景和生命周期回归，再更新基线与来源清单。不要为了让测试通过修改原始场景的预期。
 
 上游 `9862c93` 报告语义检索 + DeepSeek 实测达到164/166，并将 `MEMORY_LLM_JUDGE_MAX_TOKENS` 默认值调整为2048；本包已纳入该修复。164/166 是上游报告，本次未用真实云模型独立复测，详见随包 `upstream/eval/README.md`。

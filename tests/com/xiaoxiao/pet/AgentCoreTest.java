@@ -165,6 +165,16 @@ public final class AgentCoreTest {
   check(MemoryLedger.followUps(fs,obs.plusDays(1)).length()==0,"asked once, not again");
   in.remember=true;in.now=spoke+86_400_000L;JSONObject pc=AgentStore.empty(0);MemoryLedger.migrate(pc);pc.put("memories",plan.getJSONArray("memories"));
   check(PromptBuilder.build(in,"",true,pc,null).toString().contains("今天：我明天（2026-10-29）有面试")&&PromptBuilder.build(in,"早",false,pc,null).toString().contains("近期安排"),"proactive turn may ask how the interview went; chat knows the schedule");
+  // Offline memory now runs the engine's rules in Java (LocalEngine; replayed against Python in tests/local-engine).
+  MemoryBridge.Config offline=new MemoryBridge.Config(false,null,"",false,false);long d1=1_772_618_400_000L;
+  JSONObject mem=MemoryLedger.copy(AgentStore.empty(0));
+  mem=MemoryBridge.evaluate(offline,mem,new JSONArray().put(MemoryLedger.record("b","我住在北京","turn-b",false,d1)),"",d1,new AgentTransport.Token()).state;
+  MemoryBridge.Result moved=MemoryBridge.evaluate(offline,mem,new JSONArray().put(MemoryLedger.record("s","我不再住在北京了，搬到上海了","turn-s",false,d1+3600_000L)),"",d1+3600_000L,new AgentTransport.Token());
+  check(moved.state.getJSONArray("memories").length()==1&&"我不再住在北京了，搬到上海了".equals(moved.state.getJSONArray("memories").getJSONObject(0).getString("text"))&&"superseded".equals(moved.state.getJSONArray("archive").getJSONObject(0).getJSONObject("engine").getString("archived_reason")),"offline correction archives the old fact (rule mode needs shared wording, like the service)");
+  check(MemoryBridge.evaluate(offline,mem,new JSONArray().put(MemoryLedger.record("n","提醒我明天开会","turn-n",true,d1)),"",d1,new AgentTransport.Token()).rejected.length()==1,"offline noise is rejected, so an explicit note can say it was not kept");
+  JSONObject full=MemoryLedger.copy(AgentStore.empty(0));for(int i=0;i<120;i++)full.getJSONArray("memories").put(MemoryLedger.record("f"+i,"第"+i+"件很特别的小事情",("t"+i),i>0,d1));
+  JSONArray kept=MemoryBridge.evaluate(offline,full,new JSONArray().put(MemoryLedger.record("x","我养了一只叫团子的橘猫","turn-x",false,d1)),"",d1,new AgentTransport.Token()).state.getJSONArray("memories");
+  check(kept.length()==120&&!kept.toString().contains("\"f0\"")&&kept.toString().contains("团子"),"a full notebook drops the oldest unpinned memory, as before");
   System.out.println("PASS: "+checks+" core checks");
  }
 }

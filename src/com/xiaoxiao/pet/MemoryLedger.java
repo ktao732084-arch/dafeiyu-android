@@ -72,6 +72,11 @@ final class MemoryLedger {
         for(int i=0;i<due.length();i++){JSONObject d=due.getJSONObject(i);if(!"明天".equals(d.optString("when"))&&!done.contains(d.optString("id")))out.put(d);}
         return out;
     }
+    /** Drops the oldest unpinned memories until n more fit; the notebook keeps pinned ones. */
+    static void makeRoom(JSONObject s,int n)throws Exception {
+        migrate(s);JSONArray a=s.getJSONArray("memories");
+        while(a.length()+n>MAX_ACTIVE){int remove=-1;for(int i=0;i<a.length();i++)if(!a.getJSONObject(i).optBoolean("pinned")){remove=i;break;}if(remove<0)throw new java.io.IOException("记忆已满，请先删除几条");a.remove(remove);}
+    }
     static JSONArray candidates(String user,JSONArray quotes,String explicit,String turn,long now)throws Exception {
         JSONArray a=new JSONArray();if(explicit!=null){if(explicit.trim().isEmpty()||explicit.length()>240||!user.contains(explicit)||AgentPolicy.sensitive(explicit))throw new java.io.IOException("请填写 1–240 字，不含密码或证件号码");a.put(record(UUID.randomUUID().toString(),explicit,turn,true,now));}
         else if(quotes!=null)for(int i=0;i<Math.min(3,quotes.length());i++){String q=quotes.optString(i,"");if(AgentPolicy.validEvidence(user,q))a.put(record(UUID.randomUUID().toString(),q,turn,false,now));}return a;

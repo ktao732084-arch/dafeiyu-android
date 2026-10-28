@@ -78,8 +78,11 @@ final class MemoryBridge {
             if(response.optBoolean("degraded"))status+=" · 部分组件失败，已用规则补充";
             lastStatus=status;return new Result(state,response.getJSONArray("hits"),true,status,response.optJSONArray("rejected"));
         }catch(Exception failure){token.check();lastStatus="记忆服务暂不可用，本轮使用手机本地记忆";}
-        for(int i=0;i<incoming.length();i++)MemoryLedger.addLocal(state,incoming.getJSONObject(i));
-        String status=config.enabled?lastStatus:"手机本地记忆";lastStatus=status;return new Result(state,null,false,status,new JSONArray());
+        // No service: the same rule-mode write path in Java (corrections, merges, date grounding, noise).
+        // Unlike the service, a full phone makes room by dropping the oldest unpinned memory, as before.
+        MemoryLedger.makeRoom(state,incoming.length());
+        LocalEngine.Result local=LocalEngine.evaluate(state,incoming,now,TimeZone.getDefault().getOffset(now)/60000);
+        String status=config.enabled?lastStatus:"手机本地记忆";lastStatus=status;return new Result(local.state,null,false,status,local.rejected);
     }
     static void validate(JSONObject response,JSONObject previous,JSONArray incoming)throws Exception {
         if(response.optInt("protocol")!=1)throw new IOException("不兼容的记忆服务协议");
