@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "300a25fbb4f48341aa71bbe746964b1219d4a979e040aba456a3a5269a21151e"
+      "sha256": "e8a80ba7d911e0f28aa695376fe44b9a0bf8a0739dc2d753b07687699e29c775"
     },
     {
       "path": "LICENSE",
@@ -78,7 +78,7 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "7bf81f8f11390ca480e1145dbb877d2285bd51a84c531537f2ea5889d9ca19bd",
+      "sha256": "01f55e376f6a6f9d37520adbc412eada34e878a08d581fb86c6186ab6728ada8",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
@@ -1959,7 +1959,7 @@
       "path": "src/com/xiaoxiao/pet/MemoryLedger.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "77e7588d9406a947d347968fc52e503178109508e4d2bb06803a7ad2d97d0282",
+      "sha256": "a9720a5dd5ec9de746cc6ae4ce614415b4a39250634ee28b644537c12c3d7062",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2013,7 +2013,7 @@
         "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/src/noise_filter.py"
       ],
       "license_scope": "MIT; upstream notice preserved",
-      "sha256": "ca58300f99552da2b588f5e6f562cad12a7720699281ea85004f6061537a43f2"
+      "sha256": "93212750a466d4bbc076d73a1b9ff2b983a8154ad207d4eca0b0f93044d8f261"
     },
     {
       "path": "src/com/xiaoxiao/pet/NativeMemoryIntelligence.java",
@@ -2108,7 +2108,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "bed86db093c88e87dfc610d0791387e53e9790d7cc76b5a0acb16531ffdb5a83"
+      "sha256": "f1531eda86a2090887aa8c27baa3058161f9fc739e395ff57d11b8e98f945bf3"
     },
     {
       "path": "src/com/xiaoxiao/pet/ReplySegments.java",
@@ -2200,6 +2200,12 @@
       "sha256": "24363bd7b65ac27c345a6ecaae4b93b8ec163cdc7450884c0c3ba08c964924d0"
     },
     {
+      "path": "tests/com/xiaoxiao/pet/MemoryCaptureTest.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "6d82bd6a4a0a655047faeaf545409638f7408939bc3aa33d66309b6cee77aa72"
+    },
+    {
       "path": "tests/com/xiaoxiao/pet/MotionEngineTest.java",
       "relationship": "copied",
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/tests/com/xiaoxiao/pet/MotionEngineTest.java",
@@ -2229,6 +2235,24 @@
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
       "sha256": "b0599f8e99e76347bded7f44e3169321b15803e2db599673ecf1a6b9faa6a02b"
+    },
+    {
+      "path": "tests/memory-capture/README.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "d58780fc25e233b2f2cdbd85c6834f10d5663adf79b15a6aa5e359dc3b12c8c1"
+    },
+    {
+      "path": "tests/memory-capture/blind.txt",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "4ff5bf375025495ce32463cff19a39939706a330cf4494d1e58ce52550546f4c"
+    },
+    {
+      "path": "tests/memory-capture/tuning.txt",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "4212fa15c79538245c8d7e704ca42615b4b0902f52677e0448c08d98919fecd1"
     },
     {
       "path": "tests/robolectric/README.md",
@@ -2322,7 +2346,7 @@
       "path": "tests/run-core.ps1",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "b9cf9636c9299d678344f771f8425b660a709207ff1700276fc77ef6caa843a1",
+      "sha256": "b1fde345d2eb07ca05d964c884ba52dcdd3ae7086144d839a91dc8c0e686d2a2",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2336,7 +2360,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "07fb631f976dcfdcc5a6e2dd10d3fe167aa8af4e73c058371d4d897eab5a1542"
+      "sha256": "8f29584c14b2458ea9f79e95e547dac05f7f850fc85d9777e116cca35690beb5"
     },
     {
       "path": "tools/generate-native-memory-rules.py",

@@ -65,7 +65,15 @@ final class MemoryLedger {
     }
     static JSONArray candidates(String user,JSONArray quotes,String explicit,String turn,long now)throws Exception {
         JSONArray a=new JSONArray();if(explicit!=null){if(explicit.trim().isEmpty()||explicit.length()>240||!user.contains(explicit)||AgentPolicy.sensitive(explicit))throw new java.io.IOException("请填写 1–240 字，不含密码或证件号码");a.put(record(UUID.randomUUID().toString(),explicit,turn,true,now));}
-        else if(quotes!=null)for(int i=0;i<Math.min(3,quotes.length());i++){String q=quotes.optString(i,"");if(AgentPolicy.validEvidence(user,q))a.put(record(UUID.randomUUID().toString(),q,turn,false,now));}return a;
+        else {
+            // The chat model's quotes first; then sentences the local rules recognise as facts, so a fact is kept
+            // even when the model forgot to quote it. At most three per turn (the service protocol's limit).
+            List<String> kept=new ArrayList<>();
+            if(quotes!=null)for(int i=0;i<quotes.length()&&kept.size()<3;i++){String q=quotes.optString(i,"");if(AgentPolicy.validEvidence(user,q)&&!kept.contains(q))kept.add(q);}
+            for(String f:NativeMemoryEngine.autoFacts(user)){if(kept.size()>=3)break;boolean covered=false;for(String k:kept)if(k.contains(f)||f.contains(k))covered=true;if(!covered)kept.add(f);}
+            for(String q:kept)a.put(record(UUID.randomUUID().toString(),q,turn,false,now));
+        }
+        return a;
     }
     static Set<String> staleSources(JSONObject s,long now)throws Exception {
         Set<String> out=new HashSet<>();for(String pool:new String[]{"memories","archive"}){JSONArray a=s.optJSONArray(pool);if(a==null)continue;for(int i=0;i<a.length();i++){JSONObject r=a.getJSONObject(i);if(pool.equals("archive")||!current(r,now)){JSONArray sources=sources(r);for(int j=0;j<sources.length();j++)out.add(sources.optString(j));}}}return out;
