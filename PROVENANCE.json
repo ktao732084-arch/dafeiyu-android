@@ -1,0 +1,1702 @@
+{
+  "schema": 1,
+  "version": "0.2.0",
+  "android_base_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+  "scope": "Initial publication inventory; generated publication documentation may not list itself. Text files use LF so checksums match repository contents.",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "f5fb5b8f41915a232775d8ff8a29a230b8b4a3731032d8241ed805e55a237083"
+    },
+    {
+      "path": ".gitignore",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "1fd377bcadbaeec528e7f9da2c5e855bb65d8649056d52c35e4955dd51dddfce"
+    },
+    {
+      "path": "AndroidManifest.xml",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/AndroidManifest.xml",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "02572e8467fa401e36d49ac1288feee1fbd7bf04",
+      "sha256": "96582d6fb8c9495e12147e4033eec844bf00467c5382432f3c98b2323b355ee8",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "ASSET_LICENSE.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "3bdf8415be9d95d07feef760cf74c131c3e846e71bf4c144963a507c7e504807"
+    },
+    {
+      "path": "assets/catalog.json",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/catalog.json",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "0898f9644b1e8889ee562c27e2f304bb97f3fe14",
+      "sha256": "7d82e891327a36aa0b9eef1f017c916f8152f12145654bc0ab1a994918ec2e37",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "assets/main/000.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/000.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "1d216f845b96e871e4fd6395f7a4b66a9ede4203",
+      "sha256": "5df35da911df1e9880e41584fbe19a00fec48a795fc377170ee227761d0302c4",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/001.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/001.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "22062717a57820146ea6f8f2cd9e1e6e6c5fc428",
+      "sha256": "f8d394b90583c5e03ad48bca3ccb74b8294f0fc3a785612323b76a1b1b45a456",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/002.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/002.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "faadd6b27d274233017ef32c1c89e0e0af912ab1",
+      "sha256": "9618adb5cb226ff0e82578ed4ee1dc93d712187715ccc6535b3b339aa39c7ad4",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/003.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/003.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "d9de636ea931d39a0a243359e3031b731d31c9bf",
+      "sha256": "f5b448282f070cf4b046f9df59ee4da77ba1d7593b169e0bd6b894eb00bf65ee",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/004.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/004.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "a44273d8161a1961340db885364b4dfb001eb3d7",
+      "sha256": "5eb0e4e97852597fa13df20571f92944ab896afd5048ea32c4e3a0fd757f5877",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/005.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/005.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "0bcd3f92aed24148370b432bed276a7c7348ffd8",
+      "sha256": "05c8b7a5d76b4b4dc47a0c6527b50f0d575c724302cc55ff6e0d3f759b19cad3",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/006.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/006.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "cdb7d9d154efde32c886dbde47e0eb4e053bd475",
+      "sha256": "aab11268a45f5f9b6ab4a1cc30139c3749f9911a1ad906aeab8c8eb2c4246c91",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/007.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/007.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "e387e2396143aeaf4f5a3d377c10e83f83b14998",
+      "sha256": "0d63834fe4a87ed521ffcaa90730bbf7f74aea927b4b031d0a8ca09769d74d14",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/008.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/008.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "8252d32601bee5a4edaa832e8417845f4c93c82d",
+      "sha256": "68061c1cf3b672883ff51de3056a27a4cc9a4a0a90103187daf5eab82b6ba1e7",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/009.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/009.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "a6d3fea08af1e18dd9e0794dfec5b6a8350d20b3",
+      "sha256": "a14fdd8993b0e9fcda145042e6f5c7da6f8b1905de2f198b58ed3b68e40354d1",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/010.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/010.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "7320e3ec5177ddcc54023534be81149c5109d25c",
+      "sha256": "857d878f7335275c2a680ffe5483362a78d15a8488d85eee498f16ef60de7601",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/011.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/011.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "f0293d65435062fb2e54d4432fca379236ab0a82",
+      "sha256": "e85688b182cfb86fcf49819b269a491768ca7a0f875b6d241a2f85c0ec2e417f",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/012.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/012.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "398bc326c400126ecdb000946c8a90e308bc9d02",
+      "sha256": "8fabe9ebe4664a516f7f24fa97fca2720288466c8a0a7989f3b3298826fde6ea",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/013.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/013.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "26a84ceb7a90d9eb43e8607b45ea66e2de8a1bb7",
+      "sha256": "27f08b9558c78faef3c082d40f781fef36a8e30bb8ae848ef9e631cc224504d3",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/014.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/014.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "a0c3f60e4954cb21c645f01a38ee7e01153751ed",
+      "sha256": "f105d48f807cef2c4c431683a6e79cd1e56630cecfd2f1a6e1e988b23cc35384",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/015.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/015.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "4aabc4f17e80f2097ae33ae6d0cf4f21ede46c5f",
+      "sha256": "ccef6047a17a01e93932debca9e9192675e894f43224909889ff35948da73e8d",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/016.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/016.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "8a12bdeddd7a14b48f0e1ecd75f6e21946747f5c",
+      "sha256": "9fb07fbd9505fe932a78e68669ad833c9e76684dd5771148495ca52ad7d34e52",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/017.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/017.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "1c7fba36ae69bcabf011be3ac726ef5f6535c459",
+      "sha256": "173c38c3b92444c6e8b79ff8538f8add380841ba4a9d3eb51592728e74545eca",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/018.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/018.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "a292d819dc9ab53d6fa09c2ce4bf6db3b842d554",
+      "sha256": "80ec8eca05b57dfe6a86e77920aa978e71d7d9e214cc943376d56329b71d2990",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/019.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/019.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "cdeb2f6cf696a602aa8ba28a7c6c7415c7e86d8d",
+      "sha256": "da5ca0a6078f07b77f07a008f7cb2111bf323a7b969e30092ab161a648ab0881",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/020.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/020.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "26f291b80f0cf1e61e51703eb2bf47336dcb24bb",
+      "sha256": "997cccefb58dd719fa272f70fbc0f53fabe71482570a4b3cb1db594906ad84d2",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/021.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/021.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "b711656354c2bb963108c38668fc2a612ceaa985",
+      "sha256": "219fa1905f65fde0f2c5722d3537fb91f216d4a817149c74a08447fef2a2982c",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/022.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/022.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "30b514109f64bf3b539cc5ac2b12fcec5b6b7915",
+      "sha256": "a00be5abc61f6103b944bbd4509d9b86a9812c948a1666bd78b3f59595a78380",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/023.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/023.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "1697551a35ba90d8847d8833e5a56464d8c8856d",
+      "sha256": "2bc126c4f6a388d6ee1f4c5d9d3ce2d70a92af69ba38734153801032d5ea0a63",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/024.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/024.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "7a908134477634662fffdaa047b11f35cc1a37c6",
+      "sha256": "d4af5475c0f117e633e0862b394f14ddc4fa30640c86eb4006267172a1c85bee",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/025.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/025.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "0ff9c47876e32abbac1fc587d37413706fac9e2e",
+      "sha256": "f042f5f6b6e0eb1f61be30f3eb44f773f5164c5dfd1a7f66deac2c893f56700c",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/026.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/026.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "b361f9573af206f7e623bc0a1656308ee5a443f9",
+      "sha256": "7a779916a8aad7f5da77b0e1bf324343928dc9a67ebaf6783ef2844835b4ffd9",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/027.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/027.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "d70077634b0e6ac0c5cb26049a261616640394f3",
+      "sha256": "3b4353cb286253d3f07ebc0f1c3d40a5e0fe46578855a28b98ab3d71210bc147",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/028.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/028.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "8cfa3e1df3fd332b4a0bdb39b5673b6e72241a14",
+      "sha256": "57c56edfbf9f63833c2cd9e917ddffd825e4052b029b9df9fcf545cc2501d23b",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/029.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/029.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "8cd6da673c9ba2b64d428e64aa8ef21f04835c8d",
+      "sha256": "48cc4218674f352e6124c82ed1abb03fe98d29738f5d6cde0069ac541125154e",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/030.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/030.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "f500e7332b21db8e8f2f22692f0cdc7ad5c37f69",
+      "sha256": "df05902bd3bdc9f85ea46db0393cc3cf8c66c2644dd300e50320815f05e8fc49",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/031.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/031.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "5f81d6d7708b202d574813482b5912fdf2fa05ca",
+      "sha256": "c3b8d2d9c99e08ee8023893784b8aeed7d683e817040c36337d8cbf31b01af95",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/032.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/032.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "17fc97c831695e0603c76735a742d102e57c39e4",
+      "sha256": "a21f2dbaab1cc69a4466d1420c5494c887a155957502fb31504620e87d96dda6",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/033.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/033.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "fa590e32767bf31bfde2e465bf6b029f4efb894f",
+      "sha256": "6da0e4488adcdb311ad77cca67a98d9cfaecc8d68456c43bacae850feedb0b38",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/034.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/034.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "e00def98d98f22f553eaac5c3afd377f1a1cc41e",
+      "sha256": "8e72d23729d89efe2292bf95b40c31bbdd256463dd00b0b4750675f17b81271d",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/035.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/035.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "bdd590916569645b0ada7d85f3ffabe41290a731",
+      "sha256": "a98d9740853c1c288463ef8d8008d9c5d7ec354086e4864fcf943eb808abfcb8",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/036.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/036.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "6cf0259cd41284810db8bd3f596839addbf07c12",
+      "sha256": "c15fb7c9782d758bcc1bef3b9904b0a0dd6abcc514ba7c97e0ce46fb09789d37",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/037.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/037.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "000198706910aec269cab3c9a4cc0fff0bce97f8",
+      "sha256": "5603eb1718cd16ead21da0a1cadfb3b03394fc88f1036fdb910e248ba02ce4a8",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/038.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/038.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "4475c2052f45eca69bd2b7203e706353b79de2d3",
+      "sha256": "f8128ec8becbd0616cdcfe88c3624a5614b3475c7828e4b4ae768602ec545326",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/039.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/039.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "f2be6b868d89a389c4380a073db3a70046dd8003",
+      "sha256": "56998f22408bc4240e913e8e41c64f897943f4beb654bae1db672c1caa7e4f2e",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/040.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/040.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "0955057fc0654aff36af14ee768b2d53686efb3d",
+      "sha256": "12331607596af988dbe2183656ed0dae4ec9d7d250abb00cf17f70c6afebb914",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/041.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/041.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "e67dd55c1c0b1f1856af7905fc001c39bc2854fa",
+      "sha256": "a8061f0f03557b2f0da366401a183e355e845e1c454d04286aa3d364d31a7f71",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/042.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/042.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "8e7116d32c4870ef37bd52db392a6adca36bac21",
+      "sha256": "7ecb7df4ef41ecda5590db4526f7a43c273a0afb265e80e3526bc3d021119e66",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/043.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/043.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "4bc5e43849eb2777b3eaac76395d1ee01fe83ab1",
+      "sha256": "f0da3410c6375157f802480a2392f2925eaa9cd8edd9b715811fcc5585e3230a",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/044.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/044.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "5afc4b03a5ffbd80061f6bb61fcee02fff4bb630",
+      "sha256": "f962b5d3a6a0186d80ac3d18862bba4ea2a0f402c499516559356012e37380d9",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/045.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/045.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "c8637ddad0e38679430ba2d6779ae10c88a60247",
+      "sha256": "6b1b8191c159f157463a772b4e2e0ccfb439741c25a02834c407d3347b9e728e",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/046.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/046.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "5d29ced8f3ecc3aa20679bfaad9eac2d92ab1e6f",
+      "sha256": "03e626556661695a678fc972ddcadb83424af01c2ff6717f96483fdc14873e40",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/047.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/047.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "282a40d0e82b75bc90760ebfa6ed91f133b92da5",
+      "sha256": "d5f5716992ceabf17d23fc447515e0373b551274a8de0ea1a2cb4e3672b9e1ba",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/048.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/048.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "84051a5164cdc60daea9b179e7619fc59c3a26f6",
+      "sha256": "11b6ad5bd6a0060cef95ecfaf826a655033ab5b92155c9e7fe7ad4de4a1e9d75",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/049.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/049.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "01784ab7d5eddc3fb78eb16a4a601936350d7ce6",
+      "sha256": "0e10753b7ce35d0756263241b0d6bcfec515429dd9a97860eba96a480b67c2f9",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/050.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/050.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "fca87bd7406111abf039e7c8019f6eada4d2d519",
+      "sha256": "e4c6d69f133468bbd99f7e420d068b22999fc6cbb24694f2e412bd9cf3c0567a",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/051.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/051.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "4dfd76e13b9981c8ea0307ed1b9063faa71a92b5",
+      "sha256": "f369d2c0b400e070842a64ccc0a2d3482f9987655b06c6272f8b5e2bc95a3600",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/052.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/052.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "9265572f0f193bc267e7483c1091681e1d979246",
+      "sha256": "e924bc5da7bd9cee5fca85c3e5bc7c2b9eb5cd22e2163074d586042e35cd436e",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/053.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/053.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "299eb4bd9a57ae142ee2b8fe05a6d39b526d8e53",
+      "sha256": "20859b73e98c1c1989cb1cd60b91fe08acf8102ca793d04e21f56e70a10ad74f",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/054.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/054.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "4697347fe9448bdadc482a4e983cfbd2777012e0",
+      "sha256": "d9bf822088e27edc54039e81f98f70b805bf47f4d3bd18f0e19f4ce5575fb38a",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/055.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/055.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "02e8162eeba18c110f7a18fdb5aedf7285329afc",
+      "sha256": "9d32efa92881a39f02c58389b6c65868ba9645f3de01d961a5113958fe54c9f0",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/056.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/056.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "27d94def94e68b0e45fa6f4a8b4c5d7f8ec65548",
+      "sha256": "468dab1382b58ca610860e0a7d5335b6ff60f2ff00ecf3f39c309516e17925b3",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/057.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/057.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "94cf6c77de109f3dea42e40515b8adb55df67503",
+      "sha256": "5c19b20118a4d0413075761d1ccec75c94c0be2e206e61cfff44ef7fe6474c0a",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/058.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/058.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "c0ad2793b7aa5d8a068fef4c12a2c3a39395e5b4",
+      "sha256": "6023b974b3972c13c6ad3f9d2fc02e30ff891329d2e73a832114de3a49cba210",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/059.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/059.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "27ad14879cd0209edfca6643f30a19855faf08ff",
+      "sha256": "759b61a911655df58fac2c64e8498773be2796ddeed49acc073bbb1de1a82afa",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/060.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/060.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "61fcd3c2963cab663b6eabea3999ef449b6e78fc",
+      "sha256": "c47bdd6f8bedcda0f3d0c7b99d4410df8dbcc75c119f73b52408c0648cccd95c",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/061.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/061.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "f584083a4e8344db6d23067360d0a364784ef298",
+      "sha256": "8efe9b36b1ebfaebaed691e6327743a4b603b1e95e2b7725ab134589861f753d",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/062.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/062.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "b6818dc31d9f18363634c0b8511c48e3f1852f68",
+      "sha256": "801e0434eebf82c3e8ca68a0fa63a659d12ca2f8545c94db13134b13cca6565e",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/063.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/063.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "9f65fc4e7cb09ecc29ba1d6c5333adc2382c2e02",
+      "sha256": "65314af0c47359be60e9aa4e12f6b40fa232893855cfeda8350c37baba0031ff",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/064.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/064.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "90b708ea83193c08c56676f97d47f1e1bff9e615",
+      "sha256": "f5ae4fc2b65eac60876f36b41a1de309cc4cae646d388dcdde65501453d888e3",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/065.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/065.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "1a1156a7e561434cc5a6bb70ed364754d4b45fd9",
+      "sha256": "81751ef6609104429fa5ff81165b06f4dd1ce45d6eebbe4901ac54dcff829f63",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/066.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/066.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "d1a36a383057e1884eea88f318d70c3161b1f889",
+      "sha256": "292c66da16e2779b221719e3f417bdbe2b55d921ad9141ee5f94b9b8413f6e34",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/067.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/067.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "deae9afbfd5da01f038b399b2fa4b7352fef3afa",
+      "sha256": "20ba2fadf80ab63ec18a0c8b5d8423466614a1c145f450fa3c9e5d72c879bb4b",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/068.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/068.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "1d0df3ec9887d599d54ef64bf3c8232c08e780f7",
+      "sha256": "5a567586635ed07680be7a17b5697f949f1385d5b318fd3b1c743238bf8a0e98",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/069.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/069.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "e1ddd9ca2f3fad8c172f07c9b3f6d3fdb11b871b",
+      "sha256": "ce40ccc2c51971ba57d0ce86db7f6125c741dbae9b26f64993757047b0ff307c",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/070.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/070.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "faa8f8328ebb1b271a0574cdb4292206fc62ec25",
+      "sha256": "cff636edab4dcc402069ddc74c1f884262289ce40912b5bcf653d642cbfa8be5",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/071.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/071.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "78bcc7f9338ddd1afda7e23c7b83f681d9cbb1b4",
+      "sha256": "75a0282f1a2d7c6e7a6db0d1525dd4e9633346be9852f0345a9873bf474d362a",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/072.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/072.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "e2f2b8e2771683979c1ac2562c4a5b50dde2c2b8",
+      "sha256": "58a20d2a3fcb739322e6c21985356ce05ccb45c87e57ff9a0ebe89b264bbcf37",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/073.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/073.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "6b94ca2e2b1fd606f008c3e89d4ffc8ff35441bf",
+      "sha256": "8aa3abaeebd0ea926d0b2e2ebf1ef88bb42a85e75a74eb7e33adfc9a6031ba5e",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/074.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/074.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "b831a55782915d787eb556cba099f4b0504b3a5c",
+      "sha256": "02e72fed9072ea679273b7e24c789208f1f77ae09899e0889af175d471bcf34c",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/075.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/075.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "dd25c603b2b3fc197c4f90c6a70ca5f3a77bc58b",
+      "sha256": "bc8b841d86af2217084859e8ea810a1509afc28b9b00392c538619918420b71b",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/076.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/076.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "54416cc9341dd30f1b683b37822f92333f5adc29",
+      "sha256": "2fff902629023392f2846c8dadaa6127d877ef83ef4d442cce7e1e26dd946a48",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/077.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/077.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "ac4cb30288a8a7ec6acac3ec19bc7b8d0ad844a6",
+      "sha256": "bfe2945581e3a0c593acb01b32e62e7b02a09d9db734a3c46cfbcf8c5ff1ca6f",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/078.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/078.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "f261259ff11d3dc0e636ba86b10a63a83d038999",
+      "sha256": "cf0337b7bc084b811f27147d5a292e214ea644b585645d5ed1fd61fb444fedd0",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/079.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/079.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "b5b6f5a27d087fc3bf9245b0c4eef53620cb8800",
+      "sha256": "889090f9c924ca13774cf9e7c35518dc5a43ac57a8f38be6be671caa222ec7eb",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/080.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/080.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "702f8ddae7809db74eefbb29fe5f180021356455",
+      "sha256": "fd795fceca0df007a107414185292f0cfa452dba90003c20950d6328d2586b14",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/081.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/081.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "5a79219086bb8d206c70a85a7747c2db8dc4178d",
+      "sha256": "8fc5d45531b30e761a4c50cd5097ccfbf16531e06e7ee63cc573c98ea4d935fd",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/082.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/082.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "7f6bcb1a16e07f938533466878ebc2f0b6a7c8de",
+      "sha256": "de082b0deca4d5e7c5020e827999cf2e3b7ebc222f193dd1f485d4669ff864d4",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/083.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/083.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "e135c642ca8065489beab87e7dfe5ef17bea0853",
+      "sha256": "0eab5e8ae5804bd2deb90eb485c06413c2bee652e8e094bc74f0ef7f3e420224",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/084.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/084.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "fdd0299a036d1240a1877cb5a4b870ffd73253ec",
+      "sha256": "f2d4ae5eef1631c87b733656554636465e265db7b1c64057446e168619baba34",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/085.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/085.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "7f6def4ea1d05171bde4168b1fe205a040f88022",
+      "sha256": "38b0a68fa1c6ad20b2f3917ecb3b6124894f095c268f925f783cb4de8c4ff51b",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/086.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/086.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "98569583ef29b237cb7191e0dd6cae975f911105",
+      "sha256": "62c5fa43c735f579711c555d806c7bb6e94e0794c63e0402bf3f5618a48ca2f6",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/087.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/087.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "fb39c5a8efd6d6045fb4dcbd5d63724309a46362",
+      "sha256": "38395901fb0886a1d720a4856d37b71f94569942219c0b9ad8ec8c984e7e32c2",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/088.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/088.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "d7b917fc02b42d80901665596a560b68a5e0f191",
+      "sha256": "ba9ad68bf15921afff120e8d65ae93a30b7992175469b4ebcbeb41511f2051b6",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/089.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/089.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "14f06fc4d464405f6cdcc4fd76b7fd5b6dc2ae9b",
+      "sha256": "95b7aa2aa7101c845e740e507f22c60b587b4f37462234c8f9c10639f165d3bc",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/090.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/090.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "159184e1c592685cf3d1e5e6c4773cf0de225be5",
+      "sha256": "6a3ca3903ded8fb68c371cb4ca0f279835bad3d7029ee0271c0fc0dd21f9309d",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/091.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/091.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "a0b7afc3a975cc8de8ac8884057325f56762ecba",
+      "sha256": "ac907bdb92dc80e79812cf176c27892ba27f5b267c78a853765de95d1bb86d00",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/092.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/092.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "9a90ba80ab6c418bc72510a096db289536e4f20c",
+      "sha256": "0984e24e17788b8525044e786975f2757213e054a93736fd724472230d8511a5",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/093.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/093.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "cfdd0fa5084a5ae3c327bac7e376060736dec2fc",
+      "sha256": "6e774afbd710c02296f0d14d20215f886c8d0ad16f50100cf7c4f6d446aa2692",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/094.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/094.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "2b293cc553d04bfc83d816b3ef003f59b978c56a",
+      "sha256": "224901a1bfdcecd6383a3ed79d0d44f509edb16e32a1daddb749070dcd320176",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/095.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/095.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "2082abc3128c894a0fda5dddbc84905ba5556eed",
+      "sha256": "2ce977c7304c549a1f7e898a0fe14d9e26481d20d210e84b52de8f64d18180d3",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/096.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/096.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "ca227bd5f94d3ed3ac4a6646600855f80d3e2667",
+      "sha256": "f8a059dd6c6ebbb364309a568e5ea412dacde84ce502797667f1671c4358aa81",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/097.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/097.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "dcb9514822c9929cb77b3642dfa963e6c4829427",
+      "sha256": "3b9bdd5f07c33e051119efe16cba02fff84e32be6f672efb52852cd14df785e9",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/098.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/098.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "a90667805ac7448911fcb877615e90bf2cb7d096",
+      "sha256": "75c1773acf01ac250186aad0546addf32c2aa2b588dd79af9babc6f5d4d1a6b5",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/099.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/099.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "300f8e4aabdd3148555056308072ca0302e8b886",
+      "sha256": "6481f240e3ae3aadfcfa723428db69f001a2b116820bb764413cefe238d18fd5",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/100.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/100.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "37b854d93c57cc45e17cc3d2a44d36d6f5edd54b",
+      "sha256": "7c996141c8b0cf0c821cdba6ee95dad4e77d7e367f4f8221368c562d9b895cb0",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/101.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/101.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "73f13514c426de8af271206551fa8e8beb4b2a03",
+      "sha256": "8c9eb08c6f9440e0bb41eac86e35a481d10a3f5be6714adb206ff1fa3e4a095a",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/a_2e3f9165ad3c.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/a_2e3f9165ad3c.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "94ec3ab32fcf33c4af21a58b431819b0db29cc98",
+      "sha256": "5f8cc093020940f7e2c69bf008ce0e260ed860090f630f7c8622941bd7cd575d",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/a_70398079e619.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/a_70398079e619.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "ed6222077ec45a6b3799bfdd77f37765cdb32ba9",
+      "sha256": "e8358e1e9d8337039156382c5668b9baf3978ad0feebeb330157c149d77df2a6",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/a_750aef5507f1.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/a_750aef5507f1.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "488ca48a354caa672085c1763cca9857030f2811",
+      "sha256": "b1b2ffd84531cd78214ff1fadfbdb608948c06a80d3cc74cd233a11041317bce",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/a_e2993de062c7.mp4",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/a_e2993de062c7.mp4",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "2499cc79b4e7504c929d00e620fb1ed68cd5fc60",
+      "sha256": "84d450baa9cc5e154b262042ec366d06234600311784ee24e343a3b40dfbf8b2",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/main/portrait.png",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/assets/main/portrait.png",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "2b17e6dfd40431062cefaf20ace059bfcadbe2ea",
+      "sha256": "88c31a1003796daa38b5449bf14ed81b774f977d2bb97277ccda0517c8b5aeb9",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT",
+      "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
+    },
+    {
+      "path": "assets/persona-default.txt",
+      "relationship": "persona-adaptation",
+      "direct_source": "https://github.com/ERUIHNIYHBKBNF/dafeiyu-persona/blob/5b08af8353fcfcc1378ea73f33686d669d61703f/dafeiyu/SKILL.md",
+      "sha256": "5f62eb17f5aefae0347ac45d3a79f3af2f5e7e86a320c30bb50cebc77c74b716",
+      "source_commit": "5b08af8353fcfcc1378ea73f33686d669d61703f"
+    },
+    {
+      "path": "assets/personas.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "447ac27859688e85326ec1602a3b25dcf56950f763ddc163e3daa14f8279aaca",
+      "design_reference": "Five newly written styles; shared character style informed by dafeiyu-persona. Not five upstream plugins."
+    },
+    {
+      "path": "build.ps1",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/build.ps1",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "dfb18a59464d1e81ffc0b6f99417008b510ba707",
+      "sha256": "67f833bec0bc5c418a7342489ea735ec36f7900cec19962dde941757080a86e7",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "df97ee0c44eacc3591ed4b0aff74f712705b1b170c579756b476caa1f2f405cd"
+    },
+    {
+      "path": "docs/test-reports/robolectric-results.txt",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "cb94ba1357cc4fae6a5662093ce220302510a69e621b289726e7ac2aebdf711f"
+    },
+    {
+      "path": "docs/test-reports/robolectric-results.xml",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "6cc0090429df084d9c379598e2e2b2e9dd82ee83ac6b1dda8368f5756e5d2e01"
+    },
+    {
+      "path": "docs/test-reports/validation-result.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "970e094324cf4e1df35cae2a0da4aa23971378988a79a658b04943d3b0ae659a"
+    },
+    {
+      "path": "instrumentation/AgentInstrumentation.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "2849efe40835d3d2772d9f6a14947a2721ce6a76b5d6ca01434a2558ea1c8efc"
+    },
+    {
+      "path": "instrumentation/AndroidManifest.xml",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "d4eacc85b321f7612777b9d9add3c68e21f506c0d3832cc64cca59c572575587"
+    },
+    {
+      "path": "instrumentation/build-tests.ps1",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "0451187ff937bd47b8c2f0dc0e00bffa2d4d7f5221f6f1136b2fb6ce568f6bc1"
+    },
+    {
+      "path": "instrumentation/PersonaChecks.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "fef24c197679915926182fab2e4ea1c0e7315236b45732f9985b65138ef74a50"
+    },
+    {
+      "path": "LICENSE",
+      "relationship": "preserved-license",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/LICENSE",
+      "sha256": "22757dc9c895b2729a2fc684d227cadfb54d5af3dd300029926839e8c4e269ce"
+    },
+    {
+      "path": "NOTICE-DAFEIYU.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "4c3cdf082c3ecedc800da787cf9c895aea8d2c4ada3986a8450eae4e3cf8d288"
+    },
+    {
+      "path": "PERSONA-UPSTREAM.md",
+      "relationship": "archived-reference",
+      "direct_source": "https://github.com/ERUIHNIYHBKBNF/dafeiyu-persona/blob/5b08af8353fcfcc1378ea73f33686d669d61703f/dafeiyu/SKILL.md",
+      "sha256": "8a0c8b0a1c862cb7ddb023f431a93b2ea2321c37343c016506f2ac3b9f7f8da4",
+      "source_commit": "5b08af8353fcfcc1378ea73f33686d669d61703f"
+    },
+    {
+      "path": "README.md",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
+      "sha256": "3d34702284c690b1716fea1a3d4e4c017deb612570808e8a3cff8d12012e79d3",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "res/anim/panel_enter.xml",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/anim/panel_enter.xml",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "25281ddba555820d623b5f8230039568f5bf607f",
+      "sha256": "fa535a087a91b762bdc1448f4c29a08cabe0c993abb4ded4a5979dc41235e07a",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "res/anim/panel_exit.xml",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/anim/panel_exit.xml",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "610715eb44736a9b00f2d60652111bfc463760ae",
+      "sha256": "ec14600038ceb52338b356c1a92a7f25c57e66233c6ea3ef6850d3df2f86f952",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "res/anim/panel_spring.xml",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/anim/panel_spring.xml",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "daf0a503b00343fe6b7e88482480fb7fd1d2e3ed",
+      "sha256": "9d6ad72bcbe4b6ca7f145643f61f3e2e9397c78b632d54944e6de3a1ac8ab16c",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "res/drawable/app_icon.png",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/drawable/app_icon.png",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "ecd5de837d1423c8d0e5ed71a5398f472c090d7f",
+      "sha256": "4b25578205cd406219d98d85922bb45a45fe6fe9276a6cf16258a400082f3d38",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT"
+    },
+    {
+      "path": "res/drawable/app_icon_content.png",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/drawable/app_icon_content.png",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "5dc3094c73f7b60a514f1ede1f1b9136a760c1d2",
+      "sha256": "4f467004467f8a6209543713f23594a409d30270e9902daa2141949d57f91e93",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT"
+    },
+    {
+      "path": "res/drawable/app_icon_foreground.xml",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/drawable/app_icon_foreground.xml",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "0431028ab0e6c26a47aaf87dd510ea81f969e974",
+      "sha256": "6596df5ba19ecdfccc4ed8a54bf97561dc70593a3431bcbc8b244d774f091bc7",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "res/drawable/artemis_day.png",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/drawable/artemis_day.png",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "0b8a7b818fc087b52a2a909bf51371957cf46a63",
+      "sha256": "d867b52d709aadc3e68650ddfd70adf8cd34896098f054be440c4049fce12f77",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT"
+    },
+    {
+      "path": "res/drawable/artemis_night.png",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/drawable/artemis_night.png",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "46309d5e53b3edfc138927c3fe1a63abc218628b",
+      "sha256": "c0c49c0033c55c75a4b1bd3413d80ad057ab9cf387150fcd49b66e7b2f143580",
+      "license_scope": "Third-party visual asset; see ASSET_LICENSE.md, not blanket code MIT"
+    },
+    {
+      "path": "res/drawable/fish_mark.xml",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "c4bb9d81d5394d37479d9825a198fd00fa1bd528124548792e106ded395602d4"
+    },
+    {
+      "path": "res/mipmap-anydpi/ic_launcher.xml",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/mipmap-anydpi/ic_launcher.xml",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "d8ceb3d54058586c31399a1e5ab33eec6e45c576",
+      "sha256": "9fae19da11b0ac16c8e9e82fd949280c82de5676474f4d33805bc4ae6f1173ed",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "res/mipmap-anydpi-v26/ic_launcher.xml",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "64510ee5a056436bef32d0f65c00bfed555d9fdd",
+      "sha256": "6d4fac0b720e9a9a7984e8035203d253c8fbf045c54911753d45f6d9445eba93",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "res/values/icon_colors.xml",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/values/icon_colors.xml",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "33965db1315a5d46a16d819289152dd4ac5cf791",
+      "sha256": "53d15462d5ef97419d83e3ffd0e52a94c91d185ecef832022f55095843c0a7b9",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "res/values/styles.xml",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/res/values/styles.xml",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "dd051d4dad8d86ac791829530c698cdb4cd55099",
+      "sha256": "13510c1827904e094c66a1e7a3a244b1f010b1afe7588c20bf2a075fe6504491",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "SOURCE_MAP.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "edf0755a7437eccb2662db253a5e592fe4ec061838dfbb050aaa5227045c09d0"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/ActionSheet.java",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/ActionSheet.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "fe6ced9857ab2b06fed723ea366568b7688d1d0a",
+      "sha256": "c83bae44575e051b99d129053d7bb48d8e22abde65ed1d5a0fe145ec4efc85d8",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/AgentPanel.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "cc9731ca7c40b5cb155069890d17ecdf7fe6c271f31f8051d6dfaf209fd83146"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/AgentPolicy.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "c85b1b3240456cdc253ea5bf95c198cefa8a2648fcebfc0f0c02155c477621ea"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/AgentReply.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "394738a9bcb9c7c65d64d35d25589b36ce1c3ffe78f22ab994a61dac762838fb"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/AgentRuntime.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "6fe81a310b1d1b5b960c5553ed51db5908efa93f8011b7cacd550aaecf4f02e5"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/AgentStore.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "56593ba41bfb82e5258806aed8eb11d3df5ee3762cbea4b392f10d4dad2043a1"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/AgentTransport.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "3418845a5e9df84981b103c645e6c7622049b1fabc7b8332d43bb458708ed1db"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/AlphaVideo.java",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/AlphaVideo.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "aba95b5e0e981cd82ba8d1feb5db3bbb8b2dfe17",
+      "sha256": "e655dcd8771b9bdc7b0468cf5f27cbb63120cb2e03043f92ae5c6be250eb5812",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/AmbientBackground.java",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/AmbientBackground.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "103126e668bf8aa920d678f37f846280c3c5bf73",
+      "sha256": "c2ce0f1387734d929485444041923caf244b2797f364ba3a35520b1669686247",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/ApiEndpoint.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "7ef51db4ceba8b40b535c41fa05cfcc394892feea67a0bb1218df0e5071f8fe2"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/Apple.java",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/Apple.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "c59cbd46121360cc54b70360f981e754f489d4aa",
+      "sha256": "21128d8acd882b35a6e0aeff79590432fe33c5339b2ee76b08d09b5564452f40",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/Chat.java",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/Chat.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "7f6fc69ef493821f9a5064d4582abf4c76dfb49d",
+      "sha256": "513d200145170b16f0ff03357e7f4754a6564972e3abd0719dfb26fef1f3b931",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/ClientPage.java",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/ClientPage.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "c819129dfd603dda24055f7dab3a89c2117e53ac",
+      "sha256": "a3edf31936f699d1aea13f18d6b6c683ba095580416cf3cfc5b2edf8d9fef622",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/ClonePanel.java",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/ClonePanel.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "f559c654b741f2743b7e335fe85ea8b78cc862a1",
+      "sha256": "6d3ac17ba298d5d221f9506f7f1c3a8e9f0ac1fad0c245886fcf4bfc74586e7c",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/CompactPanel.java",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/CompactPanel.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "f762b593fbdb984103106392838e203757190716",
+      "sha256": "8df623274041de7acbaf3a8fb368bdb097d31daa009f23ddbd701084b0c21d5e",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/Data.java",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/Data.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "eb996d404a7591cf27388c8b651f86eb0eb7c189",
+      "sha256": "d40e84d406dcb65d9a20e66e3cfb22589da0d80ce32d7f609c45cc93a60f404e",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/DialogLifecycle.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "477de9bdc0e7e34e0681299d78341667dc369c55f05c045ae3d286bade8f1246"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/FrostedPanel.java",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/FrostedPanel.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "caebc7e7beb32b9abeac805da4f2d6503f97691d",
+      "sha256": "290dfa6e91ab17e23b376b126b298c3456c2be73b33208aaf43ef35b73e5263d",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/GlassSurface.java",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/GlassSurface.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "dce962abe5748609e1bce7310f5f5bf781cd5fa2",
+      "sha256": "4c4b102b0de68d8435c57d0ffbbd957de155505007dcdaeb48b3477c0726c9d8",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/GroupedList.java",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/GroupedList.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "685726fb2da87e099f999d6a447c28cad4cdcab1",
+      "sha256": "618177ac9d1b55eea30bcba3e6274111e8bbc9070cf96d660799429f9e5d9396",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/MainActivity.java",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/MainActivity.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "af07db10487b980c0125c71a694f6ed46c68f26e",
+      "sha256": "f22a5f79844babe4702767711173f3adb3e5181b2238fcaa9a343d6ede23c2d7",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/ModelSettings.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "3e2784a4b078135c27135000a9795c5893d3d4fda6427c1e02c51635601fc61d"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/MotionEngine.java",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/MotionEngine.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "eb7214c4effda4582fe96517ac34f2833ad89dbf",
+      "sha256": "bb9f041686cfd5fbad30b6cb1dde73391732276958b2b0b343e2e6ff6c8a0b42",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/PermissionsPanel.java",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/PermissionsPanel.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "86636120a4fba61f4709664b37863b11925382cf",
+      "sha256": "20891b57a056b32be0025a6e391c59ec5412d5d792d14a66db706221eec920d8",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/PersonaManager.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "505556683e29438f1567d03321208b63bd444e6a1be624540e811e7c1206e163"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/PersonaPanel.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "6dfe7880d651ece26662d526c442d1cf5d6e96ecae0e0d230e03ba37f2103086"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/PetMenu.java",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/PetMenu.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "e8ecb1b64ddb34aa42d87ab02298e7b1f9baf15c",
+      "sha256": "472fc925f10f7bcff82bda82b198418c4f0add85e05593674631a60817da5295",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/PetService.java",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/PetService.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "d07c4c284c5ce664dc28768d11499529d80a50cb",
+      "sha256": "fd78ca0ed63b3a83286477f261dbe5349f4bc8605c837620b51a91c49d34513f",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/ProfilePage.java",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/ProfilePage.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "5c73b157ffe4aeea8e68eb69b2c25ed31cb2502f",
+      "sha256": "47ce15ec8e2c909a6ebcd8895b558e377c69113838177de5e895241f3e6a54f8",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/SizePanel.java",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/SizePanel.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "e5b1c2eabb1d250879a0ef4e2e886b5c4b185897",
+      "sha256": "0d42aec034230744bd2f5b3025a6821d221255d3bbae3a8f59b5ab1d6e66a4ba",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/SpringScrollView.java",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/SpringScrollView.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "190b8f5980c42117b0c1243ca8139a9d972fd304",
+      "sha256": "643423b2bc463ce9071ebc3cf9e6957913194e2c48715e19a013e9b1fcab93ba",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/SwitchRow.java",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/SwitchRow.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "fc5a35f23a577e22001fe8085a0ab682d0c1e28a",
+      "sha256": "21dfc97d874fbc73594e7054a8622df22871270088aabd2c10e58b8c92dc8ff1",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/UiMotion.java",
+      "relationship": "adapted",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/UiMotion.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "d3d3976b88873798cf0f2ad87e32fd0663ea54fd",
+      "sha256": "7833d760e1dc73ffd28cc5a0ac3a1d6d20d3798b32c433c25c12c2f2cfd6c79d",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "tests/check_action_return.py",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/tests/check_action_return.py",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "c75a274ca287ee00b4cd90e2dc2f918899e856a0",
+      "sha256": "04936b89e0b3f1ba17d542ad00e6fe877c3e2fa922ffafda20ddb8d6283a24ad",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "tests/com/xiaoxiao/pet/AgentCoreTest.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "a676e58f9c95c83391785504a41396206665d972dc511dfbc005cb6e452e670f"
+    },
+    {
+      "path": "tests/com/xiaoxiao/pet/ApiEndpointTest.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "763ef3e7915367bf2bc363cda0d0aed5de49f90c068cc6cd7f03b6d3a94362f0"
+    },
+    {
+      "path": "tests/com/xiaoxiao/pet/MotionEngineTest.java",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/tests/com/xiaoxiao/pet/MotionEngineTest.java",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "0b50f79ab751e1ad50fcb877f1b3d1d20f6937ac",
+      "sha256": "6d8a032378f853f94e7904662d4068580fbadd74d703f9147fab49637cce1088",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "tests/robolectric/bootstrap.py",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "1dce5a8601c869d74ad19374d8f651df42bc48266d3d6f937427fe7324d24a06"
+    },
+    {
+      "path": "tests/robolectric/pom.xml",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "a3167efcc826080a780dafb037cff9135b566b55e51ecbda9890532649d2d79a"
+    },
+    {
+      "path": "tests/robolectric/README.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "8fc298c6f5f8ad6c614c8806129d9fe1c39d3f59ffa542167f86e98aedcb4507"
+    },
+    {
+      "path": "tests/robolectric/run-tests.ps1",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "c20b3b99ce784764f5df8e2ab44ed1f1b30f259602e6e9947ce7243b763b8a31"
+    },
+    {
+      "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/PersonaChecks.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "fef24c197679915926182fab2e4ea1c0e7315236b45732f9985b65138ef74a50"
+    },
+    {
+      "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/TestKeyStore.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "05d1682358ac985b39c674dc44df38155646ebd0639d3d4fa4c3749f739f8020"
+    },
+    {
+      "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/UiTest.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "61a8d0cb5cfec6cdab0a5e260485ad83791ee74fd30ffa2385104209796077de"
+    },
+    {
+      "path": "tests/robolectric/validation-result.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "970e094324cf4e1df35cae2a0da4aa23971378988a79a658b04943d3b0ae659a"
+    },
+    {
+      "path": "tests/run-core.ps1",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "762a1833a35a50538598145105c8d7d71007637af1d6c526765819939a8ed003"
+    },
+    {
+      "path": "THIRD-PARTY-LICENSE.txt",
+      "relationship": "copied",
+      "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/THIRD-PARTY-LICENSE.txt",
+      "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
+      "source_blob": "7d87632065ae9bbebe4fb7a275f38f3cd1c30c41",
+      "sha256": "22757dc9c895b2729a2fc684d227cadfb54d5af3dd300029926839e8c4e269ce",
+      "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "UPSTREAM.txt",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "0290666148af828052bd0af4738c87204e9c820bb8565288a59275f6610f1857"
+    },
+    {
+      "path": "VALIDATION.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "86d4749588494464e4d7ab5ccf45790b435b35704df5fdc4253a4e2111c644be"
+    }
+  ]
+}

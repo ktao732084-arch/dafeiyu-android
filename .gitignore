@@ -1,0 +1,24 @@
+# Generated files and machine-specific state
+build/
+fish-assets/
+**/build/
+**/target/
+**/__pycache__/
+*.pyc
+*.apk
+*.zip
+*.keystore
+*.jks
+*.p12
+.env
+.env.*
+local.properties
+.idea/
+.vscode/
+*.log
+tests/robolectric/libs/
+tests/robolectric/repository/
+tests/robolectric/android-runtime/
+tests/robolectric/apache-maven-*/
+tests/robolectric/settings.xml
+tests/robolectric/src/test/resources/com/android/tools/test_config.properties

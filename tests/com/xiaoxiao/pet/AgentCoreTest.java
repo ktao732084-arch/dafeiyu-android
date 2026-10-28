@@ -1,0 +1,80 @@
+package com.xiaoxiao.pet;
+import org.json.*;import java.io.*;import java.nio.file.*;
+
+/** Real filesystem persistence and policy regression tests; run with org.json on the JVM. */
+public final class AgentCoreTest {
+ static int checks;
+ static void check(boolean yes,String message){checks++;if(!yes)throw new AssertionError(message);}
+ public static void main(String[] args)throws Exception{
+  File root=new File(args[0]);root.mkdirs();
+  check(AgentPolicy.quiet(23)&&AgentPolicy.quiet(7)&&!AgentPolicy.quiet(8),"quiet hours boundaries");
+  long now=100_000_000L;
+  check(AgentPolicy.mayInitiate(now,now-31*60000,now-91*60000,0,12,true,true,true,false,false),"eligible proactive");
+  check(!AgentPolicy.mayInitiate(now,0,0,0,12,true,true,true,false,false),"no unsolicited cold start");
+  check(!AgentPolicy.mayInitiate(now,now-31*60000,now-91*60000,3,12,true,true,true,false,false),"daily budget");
+  check(!AgentPolicy.mayInitiate(now,now-31*60000,now-91*60000,0,12,true,false,true,false,false),"screen off gate");
+  check(!AgentPolicy.mayInitiate(now,now-31*60000,now-91*60000,0,12,true,true,true,true,false),"focus gate");
+  check(!AgentPolicy.mayInitiate(now,now-31*60000,now-10*60000,0,12,true,true,true,false,false),"request cooldown");
+  check("calm".equals(AgentPolicy.emotion("execute_shell")),"unknown action cannot execute");
+  check(AgentPolicy.relevance("喜欢什么咖啡","我喜欢喝冰咖啡")>0,"Chinese bigram recall");
+  check(AgentPolicy.validEvidence("我喜欢喝冰咖啡","喜欢喝冰咖啡"),"grounded quote");
+  check(!AgentPolicy.validEvidence("我喜欢喝茶","我喜欢咖啡"),"invented quote rejected");
+  check(!AgentPolicy.validEvidence("密码是abcdef","密码是abcdef"),"secrets not stored automatically");
+  check("你好\n\"鱼\"".equals(AgentPolicy.partialReply("{\"reply\":\"你好\\n\\\"鱼\\\"")),"stream escapes");
+  check("".equals(AgentPolicy.partialReply("{\"emotion\":\"happy\",")),"no metadata in UI");
+  check("你".equals(AgentPolicy.partialReply("{\"reply\":\"\\u4f60\\u")),"partial unicode");
+  check(!AgentPolicy.validEvidence("假如我喜欢小熊", "我喜欢小熊"),"hypothetical not memory");
+  AgentReply envelope=AgentReply.parse("```json\n{\"reply\":\"你好呀\",\"emotion\":\"happy\",\"memories\":[]}\n```");
+  check("你好呀".equals(envelope.reply)&&"happy".equals(envelope.emotion),"fenced JSON compatible");
+  check("普通回复".equals(AgentReply.parse("普通回复").reply),"plain model response compatible");
+  check("calm".equals(AgentReply.parse("{\"reply\":\"hi\",\"emotion\":\"unknown\"}").emotion),"reply action allowlist");
+  boolean malformed=false;try{AgentReply.parse("{\"reply\":\"broken");}catch(IOException e){malformed=true;}check(malformed,"truncated JSON rejected");
+  malformed=false;try{AgentReply.parse("{\"reply\":[1,2]}");}catch(IOException e){malformed=true;}check(malformed,"typed reply required");
+  check("你好".equals(AgentReply.parse("<think>internal</think>{\"reply\":\"你好\"}").reply),"reasoning not displayed");
+  AgentStore db=new AgentStore(new File(root,"primary"));
+  check(db.commit(0,"我喜欢蓝色，密码是abc","记下了","happy",new JSONArray().put("我喜欢蓝色").put("我喜欢红色").put("密码是abc"),true,false),"transaction committed");
+  check(db.snapshot().getJSONArray("memories").length()==1,"only evidenced nonsecret memory");
+  db.commit(db.epoch(),"我喜欢蓝色","嗯","calm",new JSONArray().put("我喜欢蓝色"),true,false);
+  check(db.snapshot().getJSONArray("memories").length()==1,"duplicate suppression");
+  check(db.history().length()==4,"full user/assistant pairs");
+  db=new AgentStore(new File(root,"primary"));check(db.memoryContext("蓝色").contains("我喜欢蓝色"),"durable across restart");
+  long old=db.epoch();db.clear(true);check(!db.commit(old,"旧请求","旧回复","happy",null,true,false),"no resurrection after reset");
+  check(db.history().length()==0&&db.snapshot().getJSONArray("memories").length()==0,"reset erases both");
+  check(!new File(root,"primary/companion-v1.json.bak").exists(),"reset deletes backup");
+  db.commit(db.epoch(),"记住：我喜欢蓝色","记下啦","happy",null,true,false,"我喜欢蓝色");
+  JSONObject explicit=db.snapshot().getJSONArray("memories").getJSONObject(0);
+  check(explicit.optBoolean("pinned")&&!explicit.optString("source").startsWith("你"),"explicit memory points to actual turn");
+  db.forget(explicit.getString("id"));check(!db.history().toString().contains("蓝色"),"forget explicit memory removes source conversation");
+  long cancelledEpoch=db.epoch();db.clear(true);check(!db.commit(cancelledEpoch,"记住：我喜欢猫","记下啦","happy",null,true,false,"我喜欢猫")&&db.snapshot().getJSONArray("memories").length()==0,"stale explicit request cannot write memory");
+  db.commit(db.epoch(),"我喜欢雨天","那就听雨","calm",new JSONArray().put("我喜欢雨天"),false,false);
+  check(db.snapshot().getJSONArray("memories").length()==0,"memory opt-out respected");
+  db.commit(db.epoch(),"我喜欢猫","好","happy",new JSONArray().put("我喜欢猫"),true,false);
+  String id=db.snapshot().getJSONArray("memories").getJSONObject(0).getString("id");
+  db.forget(id);check(!db.history().toString().contains("我喜欢猫"),"forget also removes source turn");
+  db.remember("我喜欢小狗");id=db.snapshot().getJSONArray("memories").getJSONObject(0).getString("id");db.editMemory(id,"我喜欢小熊",false);
+  check(!db.memoryContext("小狗").contains("小狗")&&db.memoryContext("小熊").contains("小熊"),"edit replaces actual stored fact");
+  boolean secretDenied=false;try{db.remember("我的密码是1234");}catch(IOException expected){secretDenied=true;}check(secretDenied,"manual secret rejected");
+  db.reserveAttempt("2026-10-28",now);db.reserveAttempt("2026-10-28",now+1);check(db.snapshot().optInt("attempts")==2,"daily attempts persist");
+  db.reserveAttempt("2026-10-29",now+2);check(db.snapshot().optInt("attempts")==1,"new local date resets budget");
+  for(int i=0;i<170;i++)db.commit(db.epoch(),"turn "+i,"answer","calm",null,false,false);
+  check(db.snapshot().getJSONArray("turns").length()==160,"bounded history");
+  db.clear(false);check(db.history().length()==0&&db.snapshot().getJSONArray("memories").length()==1,"history-only clear keeps memory");
+  AgentStore recover=new AgentStore(new File(root,"recover"));recover.remember("我喜欢海洋");recover.commit(recover.epoch(),"你好","你好","calm",null,false,false);
+  Files.write(new File(root,"recover/companion-v1.json").toPath(),"corrupt".getBytes("UTF-8"));
+  recover=new AgentStore(new File(root,"recover"));check(recover.snapshot().optBoolean("recovered")&&recover.memoryContext("海洋").contains("海洋"),"validated backup recovery");
+  Files.delete(new File(root,"recover/companion-v1.json").toPath());
+  recover=new AgentStore(new File(root,"recover"));check(recover.memoryContext("海洋").contains("海洋")&&new File(root,"recover/companion-v1.json").exists(),"orphan backup restores primary instead of starting empty");
+  File largeDir=new File(root,"large");largeDir.mkdirs();JSONObject large=AgentStore.empty(0);
+  String longUser=new String(new char[8000]).replace('\0','鲸'),longReply=new String(new char[5000]).replace('\0','好');
+  for(int i=0;i<125;i++)large.getJSONArray("turns").put(new JSONObject().put("id","large-"+i).put("user",longUser).put("reply",longReply));
+  File largeFile=new File(largeDir,"companion-v1.json");Files.write(largeFile.toPath(),large.toString().getBytes("UTF-8"));
+  check(largeFile.length()>AgentStore.MAX_FILE_BYTES,"legacy long Chinese conversation exceeds old read cap");
+  AgentStore bounded=new AgentStore(largeDir);
+  check(largeFile.length()<=AgentStore.MAX_FILE_BYTES&&bounded.snapshot().getJSONArray("turns").length()<125,"oversize legacy conversation is compacted on load");
+  check("large-124".equals(bounded.snapshot().getJSONArray("turns").getJSONObject(bounded.snapshot().getJSONArray("turns").length()-1).getString("id")),"compaction keeps newest complete turn");
+  bounded.remember("我喜欢海洋");bounded.commit(bounded.epoch(),longUser,longReply,"calm",null,false,false);
+  check(largeFile.length()<=AgentStore.MAX_FILE_BYTES&&new File(largeFile+".bak").length()<=AgentStore.MAX_FILE_BYTES,"new long turns keep primary and backup within byte budget");
+  bounded=new AgentStore(largeDir);check(bounded.history().length()>0&&bounded.memoryContext("海洋").contains("海洋"),"long conversation and memories survive restart");
+  System.out.println("PASS: "+checks+" core checks");
+ }
+}

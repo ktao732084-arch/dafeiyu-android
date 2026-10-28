@@ -1,0 +1,18 @@
+{
+  "completed_at": "2026-10-28T20:40:48+08:00",
+  "tested_classes_last_modified": "2026-10-28T20:39:20+08:00",
+  "test_environment": "Robolectric 4.13 / Android API 34 / JDK 17 / Windows",
+  "test_methods": 14,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "persona_checks_within_one_test_method": 33,
+  "app_classes_snapshot_sha256": "0a89d0666c6b0136d5768c8197267c6f17413fdc98f0277c6153b61a83f31b94",
+  "corresponding_signed_apk_sha256": "d4c68d3c66d4f2bbeedf027ec029df951388e35f319b47c488c2b0db82eba00b",
+  "device_or_full_emulator_installation_tested": false,
+  "real_model_endpoint_tested": false,
+  "actual_android_keystore_tested": false,
+  "model_stub": "Controlled model outputs exercise actual AgentRuntime and chat UI callbacks",
+  "keystore_stub": "Test-only in-memory AES key; app AES/GCM and settings code execute",
+  "report": "target/surefire-reports/TEST-com.xiaoxiao.pet.UiTest.xml"
+}

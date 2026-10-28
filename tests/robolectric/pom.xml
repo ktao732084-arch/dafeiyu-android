@@ -1,0 +1,12 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>test.fish</groupId><artifactId>android-ui-checks</artifactId><version>1</version>
+<properties><android.sdk>${project.basedir}/../toolchain/sdk</android.sdk><maven.compiler.source>8</maven.compiler.source><maven.compiler.target>8</maven.compiler.target><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>
+<dependencies>
+<dependency><groupId>org.robolectric</groupId><artifactId>robolectric</artifactId><version>4.13</version><scope>test</scope><exclusions><exclusion><groupId>androidx.test</groupId><artifactId>monitor</artifactId></exclusion><exclusion><groupId>androidx.test.espresso</groupId><artifactId>espresso-idling-resource</artifactId></exclusion></exclusions></dependency>
+<dependency><groupId>junit</groupId><artifactId>junit</artifactId><version>4.13.2</version><scope>test</scope></dependency>
+<dependency><groupId>test.fish</groupId><artifactId>app</artifactId><version>1</version><scope>system</scope><systemPath>${project.basedir}/libs/app.jar</systemPath></dependency>
+<dependency><groupId>android</groupId><artifactId>api</artifactId><version>34</version><scope>system</scope><systemPath>${android.sdk}/platforms/android-34/android.jar</systemPath></dependency>
+<dependency><groupId>androidx.test</groupId><artifactId>monitor-classes</artifactId><version>1.7.1</version><scope>system</scope><systemPath>${project.basedir}/libs/monitor.jar</systemPath></dependency>
+<dependency><groupId>androidx.test</groupId><artifactId>espresso-classes</artifactId><version>3.6.1</version><scope>system</scope><systemPath>${project.basedir}/libs/espresso.jar</systemPath></dependency>
+</dependencies>
+<build><plugins><plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.2.5</version><configuration><argLine>-Xmx2048m</argLine><systemPropertyVariables><maven.repo.local>${project.basedir}/repository</maven.repo.local><robolectric.offline>true</robolectric.offline><robolectric.dependency.dir>${project.basedir}/android-runtime</robolectric.dependency.dir><robolectric.logging.enabled>true</robolectric.logging.enabled></systemPropertyVariables></configuration></plugin></plugins></build>
+</project>
