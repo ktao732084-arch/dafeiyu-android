@@ -1,80 +1,169 @@
 package com.xiaoxiao.pet;
-import android.app.*;import android.content.*;import android.os.*;import android.view.*;import android.widget.*;
+import android.app.*;import android.content.*;import android.content.res.ColorStateList;import android.graphics.*;import android.graphics.drawable.*;import android.os.*;import android.view.*;import android.view.animation.*;import android.widget.*;
 import org.json.*;import java.util.*;import java.text.SimpleDateFormat;
 
-/** Paged conversation UI. The model still receives only its bounded recent context. */
+/** Paged conversation UI in a messaging-app layout. The model still receives only its bounded recent context. */
 final class ChatPage {
+    static final long STAMP_GAP=5*60*1000L;
     final Context c;final String role,id;final boolean overlay;final Dialog dialog;final Handler handler=new Handler(Looper.getMainLooper());
-    final LinearLayout rows;final ScrollView scroll;final EditText input;TextView status;final Button send,older;
-    final SpeechQueue speech;final Runnable interrupt;JSONArray records=new JSONArray();boolean sending;String draft="",turnId;long from=Long.MIN_VALUE,to=Long.MAX_VALUE;
+    final LinearLayout rows;final ScrollView scroll;final EditText input;TextView status;final TextView presence,filter;final Button send,older;final int bubbleWidth;
+    final SpeechQueue speech;final Runnable interrupt;JSONArray records=new JSONArray();boolean sending;String draft="",turnId,lastDay;long from=Long.MIN_VALUE,to=Long.MAX_VALUE,lastStamp;View typing;
     ChatPage(Context context,String role,String id){
         this.c=context;this.role=role;this.id=id;overlay=!(c instanceof Activity);dialog=overlay?CompactPanel.create(c):ClientPage.create(c);
-        LinearLayout box=column();box.setPadding(dp(14),dp(10),dp(14),dp(10));
-        LinearLayout top=new LinearLayout(c);TextView title=Apple.label(c,Data.name(role),20,true);top.addView(title,new LinearLayout.LayoutParams(0,-2,1));Button close=button("收起");top.addView(close);close.setOnClickListener(v->dialog.dismiss());box.addView(top);
-        older=button("更早的聊天");older.setOnClickListener(v->loadOlder());box.addView(older);
-        LinearLayout navigation=new LinearLayout(c);Button byDate=button("按日期查看"),latest=button("回到最新");navigation.addView(byDate,new LinearLayout.LayoutParams(0,-2,1));navigation.addView(latest,new LinearLayout.LayoutParams(0,-2,1));box.addView(navigation);
-        byDate.setOnClickListener(v->{stopSpeaking();Calendar today=Calendar.getInstance();DatePickerDialog picker=new DatePickerDialog(c,(view,year,month,day)->{java.time.ZoneId zone=java.time.ZoneId.systemDefault();java.time.LocalDate date=java.time.LocalDate.of(year,month+1,day);from=date.atStartOfDay(zone).toInstant().toEpochMilli();to=date.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli();loadLatest();status.setText("所选日期："+date+"（"+zone+"）");},today.get(Calendar.YEAR),today.get(Calendar.MONTH),today.get(Calendar.DAY_OF_MONTH));if(overlay)picker.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);picker.show();});
-        latest.setOnClickListener(v->{stopSpeaking();from=Long.MIN_VALUE;to=Long.MAX_VALUE;loadLatest();status.setText("");});
-        rows=column();scroll=new SpringScrollView(c);scroll.addView(rows);scroll.setBackground(Apple.shape(c,Apple.BACK,14));box.addView(scroll,new LinearLayout.LayoutParams(-1,overlay?dp(180):0,overlay?0:1));
-        status=Apple.label(c,"",12,false);status.setTextColor(Apple.SECONDARY);box.addView(status);
-        LinearLayout compose=new LinearLayout(c);compose.setGravity(Gravity.CENTER_VERTICAL);input=new EditText(c);input.setTextColor(Apple.INK);input.setHintTextColor(Apple.SECONDARY);input.setTextSize(15);input.setHint("今天想说些什么？");input.setMaxLines(4);input.setMinHeight(dp(48));input.setBackground(Apple.shape(c,Apple.BACK,12));input.setPadding(dp(10),dp(8),dp(10),dp(8));input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(8000)});compose.addView(input,new LinearLayout.LayoutParams(0,-2,1));send=button("发送");compose.addView(send);box.addView(compose);
+        bubbleWidth=Math.round(Math.min(c.getResources().getDisplayMetrics().widthPixels,overlay?dp(360):Integer.MAX_VALUE)*.66f);
+        LinearLayout box=column();box.setBackgroundColor(Apple.PANEL);
+        // Header: back, her avatar, name and presence, then the history menu.
+        LinearLayout top=new LinearLayout(c);top.setGravity(Gravity.CENTER_VERTICAL);top.setPadding(dp(4),dp(6),dp(4),dp(6));
+        ImageButton close=icon(Glyph.BACK,"收起聊天");close.setOnClickListener(v->dialog.dismiss());top.addView(close,new LinearLayout.LayoutParams(dp(44),dp(44)));
+        View face=new View(c);face.setBackground(Avatar.of(c,role,38));LinearLayout.LayoutParams faceSize=new LinearLayout.LayoutParams(dp(38),dp(38));faceSize.rightMargin=dp(10);top.addView(face,faceSize);
+        LinearLayout who=column();TextView title=Apple.label(c,Data.name(role),17,true);title.setSingleLine(true);title.setEllipsize(android.text.TextUtils.TruncateAt.END);who.addView(title);
+        presence=Apple.label(c,"",12,false);presence.setTextColor(Apple.SECONDARY);presence.setPadding(0,dp(4),0,0);who.addView(presence);top.addView(who,new LinearLayout.LayoutParams(0,-2,1));idle();
+        ImageButton more=icon(Glyph.MORE,"聊天记录选项");more.setOnClickListener(v->menu(v));top.addView(more,new LinearLayout.LayoutParams(dp(44),dp(44)));
+        box.addView(top);box.addView(Apple.hairline(c),new LinearLayout.LayoutParams(-1,1));
+        filter=Apple.label(c,"",13,false);filter.setTextColor(Apple.BLUE);filter.setGravity(Gravity.CENTER);filter.setPadding(dp(16),dp(9),dp(16),dp(9));filter.setBackground(Apple.shape(c,Apple.TINT,0));filter.setVisibility(View.GONE);filter.setOnClickListener(v->latest());box.addView(filter);
+        // Conversation: grey backdrop, white bubbles for her and blue ones for you.
+        LinearLayout list=column();list.setPadding(dp(12),dp(6),dp(12),dp(12));
+        older=new Button(c);older.setText("查看更早的消息");Apple.button(older,false);older.setTextSize(13);older.setBackground(null);older.setOnClickListener(v->loadOlder());list.addView(older,new LinearLayout.LayoutParams(-1,dp(40)));
+        rows=column();list.addView(rows);scroll=new SpringScrollView(c);scroll.setFillViewport(true);scroll.setBackgroundColor(Apple.FILL);scroll.addView(list);box.addView(scroll,new LinearLayout.LayoutParams(-1,overlay?dp(240):0,overlay?0:1));
+        status=Apple.label(c,"",12,false);status.setTextColor(Apple.SECONDARY);status.setGravity(Gravity.CENTER);status.setLineSpacing(dp(2),1);status.setPadding(dp(16),dp(8),dp(16),dp(8));status.setBackgroundColor(Apple.FILL);status.setVisibility(View.GONE);
+        status.addTextChangedListener(new Watcher(()->status.setVisibility(status.getText().length()==0?View.GONE:View.VISIBLE)));box.addView(status);
+        // Composer: a rounded field and a pill-shaped send button.
+        box.addView(Apple.hairline(c),new LinearLayout.LayoutParams(-1,1));
+        LinearLayout compose=new LinearLayout(c);compose.setGravity(Gravity.BOTTOM);compose.setPadding(dp(12),dp(8),dp(12),dp(10));
+        input=new EditText(c);input.setTextColor(Apple.INK);input.setHintTextColor(Apple.SECONDARY);input.setTextSize(16);input.setHint("想和她说点什么…");input.setMaxLines(5);input.setMinHeight(dp(40));input.setBackground(Apple.shape(c,Apple.FILL,20));input.setPadding(dp(16),dp(9),dp(16),dp(9));input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(8000)});compose.addView(input,new LinearLayout.LayoutParams(0,-2,1));
+        send=new Button(c);send.setText("发送");Apple.button(send,true);GradientDrawable pill=new GradientDrawable();pill.setColor(Apple.PRIMARY);pill.setCornerRadius(dp(20));send.setBackground(new RippleDrawable(ColorStateList.valueOf(0x33ffffff),pill,null));send.setMinHeight(dp(40));
+        LinearLayout.LayoutParams sendSize=new LinearLayout.LayoutParams(-2,dp(40));sendSize.leftMargin=dp(8);compose.addView(send,sendSize);box.addView(compose);
+        input.addTextChangedListener(new Watcher(this::sendState));sendState();
         speech=new SpeechQueue(new SpeechQueue.Clock(){public void later(Runnable r,long delay){handler.postDelayed(r,delay);}public void remove(Runnable r){handler.removeCallbacks(r);}},new SpeechQueue.Sink(){
             public boolean visible(){return dialog.isShowing()&&(!(c instanceof Activity)||!((Activity)c).isFinishing());}
-            public void show(String text,int shown,boolean preview){try{AgentRuntime.store().shown(turnId,shown);loadLatest();status.setText(preview?"详细回复已保存，点击查看全文":"");}catch(Exception e){status.setText("展示状态未保存，请查看聊天记录。");}}
+            public void show(String text,int shown,boolean preview){try{AgentRuntime.store().shown(turnId,shown);loadLatest();status.setText(preview?"她写了一段长长的回复，点气泡下方就能看全文":"");}catch(Exception e){status.setText("展示状态没保存上，可以在聊天记录里查看。");}}
             public void stop(int shown){}
         });interrupt=()->speech.cancel();
         dialog.setOnDismissListener(d->{speech.cancel();handler.removeCallbacksAndMessages(null);if(sending){sending=false;AgentRuntime.cancel();}PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();if(Chat.petChats.get(id)==dialog)Chat.petChats.remove(id);if(Chat.presentations.get(id)==interrupt)Chat.presentations.remove(id);});
         dialog.setContentView(box);send.setOnClickListener(v->send());
     }
     static void show(Context c,String role,String id){
-        try{if(!PersonaManager.ensureInitialized(role)){Toast.makeText(c,"请先在首页完成初次相遇",1).show();return;}}catch(Exception e){Toast.makeText(c,e.getMessage(),1).show();return;}
-        if(Chat.isPetChatOpen(id)){if(c instanceof Activity)Chat.closePet(id);else return;}AgentRuntime.interruptProactive();if(AgentRuntime.busy()){Toast.makeText(c,"她正在回复，请先停止当前回复",0).show();return;}
+        try{if(!PersonaManager.ensureInitialized(role)){Toast.makeText(c,"先回首页和她初次相遇吧",1).show();return;}}catch(Exception e){Toast.makeText(c,e.getMessage(),1).show();return;}
+        if(Chat.isPetChatOpen(id)){if(c instanceof Activity)Chat.closePet(id);else return;}AgentRuntime.interruptProactive();if(AgentRuntime.busy()){Toast.makeText(c,"她还在回上一句，先停下当前回复吧",0).show();return;}
         Chat.interruptPresentation(id);new ChatPage(c,role,id).open();
     }
-    void open(){Chat.presentations.put(id,interrupt);if(overlay){Chat.petChats.put(id,dialog);CompactPanel.showComposer(dialog,c,pet(),"大肥鱼-对话");}else ClientPage.show(dialog,"大肥鱼-聊天记录");loadLatest();}
+    void open(){Chat.presentations.put(id,interrupt);if(overlay){Chat.petChats.put(id,dialog);CompactPanel.showComposer(dialog,c,pet(),"大肥鱼-对话");}else ClientPage.show(dialog,"大肥鱼-聊天");loadLatest();}
     PetService.Pet pet(){return PetService.instance==null?null:PetService.instance.pets.get(id);}
-    void loadLatest(){try{older.setText("更早的聊天");older.setEnabled(true);records=AgentRuntime.store().historyRange(from,to,null,20);render();scroll.post(()->scroll.fullScroll(View.FOCUS_DOWN));}catch(Exception e){status.setText("聊天记录暂时无法读取，请稍后重试。");}}
-    void loadOlder(){stopSpeaking();try{if(records.length()==0)return;JSONArray page=AgentRuntime.store().historyRange(from,to,records.getJSONObject(0).getString("pageKey"),20);if(page.length()==0){older.setText("已经到最早的记录");older.setEnabled(false);return;}int height=rows.getHeight(),position=scroll.getScrollY();for(int i=0;i<records.length();i++)page.put(records.getJSONObject(i));records=page;render();scroll.post(()->scroll.scrollTo(0,position+rows.getHeight()-height));}catch(Exception e){status.setText("更早的记录读取失败，请稍后重试。");}}
+    void idle(){presence.setText("在线 · "+AgentRuntime.moodLabel());presence.setTextColor(Apple.SECONDARY);}
+    void sendState(){send.setAlpha(sending||input.getText().toString().trim().length()>0?1f:.45f);}
+    void menu(View anchor){
+        PopupMenu menu=new PopupMenu(c,anchor);menu.getMenu().add(0,1,0,"按日期查看");menu.getMenu().add(0,2,1,"回到最新");
+        menu.setOnMenuItemClickListener(item->{if(item.getItemId()==1)pickDate();else latest();return true;});menu.show();
+    }
+    void pickDate(){
+        stopSpeaking();Calendar today=Calendar.getInstance();
+        DatePickerDialog picker=new DatePickerDialog(c,(view,year,month,day)->{java.time.ZoneId zone=java.time.ZoneId.systemDefault();java.time.LocalDate date=java.time.LocalDate.of(year,month+1,day);from=date.atStartOfDay(zone).toInstant().toEpochMilli();to=date.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli();
+            filter.setText("只看 "+year+"年"+(month+1)+"月"+day+"日 的聊天（"+zone+"）· 点这里回到最新");filter.setVisibility(View.VISIBLE);status.setText("");loadLatest();},today.get(Calendar.YEAR),today.get(Calendar.MONTH),today.get(Calendar.DAY_OF_MONTH));
+        if(overlay)picker.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);picker.show();
+    }
+    void latest(){stopSpeaking();from=Long.MIN_VALUE;to=Long.MAX_VALUE;filter.setVisibility(View.GONE);loadLatest();status.setText("");}
+    void loadLatest(){try{older.setText("查看更早的消息");older.setEnabled(true);records=AgentRuntime.store().historyRange(from,to,null,20);render();scroll.post(()->scroll.fullScroll(View.FOCUS_DOWN));}catch(Exception e){status.setText("聊天记录暂时打不开，稍后再试试。");}}
+    void loadOlder(){stopSpeaking();try{if(records.length()==0)return;JSONArray page=AgentRuntime.store().historyRange(from,to,records.getJSONObject(0).getString("pageKey"),20);if(page.length()==0){older.setText("已经翻到最早的聊天啦");older.setEnabled(false);return;}int height=rows.getHeight(),position=scroll.getScrollY();for(int i=0;i<records.length();i++)page.put(records.getJSONObject(i));records=page;render();scroll.post(()->scroll.scrollTo(0,position+rows.getHeight()-height));}catch(Exception e){status.setText("更早的聊天没读出来，稍后再试试。");}}
     void render()throws Exception {
-        rows.removeAllViews();older.setVisibility(records.length()==0?View.GONE:View.VISIBLE);String previous="";
-        if(records.length()==0)rows.addView(Apple.label(c,from==Long.MIN_VALUE?"我在呢。先说说你吧。\n\n也可以试试「记住：我喜欢蓝色」。":"这一天没有聊天记录。",16,false));
+        rows.removeAllViews();typing=null;lastDay=null;lastStamp=Long.MIN_VALUE;older.setVisibility(records.length()==0?View.GONE:View.VISIBLE);
+        if(records.length()==0){empty();return;}
         for(int i=0;i<records.length();i++){
-            JSONObject t=records.getJSONObject(i);String day=time(t,"yyyy年M月d日",t.optLong("at"));
-            if(!day.equals(previous)){TextView heading=Apple.label(c,day,12,false);heading.setGravity(Gravity.CENTER);heading.setTextColor(Apple.SECONDARY);heading.setPadding(0,dp(10),0,dp(8));rows.addView(heading);previous=day;}
-            if(!t.optString("user").isEmpty())bubble(t.optString("user"),"你 · "+time(t,"HH:mm:ss",t.optLong("at")),true,null);
-            String visible=ReplySegments.visible(t),label=ReplySegments.label(t);bubble(visible.isEmpty()?"回复已保存，点击查看全文。":visible,(t.optBoolean("proactive")?"她主动说":"她")+" · "+time(t,"HH:mm:ss",t.optLong("repliedAt",t.optLong("at"))),false,label.isEmpty()?null:t);
+            JSONObject t=records.getJSONObject(i);long at=t.optLong("at"),replied=t.optLong("repliedAt",at);
+            if(!t.optString("user").isEmpty()){stamp(t,at);message(t.optString("user"),true,null,false);}
+            String visible=ReplySegments.visible(t),label=ReplySegments.label(t);stamp(t,replied);
+            message(visible.isEmpty()?"回复已经保存好了，点开看看全文吧。":visible,false,label.isEmpty()?null:t,t.optBoolean("proactive"));
         }
     }
-    void bubble(String text,String caption,boolean user,JSONObject pending){
-        LinearLayout wrapper=column();wrapper.setPadding(dp(8),dp(6),dp(8),dp(6));wrapper.setGravity(user?Gravity.RIGHT:Gravity.LEFT);
-        TextView meta=Apple.label(c,caption,11,false);meta.setTextColor(Apple.SECONDARY);wrapper.addView(meta);
-        TextView content=Apple.label(c,text,16,false);content.setTextIsSelectable(true);content.setLineSpacing(dp(3),1);content.setPadding(dp(12),dp(10),dp(12),dp(10));content.setBackground(Apple.shape(c,user?Apple.PANEL:Apple.BACK,14));
-        content.setOnLongClickListener(v->{android.content.ClipboardManager clipboard=(android.content.ClipboardManager)c.getSystemService(Context.CLIPBOARD_SERVICE);clipboard.setPrimaryClip(ClipData.newPlainText("聊天内容",text));Toast.makeText(c,"已复制",0).show();return true;});wrapper.addView(content);
-        if(pending!=null){Button expand=button(ReplySegments.label(pending));expand.setOnClickListener(v->expand(pending));wrapper.addView(expand);}
-        rows.addView(wrapper,new LinearLayout.LayoutParams(-1,-2));
+    void empty(){
+        LinearLayout hello=column();hello.setGravity(Gravity.CENTER_HORIZONTAL);hello.setPadding(dp(24),dp(overlay?12:56),dp(24),dp(24));
+        View face=new View(c);face.setBackground(Avatar.of(c,role,72));hello.addView(face,new LinearLayout.LayoutParams(dp(72),dp(72)));
+        boolean filtered=from!=Long.MIN_VALUE;
+        TextView line=Apple.label(c,filtered?"这一天我们没有聊天哦。":"我在呢，先说说你吧～",16,true);line.setGravity(Gravity.CENTER);line.setPadding(0,dp(14),0,0);hello.addView(line);
+        if(!filtered){
+            TextView tip=Apple.label(c,"想让她记住什么，可以这样开头：",13,false);tip.setTextColor(Apple.SECONDARY);tip.setPadding(0,dp(10),0,dp(10));hello.addView(tip);
+            Button example=new Button(c);example.setText("记住：我喜欢蓝色");Apple.button(example,false);example.setTextSize(14);example.setOnClickListener(v->{input.setText("记住：我喜欢蓝色");input.setSelection(input.length());input.requestFocus();});hello.addView(example,new LinearLayout.LayoutParams(-2,dp(38)));
+        }
+        rows.addView(hello,new LinearLayout.LayoutParams(-1,-2));
+    }
+    /** A centred time label when the day changes or five quiet minutes have passed, as messaging apps do. */
+    void stamp(JSONObject turn,long at){
+        String day=time(turn,"yyyyMMdd",at);if(day.equals(lastDay)&&at-lastStamp<STAMP_GAP){lastStamp=Math.max(lastStamp,at);return;}
+        lastDay=day;lastStamp=at;TextView label=Apple.label(c,when(turn,at),12,false);label.setTextColor(Apple.SECONDARY);label.setGravity(Gravity.CENTER);label.setPadding(0,dp(12),0,dp(6));rows.addView(label,new LinearLayout.LayoutParams(-1,-2));
+    }
+    static String when(JSONObject turn,long at){
+        TimeZone zone=turn.has("timeZone")?TimeZone.getTimeZone(turn.optString("timeZone")):TimeZone.getDefault();
+        Calendar now=Calendar.getInstance(zone),then=Calendar.getInstance(zone);then.setTimeInMillis(at);String clock=time(turn,"HH:mm",at);
+        if(now.get(Calendar.YEAR)==then.get(Calendar.YEAR)&&now.get(Calendar.DAY_OF_YEAR)==then.get(Calendar.DAY_OF_YEAR))return clock;
+        now.add(Calendar.DAY_OF_YEAR,-1);if(now.get(Calendar.YEAR)==then.get(Calendar.YEAR)&&now.get(Calendar.DAY_OF_YEAR)==then.get(Calendar.DAY_OF_YEAR))return "昨天 "+clock;
+        return time(turn,now.get(Calendar.YEAR)==then.get(Calendar.YEAR)?"M月d日 ":"yyyy年M月d日 ",at)+clock;
+    }
+    View message(String text,boolean user,JSONObject pending,boolean proactive){
+        LinearLayout line=new LinearLayout(c);line.setGravity(user?Gravity.END:Gravity.START);line.setPadding(0,dp(5),0,dp(5));
+        LinearLayout body=column();body.setGravity(user?Gravity.END:Gravity.START);
+        TextView content;
+        if(user){
+            // Constant blue with white text in both appearances, like the primary button; not palette-mapped.
+            content=new TextView(c);content.setText(text);content.setTextSize(16);content.setTextColor(Color.WHITE);content.setIncludeFontPadding(false);
+            GradientDrawable shape=new GradientDrawable();shape.setColor(Apple.PRIMARY);float r=dp(18),tip=dp(6);shape.setCornerRadii(new float[]{r,r,tip,tip,r,r,r,r});content.setBackground(shape);
+        }else{content=Apple.label(c,text,16,false);content.setBackground(Apple.corners(c,Apple.PANEL,6,18,18,18));}
+        content.setMaxWidth(bubbleWidth);content.setLineSpacing(dp(3),1);content.setPadding(dp(13),dp(10),dp(13),dp(10));
+        content.setOnLongClickListener(v->{android.content.ClipboardManager clipboard=(android.content.ClipboardManager)c.getSystemService(Context.CLIPBOARD_SERVICE);clipboard.setPrimaryClip(ClipData.newPlainText("聊天内容",text));Toast.makeText(c,"已复制",0).show();return true;});
+        if(pending!=null)content.setOnClickListener(v->expand(pending));
+        body.addView(content);
+        if(proactive){TextView note=Apple.label(c,"她主动来找你",11,false);note.setTextColor(Apple.SECONDARY);note.setPadding(dp(4),dp(5),0,0);body.addView(note);}
+        if(pending!=null){Button expand=new Button(c);expand.setText(ReplySegments.label(pending));Apple.button(expand,false);expand.setTextSize(12);expand.setMinHeight(dp(30));expand.setPadding(dp(12),0,dp(12),0);expand.setOnClickListener(v->expand(pending));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-2,dp(30));p.topMargin=dp(6);body.addView(expand,p);}
+        View face=new View(c);face.setBackground(user?Avatar.me(c,36):Avatar.of(c,role,36));LinearLayout.LayoutParams faceSize=new LinearLayout.LayoutParams(dp(36),dp(36));
+        if(user){faceSize.leftMargin=dp(8);line.addView(body);line.addView(face,faceSize);}else{faceSize.rightMargin=dp(8);line.addView(face,faceSize);line.addView(body);}
+        rows.addView(line,new LinearLayout.LayoutParams(-1,-2));return line;
+    }
+    /** Three breathing dots in her bubble while the reply is on its way. */
+    void typing(boolean on){
+        if(typing!=null){rows.removeView(typing);typing=null;}if(!on)return;
+        LinearLayout line=new LinearLayout(c);line.setPadding(0,dp(5),0,dp(5));View face=new View(c);face.setBackground(Avatar.of(c,role,36));LinearLayout.LayoutParams faceSize=new LinearLayout.LayoutParams(dp(36),dp(36));faceSize.rightMargin=dp(8);line.addView(face,faceSize);
+        LinearLayout dots=new LinearLayout(c);dots.setGravity(Gravity.CENTER_VERTICAL);dots.setPadding(dp(14),0,dp(14),0);dots.setBackground(Apple.corners(c,Apple.PANEL,6,18,18,18));dots.setContentDescription("她正在输入");
+        for(int i=0;i<3;i++){View dot=new View(c);dot.setBackground(Apple.shape(c,Apple.SECONDARY,4));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(7),dp(7));if(i>0)p.leftMargin=dp(5);dots.addView(dot,p);
+            if(UiMotion.enabled()){AlphaAnimation pulse=new AlphaAnimation(1f,.25f);pulse.setDuration(480);pulse.setStartOffset(i*160L);pulse.setRepeatMode(Animation.REVERSE);pulse.setRepeatCount(Animation.INFINITE);dot.startAnimation(pulse);}}
+        line.addView(dots,new LinearLayout.LayoutParams(-2,dp(38)));rows.addView(line,new LinearLayout.LayoutParams(-1,-2));typing=line;
     }
     void expand(JSONObject turn){
         stopSpeaking();
-        TextView full=Apple.label(c,turn.optString("reply"),16,false);full.setPadding(dp(16),dp(12),dp(16),dp(12));full.setTextIsSelectable(true);ScrollView view=new SpringScrollView(c);view.addView(full);
-        AlertDialog details=new Apple.Builder(c).setTitle("完整回复").setView(view).setPositiveButton("完成",null).create();if(overlay)details.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);details.show();
-        try{AgentRuntime.store().shown(turn.getString("id"),ReplySegments.count(turn));turn.put("displayed",ReplySegments.count(turn));render();}catch(Exception e){status.setText("展示状态暂未保存");}
+        TextView full=Apple.label(c,turn.optString("reply"),16,false);full.setLineSpacing(dp(4),1);full.setPadding(dp(20),dp(12),dp(20),dp(12));full.setTextIsSelectable(true);ScrollView view=new SpringScrollView(c);view.addView(full);
+        AlertDialog details=new Apple.Builder(c).setTitle("她的完整回复").setView(view).setPositiveButton("看完了",null).create();if(overlay)details.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);details.show();
+        try{AgentRuntime.store().shown(turn.getString("id"),ReplySegments.count(turn));turn.put("displayed",ReplySegments.count(turn));render();}catch(Exception e){status.setText("展示状态暂时没保存上");}
     }
     void send(){
         if(sending){AgentRuntime.cancel();return;}String message=input.getText().toString().trim();if(message.isEmpty())return;
-        speech.cancel();from=Long.MIN_VALUE;to=Long.MAX_VALUE;PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();draft=message;turnId=null;
+        speech.cancel();from=Long.MIN_VALUE;to=Long.MAX_VALUE;filter.setVisibility(View.GONE);PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();draft=message;turnId=null;
         AgentRuntime.Listener listener=new AgentRuntime.Listener(){
             public void saved(String id){turnId=id;}
-            public void partial(String text){if(dialog.isShowing())status.setText("正在组织回复…");}
-            public void done(String reply,String emotion){if(!dialog.isShowing())return;from=Long.MIN_VALUE;to=Long.MAX_VALUE;sending=false;send.setText("发送");input.setEnabled(true);status.setText("");loadLatest();
+            public void partial(String text){if(dialog.isShowing())presence.setText("正在组织语言…");}
+            public void done(String reply,String emotion){if(!dialog.isShowing())return;from=Long.MIN_VALUE;to=Long.MAX_VALUE;sending=false;send.setText("发送");input.setEnabled(true);sendState();idle();status.setText("");loadLatest();
                 PetService.Pet p=pet();if(p!=null)p.clearBubble();if(overlay&&p!=null&&p.visible&&!p.docked){AgentRuntime.express(id,emotion,reply,turnId);}else speech.start(reply);
             }
-            public void error(String message){if(!dialog.isShowing())return;sending=false;send.setText("发送");input.setEnabled(true);input.setText(draft);status.setText(message);loadLatest();PetService.Pet p=pet();if(p!=null)p.clearBubble();}
+            public void error(String message){if(!dialog.isShowing())return;sending=false;send.setText("发送");input.setEnabled(true);input.setText(draft);sendState();idle();status.setText(message);loadLatest();PetService.Pet p=pet();if(p!=null)p.clearBubble();}
         };
-        if(!AgentRuntime.send(message,false,listener)){status.setText("她正在回复，请稍候");return;}sending=true;input.setText("");input.setEnabled(false);send.setText("停止");status.setText("正在想怎么说…");bubble(message,"你 · 正在发送",true,null);scroll.post(()->scroll.fullScroll(View.FOCUS_DOWN));if(owner!=null&&owner.visible)owner.thinking();
+        if(!AgentRuntime.send(message,false,listener)){status.setText("她还在回上一句，稍等一下哦");return;}
+        sending=true;input.setText("");input.setEnabled(false);send.setText("停止");sendState();status.setText("");presence.setText("对方正在输入…");presence.setTextColor(Apple.BLUE);
+        if(records.length()==0)rows.removeAllViews();stamp(new JSONObject(),System.currentTimeMillis());message(message,true,null,false);typing(true);scroll.post(()->scroll.fullScroll(View.FOCUS_DOWN));if(owner!=null&&owner.visible)owner.thinking();
     }
     void stopSpeaking(){speech.cancel();PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();}
     LinearLayout column(){LinearLayout l=new LinearLayout(c);l.setOrientation(1);return l;}
+    ImageButton icon(int kind,String description){ImageButton b=new ImageButton(c);b.setImageDrawable(new Glyph(c,kind));b.setContentDescription(description);b.setBackground(new RippleDrawable(ColorStateList.valueOf(0x18656580),null,null));UiMotion.press(b);return b;}
     static String time(JSONObject turn,String format,long at){SimpleDateFormat f=new SimpleDateFormat(format,Locale.CHINA);if(turn.has("timeZone"))f.setTimeZone(TimeZone.getTimeZone(turn.optString("timeZone")));return f.format(new Date(at));}
     int dp(int n){return Apple.dp(c,n);}
-    Button button(String label){Button b=new Button(c);b.setText(label);Apple.button(b,false);return b;}
+    static final class Watcher implements android.text.TextWatcher {
+        final Runnable changed;Watcher(Runnable changed){this.changed=changed;}
+        public void beforeTextChanged(CharSequence s,int a,int b,int n){}public void onTextChanged(CharSequence s,int a,int b,int n){}public void afterTextChanged(android.text.Editable s){changed.run();}
+    }
+    /** Header glyphs on a 24-unit grid, drawn in the current ink colour. */
+    static final class Glyph extends Drawable {
+        static final int BACK=0,MORE=1;final int size,kind;final Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);
+        Glyph(Context c,int kind){size=Apple.dp(c,24);this.kind=kind;setBounds(0,0,size,size);}
+        public int getIntrinsicWidth(){return size;}public int getIntrinsicHeight(){return size;}
+        public void draw(Canvas c){Rect b=getBounds();c.save();c.translate(b.left,b.top);c.scale(size/24f,size/24f);p.setColor(Apple.INK);
+            if(kind==BACK){p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(2f);p.setStrokeCap(Paint.Cap.ROUND);p.setStrokeJoin(Paint.Join.ROUND);Path g=new Path();g.moveTo(15,5);g.lineTo(8,12);g.lineTo(15,19);c.drawPath(g,p);}
+            else{p.setStyle(Paint.Style.FILL);for(int i=0;i<3;i++)c.drawCircle(5.5f+i*6.5f,12,1.8f,p);}
+            c.restore();}
+        public void setAlpha(int a){p.setAlpha(a);}public void setColorFilter(ColorFilter f){p.setColorFilter(f);}public int getOpacity(){return PixelFormat.TRANSLUCENT;}
+    }
 }

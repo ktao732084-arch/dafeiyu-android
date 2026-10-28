@@ -12,7 +12,8 @@ final class FrostedPanel {
  static WeakReference<MainActivity> main=new WeakReference<>(null);
  static Consumer<Boolean> mainListener;
  static android.graphics.drawable.Drawable mainBackground;
- static boolean enabled(){return Data.prefs().getBoolean("appearance.glass",true);}
+ // Solid white surfaces by default; the frosted look remains available behind this preference.
+ static boolean enabled(){return Data.prefs().getBoolean("appearance.glass",false);}
  static boolean available(){return enabled()&&Build.VERSION.SDK_INT>=31&&Data.app.getSystemService(WindowManager.class).isCrossWindowBlurEnabled();}
  static int tint(int color,int alpha){return (color&0xffffff)|(alpha<<24);}
  static void attachMain(MainActivity a){main=new WeakReference<>(a);mainBackground=null;if(Build.VERSION.SDK_INT>=31){mainListener=on->refresh();a.getSystemService(WindowManager.class).addCrossWindowBlurEnabledListener(a.getMainExecutor(),mainListener);}refresh();}
