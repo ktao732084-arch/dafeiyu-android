@@ -104,7 +104,7 @@ final class AgentStore {
             if(!remember||proactive)throw new IOException("当前不能写入记忆");
             if(explicit.trim().isEmpty()||explicit.length()>240||!user.contains(explicit))throw new IOException("记忆请填写 1–240 个字");
             if(AgentPolicy.sensitive(explicit))throw new IOException("请不要把密码、密钥或证件号码保存为记忆");
-            if(plan==null){if(next.getJSONArray("memories").length()>=120)throw new IOException("记忆已满，请先删除几条");addMemory(next,explicit,tid,true,now);}
+            if(plan==null){if(next.getJSONArray("memories").length()>=MemoryLedger.MAX_ACTIVE)throw new IOException("记忆已满，请先删除几条");addMemory(next,explicit,tid,true,now);}
         }
         JSONArray turns=next.getJSONArray("turns");
         // Presentation may advance while the model works on an older memory snapshot.
@@ -160,7 +160,7 @@ final class AgentStore {
     synchronized void remember(String text,boolean pinned)throws Exception {
         if(text.trim().isEmpty()||text.length()>240)throw new IOException("记忆请填写 1–240 个字");
         if(AgentPolicy.sensitive(text))throw new IOException("请不要把密码、密钥或证件号码保存为记忆");
-        JSONObject next=snapshot();if(next.getJSONArray("memories").length()>=120)throw new IOException("记忆已满，请先删除几条");
+        JSONObject next=snapshot();if(next.getJSONArray("memories").length()>=MemoryLedger.MAX_ACTIVE)throw new IOException("记忆已满，请先删除几条");
         addMemory(next,text.trim(),"你手动保存",pinned,System.currentTimeMillis());next.put("epoch",epoch()+1);save(next);
     }
     synchronized void editMemory(String id,String text,boolean pinned)throws Exception {

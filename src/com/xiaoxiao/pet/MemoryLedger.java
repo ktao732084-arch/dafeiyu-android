@@ -6,7 +6,9 @@ import java.time.*;
 
 /** Phone-owned state and provenance. Engine metadata is separate from user quotes. */
 final class MemoryLedger {
-    static final int MAX_ACTIVE=120,MAX_ARCHIVE=240,MAX_AUDIT=512;
+    // Phone capacity. The prompt still carries only the relevant few (CORE+10); the optional Python service
+    // keeps its own protocol limit of SERVICE_ACTIVE, beyond which MemoryBridge uses the phone engine.
+    static final int MAX_ACTIVE=500,MAX_ARCHIVE=1000,MAX_AUDIT=512,SERVICE_ACTIVE=120,SERVICE_ARCHIVE=240;
     static void migrate(JSONObject s)throws Exception {
         if(!s.has("archive"))s.put("archive",new JSONArray());
         if(!s.has("audit"))s.put("audit",new JSONArray());
