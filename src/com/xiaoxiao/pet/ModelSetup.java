@@ -27,8 +27,8 @@ final class ModelSetup {
             providers=new RadioGroup(a);providers.setOrientation(1);
             deepseek=option("DeepSeek（推荐）");custom=option("其他模型 / 自定义");body.addView(providers);
             guide=column();body.addView(guide);
-            label(guide,"DeepSeek V4.1 Flash · 日常聊天\n只需一枚 API Key，地址和模型已为你选好。",14);
-            label(guide,"① 打开官方平台，登录后创建 API Key\n② 复制完整 Key，回到这里粘贴\n③ 点击「连接并保存」",13);
+            label(guide,"DeepSeek V4.1 Flash · 日常聊天\n只要一枚 API Key，地址和模型都替你选好了。",14);
+            label(guide,"① 打开官方平台，登录后创建 API Key\n② 复制完整的 Key，回到这里粘贴\n③ 点「连接并保存」，她就能开口啦",13);
             button(guide,"去 DeepSeek 官网获取 Key",()->open(ModelPresets.KEY_URL));
             label(guide,"API 按用量收费，需要账户有可用余额；网页聊天免费不代表 API 免费。",12);
             button(guide,"查看余额 / 充值",()->open(ModelPresets.BALANCE_URL));
@@ -39,7 +39,7 @@ final class ModelSetup {
             header=new Switch(a);header.setText("使用 api-key 请求头");header.setTextColor(Apple.INK);header.setChecked(Data.prefs().getBoolean("api.header",false));advanced.addView(header);
             key=Chat.field(a,body,Data.prefs().getString("api.secret","").isEmpty()?"在这里粘贴 API Key":"已保存 Key；留空继续使用","",true);key.setContentDescription("API Key");
             key.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
-            label(body,"Key 加密保存在手机。聊天内容和相关记忆会发给所选模型服务商。",12);
+            label(body,"Key 加密存在这台手机里。聊天内容和相关记忆会发给你选的模型服务商。",12);
             test=button(body,"测试连接",()->connect(false));
             status=label(body,"连接测试会发送一条简短消息，使用你的 API 额度。",12);status.setContentDescription("模型连接状态");status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
             balance=label(body,DeepSeekBalance.cached(),13);balance.setContentDescription("账户余额");balance.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
@@ -109,7 +109,7 @@ final class ModelSetup {
         int dp(int value){return Apple.dp(a,value);}
         LinearLayout column(){LinearLayout l=new LinearLayout(a);l.setOrientation(1);return l;}
         TextView label(LinearLayout parent,String text,int size){TextView v=Apple.label(a,text,size,false);v.setTextColor(Apple.SECONDARY);v.setPadding(0,dp(6),0,dp(6));parent.addView(v);return v;}
-        Button button(LinearLayout parent,String text,Runnable action){Button b=new Button(a);b.setText(text);Apple.button(b,false);parent.addView(b,new LinearLayout.LayoutParams(-1,dp(48)));b.setOnClickListener(v->action.run());return b;}
-        RadioButton option(String name){RadioButton b=new RadioButton(a);b.setId(View.generateViewId());b.setText(name);b.setTextColor(Apple.INK);providers.addView(b);return b;}
+        Button button(LinearLayout parent,String text,Runnable action){Button b=new Button(a);b.setText(text);Apple.button(b,false);LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(48));p.topMargin=dp(6);p.bottomMargin=dp(2);parent.addView(b,p);b.setOnClickListener(v->action.run());return b;}
+        RadioButton option(String name){RadioButton b=new RadioButton(a);b.setId(View.generateViewId());b.setText(name);Apple.choice(b);RadioGroup.LayoutParams p=new RadioGroup.LayoutParams(-1,-2);p.topMargin=dp(10);providers.addView(b,p);return b;}
     }
 }

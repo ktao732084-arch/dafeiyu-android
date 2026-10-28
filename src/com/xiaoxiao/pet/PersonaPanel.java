@@ -2,6 +2,7 @@ package com.xiaoxiao.pet;
 
 import android.app.Dialog;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -36,13 +37,20 @@ final class PersonaPanel {
         text.setLineSpacing(a.dp(4), 1);text.setPadding(0, a.dp(14), 0, a.dp(14));body.addView(text);
     }
 
+    private static void hello(MainActivity a, LinearLayout body) {
+        View face = new View(a);face.setBackground(Avatar.of(a, "main", 80));
+        LinearLayout.LayoutParams size = new LinearLayout.LayoutParams(a.dp(80), a.dp(80));size.gravity = Gravity.CENTER_HORIZONTAL;size.topMargin = a.dp(12);
+        body.addView(face, size);
+    }
+
     private static void readOnly(MainActivity a, String role, LinearLayout body) {
+        hello(a, body);
         TextView name = Apple.label(a, PersonaManager.label(role), 22, true);
-        name.setPadding(0, a.dp(20), 0, 0);name.setContentDescription("已固定人格：" + PersonaManager.label(role));body.addView(name);
+        name.setGravity(Gravity.CENTER);name.setPadding(0, a.dp(14), 0, 0);name.setContentDescription("已固定人格：" + PersonaManager.label(role));body.addView(name);
         String mode = PersonaManager.mode(role);
         String source = PersonaManager.RANDOM.equals(mode) ? "初次相遇时随机遇见的她。" :
-                PersonaManager.LEGACY.equals(mode) || PersonaManager.CUSTOM.equals(mode) ? "沿用升级前的性格与共同经历。" : "初次相遇时，你选择了这样的她。";
-        note(a, body, source + "\n性格已经固定；她仍会有自然的情绪变化，也会在相处中更了解你。清空聊天或记忆不会改变人格。");
+                PersonaManager.LEGACY.equals(mode) || PersonaManager.CUSTOM.equals(mode) ? "沿用升级前的性格和你们的共同经历。" : "初次相遇时，你选了这样的她。";
+        note(a, body, source + "\n性格已经定下来了；她还是会有小情绪，也会在相处中越来越懂你。清空聊天或记忆都不会改变她的性格。");
         if (!PersonaManager.CUSTOM.equals(mode)) {
             PersonaManager.Persona item = PersonaManager.find(PersonaManager.activeId(role));
             if (item != null) note(a, body, item.description);
@@ -50,7 +58,8 @@ final class PersonaPanel {
     }
 
     private static void firstMeeting(MainActivity a, String role, Dialog dialog, LinearLayout body) {
-        note(a, body, "想遇见一只怎样的大肥鱼？\n可以亲自选择，也可以交给缘分。确认后她会一直保留这个性格，之后不提供更换入口。");
+        hello(a, body);
+        note(a, body, "想遇见一只怎样的大肥鱼？\n可以亲自挑，也可以交给缘分。确认之后她就一直是这个性格了，以后不能再换哦。");
         RadioGroup choices = new RadioGroup(a);choices.setOrientation(LinearLayout.VERTICAL);
         final String[] selection = {PersonaManager.DEFAULT_ID};
         int index = 100;
@@ -60,17 +69,17 @@ final class PersonaPanel {
             if (PersonaManager.DEFAULT_ID.equals(item.id)) option.setChecked(true);
             option.setOnCheckedChangeListener((button, checked) -> { if (checked) selection[0] = item.id; });
         }
-        RadioButton random = option(a, choices, ++index, "交给缘分\n从这 5 种性格中随机遇见一位，确认后固定。");
+        RadioButton random = option(a, choices, ++index, "交给缘分\n从这 5 种性格里随机遇见一位，遇见了就不变。");
         random.setContentDescription("初始化随机人格");
         random.setOnCheckedChangeListener((button, checked) -> { if (checked) selection[0] = PersonaManager.RANDOM; });
         body.addView(choices);
-        note(a, body, "5 种表达风格由本版新增编写。随机只在这次相遇时抽取一次，重开 App 不会改变。");
+        note(a, body, "5 种说话风格是这一版新写的。随机只在这次相遇时抽一次，重开 App 也不会变。");
         Button confirm = a.button(body, "确认性格，开始陪伴", view -> {
             try {
                 String chosen = selection[0];
                 if (PersonaManager.RANDOM.equals(chosen)) PersonaManager.initializeRandom(role);else PersonaManager.initialize(role, chosen);
                 a.render();dialog.dismiss();
-                Toast.makeText(a, "遇见啦，她是" + PersonaManager.label(role), Toast.LENGTH_LONG).show();
+                Toast.makeText(a, "遇见啦！她是「" + PersonaManager.label(role) + "」", Toast.LENGTH_LONG).show();
             } catch (Exception error) { AgentPanel.fail(a, error); }
         });
         Apple.button(confirm, true);
@@ -78,9 +87,8 @@ final class PersonaPanel {
 
     private static RadioButton option(MainActivity a, RadioGroup group, int id, String text) {
         RadioButton option = new RadioButton(a);option.setId(id);option.setText(text);
-        option.setTextColor(Apple.INK);option.setTextSize(15);option.setPadding(a.dp(8), a.dp(12), a.dp(8), a.dp(12));
-        option.setMinHeight(a.dp(76));option.setBackground(Apple.shape(a, Apple.BACK, 12));
-        RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(-1, -2);params.topMargin = a.dp(8);
+        Apple.choice(option);option.setMinHeight(a.dp(76));
+        RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(-1, -2);params.topMargin = a.dp(10);
         group.addView(option, params);return option;
     }
 }
