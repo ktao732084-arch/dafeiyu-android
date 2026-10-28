@@ -5,9 +5,10 @@ import org.json.*;import java.util.*;import java.text.SimpleDateFormat;
 /** Paged conversation UI in a messaging-app layout. The model still receives only its bounded recent context. */
 final class ChatPage {
     static final long STAMP_GAP=5*60*1000L;
+    static java.lang.ref.WeakReference<ChatPage> current=new java.lang.ref.WeakReference<>(null);
     final Context c;final String role,id;final boolean overlay;final Dialog dialog;final Handler handler=new Handler(Looper.getMainLooper());
-    final LinearLayout rows;final ScrollView scroll;final EditText input;TextView status;final TextView presence,filter;final Button send,older;final int bubbleWidth;
-    final SpeechQueue speech;final Runnable interrupt;JSONArray records=new JSONArray();boolean sending;String draft="",turnId,lastDay;long from=Long.MIN_VALUE,to=Long.MAX_VALUE,lastStamp;View typing;
+    final LinearLayout rows;final ScrollView scroll;final EditText input;TextView status;final TextView presence,filter,setup;final Button send,older,jump;final int bubbleWidth;
+    final SpeechQueue speech;final Runnable interrupt,refresh;JSONArray records=new JSONArray();boolean sending,paged,nearBottom=true;String draft="",turnId,lastDay;long from=Long.MIN_VALUE,to=Long.MAX_VALUE,lastStamp;View typing;
     ChatPage(Context context,String role,String id){
         this.c=context;this.role=role;this.id=id;overlay=!(c instanceof Activity);dialog=overlay?CompactPanel.create(c):ClientPage.create(c);
         bubbleWidth=Math.round(Math.min(c.getResources().getDisplayMetrics().widthPixels,overlay?dp(360):Integer.MAX_VALUE)*.66f);
@@ -24,7 +25,16 @@ final class ChatPage {
         // Conversation: grey backdrop, white bubbles for her and blue ones for you.
         LinearLayout list=column();list.setPadding(dp(12),dp(6),dp(12),dp(12));
         older=new Button(c);older.setText("查看更早的消息");Apple.button(older,false);older.setTextSize(13);older.setBackground(null);older.setOnClickListener(v->loadOlder());list.addView(older,new LinearLayout.LayoutParams(-1,dp(40)));
-        rows=column();list.addView(rows);scroll=new SpringScrollView(c);scroll.setFillViewport(true);scroll.setBackgroundColor(Apple.FILL);scroll.addView(list);box.addView(scroll,new LinearLayout.LayoutParams(-1,overlay?dp(240):0,overlay?0:1));
+        rows=column();list.addView(rows);scroll=new SpringScrollView(c);scroll.setFillViewport(true);scroll.setBackgroundColor(Apple.FILL);scroll.addView(list);
+        FrameLayout stage=new FrameLayout(c);stage.addView(scroll,new FrameLayout.LayoutParams(-1,-1));box.addView(stage,new LinearLayout.LayoutParams(-1,overlay?dp(240):0,overlay?0:1));
+        // Scrolled up to read? A small chip brings you back to the newest message.
+        jump=new Button(c);jump.setText("↓ 最新消息");Apple.button(jump,false);jump.setTextSize(13);jump.setMinHeight(dp(34));jump.setPadding(dp(14),0,dp(14),0);jump.setElevation(dp(3));jump.setVisibility(View.GONE);jump.setOnClickListener(v->scroll.fullScroll(View.FOCUS_DOWN));
+        GradientDrawable chip=Apple.shape(c,Apple.PANEL,17);jump.setBackground(new RippleDrawable(ColorStateList.valueOf((Apple.BLUE&0xffffff)|0x24000000),chip,null));
+        FrameLayout.LayoutParams corner=new FrameLayout.LayoutParams(-2,dp(34),Gravity.BOTTOM|Gravity.END);corner.setMargins(0,0,dp(14),dp(12));stage.addView(jump,corner);
+        scroll.setOnScrollChangeListener((v,x,y,ox,oy)->bottom());
+        // When the keyboard shrinks the list, keep the newest message in view if you were reading it.
+        scroll.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{if(b-t<ob-ot&&nearBottom)scroll.post(()->scroll.fullScroll(View.FOCUS_DOWN));});
+        setup=Apple.label(c,"还没接通模型，现在她只能帮你记东西（用「记住：」开头）。点这里去连接 ›",13,false);setup.setTextColor(Apple.BLUE);setup.setLineSpacing(dp(2),1);setup.setPadding(dp(16),dp(10),dp(16),dp(10));setup.setBackground(Apple.shape(c,Apple.TINT,0));setup.setOnClickListener(v->connect());box.addView(setup);
         status=Apple.label(c,"",12,false);status.setTextColor(Apple.SECONDARY);status.setGravity(Gravity.CENTER);status.setLineSpacing(dp(2),1);status.setPadding(dp(16),dp(8),dp(16),dp(8));status.setBackgroundColor(Apple.FILL);status.setVisibility(View.GONE);
         status.addTextChangedListener(new Watcher(()->status.setVisibility(status.getText().length()==0?View.GONE:View.VISIBLE)));box.addView(status);
         // Composer: a rounded field and a pill-shaped send button.
@@ -38,18 +48,28 @@ final class ChatPage {
             public boolean visible(){return dialog.isShowing()&&(!(c instanceof Activity)||!((Activity)c).isFinishing());}
             public void show(String text,int shown,boolean preview){try{AgentRuntime.store().shown(turnId,shown);loadLatest();status.setText(preview?"她写了一段长长的回复，点气泡下方就能看全文":"");}catch(Exception e){status.setText("展示状态没保存上，可以在聊天记录里查看。");}}
             public void stop(int shown){}
-        });interrupt=()->speech.cancel();
-        dialog.setOnDismissListener(d->{speech.cancel();handler.removeCallbacksAndMessages(null);if(sending){sending=false;AgentRuntime.cancel();}PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();if(Chat.petChats.get(id)==dialog)Chat.petChats.remove(id);if(Chat.presentations.get(id)==interrupt)Chat.presentations.remove(id);});
+        });interrupt=()->speech.cancel();refresh=()->{if(dialog.isShowing()&&!sending&&!paged&&from==Long.MIN_VALUE)loadLatest();};
+        dialog.setOnDismissListener(d->{if(Chat.historyViews.get(id)==refresh)Chat.historyViews.remove(id);speech.cancel();handler.removeCallbacksAndMessages(null);if(sending){sending=false;AgentRuntime.cancel();}PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();if(Chat.petChats.get(id)==dialog)Chat.petChats.remove(id);if(Chat.presentations.get(id)==interrupt)Chat.presentations.remove(id);});
+        // Returning from 模型连接 hides the banner straight away.
+        box.getViewTreeObserver().addOnWindowFocusChangeListener(focused->{if(focused)setup.setVisibility(AgentRuntime.configured()?View.GONE:View.VISIBLE);});
         dialog.setContentView(box);send.setOnClickListener(v->send());
     }
     static void show(Context c,String role,String id){
         try{if(!PersonaManager.ensureInitialized(role)){Toast.makeText(c,"先回首页和她初次相遇吧",1).show();return;}}catch(Exception e){Toast.makeText(c,e.getMessage(),1).show();return;}
-        if(Chat.isPetChatOpen(id)){if(c instanceof Activity)Chat.closePet(id);else return;}AgentRuntime.interruptProactive();if(AgentRuntime.busy()){Toast.makeText(c,"她还在回上一句，先停下当前回复吧",0).show();return;}
+        if(Chat.isPetChatOpen(id)){if(c instanceof Activity)Chat.closePet(id);else return;}
+        // This screen's chat page is already open (for example behind 模型连接): bring it up to date instead of stacking another.
+        ChatPage open=current.get();if(open!=null&&open.c==c&&open.id.equals(id)&&open.dialog.isShowing()){open.loadLatest();return;}AgentRuntime.interruptProactive();if(AgentRuntime.busy()){Toast.makeText(c,"她还在回上一句，先停下当前回复吧",0).show();return;}
         Chat.interruptPresentation(id);new ChatPage(c,role,id).open();
     }
-    void open(){Chat.presentations.put(id,interrupt);if(overlay){Chat.petChats.put(id,dialog);CompactPanel.showComposer(dialog,c,pet(),"大肥鱼-对话");}else ClientPage.show(dialog,"大肥鱼-聊天");loadLatest();}
+    void open(){current=new java.lang.ref.WeakReference<>(this);Chat.presentations.put(id,interrupt);Chat.historyViews.put(id,refresh);if(overlay){Chat.petChats.put(id,dialog);CompactPanel.showComposer(dialog,c,pet(),"大肥鱼-对话");}else ClientPage.show(dialog,"大肥鱼-聊天");loadLatest();}
     PetService.Pet pet(){return PetService.instance==null?null:PetService.instance.pets.get(id);}
     void idle(){presence.setText("在线 · "+AgentRuntime.moodLabel());presence.setTextColor(Apple.SECONDARY);}
+    /** Tracks whether the newest message is on screen, and shows the jump chip when it is not. */
+    void bottom(){View list=scroll.getChildAt(0);nearBottom=list==null||scroll.getScrollY()+scroll.getHeight()>=list.getHeight()-dp(64);jump.setVisibility(nearBottom||records.length()==0?View.GONE:View.VISIBLE);}
+    void connect(){
+        if(c instanceof Activity){ModelSetup.show((Activity)c);return;}
+        dialog.dismiss();c.startActivity(new Intent(c,MainActivity.class).putExtra("openModel",true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP));
+    }
     void sendState(){send.setAlpha(sending||input.getText().toString().trim().length()>0?1f:.45f);}
     void menu(View anchor){
         PopupMenu menu=new PopupMenu(c,anchor);menu.getMenu().add(0,1,0,"按日期查看");menu.getMenu().add(0,2,1,"回到最新");
@@ -59,11 +79,11 @@ final class ChatPage {
         stopSpeaking();Calendar today=Calendar.getInstance();
         DatePickerDialog picker=new DatePickerDialog(c,(view,year,month,day)->{java.time.ZoneId zone=java.time.ZoneId.systemDefault();java.time.LocalDate date=java.time.LocalDate.of(year,month+1,day);from=date.atStartOfDay(zone).toInstant().toEpochMilli();to=date.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli();
             filter.setText("只看 "+year+"年"+(month+1)+"月"+day+"日 的聊天（"+zone+"）· 点这里回到最新");filter.setVisibility(View.VISIBLE);status.setText("");loadLatest();},today.get(Calendar.YEAR),today.get(Calendar.MONTH),today.get(Calendar.DAY_OF_MONTH));
-        if(overlay)picker.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);picker.show();
+        picker.getDatePicker().setMaxDate(System.currentTimeMillis());if(overlay)picker.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);picker.show();
     }
     void latest(){stopSpeaking();from=Long.MIN_VALUE;to=Long.MAX_VALUE;filter.setVisibility(View.GONE);loadLatest();status.setText("");}
-    void loadLatest(){try{older.setText("查看更早的消息");older.setEnabled(true);records=AgentRuntime.store().historyRange(from,to,null,20);render();scroll.post(()->scroll.fullScroll(View.FOCUS_DOWN));}catch(Exception e){status.setText("聊天记录暂时打不开，稍后再试试。");}}
-    void loadOlder(){stopSpeaking();try{if(records.length()==0)return;JSONArray page=AgentRuntime.store().historyRange(from,to,records.getJSONObject(0).getString("pageKey"),20);if(page.length()==0){older.setText("已经翻到最早的聊天啦");older.setEnabled(false);return;}int height=rows.getHeight(),position=scroll.getScrollY();for(int i=0;i<records.length();i++)page.put(records.getJSONObject(i));records=page;render();scroll.post(()->scroll.scrollTo(0,position+rows.getHeight()-height));}catch(Exception e){status.setText("更早的聊天没读出来，稍后再试试。");}}
+    void loadLatest(){setup.setVisibility(AgentRuntime.configured()?View.GONE:View.VISIBLE);try{paged=false;older.setText("查看更早的消息");older.setEnabled(true);records=AgentRuntime.store().historyRange(from,to,null,20);render();scroll.post(()->{scroll.fullScroll(View.FOCUS_DOWN);bottom();});}catch(Exception e){status.setText("聊天记录暂时打不开，稍后再试试。");}}
+    void loadOlder(){stopSpeaking();try{if(records.length()==0)return;JSONArray page=AgentRuntime.store().historyRange(from,to,records.getJSONObject(0).getString("pageKey"),20);if(page.length()==0){older.setText("已经翻到最早的聊天啦");older.setEnabled(false);return;}int height=rows.getHeight(),position=scroll.getScrollY();for(int i=0;i<records.length();i++)page.put(records.getJSONObject(i));records=page;paged=true;render();scroll.post(()->scroll.scrollTo(0,position+rows.getHeight()-height));}catch(Exception e){status.setText("更早的聊天没读出来，稍后再试试。");}}
     void render()throws Exception {
         rows.removeAllViews();typing=null;lastDay=null;lastStamp=Long.MIN_VALUE;older.setVisibility(records.length()==0?View.GONE:View.VISIBLE);
         if(records.length()==0){empty();return;}

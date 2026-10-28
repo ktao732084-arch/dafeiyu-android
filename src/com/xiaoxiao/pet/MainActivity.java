@@ -5,7 +5,7 @@ public class MainActivity extends Activity {
  static boolean active;LinearLayout content;final Handler handler=new Handler(Looper.getMainLooper());
  public void onCreate(Bundle b){Data.init(this);Apple.load();setTheme(Apple.dark?com.dafeiyu.companion.R.style.AppThemeDark:com.dafeiyu.companion.R.style.AppTheme);super.onCreate(b);try{if(!PersonaManager.ensureInitialized("main"))handler.post(()->PersonaPanel.show(this,"main"));}catch(Exception e){AgentPanel.fail(this,e);}render();consumeChatIntent();}
  public void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);consumeChatIntent();}
- void consumeChatIntent(){if(getIntent()!=null&&getIntent().getBooleanExtra("openChat",false)){getIntent().removeExtra("openChat");handler.post(()->openChat());}}
+ void consumeChatIntent(){if(getIntent()==null)return;if(getIntent().getBooleanExtra("openChat",false)){getIntent().removeExtra("openChat");handler.post(()->openChat());}if(getIntent().getBooleanExtra("openModel",false)){getIntent().removeExtra("openModel");handler.post(()->Chat.settings(this));}}
  public void onResume(){super.onResume();active=true;AgentRuntime.interruptProactive();Apple.load();render();PermissionsPanel.refresh();if(PetService.instance!=null)PetService.instance.control(true);}
  public void onPause(){Chat.interruptPresentation("main");active=false;if(PetService.instance!=null)PetService.instance.control(false);super.onPause();}
  public void onDestroy(){DialogLifecycle.close(this);handler.removeCallbacksAndMessages(null);super.onDestroy();}

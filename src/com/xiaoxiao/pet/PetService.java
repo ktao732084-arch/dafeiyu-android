@@ -90,7 +90,7 @@ public class PetService extends Service {
    clearBubble();speechTurn=turnId;
    if(speech==null)speech=new SpeechQueue(new SpeechQueue.Clock(){public void later(Runnable task,long delay){handler.postDelayed(task,delay);}public void remove(Runnable task){handler.removeCallbacks(task);}},new SpeechQueue.Sink(){
     public boolean visible(){return Pet.this.visible&&!docked&&frame!=null&&animating();}
-    public void show(String text,int shown,boolean preview){showBubble(text+"\n\n点此查看聊天记录",false);try{AgentRuntime.store().shown(speechTurn,shown);}catch(Exception e){Data.log(role,"气泡展示状态暂未保存");}}
+    public void show(String text,int shown,boolean preview){showBubble(text+"\n\n点此查看聊天记录",false);try{AgentRuntime.store().shown(speechTurn,shown);Chat.historyChanged(Pet.this.id);}catch(Exception e){Data.log(role,"气泡展示状态暂未保存");}}
     public void stop(int shown){clearBubbleVisual();}
    });speech.start(text);
   }

@@ -17,6 +17,9 @@ final class Chat {
  static EditText field(Context c,LinearLayout parent,String hint,String text,boolean password){EditText e=new EditText(c);e.setText(text);e.setHint(hint);e.setTextSize(15);e.setTextColor(Apple.INK);e.setHintTextColor(Apple.SECONDARY);e.setPadding(Apple.dp(c,16),Apple.dp(c,13),Apple.dp(c,16),Apple.dp(c,13));e.setBackground(Apple.shape(c,Apple.FILL,14));e.setSingleLine(true);if(password)e.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);LinearLayout.LayoutParams item=new LinearLayout.LayoutParams(-1,-2);item.topMargin=Apple.dp(c,12);parent.addView(e,item);return e;}
  static void settings(Activity a){ModelSetup.show(a);}
  static final Map<String,Runnable> presentations=new HashMap<>();
+ // Open chat pages refresh when the pet shows a segment in its own bubble.
+ static final Map<String,Runnable> historyViews=new HashMap<>();
+ static void historyChanged(String id){Runnable refresh=historyViews.get(id);if(refresh!=null)refresh.run();}
  static void interruptPresentation(String id){Runnable stop=presentations.get(id);if(stop!=null)stop.run();if(PetService.instance!=null){PetService.Pet p=PetService.instance.pets.get(id);if(p!=null)p.clearBubble();}}
  static void show(Context c,String role,String instance){ChatPage.show(c,role,instance);}
  static void openHistory(Context c){c.startActivity(new Intent(c,MainActivity.class).putExtra("openChat",true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP));}
