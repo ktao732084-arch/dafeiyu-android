@@ -20,8 +20,11 @@ final class Initiative {
         return stored>0&&now>=activity&&now-activity>=IDLE_GRACE&&now>=attempt&&now-attempt>=MIN_GAP&&now>=nextAt(s);
     }
     static void interaction(JSONObject s,String note,long at)throws Exception{
+        interaction(s,note,at,"touch","main");
+    }
+    static void interaction(JSONObject s,String note,long at,String kind,String pet)throws Exception{
         JSONArray a=s.optJSONArray("interactions");if(a==null)s.put("interactions",a=new JSONArray());
-        a.put(new JSONObject().put("at",at).put("timeZone",ZoneId.systemDefault().getId()).put("kind","touch").put("note",AgentPolicy.clip(note,120)));
+        a.put(new JSONObject().put("at",at).put("timeZone",ZoneId.systemDefault().getId()).put("kind",kind).put("pet",pet).put("note",AgentPolicy.clip(note,120)));
         while(a.length()>KEEP_INTERACTIONS)a.remove(0);
         if(!s.optBoolean("proactiveWaiting")&&!s.optBoolean("proactiveAwaitingPlan")){long next=nextAt(s);s.put("proactiveNextAt",Math.min(next,at+MIN_GAP));}
     }
@@ -87,8 +90,8 @@ final class Initiative {
         java.util.Set<String> stale=MemoryLedger.staleSources(s,now);
         if(turns!=null){for(int i=Math.max(0,turns.length()-6);i<turns.length();i++){
             JSONObject t=turns.getJSONObject(i);if(stale.contains(t.optString("id")))continue;
-            exchanges.put(new JSONObject().put("at",t.optLong("at")).put("timeZone",t.optString("timeZone")).put("local_time",localTime(t.optLong("at"),t.optString("timeZone"))).put("proactive",t.optBoolean("proactive")).put("user",AgentPolicy.clip(t.optString("user"),140)).put("shown_reply",AgentPolicy.clip(ReplySegments.visible(t),140)));
-        }for(int i=turns.length()-1;i>=0;i--){JSONObject t=turns.getJSONObject(i);if(!t.optString("user").isEmpty())break;if(t.optBoolean("proactive")&&!ReplySegments.visible(t).isEmpty())unanswered++;}}
+            exchanges.put(new JSONObject().put("at",t.optLong("at")).put("timeZone",t.optString("timeZone")).put("local_time",localTime(t.optLong("at"),t.optString("timeZone"))).put("proactive",t.optBoolean("proactive")).put("interaction",t.has("interaction")).put("user",AgentPolicy.clip(t.optString("user"),140)).put("shown_reply",AgentPolicy.clip(ReplySegments.visible(t),140)));
+        }for(int i=turns.length()-1;i>=0;i--){JSONObject t=turns.getJSONObject(i);if(!t.optString("user").isEmpty())break;if(t.optBoolean("proactive")&&!t.has("interaction")&&!ReplySegments.visible(t).isEmpty())unanswered++;}}
         out.put("recent_exchanges",exchanges).put("unanswered_proactive_messages",unanswered).put("last_outcome",s.optString("proactiveOutcome"));return out;
     }
 }

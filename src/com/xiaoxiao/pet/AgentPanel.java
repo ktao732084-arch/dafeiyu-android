@@ -7,6 +7,8 @@ final class AgentPanel {
   LinearLayout l=a.column();l.setPadding(a.dp(18),a.dp(4),a.dp(18),a.dp(16));GroupedList.note(l,"按你舒服的节奏来。她主动开口时也会用到你配置的模型额度。");
   GroupedList.toggle(GroupedList.group(l),"记住重要的事",AgentRuntime.rememberEnabled(),(v,on)->{AgentRuntime.cancel();Data.prefs().edit().putBoolean("agent.memory",on).apply();});
   GroupedList.note(l,"她会从你的原话里记下喜好和约定。关掉后不再自动记下或翻找旧事；你问某段时间聊过什么时，仍会查本机聊天记录。");
+  GroupedList.toggle(GroupedList.group(l),"摸摸或挪动后回应我",TouchReply.enabled(),(v,on)->{Data.prefs().edit().putBoolean("agent.touchReply",on).apply();if(!on){PetService service=PetService.instance;if(service!=null)for(PetService.Pet pet:service.pets.values())TouchReply.cancel(pet);}});
+  GroupedList.note(l,"连续互动后，她会按自己的性格接一句短话。使用已连接的模型额度；聊天、剧情、安静陪伴和你说正在忙时优先。不接通模型时仍有动作反馈。");
   final TextView[] hint=new TextView[1];
   GroupedList.toggle(GroupedList.group(l),"偶尔主动和我说话",Data.prefs().getBoolean("agent.proactive",false),(v,on)->{if(!on)AgentRuntime.cancel();Data.prefs().edit().putBoolean("agent.proactive",on).apply();proactiveHint(hint[0]);});
   hint[0]=GroupedList.note(l,"");hint[0].setTextColor(Apple.BLUE);proactiveHint(hint[0]);

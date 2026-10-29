@@ -1,0 +1,75 @@
+Source: 64c5a3282b1179b3a3994707e8e1857afb31e48e
+Android 15 / API 35 / MuMu emulator-5554 / x86_64
+Controlled model; isolated com.dafeiyu.touchchecks
+����: [options] δ�� -source 8 һ������������·��
+1 ������
+D:\C_Migrated\Documents\Codex\2026-10-29\new-chat-2\work\claude-growth-integration/assets/personas.json: 1 file pushed, 0 skipped. 25.9 MB/s (22045 bytes in 0.001s)
+D:\C_Migrated\Documents\Codex\2026-10-29\new-chat-2\work\claude-growth-integration/build/dex/classes.dex: 1 file pushed, 0 skipped. 53.7 MB/s (539796 bytes in 0.010s)
+D:\C_Migrated\Documents\Codex\2026-10-29\new-chat-2\work\claude-growth-integration\build\core-device/dex/classes.dex: 1 file pushed, 0 skipped. 4.2 MB/s (166952 bytes in 0.037s)
+D:\C_Migrated\Documents\Codex\2026-10-29\new-chat-2\work\claude-growth-integration/memory-service/upstream/eval/cases\: 10 files pushed, 0 skipped. 0.5 MB/s (21994 bytes in 0.039s)
+D:\C_Migrated\Documents\Codex\2026-10-29\new-chat-2\work\claude-growth-integration/memory-service/protocol-baseline.json: 1 file pushed, 0 skipped. 12.9 MB/s (39310 bytes in 0.003s)
+D:\C_Migrated\Documents\Codex\2026-10-29\new-chat-2\work\claude-growth-integration\tests/memory-capture\: 3 files pushed, 0 skipped. 0.4 MB/s (4576 bytes in 0.011s)
+D:\C_Migrated\Documents\Codex\2026-10-29\new-chat-2\work\claude-growth-integration/assets/story.json: 1 file pushed, 0 skipped. 20.5 MB/s (15071 bytes in 0.001s)
+D:\C_Migrated\Documents\Codex\2026-10-29\new-chat-2\work\claude-growth-integration/assets/catalog.json: 1 file pushed, 0 skipped. 25.6 MB/s (18389 bytes in 0.001s)
+Android core audit: Dalvik; SDK 35
+RUN core
+PASS: 141 core checks
+RUN physics
+PASS momentum, separation, held drag, screen edges, placement, throw bounce
+RUN API addresses
+PASS: 13 API endpoint checks
+RUN actions
+PASS: 10708 action plan checks
+RUN history and segments
+PASS: 605 history, timestamps and segment checks
+RUN native memory replay
+PASS: native memory 145/166 product expectations on 84 shared scenarios (Python rules 145/166)
+RUN dated recall
+PASS: 38 temporal history recall checks
+RUN episodic index
+  index of 360 turns built in 330 ms; search 1 ms
+PASS: 11 episodic recall checks
+RUN rule capture
+PASS: rule capture tuning 47/48 facts, 0/60 false; blind 22/25, 2/25 false; shared scenarios 113/114, privacy 0
+RUN diary
+PASS: 19 diary checks
+RUN Unicode regex
+Runtime: Dalvik / 2.1.0
+Platform accepts Unicode flag: false
+PASS: 83 native Unicode regex checks
+RUN nickname and reply polish
+PASS: 33 nickname and reply presentation checks
+RUN model initiative
+PASS: 62 model initiative checks
+RUN chat search and notebook filter
+  shown() on the calling thread: 0 ms
+PASS: 21 chat search, notebook filter and storage checks
+RUN gomoku rules, persistence and context
+UI_SMOKE_MOVES: [A1, B1, D1, E1, F1, G1]; outcome=pet_win
+PASS: 327 gomoku rules, persistence and context checks
+RUN growth main line
+PASS: 3620 growth checks
+RUN updates
+PASS: 30 update core checks
+RUN character and mood
+PASS: 217 character checks
+RUN touch reactions
+PASS: 26 touch-reply checks
+DEVICE SUITES: 19 passed, 0 failed
+PASS: 61 Android runtime checks
+
+Performing Incremental Install
+Performing Streamed Install
+Success: streamed 91574799 bytes
+Success
+PASS: 12 Android touch-response checks
+
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 34.66 s -- in com.xiaoxiao.pet.ConversationTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.121 s -- in com.xiaoxiao.pet.GomokuUiTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.652 s -- in com.xiaoxiao.pet.GrowthUiTest
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.816 s -- in com.xiaoxiao.pet.InitiativeRuntimeTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.405 s -- in com.xiaoxiao.pet.TouchReplyRuntimeTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.602 s -- in com.xiaoxiao.pet.UiTest
+[INFO] Tests run: 63, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Finished at: 2026-10-29T18:19:42+08:00
