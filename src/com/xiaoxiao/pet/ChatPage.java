@@ -113,18 +113,18 @@ final class ChatPage {
     }
     /** Days are cut in the phone's current time zone; only worth saying when the chats were recorded in another one. */
     static String zoneNote(java.time.ZoneId zone){
-        try{JSONArray last=AgentRuntime.store().historyRange(Long.MIN_VALUE,Long.MAX_VALUE,null,1);if(last.length()==0)return "";String recorded=last.getJSONObject(0).optString("timeZone");
+        try{JSONArray last=AgentRuntime.store().conversationRange(Long.MIN_VALUE,Long.MAX_VALUE,null,1);if(last.length()==0)return "";String recorded=last.getJSONObject(0).optString("timeZone");
             if(recorded.isEmpty()||java.time.ZoneId.of(recorded).getRules().equals(zone.getRules()))return "";}catch(Exception unknown){return "";}
         return "（按手机当前时区 "+TimeZone.getTimeZone(zone).getDisplayName(false,TimeZone.SHORT,Locale.CHINA)+"）";
     }
     void latest(){stopSpeaking();from=Long.MIN_VALUE;to=Long.MAX_VALUE;anchor=focus=null;filter.setVisibility(View.GONE);loadLatest();status.setText("");}
-    void loadLatest(){setup.setVisibility(AgentRuntime.configured()?View.GONE:View.VISIBLE);try{paged=false;older.setText("查看更早的消息");older.setEnabled(true);records=AgentRuntime.store().historyRange(from,to,anchor,PAGE);render();scroll.post(()->{scroll.fullScroll(View.FOCUS_DOWN);bottom();});}catch(Exception e){status.setText("聊天记录暂时打不开，稍后再试试。");}}
-    void loadOlder(){stopSpeaking();try{if(records.length()==0)return;JSONArray page=AgentRuntime.store().historyRange(from,to,records.getJSONObject(0).getString("pageKey"),PAGE);if(page.length()==0){older.setText("已经翻到最早的聊天啦");older.setEnabled(false);return;}boolean earliest=page.length()<PAGE;int height=rows.getHeight(),position=scroll.getScrollY();for(int i=0;i<records.length();i++)page.put(records.getJSONObject(i));records=page;paged=true;render();if(earliest){older.setText("已经翻到最早的聊天啦");older.setEnabled(false);}scroll.post(()->scroll.scrollTo(0,position+rows.getHeight()-height));}catch(Exception e){status.setText("更早的聊天没读出来，稍后再试试。");}}
+    void loadLatest(){setup.setVisibility(AgentRuntime.configured()?View.GONE:View.VISIBLE);try{paged=false;older.setText("查看更早的消息");older.setEnabled(true);records=AgentRuntime.store().conversationRange(from,to,anchor,PAGE);render();scroll.post(()->{scroll.fullScroll(View.FOCUS_DOWN);bottom();});}catch(Exception e){status.setText("聊天记录暂时打不开，稍后再试试。");}}
+    void loadOlder(){stopSpeaking();try{if(records.length()==0)return;JSONArray page=AgentRuntime.store().conversationRange(from,to,records.getJSONObject(0).getString("pageKey"),PAGE);if(page.length()==0){older.setText("已经翻到最早的聊天啦");older.setEnabled(false);return;}boolean earliest=page.length()<PAGE;int height=rows.getHeight(),position=scroll.getScrollY();for(int i=0;i<records.length();i++)page.put(records.getJSONObject(i));records=page;paged=true;render();if(earliest){older.setText("已经翻到最早的聊天啦");older.setEnabled(false);}scroll.post(()->scroll.scrollTo(0,position+rows.getHeight()-height));}catch(Exception e){status.setText("更早的聊天没读出来，稍后再试试。");}}
     void render()throws Exception {
         rows.removeAllViews();typing=null;lastDay=null;lastStamp=Long.MIN_VALUE;older.setVisibility(records.length()==0||!paged&&records.length()<PAGE?View.GONE:View.VISIBLE);
         if(records.length()==0){empty();return;}
         for(int i=0;i<records.length();i++){
-            JSONObject t=records.getJSONObject(i);long at=t.optLong("at"),replied=t.optLong("repliedAt",at);
+            JSONObject t=records.getJSONObject(i);if(t.has("interaction"))continue;long at=t.optLong("at"),replied=t.optLong("repliedAt",at);
             if(focus!=null&&focus.equals(t.optString("id"))){TextView mark=Apple.label(c,"— 搜索到的这一句 —",12,false);mark.setTextColor(Apple.BLUE);mark.setGravity(Gravity.CENTER);mark.setPadding(0,dp(14),0,0);rows.addView(mark,new LinearLayout.LayoutParams(-1,-2));lastDay=null;}
             if(!t.optString("user").isEmpty()){stamp(t,at);message(t.optString("user"),true,null,false);}
             stamp(t,replied);segments(t);
@@ -132,8 +132,9 @@ final class ChatPage {
     }
     /** Each shown segment is its own bubble, like several short messages in a row; the rest waits behind the full-text pill. */
     void segments(JSONObject t){
+        if(t.has("interaction"))return;
         List<String> parts=ReplySegments.parts(t);int shown=t.has("displayed")?Math.min(parts.size(),t.optInt("displayed")):parts.size();
-        JSONObject pending=ReplySegments.label(t).isEmpty()?null:t;String reason=t.has("interaction")?"回应了你的互动":t.optBoolean("proactive")?"她主动来找你":null;
+        JSONObject pending=ReplySegments.label(t).isEmpty()?null:t;String reason=t.optBoolean("proactive")?"她主动来找你":null;
         if(shown==0){message("回复已经保存好了，点开看看全文吧。",false,pending,reason);return;}
         boolean invite=GomokuInvite.offered(t.optString("user"),ReplySegments.visible(t));
         for(int i=0;i<shown;i++){
@@ -242,13 +243,14 @@ final class ChatPage {
         try{java.time.ZoneId zone=java.time.ZoneId.systemDefault();long at=hit.optLong("at");java.time.LocalDate day=java.time.Instant.ofEpochMilli(at).atZone(zone).toLocalDate();
             from=day.atStartOfDay(zone).toInstant().toEpochMilli();to=day.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli();
             // Page keys sort by time; ending the page just after the found turn's key includes it. Up to three later turns follow when the day has them.
-            JSONArray after=AgentRuntime.store().historyRange(at+1,to,null,40);String end=hit.getString("pageKey");
+            JSONArray after=AgentRuntime.store().conversationRange(at+1,to,null,40);String end=hit.getString("pageKey");
             if(after.length()>0&&after.length()<40)end=after.getJSONObject(Math.min(2,after.length()-1)).getString("pageKey");
             anchor=end+"\uffff";focus=hit.getString("id");
             filter.setText("「"+AgentPolicy.clip(q,12)+"」· "+when(hit,at)+" · 点这里回到最新");filter.setVisibility(View.VISIBLE);status.setText("");loadLatest();
         }catch(Exception e){status.setText("没能打开那段聊天，稍后再试试。");}
     }
     void expand(JSONObject turn){
+        if(turn.has("interaction"))return;
         stopSpeaking();
         TextView full=Apple.label(c,AgentPolicy.replyText(turn.optString("reply")),16,false);full.setLineSpacing(dp(4),1);full.setPadding(dp(20),dp(12),dp(20),dp(12));full.setTextIsSelectable(true);ScrollView view=new SpringScrollView(c);view.addView(full);
         AlertDialog details=new Apple.Builder(c).setTitle("她的完整回复").setView(view).setPositiveButton("看完了",null).create();if(overlay)details.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);details.show();

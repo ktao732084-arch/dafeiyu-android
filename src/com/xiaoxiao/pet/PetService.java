@@ -98,16 +98,19 @@ public class PetService extends Service {
   PetService owner(){return PetService.this;}
   void userInteraction(String kind,String note,boolean reply){TouchReply.event(PetService.this,this,kind,note,reply);}
   void userDockAtEdge(boolean right,float center,float restoreX,float restoreY){if(docked||docking)return;userInteraction("dock","用户把你拖到屏幕边缘收了起来",false);dockAtEdge(right,center,restoreX,restoreY);}
-  SpeechQueue speech;String speechTurn;
+  SpeechQueue speech;String speechTurn;boolean speechInteraction;
   void clearBubble(){TouchReply.cancel(this);if(speech!=null)speech.cancel();endScene();clearBubbleVisual();}
   void clearBubbleVisual(){if(thinkingTick!=null){handler.removeCallbacks(thinkingTick);thinkingTick=null;}if(bubbleEnd!=null)handler.removeCallbacks(bubbleEnd);if(bubble!=null){if(bubbleDialog!=null){bubbleDialog.dismiss();bubbleDialog=null;}bubble=null;bubbleHeight=0;}}
   void thinking(){reply("正在回复…");if(!UiMotion.enabled())return;thinkingTick=new Runnable(){int count;public void run(){if(bubble==null)return;count=count%3+1;bubble.setText("正在回复"+(count==1?"·":count==2?"··":"···"));handler.postDelayed(this,450);}};handler.post(thinkingTick);}
   void streamReply(String text){if(thinkingTick!=null){handler.removeCallbacks(thinkingTick);thinkingTick=null;}if(bubble==null){reply(text);return;}bubble.setText(AgentPolicy.clip(Chat.displayText(text),250));}
   void speak(String text,String turnId){
-   clearBubble();speechTurn=turnId;
+   speak(text,turnId,false);
+  }
+  void speak(String text,String turnId,boolean interaction){
+   clearBubble();speechTurn=turnId;speechInteraction=interaction;
    if(speech==null)speech=new SpeechQueue(new SpeechQueue.Clock(){public void later(Runnable task,long delay){handler.postDelayed(task,delay);}public void remove(Runnable task){handler.removeCallbacks(task);}},new SpeechQueue.Sink(){
     public boolean visible(){return Pet.this.visible&&!docked&&frame!=null&&animating();}
-    public void show(String text,int shown,boolean preview){showBubble(!preview&&speech!=null&&speech.parts!=null&&shown>=speech.parts.size()?text+"\n\n点此查看聊天记录":text,false);try{AgentRuntime.store().shown(speechTurn,shown);Chat.historyChanged(Pet.this.id);}catch(Exception e){Data.log(role,"气泡展示状态暂未保存");}}
+    public void show(String text,int shown,boolean preview){showBubble(!speechInteraction&&!preview&&speech!=null&&speech.parts!=null&&shown>=speech.parts.size()?text+"\n\n点此查看聊天记录":text,false);if(speechInteraction)bubble.setOnClickListener(v->clearBubble());try{AgentRuntime.store().shown(speechTurn,shown);if(!speechInteraction)Chat.historyChanged(Pet.this.id);}catch(Exception e){Data.log(role,"气泡展示状态暂未保存");}}
     public void stop(int shown){clearBubbleVisual();}
    });speech.start(text);
   }

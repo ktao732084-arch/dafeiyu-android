@@ -16,8 +16,20 @@ public final class TouchReplyTest {
   check(db.commit(db.epoch(),"","我在呢，慢点戳。","playful",null,false,true,null,null,"reaction",now+1,null,true,null,null,2,"",first.evidence),"reaction stored");JSONObject after=db.snapshot(),turn=after.getJSONArray("turns").getJSONObject(1);
   check(after.getInt("userTurns")==before.getInt("userTurns")&&after.getLong("lastUser")==before.getLong("lastUser"),"reaction is not a user message");check(after.getLong("proactiveNextAt")==before.getLong("proactiveNextAt"),"reaction does not change idle schedule");check(turn.has("interaction")&&turn.getString("user").isEmpty()&&turn.getInt("displayed")==0,"reaction has origin and waits for display");
   db.shown("reaction",1);check(Initiative.context(db.snapshot(),now+2).getInt("unanswered_proactive_messages")==0,"touch reply is not unanswered unsolicited outreach");PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.now=now+2;JSONArray messages=PromptBuilder.build(in,"继续",false,db.snapshot(),null);check(messages.toString().contains(TouchReply.HISTORY_EVENT),"history distinguishes physical input from idle outreach");
+  check(db.conversationRange(Long.MIN_VALUE,Long.MAX_VALUE,null,20).length()==1,"chat omits reaction while keeping normal conversation");
+  check(db.historyRange(Long.MIN_VALUE,Long.MAX_VALUE,null,1).getJSONObject(0).getString("id").equals("reaction")&&messages.toString().contains("慢点戳"),"stored and displayed reaction remains available to the model");
+  check(db.searchChat("慢点戳",40).length()==0,"reaction cannot reappear through chat search");
   JSONArray request=TouchReply.prompt(new JSONArray().put(new JSONObject().put("role","system").put("content","persona")).put(new JSONObject().put("role","user").put("content","<背景>kept</背景>旧的主动指令")),first);
   check(request.getJSONObject(0).getString("content").contains("只读取reply")&&!request.getJSONObject(1).getString("content").contains("旧的主动指令")&&request.toString().contains("interaction_event"),"prompt scopes the real gesture response without rescheduling");
-  System.out.println("PASS: "+checks+" touch-reply checks");
+  filteredArchive();System.out.println("PASS: "+checks+" touch-reply checks");
+ }
+ static JSONObject row(String id,long at,boolean interaction)throws Exception{JSONObject t=new JSONObject().put("id",id).put("at",at).put("user",interaction?"":"用户原话").put("reply",interaction?"摸摸回应":"普通聊天");if(interaction)t.put("interaction",new JSONObject().put("count",3));return t;}
+ static void filteredArchive()throws Exception{
+  java.io.File dir=Files.createTempDirectory("touch-archive").toFile();ChatArchive a=new ChatArchive(dir);a.put(row("a",10,false));a.put(row("b",20,false));for(int i=0;i<25;i++)a.put(row("archived"+i,30+i,true));
+  JSONArray recent=new JSONArray().put(row("c",60,false)).put(row("d",70,false));for(int i=0;i<25;i++)recent.put(row("recent"+i,80+i,true));
+  a=new ChatArchive(dir);JSONArray first=a.page(recent,null,3,Long.MIN_VALUE,Long.MAX_VALUE,true);check(first.length()==3&&first.getJSONObject(0).getString("id").equals("b")&&first.getJSONObject(2).getString("id").equals("d"),"page filled across archived and recent hidden reactions");
+  JSONArray older=a.page(recent,first.getJSONObject(0).getString("pageKey"),3,Long.MIN_VALUE,Long.MAX_VALUE,true);check(older.length()==1&&older.getJSONObject(0).getString("id").equals("a"),"older cursor does not lose ordinary chats");
+  check(a.page(recent,null,20,80,110,true).length()==0,"reaction-only date range is empty conversation");
+  check(a.page(recent,null,1).getJSONObject(0).has("interaction")&&a.files().length==27,"filter never deletes persisted interaction evidence");
  }
 }
