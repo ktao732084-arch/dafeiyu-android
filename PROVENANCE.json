@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "52946e4d082baee12dc5914f1b7f8ddbbbe08ae9ab4285263e752f655a6d9a29"
+      "sha256": "fddee419b3899390263dc168db1763b455259ec540141731a965ee8c9901afc6"
     },
     {
       "path": "LICENSE",
@@ -1906,7 +1906,7 @@
       "path": "src/com/xiaoxiao/pet/Avatar.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "62e393fe4b4a6adc16ddd5d10bc9d617192f637e669e6d5720e57170bc3175e2"
+      "sha256": "5245941ed6334aade39628ce88dc44a21e1e76c8d90adc095e50b1de45c8a2cc"
     },
     {
       "path": "src/com/xiaoxiao/pet/Chat.java",
@@ -1927,7 +1927,7 @@
       "path": "src/com/xiaoxiao/pet/ChatPage.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "a8a010187e8653781a72cd5c9eaceab1cdecdb1a282d7d1b2a6702a05398ce24"
+      "sha256": "c3366b4131a293edf184409b677247cf52d0997131b6d5562352338b8d086434"
     },
     {
       "path": "src/com/xiaoxiao/pet/ClientPage.java",
