@@ -163,6 +163,14 @@ AppUpdate、UpdateTransport、UpdateApk、UpdateFileProvider、UpdateRuntime、U
 
 公网 IP 接入的 Nginx 路径配置、北京构建入口与 UpdateNetworkInstrumentation 为本项目新增；复用用户已有北京服务器和 IP 证书续期配置。站点最初镜像 v0.4.7；本次以原签名发布 0.4.9.2，保留上游素材归属。UpgradeAcceptance 与 OfflineTestApplication 为本项目新增验证代码：前者仅在新建模拟器使用合成数据验证真实 APK 覆盖安装，后者阻止框架单测意外访问线上更新站点。
 
+## 章节任务线（PR #24，尚未发布）
+
+任务规则、剧情配置、任务卡和棋局接入来自Claude的`feature/quest-line`分支（`4e193a9`），保留各模块原有来源。设计参考与边界见`docs/GROWTH_DESIGN.md`；本轮只做主分支整合与验证。`QuestLineInstrumentation.java`为本轮新增的独立Android任务卡、排版和真实本机记忆目标验收，没有引入第三方SDK或动画资源。
+
+## 首页动画（PR #22，尚未发布）
+
+`HeroPet.java`及首页接入、AlphaVideo首帧通知来自Claude分支提交`fceb2e5`，复用原有小小桌宠播放器、动作计划与动画素材。本轮合并补齐章节动作解锁刷新、生命周期设备验收和界面回归；`HeroPetInstrumentation.java`为本轮新增测试。没有新增动画素材或改变既有许可。
+
 ## 自然分段与棋局邀请修复（0.4.9.4）
 
 `GomokuInvite.java`和`ChatPresentationInstrumentation.java`为本项目AI辅助新增，负责本机保守邀请识别和Android聊天排版验证；`ReplySegments`与`ChatPage`在既有实现上改进自然停顿分句、旧展示版本兼容及每轮入口展示。未引入额外模型或第三方分词库，沿用原有界面和素材来源。
