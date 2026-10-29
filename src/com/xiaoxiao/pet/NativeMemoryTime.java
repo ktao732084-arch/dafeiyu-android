@@ -5,12 +5,13 @@ import java.time.*;import java.util.*;import java.util.regex.*;import org.json.*
 final class NativeMemoryTime {
     static final Map<String,Integer> DAYS=new LinkedHashMap<>();
     static {String[] words={"大前天","大后天","前天","昨天","昨晚","昨日","今天","今晚","今早","今日","明天","明早","明晚","明日","后天"};int[] shifts={-3,3,-2,-1,-1,-1,0,0,0,0,1,1,1,1,2};for(int i=0;i<words.length;i++)DAYS.put(words[i],shifts[i]);}
-    static final Pattern TOKENS=Pattern.compile("("+String.join("|",DAYS.keySet())+")|(?<!每)(下下|下|这|本|上)(?:个)?(?:周|星期|礼拜)([一二三四五六日天七])?|(?<!每)(下|这|本|上)(?:个)?月(?:(\\d{1,2})[号日])?|(?<!每)(明年|今年|去年)",Pattern.UNICODE_CHARACTER_CLASS); // \d also takes full-width digits, as in Python
+    static final Pattern TOKENS=UnicodeRegex.compile("("+String.join("|",DAYS.keySet())+")|(?<!每)(下下|下|这|本|上)(?:个)?(?:周|星期|礼拜)([一二三四五六日天七])?|(?<!每)(下|这|本|上)(?:个)?月(?:(\\d{1,2})[号日])?|(?<!每)(明年|今年|去年)",0); // Includes full-width digits on Android and desktop JVMs.
+    static final Pattern RESOLVED=UnicodeRegex.compile("^（\\d{4}.*",Pattern.DOTALL);
     static void ground(JSONObject row,JSONObject e,ZoneId zone,boolean permanent)throws Exception {
         if(!e.isNull("valid_at")&&!e.optString("valid_at").isEmpty())return;
         long at=row.optLong("at");LocalDate observed=Instant.ofEpochMilli(at).atZone(zone).toLocalDate();String text=row.getString("text");Matcher m=TOKENS.matcher(text);StringBuilder resolved=new StringBuilder();int end=0;LocalDate event=null;
         while(m.find()){
-            if(text.substring(m.end()).matches("(?sU)^（\\d{4}.*"))continue;
+            if(RESOLVED.matcher(text.substring(m.end())).matches())continue;
             String label=null;LocalDate date=null;
             try{
                 if(m.group(1)!=null){date=observed.plusDays(DAYS.get(m.group(1)));}

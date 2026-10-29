@@ -1,32 +1,24 @@
-# 0.4.5 自动历史回顾验证
+# 0.4.6 Android 正则兼容性修复验证
 
-日期：2026-10-29。版本0.4.5 / versionCode 9。APK SHA-256：5cd52a2201b6bd8867b2b30fb1068891ae1ba2c48675da663a3b8a53fa914fd9。
+2026-10-29，versionCode 10，APK SHA-256：e08152f52db00644405568c3bd932018ce961b0713990bc8c97d8332e7dffeef。
 
-用户明确询问上周、昨天或具体日期的聊天时，Runtime自动查本机近期与归档历史，再把日期、来源ID与有限原文摘录交给现有回答模型。支持超出160轮近期窗口的旧档，不需要先打开记录页或启动电脑服务。
+## 原因与修复
 
-| 检查 | 结果 |
-|---|---|
-| Android14/API34框架 | 汇总75场景通过，0失败/错误/跳过；含8项新增历史检索场景 |
-| 新增运行时场景 | 超160轮旧档进入模型上下文且只调用一次回答模型；无记录不调用模型；模糊范围澄清；旧引用不重新入库；关闭自动记忆仍可显式查询；清空后不可召回；删除竞态阻止迟到提交；未配置模型仅显示原文 |
-| JVM时间检索 | 38项检查通过，包括上一完整周、星期、月份跨年、最近天数、日期范围、无效/未来日期、夏令时、原记录时区与查询时区区分、旧档与忘记来源、摘要容量/覆盖度、取消与坏文件 |
-| 既有核心 / 历史 / 地址 / 作息 | 141项 / 556项 / 13项 / 10708次断言通过；物理回归通过 |
-| 合入关键词回忆 / 日记 | 11项 / 19项检查通过 |
-| 规则提炼 | 调参事实47/48、误记0/60；盲测事实22/25、误记2/25；共享事实113/114、隐私泄露0，保留未达预期项 |
-| 原生和Python共享回放 | 84场景仍为145/166，保留21项既有不足 |
-| APK | 编译与v2/v3验签通过，沿用旧版签名 |
+用户发送“我叫k你以后就叫我kk吧”触发姓名记忆提取，0.4.5 的 NativeMemoryEngine.pattern 显式传入 UNICODE_CHARACTER_CLASS，Android 抛出 IllegalArgumentException。NativeMemoryTime 的静态编译与内嵌 (?sU) 同样不兼容。Android 本身默认采用 Unicode 字符类，桌面 JVM 则需显式开启。依据 [Android Pattern 文档](https://developer.android.com/reference/java/util/regex/Pattern#UNICODE_CHARACTER_CLASS)，新增 UnicodeRegex 对运行环境能力只探测一次：Android 使用默认行为，桌面 JVM 保留 Unicode 标志；日期已解析后缀改为同一兼容入口，保留 DOTALL。
 
-最终构建包含主分支59d69c9的白色界面、全历史关键词回忆、规则提炼、记忆容量调整和陪伴日记，75个框架场景均在这个合并构建上完整重跑。日期查询不混入其他时段的关键词回忆和日记，也不触发额外日记生成。
+此前 Robolectric 使用宿主 JVM 的正则实现，因此75项通过并未证明 Android 正则兼容。此版增加实际 Android ART 检查，不再只靠桌面测试判断该问题。
 
-主分支的省请求优化让少量记忆不再调用检索模型，旧取消测试的单条记忆用例因此未进入待取消分支。将测试数据补足到实际会调用模型的数量，并保留取消断言、增加调用次数断言，未移除省请求优化。聊天页测试按新界面检查实际时间标签，保留历史加载与复制断言。
+## 验证结果
 
-证据：[测试清单](docs/test-reports/robolectric-results.txt)、[XML](docs/test-reports/robolectric-results.xml)、[汇总JSON](docs/test-reports/validation-result.json)、[检索与时间格式](docs/CHAT_HISTORY.md)。
+- 在当前 MuMu 模拟器 Android API35 / x86_64 的 app_process 中，旧0.4.5 DEX 复现原异常；新0.4.6 DEX 的同一套83项检查通过，进程正常退出。覆盖原句、记忆写入、全部记忆规则编译、全角数字/空格、Unicode单词、大小写、敏感字段过滤、全角日期与已解析后缀。
+- 同一83项检查在桌面 JVM 通过；Android不接受该标志而桌面接受，两个分支均实测。
+- 当前构建43项Robolectric回归通过：NativeMemoryTest 12（含原句发送完成与保存）、HistoryRecallIntegrationTest 8、UiTest 14、ConversationTest 9。模型为受控响应，未用用户Key。
+- 核心141项、完整历史/时间戳/分段556项、日期检索38项、API地址13项、动作10708次断言、往事检索11项、日记19项与物理回归通过。
+- 原生共享记忆84场景保持145/166，21项已知不足未变化；规则提炼盲测仍为22/25、误记2/25。未因这个修复重复运行未改变的Python HTTP对照套件。
+- APK编译与v2/v3签名校验通过，沿用旧版签名，支持覆盖安装。
 
-## 结果边界
+Android测试只在独立临时进程使用产品DEX与合成输入，没有读取或修改已安装App的数据、Key、配置或未发送草稿。实际聊天Runtime路径由受控模型框架测试覆盖；未宣称已用真实DeepSeek完成该句聊天。实体手机及其他Android版本仍待体验。
 
-接入模型处使用受控响应，确认请求中真实包含旧档原话、正确日期和稳定来源ID；不把未展示文字或其他时间的话题混入证据。未使用用户真实Key测试DeepSeek的最终归纳质量，提示词约束不能被当成模型永不犯错的保证。
+证据：[Android结果](docs/test-reports/android-regex-results.txt)、[框架结果](docs/test-reports/robolectric-results.txt)、[汇总](docs/test-reports/validation-result.json)。之前完整验证见 [v0.4.5报告](https://github.com/ktao732084-arch/dafeiyu-android/blob/v0.4.5/VALIDATION.md)。
 
-每次最多读取1000轮或8MiB正文，提供最多24条及约14000字符证据；截取或采样会标记不完整。字面没命中时提供同一时段候选，供现有回答模型判断。不存在、已删除或旧版已淘汰的记录不能恢复，也不能凭空推断当时没聊过。
-
-支持已列出的中文时段与数字日期，不宣称覆盖所有自然语言时间表达。原始时区或展示回执缺失的旧记录明确标为未知。关闭自动记忆仍可按明确请求查询自己的记录，但不把历史引用重新提炼为当前事实。
-
-Robolectric不是实际设备安装验收；真机视频/触摸、后台与耗电、系统Keystore和真实模型效果仍待体验。[上一版验证](docs/VALIDATION-0.4.4.md)。
+复现脚本：`tests/run-regex-device.ps1 -Sdk <SDK路径> -Jdk <JDK路径> -Serial <adb设备>`；先构建产品。脚本只在设备`/data/local/tmp/dafeiyu-regex-*`内放置临时DEX并运行，不安装、清空或操作用户App。

@@ -1,6 +1,8 @@
-# 大肥鱼 · 自动回顾聊天历史版 0.4.5
+# 大肥鱼 · Android 兼容性修复版 0.4.6
 
-[下载 APK](https://github.com/ktao732084-arch/dafeiyu-android/releases/tag/v0.4.5) · [来源清单](SOURCE_MAP.md) · [逐文件溯源](PROVENANCE.json) · [验证记录](VALIDATION.md)
+[下载 APK](https://github.com/ktao732084-arch/dafeiyu-android/releases/tag/v0.4.6) · [来源清单](SOURCE_MAP.md) · [逐文件溯源](PROVENANCE.json) · [验证记录](VALIDATION.md)
+
+0.4.6修复Android上姓名/偏好等消息触发记忆处理时的 `UNICODE_CHARACTER_CLASS flag not supported` 错误。已在Android ART中复现旧版异常并验证修复；聊天记录、固定人格和配置保留。
 
 版本号与发布节奏遵循根目录的 [项目协作约定](AGENTS.md)。
 
@@ -12,7 +14,7 @@
 
 ## 安装与使用
 
-1. 在 Android 8.0+ 安装 `dafeiyu-android-0.4.5.apk`。与0.2/0.3/0.4.0/0.4.1沿用同一体验签名，可覆盖安装保留数据。
+1. 在 Android 8.0+ 安装 `dafeiyu-android-0.4.6.apk`。与0.2/0.3/0.4.0/0.4.1沿用同一体验签名，可覆盖安装保留数据。
 2. 初次相遇时，手动选择一种性格或随机一次。确认后固定，后期没有重选人格入口。
 3. 「模型连接」默认选择 **DeepSeek V4.1 Flash**。点「去 DeepSeek 官网获取 Key」，登录后创建并复制 API Key，回到 App 粘贴，点「连接并保存」即可。地址和模型自动填写，测试成功才保存；API需有可用余额，测试与聊天会使用自己的额度。其他服务商选「其他模型 / 自定义」，旧配置保留。
 4. 「记忆手账」查看、编辑、固定或忘记记忆；「共同经历与记忆变化」查看历史。无需额外设置记忆服务器。
@@ -101,7 +103,7 @@ $env:XIAOXIAO_STORE_PASS='你的签名密码'
 ./tests/robolectric/run-tests.ps1 -AndroidRoot '.' -Sdk 'D:/Android/Sdk' -Jdk 'C:/Program Files/Java/jdk-17'
 ```
 
-产物为 `build/dafeiyu-0.4.5.apk`。原生规则由 `tools/generate-native-memory-rules.py` 从已固定的上游源码 AST 生成，不执行 Python 引擎；生成后的 Java 常量随 APK 编译。
+产物为 `build/dafeiyu-0.4.6.apk`。原生规则由 `tools/generate-native-memory-rules.py` 从已固定的上游源码 AST 生成，不执行 Python 引擎；生成后的 Java 常量随 APK 编译。
 
 `NativeMemoryTest` 在不启动Python服务的条件下运行84个共享场景，并覆盖默认设置、旧版升级、离线更正、模型配置复用、非法输出回退、批量原子性、时区和删除竞态。`MemoryIntegrationTest` 另保留Python HTTP对照；普通用户运行App不需要这些测试依赖。
 

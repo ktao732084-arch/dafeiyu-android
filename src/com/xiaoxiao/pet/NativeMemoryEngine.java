@@ -9,7 +9,7 @@ final class NativeMemoryEngine {
     static boolean contains(String text,JSONArray terms){if(terms==null)return false;String t=text.toLowerCase(Locale.ROOT);for(int i=0;i<terms.length();i++)if(t.contains(terms.optString(i).toLowerCase(Locale.ROOT)))return true;return false;}
     // Python's re treats \d \s \w \b as Unicode (full-width digits and spaces from Chinese IMEs); compiled once.
     private static final Map<String,Pattern> COMPILED=new java.util.concurrent.ConcurrentHashMap<>();
-    static Pattern pattern(String regex,int flags){return COMPILED.computeIfAbsent(flags+":"+regex,k->Pattern.compile(regex,flags|Pattern.UNICODE_CHARACTER_CLASS));}
+    static Pattern pattern(String regex,int flags){return COMPILED.computeIfAbsent(flags+":"+regex,k->UnicodeRegex.compile(regex,flags));}
     static boolean patterns(String text,JSONArray patterns,boolean start){if(patterns==null)return false;for(int i=0;i<patterns.length();i++){Matcher m=pattern(patterns.optString(i),Pattern.CASE_INSENSITIVE|Pattern.UNICODE_CASE).matcher(text);if(start?m.lookingAt():m.find())return true;}return false;}
     /** Python's str.strip(): also removes the full-width space U+3000 that trim() keeps. */
     static String strip(String s){int a=0,b=s.length();while(a<b&&(Character.isWhitespace(s.charAt(a))||Character.isSpaceChar(s.charAt(a))))a++;while(b>a&&(Character.isWhitespace(s.charAt(b-1))||Character.isSpaceChar(s.charAt(b-1))))b--;return s.substring(a,b);}

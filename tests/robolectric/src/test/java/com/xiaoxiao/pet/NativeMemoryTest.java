@@ -4,6 +4,16 @@ import java.io.*;import java.nio.file.*;import java.time.*;import java.util.conc
 
 @RunWith(RobolectricTestRunner.class) @Config(sdk=34) @LooperMode(LooperMode.Mode.PAUSED)
 public class NativeMemoryTest {
+    @Test public void reportedNameMessageCompletesAndPersists()throws Exception {
+        UiTest.ready();ModelSettings.save("https://example.invalid/v1","controlled","test-key",false);
+        String message="我叫k你以后就叫我kk吧";
+        AgentRuntime.model=(m,t,p)->"好的，kk，我记住啦。";
+        NativeMemoryIntelligence.transport=(c,m,t)->{throw new AssertionError("single fact should use local rules");};
+        UiTest.Counter listener=new UiTest.Counter();assertTrue(AgentRuntime.send(message,false,listener));UiTest.awaitIdle();
+        assertEquals(0,listener.errors);assertEquals(1,listener.done);
+        assertTrue(AgentRuntime.history().toString().contains(message));
+        assertEquals(message,AgentRuntime.store().snapshot().getJSONArray("memories").getJSONObject(0).getString("text"));
+    }
     @Before public void init()throws Exception{AgentRuntime.cancel();AgentRuntime.worker.submit(()->{}).get(15,TimeUnit.SECONDS);Data.app=null;Data.roles.clear();Data.init(RuntimeEnvironment.getApplication());Data.prefs().edit().clear().commit();AgentRuntime.memory=new AgentStore(Files.createTempDirectory("native-memory").toFile());PetService.instance=null;TestKeyStore.install();MemoryBridge.client=(c,p,b,t)->{throw new AssertionError("native mode must never call a Python service");};NativeMemoryIntelligence.transport=(c,m,t)->{throw new IOException("controlled model unavailable");};}
     @After public void cleanup()throws Exception{AgentRuntime.cancel();AgentRuntime.worker.submit(()->{}).get(15,TimeUnit.SECONDS);ShadowLooper.idleMainLooper();MemoryBridge.client=MemoryBridge::http;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;Data.logWriter.submit(()->{}).get(5,TimeUnit.SECONDS);}
     JSONObject state()throws Exception{return MemoryLedger.copy(AgentStore.empty(0));}

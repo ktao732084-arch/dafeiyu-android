@@ -11,7 +11,7 @@ product="$root/build/compile-check/classes"
 out="$root/build/core-tests"
 tests="$root/tests/com/xiaoxiao/pet"
 mkdir -p "$out"
-javac -encoding UTF-8 -cp "$product:$json" -d "$out" "$tests/ApiEndpointTest.java" "$tests/AgentCoreTest.java" "$tests/MotionEngineTest.java" "$tests/ActionPlanTest.java" "$tests/ReplyHistoryTest.java" "$tests/NativeReplayTest.java" "$tests/EpisodeRecallTest.java" "$tests/MemoryCaptureTest.java" "$tests/DiaryTest.java" "$tests/HistoryRecallTest.java"
+javac -encoding UTF-8 -cp "$product:$json" -d "$out" "$tests/ApiEndpointTest.java" "$tests/AgentCoreTest.java" "$tests/MotionEngineTest.java" "$tests/ActionPlanTest.java" "$tests/ReplyHistoryTest.java" "$tests/NativeReplayTest.java" "$tests/EpisodeRecallTest.java" "$tests/MemoryCaptureTest.java" "$tests/DiaryTest.java" "$tests/HistoryRecallTest.java" "$tests/NativeRegexTest.java"
 java -cp "$product:$out:$json" com.xiaoxiao.pet.AgentCoreTest "$out/state-$(date +%s)-$$"
 java -cp "$product:$out" com.xiaoxiao.pet.MotionEngineTest
 java -cp "$product:$out" com.xiaoxiao.pet.ApiEndpointTest
@@ -24,3 +24,5 @@ java -cp "$product:$out:$json" com.xiaoxiao.pet.HistoryRecallTest
 java -cp "$product:$out:$json" com.xiaoxiao.pet.EpisodeRecallTest "$out/episodes-$(date +%s)-$$"
 java -cp "$product:$out:$json" com.xiaoxiao.pet.MemoryCaptureTest "$root/tests/memory-capture" "$root/memory-service"
 java -cp "$product:$out:$json" com.xiaoxiao.pet.DiaryTest "$out/diary-$(date +%s)-$$"
+
+java -cp "$product:$out:$json" com.xiaoxiao.pet.NativeRegexTest

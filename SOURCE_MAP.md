@@ -128,3 +128,7 @@ HistoryRecall.java及新增测试由本项目实现，使用java.time解析日�
 AgentRuntime、PromptBuilder和AgentStore的改动将检索证据接入正常回复，保留已删除/未展示内容的约束，并禁止把历史引用重新提炼成当前事实。继续包含本仓库 [aab1428合并](https://github.com/ktao732084-arch/dafeiyu-android/commit/aab1428) 的原生记忆兼容与优化；上游原许可和素材约束不变。
 
 本轮发布还合入主分支的白色界面与社交式聊天页、EpisodeIndex全历史关键词回忆、规则自动提炼、500/1000记忆容量与陪伴日记（合并点59d69c9）。它们来自本仓库既有优化分支；日期查询与普通关键词回忆共存，日期查询避免混入其他时段的回忆和日记，也不因这次查询额外生成日记。
+
+## 0.4.6 Android 正则兼容
+
+UnicodeRegex、NativeRegexTest和设备检查脚本为本项目新增实现。Android默认Unicode字符类但不支持显式UNICODE_CHARACTER_CLASS的行为依据[Android官方文档](https://developer.android.com/reference/java/util/regex/Pattern#UNICODE_CHARACTER_CLASS)。对NativeMemoryEngine与NativeMemoryTime的兼容修正保持原记忆项目MIT归属；没有复制外部实现。
