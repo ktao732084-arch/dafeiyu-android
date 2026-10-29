@@ -39,4 +39,27 @@ public class InitiativeRuntimeTest {
         Data.prefs().edit().putLong("agent.focusUntil",System.currentTimeMillis()+60000).commit();assertFalse(AgentRuntime.canSpeakNow());Data.prefs().edit().putLong("agent.focusUntil",0).putBoolean("agent.proactive",false).commit();assertFalse(AgentRuntime.canSpeakNow());
     }
     @Test public void nightHoursAreAnOptionalUserChoice(){assertFalse(AgentRuntime.nightQuiet(23));Data.prefs().edit().putBoolean("agent.quietNight",true).commit();assertTrue(AgentRuntime.nightQuiet(23));assertTrue(AgentRuntime.nightQuiet(7));assertFalse(AgentRuntime.nightQuiet(8));}
+    @Test public void busySurvivesRestartAndTouchThenFreeUsesModelChoice()throws Exception{
+        AtomicInteger calls=new AtomicInteger();AgentRuntime.model=(m,t,p)->{calls.incrementAndGet();return "{\"reply\":\"好，等你回来\",\"next_check_minutes\":60}";};
+        UiTest.Counter first=new UiTest.Counter();AgentRuntime.send("我现在有点忙，等忙完了再说",false,first);UiTest.awaitIdle();assertEquals(1,first.done);
+        JSONObject busy=AgentRuntime.store().snapshot();assertTrue(busy.getBoolean("proactiveWaiting"));assertFalse(busy.has("proactiveNextAt"));
+        AgentRuntime.touch("用户点了你");AgentRuntime.worker.submit(()->{}).get(5,TimeUnit.SECONDS);assertFalse(AgentRuntime.store().initiativeDue(System.currentTimeMillis()+86400000,0));AgentRuntime.heartbeat(service);UiTest.awaitIdle();assertEquals(1,calls.get());
+        AgentRuntime.model=(m,t,p)->{assertTrue(m.toString().contains("waiting_for_user"));return "{\"reply\":\"忙完啦，聊个轻松的\",\"next_check_minutes\":3}";};
+        UiTest.Counter second=new UiTest.Counter();AgentRuntime.send("我忙完了，现在可以聊天了",false,second);UiTest.awaitIdle();assertEquals(1,second.done);JSONObject free=AgentRuntime.store().snapshot();assertFalse(free.getBoolean("proactiveWaiting"));assertEquals(3,free.getJSONObject("initiativePlan").getInt("minutes"));
+    }
+    @Test public void missingPlanRepairsOnceWithoutReplacingTheVisibleReply()throws Exception{
+        AtomicInteger calls=new AtomicInteger();AgentRuntime.model=(m,t,p)->calls.incrementAndGet()==1?"欢迎回来，我们聊聊吧。":"{\"reply\":\"不应替换原文\",\"next_check_minutes\":4}";
+        UiTest.Counter c=new UiTest.Counter();AgentRuntime.send("我忙完了",false,c);UiTest.awaitIdle();assertEquals(2,calls.get());assertEquals(1,c.done);JSONObject s=AgentRuntime.store().snapshot();assertEquals("model_repair",s.getJSONObject("initiativePlan").getString("source"));assertEquals("欢迎回来，我们聊聊吧。",s.getJSONArray("turns").getJSONObject(0).getString("reply"));
+    }
+    @Test public void failedRepairKeepsChatButDoesNotInventASchedule()throws Exception{
+        AtomicInteger calls=new AtomicInteger();AgentRuntime.model=(m,t,p)->{calls.incrementAndGet();return "普通文本，缺少时间";};UiTest.Counter c=new UiTest.Counter();AgentRuntime.send("我忙完了",false,c);UiTest.awaitIdle();assertEquals(2,calls.get());assertEquals(1,c.done);assertTrue(AgentRuntime.store().snapshot().getBoolean("proactiveAwaitingPlan"));assertFalse(AgentRuntime.store().snapshot().has("proactiveNextAt"));
+    }
+    @Test public void silenceAnnouncementsNeverBecomeAnotherNotification()throws Exception{
+        due();int before=AgentRuntime.history().length();AgentRuntime.model=(m,t,p)->"{\"reply\":\"你还没接吃什么那茬，我也不催。\",\"next_check_minutes\":47,\"topic\":\"午饭\"}";
+        AgentRuntime.heartbeat(service);UiTest.awaitIdle();assertNull(spoken);assertEquals(before,AgentRuntime.history().length());assertEquals("quiet",AgentRuntime.store().snapshot().getString("proactiveOutcome"));assertEquals(47,AgentRuntime.store().snapshot().getJSONObject("initiativePlan").getInt("minutes"));
+    }
+    @Test public void cancelledRepairCannotRestoreClearedAvailability()throws Exception{
+        CountDownLatch entered=new CountDownLatch(1),exit=new CountDownLatch(1);AtomicInteger calls=new AtomicInteger();AgentRuntime.model=(m,t,p)->{if(calls.incrementAndGet()==1)return "回来啦";entered.countDown();exit.await(5,TimeUnit.SECONDS);return "{\"reply\":\"回来啦\",\"next_check_minutes\":2}";};
+        UiTest.Counter c=new UiTest.Counter();AgentRuntime.send("我忙完了",false,c);assertTrue(entered.await(5,TimeUnit.SECONDS));AgentRuntime.cancel();AgentRuntime.store().clear(false);exit.countDown();UiTest.awaitIdle();assertEquals(0,AgentRuntime.history().length());assertFalse(AgentRuntime.store().snapshot().has("initiativePlan"));
+    }
 }

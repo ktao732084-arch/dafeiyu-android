@@ -2,12 +2,12 @@ package com.xiaoxiao.pet;
 import android.app.*;import android.os.*;import android.content.*;import android.graphics.*;import android.graphics.drawable.GradientDrawable;import android.provider.Settings;import android.view.*;import android.widget.*;
 
 public class MainActivity extends Activity {
- static boolean active;LinearLayout content;final Handler handler=new Handler(Looper.getMainLooper());
+ static boolean active;boolean updateResumed;LinearLayout content;final Handler handler=new Handler(Looper.getMainLooper());
  public void onCreate(Bundle b){Data.init(this);Apple.load();setTheme(Apple.dark?com.dafeiyu.companion.R.style.AppThemeDark:com.dafeiyu.companion.R.style.AppTheme);super.onCreate(b);try{if(!PersonaManager.ensureInitialized("main"))handler.post(()->PersonaPanel.show(this,"main"));}catch(Exception e){AgentPanel.fail(this,e);}render();consumeChatIntent();}
  public void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);consumeChatIntent();}
- void consumeChatIntent(){if(getIntent()==null)return;if(getIntent().getBooleanExtra("openChat",false)){getIntent().removeExtra("openChat");handler.post(()->openChat());}if(getIntent().getBooleanExtra("openModel",false)){getIntent().removeExtra("openModel");handler.post(()->Chat.settings(this));}}
- public void onResume(){super.onResume();active=true;AgentRuntime.interruptProactive();Apple.load();render();PermissionsPanel.refresh();if(PetService.instance!=null)PetService.instance.control(true);}
- public void onPause(){Chat.interruptPresentation("main");active=false;if(PetService.instance!=null)PetService.instance.control(false);super.onPause();}
+ void consumeChatIntent(){if(getIntent()==null)return;if(getIntent().getBooleanExtra("openChat",false)){getIntent().removeExtra("openChat");handler.post(()->openChat());}if(getIntent().getBooleanExtra("openModel",false)){getIntent().removeExtra("openModel");handler.post(()->Chat.settings(this));}if(getIntent().getBooleanExtra("openUpdate",false)){getIntent().removeExtra("openUpdate");handler.post(()->UpdatePanel.show(this));}}
+ public void onResume(){super.onResume();active=true;updateResumed=true;AgentRuntime.interruptProactive();Apple.load();render();PermissionsPanel.refresh();if(PetService.instance!=null)PetService.instance.control(true);handler.postDelayed(()->{if(updateResumed&&!isFinishing()&&!isDestroyed())UpdateRuntime.enter(this);},1500);}
+ public void onPause(){updateResumed=false;UpdateRuntime.leave(this);Chat.interruptPresentation("main");active=false;if(PetService.instance!=null)PetService.instance.control(false);super.onPause();}
  public void onDestroy(){DialogLifecycle.close(this);handler.removeCallbacksAndMessages(null);super.onDestroy();}
  public void onConfigurationChanged(android.content.res.Configuration c){super.onConfigurationChanged(c);Apple.load();render();}
  int dp(int v){return Apple.dp(this,v);}TextView text(String s,int size){return Apple.label(this,s,size,false);}
@@ -30,8 +30,9 @@ public class MainActivity extends Activity {
   boolean visible=PetService.instance!=null&&PetService.instance.pets.get("main")!=null&&PetService.instance.pets.get("main").visible;
   LinearLayout pair=new LinearLayout(this);hero.addView(pair);Button history=button(pair,"她的小动作",v->manage());Button desk=button(pair,visible?"请她回来歇会":"让她住到屏幕上",v->{send(visible?"hideAll":"show","main");handler.postDelayed(this::render,300);});
   for(Button b:new Button[]{history,desk}){LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(46),1);p.topMargin=dp(10);if(b==desk)p.leftMargin=dp(10);b.setLayoutParams(p);b.setBackground(Apple.shape(this,Apple.PANEL,14));}
+  boolean steps=firstSteps(visible);
   recent();
-  if(!Settings.canDrawOverlays(this)){View hint=PermissionsPanel.hint(this);LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.topMargin=dp(16);content.addView(hint,p);}
+  if(!steps&&!Settings.canDrawOverlays(this)){View hint=PermissionsPanel.hint(this);LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.topMargin=dp(16);content.addView(hint,p);}
   GroupedList.section(content,"她的声音");LinearLayout voice=GroupedList.group(content);GroupedList.row(voice,"模型连接",GroupedList.BOLT,GroupedList.SKY,v->Chat.settings(this));
   GroupedList.note(content,AgentRuntime.configured()?"已接通。聊天内容会发往你设置的模型服务商。":"还没接通。推荐 DeepSeek：去官网拿一枚 API Key，粘贴进来就能聊。");
   GroupedList.section(content,"我们的日常");LinearLayout life=GroupedList.group(content);
@@ -40,7 +41,23 @@ public class MainActivity extends Activity {
   GroupedList.row(life,"名字与称呼",GroupedList.TAG,GroupedList.VIOLET,v->ProfilePage.show(this,"main"));
   GroupedList.row(life,"陪伴设置",GroupedList.SLIDERS,GroupedList.MINT,v->AgentPanel.settings(this));
   GroupedList.section(content,"关于");LinearLayout more=GroupedList.group(content);GroupedList.row(more,"关于与开源来源",GroupedList.INFO,GroupedList.GREY,v->about());
+  GroupedList.row(more,"检查更新",GroupedList.INFO,GroupedList.SKY,v->UpdatePanel.show(this));
   TextView footer=text("大肥鱼 "+version()+" · 非官方社区二创\n记忆只存在这台手机里",12);footer.setTextColor(Apple.SECONDARY);footer.setGravity(Gravity.CENTER);footer.setLineSpacing(dp(3),1);footer.setPadding(0,dp(28),0,0);content.addView(footer);
+ }
+ /**
+  * After the first meeting, the two things still needed — a model so she can talk, and her place on the screen —
+  * as a short checklist, until both have been done once or it is dismissed. Returns whether it is shown.
+  */
+ boolean firstSteps(boolean onScreen){
+  android.content.SharedPreferences prefs=Data.prefs();boolean model=AgentRuntime.configured();
+  if(model&&onScreen&&!prefs.getBoolean("onboarding.done",false))prefs.edit().putBoolean("onboarding.done",true).apply();
+  if(!PersonaManager.isInitialized("main")||prefs.getBoolean("onboarding.done",false))return false;
+  GroupedList.section(content,"开始之前还差 "+((model?0:1)+(onScreen?0:1))+" 步");LinearLayout steps=GroupedList.group(content);
+  Button connect=GroupedList.row(steps,model?"✓ 已接通模型":"接通模型，让她能开口",GroupedList.BOLT,GroupedList.SKY,v->Chat.settings(this));
+  Button place=GroupedList.row(steps,onScreen?"✓ 她已经在桌面上":"把她放到桌面上",GroupedList.PHONE,GroupedList.MINT,v->{send("show","main");handler.postDelayed(this::render,300);});
+  if(model)connect.setTextColor(Apple.SECONDARY);if(onScreen)place.setTextColor(Apple.SECONDARY);
+  TextView later=GroupedList.note(content,"不再提示");later.setTextColor(Apple.BLUE);later.setOnClickListener(v->{prefs.edit().putBoolean("onboarding.done",true).apply();render();});
+  return true;
  }
  /** The latest exchange as one conversation-list row, like the first line of a messaging app. */
  void recent(){try{

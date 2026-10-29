@@ -1,43 +1,32 @@
 {
-  "version": "0.4.8",
-  "version_code": 12,
-  "apk_sha256": "4d29632ceb06bac3894854fbf300728865cf5f5b26085b5b672ffbc95ccada58",
-  "framework_unique_passed": 80,
-  "framework_failed": 0,
+  "version": "0.4.9.2",
+  "version_code": 15,
+  "apk_sha256": "97dca0a731bab47c1e81bf513f918f05a0b2d04277406676f458440bf7b4d25c",
+  "apk_size": 91505033,
+  "framework_unique_passed": 119,
+  "framework_failed_final_reports": 0,
   "framework_skipped": 0,
-  "final_build_framework_rechecked": 80,
-  "android_art_core_suites": 13,
-  "android_runtime_instrumentation_checks": 32,
-  "initiative_checks": 33,
-  "unicode_checks": 83,
-  "nickname_and_reply_checks": 33,
-  "core_checks": 141,
-  "history_checks": 556,
-  "temporal_history_checks": 38,
-  "action_assertions": 10708,
-  "episodic_checks": 11,
-  "diary_checks": 19,
-  "endpoint_checks": 13,
+  "framework_note": "Final full run: 118/119; after draining Python subprocess output, HTTP suite 12/12 passed on the same final product build. Aggregate unique scenarios:119.",
+  "android_api": 35,
+  "android_art_core_suites": 15,
+  "android_runtime_instrumentation_checks": 47,
+  "initiative_checks": 62,
+  "update_checks": 30,
+  "publisher_checks": 7,
+  "upgrade_from": "0.4.9.1",
+  "upgrade_preserved": [
+    "persona",
+    "nickname",
+    "memory",
+    "history",
+    "keystore"
+  ],
   "native_memory": {
     "scenarios": 84,
     "passed": 145,
     "total": 166,
     "known_unmet": 21
   },
-  "live_model_smoke": {
-    "environment": "MuMu Android API35 x86_64; existing configured model through app UI",
-    "manual_chat": "completed; an interrupted segmented reply remained marked partially displayed",
-    "physical_interaction": "11:24:02 touch persisted with timestamp",
-    "proactive": "11:26 message related to the preceding conversation appeared in chat with proactive label",
-    "next_consideration": "11:46 shown in recent-interactions panel",
-    "timing_boundary": "Initial request for a two-minute follow-up produced a roughly 15-minute schedule, without inspecting whether this was model output or fallback. A real touch advanced eligibility; proactive speech followed about two minutes after that touch. This is not an exact reminder guarantee."
-  },
-  "not_verified": [
-    "all Android versions",
-    "physical phones",
-    "broad real-model quality or battery benchmarks"
-  ],
-  "known_issues": [
-    "Existing handbook export produced a zero-byte file during earlier inspection; not repaired or used as evidence in this release."
-  ]
+  "physical_device_tested": false,
+  "live_model_tested_this_release": false
 }
