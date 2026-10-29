@@ -4,17 +4,20 @@ import org.json.*;
 
 /** Lossless local segmentation. Long/structured answers open in history instead of flashing past. */
 final class ReplySegments {
-    static final int VERSION=2;
+    static final int VERSION=3;
     static boolean previewOnly(String text){return text.length()>240||text.contains("```")||text.matches("(?s).*https?://.*")||text.matches("(?s).*\\n\\s*(?:[-*]|[0-9]+[.)、])\\s+.*");}
-    static List<String> split(String text){
+    static List<String> split(String text){return splitNatural(text,true);}
+    static List<String> splitV2(String text){return splitNatural(text,false);}
+    static List<String> splitNatural(String text,boolean shorter){
         if(text.codePointCount(0,text.length())<=12||previewOnly(text))return Collections.singletonList(text);
         List<String> sentences=new ArrayList<>();int start=0;StringBuilder closing=new StringBuilder();
         for(int i=0;i<text.length();i++){
             char c=text.charAt(i);int open="“‘「『（([".indexOf(c);
             if(open>=0)closing.append("”’」』）)]".charAt(open));
             else if(closing.length()>0&&c==closing.charAt(closing.length()-1))closing.setLength(closing.length()-1);
-            if(closing.length()==0&&"。！？!?；;\n".indexOf(c)>=0){
-                int end=i+1;while(end<text.length()&&"。！？!?；;…\r\n ".indexOf(text.charAt(end))>=0)end++;
+            boolean pause=shorter&&i+1<text.length()&&((c=='…'&&text.charAt(i+1)=='…')||(c=='—'&&text.charAt(i+1)=='—'))&&text.codePointCount(start,i)>=6;
+            if(closing.length()==0&&("。！？!?；;\n".indexOf(c)>=0||pause)){
+                int end=i+1;while(end<text.length()&&("。！？!?；;…\r\n ".indexOf(text.charAt(end))>=0||shorter&&text.charAt(end)=='—'))end++;
                 if(text.substring(start,end).trim().length()>=4){sentences.add(text.substring(start,end));start=end;}
                 i=end-1;
             }
@@ -33,7 +36,7 @@ final class ReplySegments {
                 else if(closing.length()>0&&c==closing.charAt(closing.length()-1))closing.setLength(closing.length()-1);
                 // A comma is a fallback for a long clause, never a cut inside a quotation or number.
                 if(closing.length()==0&&"，,".indexOf(c)>=0&&!(c==','&&i>0&&i+1<sentence.length()&&Character.isDigit(sentence.charAt(i-1))&&Character.isDigit(sentence.charAt(i+1)))
-                    &&sentence.codePointCount(start,sentence.length())>28&&sentence.codePointCount(start,i+1)>=12&&sentence.codePointCount(i+1,sentence.length())>=6){
+                    &&sentence.codePointCount(start,sentence.length())>(shorter?22:28)&&sentence.codePointCount(start,i+1)>=(shorter?8:12)&&sentence.codePointCount(i+1,sentence.length())>=6){
                     parts.add(sentence.substring(start,i+1));start=i+1;
                 }
             }
@@ -43,7 +46,7 @@ final class ReplySegments {
     }
     // Persisted display counts refer to the segmentation used when the reply was first saved.
     // Never reinterpret an old count using new boundaries: that can hide or disclose old text.
-    static List<String> parts(JSONObject turn){return turn.optInt("segmentVersion",1)>=VERSION?split(turn.optString("reply")):legacySplit(turn.optString("reply"));}
+    static List<String> parts(JSONObject turn){String text=turn.optString("reply");int version=turn.optInt("segmentVersion",1);return version>=3?split(text):version==2?splitV2(text):legacySplit(text);}
     static List<String> legacySplit(String text){
         if(text.length()<45||previewOnly(text))return Collections.singletonList(text);
         List<Integer> ends=new ArrayList<>();

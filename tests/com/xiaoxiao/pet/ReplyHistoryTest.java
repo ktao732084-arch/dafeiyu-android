@@ -9,6 +9,7 @@ public final class ReplyHistoryTest {
     static final String REPLY="今天的风很舒服，我就在这里安静陪你待一会儿，听你慢慢说今天发生了什么。等你忙完了，我们再一起聊点轻松的事情，或者想想周末有什么小期待。还有一件刚刚想到的特别重要的小事，我会等你有空的时候再慢慢告诉你。";
     public static void main(String[] args)throws Exception {
         segmentationRegression();
+        naturalBubblesAndInvitations();
         for(String text:new String[]{"好呀",REPLY,"你好👩‍💻！今天很开心。",REPLY+"https://example.com/a?b=1", "```java\nint a = 1;\n```"}){List<String> parts=ReplySegments.split(text);check(parts.size()>=1&&parts.size()<=8,"bounded segments");check(String.join("",parts).equals(text),"lossless segmentation");}
         check(ReplySegments.split(REPLY).size()>3,"long clauses become shorter bubbles");check(ReplySegments.previewOnly(REPLY+REPLY+REPLY),"long answer links to complete history");
         Timer timer=new Timer();List<Integer> shown=new ArrayList<>();boolean[] visible={true};SpeechQueue q=new SpeechQueue(timer,new SpeechQueue.Sink(){public boolean visible(){return visible[0];}public void show(String t,int count,boolean preview){shown.add(count);}public void stop(int count){}});
@@ -45,8 +46,8 @@ public final class ReplyHistoryTest {
             {"才艺啊……那我吹段笛子给你听，就当是手机里飘出来的声音。", "水平有限，你可别笑太大声。"},
             {"想看是想看，不过我这边只能听你说，看不到画面。", "你刷到什么好玩的，讲给我听听呗。"}
         };
-        for(String[] expected:examples){String text=String.join("",expected);List<String> parts=ReplySegments.split(text);check(parts.equals(Arrays.asList(expected)),"screenshot natural breaks: "+parts);check(String.join("",parts).equals(text),"screenshot text preserved");for(String p:parts)check(p.length()<=28,"screenshot short bubble");}
-        for(String text:new String[]{"", "好呀", "好呀。明天见！", "没有标点的一句话应该完整保留而不是从中间强行切断", "今天是2026.10.29，金额是1,234.56。", "```java\nint x=1;\n```", "看看这个链接：https://example.com/a?b=1。稍后再聊。", "清单如下：\n- 苹果\n- 香蕉"})check(ReplySegments.split(text).equals(Collections.singletonList(text)),"single or structured reply preserved");
+        for(String[] expected:examples){String text=String.join("",expected);check(ReplySegments.splitV2(text).equals(Arrays.asList(expected)),"v2 persisted boundaries stay frozen");List<String> parts=ReplySegments.split(text);check(String.join("",parts).equals(text),"screenshot text preserved");for(String p:parts)check(p.length()<=28,"screenshot short bubble");}
+        for(String text:new String[]{"", "好呀", "好呀。明天见！", "没有标点的一句话应该完整保留而不是从中间强行切断", "```java\nint x=1;\n```", "看看这个链接：https://example.com/a?b=1。稍后再聊。", "清单如下：\n- 苹果\n- 香蕉"})check(ReplySegments.split(text).equals(Collections.singletonList(text)),"single or structured reply preserved");
         for(String text:new String[]{"你好👩‍💻！今天工作顺利吗？有空一起聊聊。", "我说「慢慢来。别着急！」，等你准备好再继续。今天先休息。", "我们明天再聊吧。\r\n今天早点休息哦！", "今天想聊点什么呢？！ 我一直在这里等你。"}){List<String> parts=ReplySegments.split(text);check(String.join("",parts).equals(text),"unicode and whitespace preserved");for(String p:parts)check(!p.trim().isEmpty(),"no empty bubbles");}
         String quoted="我说「慢慢来。别着急！」，等你准备好再继续。今天先休息。";
         check(ReplySegments.split(quoted).get(0).contains("「慢慢来。别着急！」"),"quoted sentence stays intact");
@@ -57,5 +58,21 @@ public final class ReplyHistoryTest {
         check(old.getJSONArray("segmentDisplayedAt").getLong(0)==123,"old display timestamp untouched");
         old.put("segmentVersion",ReplySegments.VERSION);
         check(ReplySegments.visible(old).equals(ReplySegments.split(REPLY).get(0)),"new reply uses natural boundaries");
+    }
+    static void naturalBubblesAndInvitations()throws Exception {
+        String numeric="今天是2026.10.29，金额是1,234.56。";check(String.join("",ReplySegments.split(numeric)).equals(numeric)&&ReplySegments.split(numeric).get(1).contains("1,234.56"),"numbers stay intact at clause boundaries");
+        String text="刚刚那盘是你赢了，最后一手下得真漂亮。现在你赢两局，我赢一局，还没有平局——五子棋这回算你厉害，下次可没这么容易。";
+        List<String> parts=ReplySegments.split(text);check(parts.size()>=3,"natural pauses break long commentary: "+parts);check(String.join("",parts).equals(text),"commentary stays lossless");for(String part:parts)check(part.codePointCount(0,part.length())<=28,"short commentary clauses: "+part);
+        String pause="棋盘上的这个位置我还记着，你可别装作忘了……不过这一盘已经结束，想聊聊刚才的走法也行。";
+        check(ReplySegments.split(pause).size()>=2&&ReplySegments.split(pause).get(0).endsWith("……"),"ellipsis is a natural pause: "+ReplySegments.split(pause));check(String.join("",ReplySegments.split(pause)).equals(pause),"ellipsis stays intact");
+        JSONObject v2=new JSONObject().put("reply",text).put("segmentVersion",2).put("displayed",1).put("segmentDisplayedAt",new JSONArray().put(55));
+        check(ReplySegments.visible(v2).equals(ReplySegments.splitV2(text).get(0)),"v2 displayed prefix not reinterpreted");check(v2.getJSONArray("segmentDisplayedAt").getLong(0)==55,"timestamps retained");
+        for(String mention:new String[]{"五子棋刚才是你赢了，现在两胜一负。","我会下五子棋。","你想知道五子棋怎么玩吗？","你昨天说过想玩五子棋。","如果你想玩五子棋，改天再说。","我不想玩五子棋。","今天不下五子棋。","你说过「陪我下盘五子棋吧」。","例如：来一局五子棋吧。"})check(!GomokuInvite.offered("刚才谁赢了？",mention),"mention is not invitation: "+mention);
+        for(String invite:new String[]{"陪我下盘五子棋吧。","要不要一起下五子棋？","想不想玩五子棋？","来一局五子棋。","我们继续下五子棋吧。"})check(GomokuInvite.offered("",invite),"explicit assistant invitation: "+invite);
+        check(GomokuInvite.offered("我想玩五子棋","好呀，来吧。"),"user request offers board without repeated game keyword");
+        check(!GomokuInvite.offered("我想玩五子棋","晚点再玩吧。"),"assistant postponement suppresses board");
+        check(!GomokuInvite.offered("我不想玩五子棋","那我们聊点别的。"),"user refusal suppresses board");
+        check(!GomokuInvite.offered("谁赢了五子棋？","我赢了一局。"),"user score question suppresses board");
+        check(!GomokuInvite.offered("我想玩五子棋",""),"undisplayed reply has no action");
     }
 }

@@ -157,6 +157,10 @@ AppUpdate、UpdateTransport、UpdateApk、UpdateFileProvider、UpdateRuntime、U
 
 公网 IP 接入的 Nginx 路径配置、北京构建入口与 UpdateNetworkInstrumentation 为本项目新增；复用用户已有北京服务器和 IP 证书续期配置。站点最初镜像 v0.4.7；本次以原签名发布 0.4.9.2，保留上游素材归属。UpgradeAcceptance 与 OfflineTestApplication 为本项目新增验证代码：前者仅在新建模拟器使用合成数据验证真实 APK 覆盖安装，后者阻止框架单测意外访问线上更新站点。
 
+## 自然分段与棋局邀请修复（未独立发布）
+
+`GomokuInvite.java`和`ChatPresentationInstrumentation.java`为本项目AI辅助新增，负责本机保守邀请识别和Android聊天排版验证；`ReplySegments`与`ChatPage`在既有实现上改进自然停顿分句、旧展示版本兼容及每轮入口展示。未引入额外模型或第三方分词库，沿用原有界面和素材来源。
+
 ## 互动短气泡（源码集成，未独立发布）
 
 `TouchReply.java`、`TouchReplyTest`、`TouchReplyRuntimeTest`、`TouchReplyActivity`与`TouchReplyInstrumentation`为本项目AI辅助新增：汇总真实手势、一次模型回应、门禁与取消，以及Android浮窗验收。`PetService`在小小桌宠交互底座上补齐动作记录，runtime/store/prompt/设置/聊天页沿用本项目既有实现与来源。没有引入额外Agent框架、第三方台词或动画素材；原有角色素材许可不变。
