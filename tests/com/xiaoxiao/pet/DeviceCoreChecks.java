@@ -27,6 +27,7 @@ public final class DeviceCoreChecks {
         run("nickname and reply polish",()->ChatPolishRulesTest.main(new String[0]));
         run("model initiative",()->InitiativeTest.main(new String[0]));
         run("chat search and notebook filter",()->UsabilityTest.main(new String[]{root+"/usability"}));
+        run("gomoku rules, persistence and context",()->GomokuTest.main(new String[0]));
         System.out.println("DEVICE SUITES: "+passed+" passed, "+failures+" failed");
         System.exit(failures==0?0:1);
     }

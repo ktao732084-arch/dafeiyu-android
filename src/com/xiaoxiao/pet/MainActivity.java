@@ -5,7 +5,7 @@ public class MainActivity extends Activity {
  static boolean active;LinearLayout content;final Handler handler=new Handler(Looper.getMainLooper());
  public void onCreate(Bundle b){Data.init(this);Apple.load();setTheme(Apple.dark?com.dafeiyu.companion.R.style.AppThemeDark:com.dafeiyu.companion.R.style.AppTheme);super.onCreate(b);try{if(!PersonaManager.ensureInitialized("main"))handler.post(()->PersonaPanel.show(this,"main"));}catch(Exception e){AgentPanel.fail(this,e);}render();consumeChatIntent();}
  public void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);consumeChatIntent();}
- void consumeChatIntent(){if(getIntent()==null)return;if(getIntent().getBooleanExtra("openChat",false)){getIntent().removeExtra("openChat");handler.post(()->openChat());}if(getIntent().getBooleanExtra("openModel",false)){getIntent().removeExtra("openModel");handler.post(()->Chat.settings(this));}}
+ void consumeChatIntent(){if(getIntent()==null)return;if(getIntent().getBooleanExtra("openChat",false)){getIntent().removeExtra("openChat");handler.post(()->openChat());}if(getIntent().getBooleanExtra("openModel",false)){getIntent().removeExtra("openModel");handler.post(()->Chat.settings(this));}if(getIntent().getBooleanExtra("openGomoku",false)){getIntent().removeExtra("openGomoku");handler.post(()->GomokuPage.show(this));}}
  public void onResume(){super.onResume();active=true;AgentRuntime.interruptProactive();Apple.load();render();PermissionsPanel.refresh();if(PetService.instance!=null)PetService.instance.control(true);}
  public void onPause(){Chat.interruptPresentation("main");active=false;if(PetService.instance!=null)PetService.instance.control(false);super.onPause();}
  public void onDestroy(){DialogLifecycle.close(this);handler.removeCallbacksAndMessages(null);super.onDestroy();}
@@ -36,6 +36,7 @@ public class MainActivity extends Activity {
   GroupedList.section(content,"她的声音");LinearLayout voice=GroupedList.group(content);GroupedList.row(voice,"模型连接",GroupedList.BOLT,GroupedList.SKY,v->Chat.settings(this));
   GroupedList.note(content,AgentRuntime.configured()?"已接通。聊天内容会发往你设置的模型服务商。":"还没接通。推荐 DeepSeek：去官网拿一枚 API Key，粘贴进来就能聊。");
   GroupedList.section(content,"我们的日常");LinearLayout life=GroupedList.group(content);
+  GroupedList.row(life,"一起下五子棋",GroupedList.PLAY,GroupedList.TEAL,v->GomokuPage.show(this));
   GroupedList.row(life,"记忆手账",GroupedList.BOOK,GroupedList.ORANGE,v->AgentPanel.memories(this));
   GroupedList.row(life,PersonaManager.isInitialized("main")?"她的性格 · "+PersonaManager.label("main"):"初次相遇 · 确定性格",GroupedList.HEART,GroupedList.PINK,v->PersonaPanel.show(this,"main"));
   GroupedList.row(life,"名字与称呼",GroupedList.TAG,GroupedList.VIOLET,v->ProfilePage.show(this,"main"));

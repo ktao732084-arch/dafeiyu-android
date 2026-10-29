@@ -68,6 +68,11 @@ public class AgentInstrumentation extends Instrumentation {
     check("model".equals(AgentRuntime.store().snapshot().getJSONObject("initiativePlan").getString("source")),"schedule provenance persisted on Android");
     int beforeNag=AgentRuntime.history().length();AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"我不催，你还没回复\",\"next_check_minutes\":41}";
     AgentRuntime.send("",true,new Reply());AgentRuntime.worker.submit(()->{}).get(10,TimeUnit.SECONDS);check(AgentRuntime.history().length()==beforeNag,"announcing silence does not send another message");
+    GomokuStore games=GomokuPage.store();Gomoku game=games.fresh();while(!game.over()){if(game.turn()==1){int point=0;while(game.board[point]!=0)point++;game=games.move(game.id,game.moves.size(),point,false);}else game=games.move(game.id,game.moves.size(),-1,true);}
+    check(games.context().getJSONArray("recent_results").length()==1,"real game result persisted on Android");
+    check(AgentRuntime.context("刚才五子棋谁赢了",false).toString().contains(game.id),"actual Android model context receives completed game");
+    check(new GomokuStore(new java.io.File(isolatedFiles,"agent")).load().outcome().equals(game.outcome()),"terminal game survives Android store reopen");
+    AgentRuntime.store().clear(true);check(games.context().getJSONArray("recent_results").length()==0,"forget all also clears game history on Android");
     result.putString("stream","PASS: "+checks+" Android runtime checks\n");
    }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;MemoryBridge.client=MemoryBridge::http;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}
   }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e.toString());result.putString("stack",android.util.Log.getStackTraceString(e));}
