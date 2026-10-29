@@ -171,7 +171,7 @@ final class AgentRuntime {
                         // Recheck after the network wait, before saving a message the user won't see.
                         if(!canSpeakNow()){try{db.initiativeDecision(commitEpoch,"not-visible",output.plan,System.currentTimeMillis());}catch(Exception ignored){}release(token);return;}
                         try{
-                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,false,true,null,null,turnId,observed,null,true,null,output.plan,output.moodLevel,rememberEnabled()?output.moodCause:"",output.moodChanged)){release(token);return;}db.markFollowed(offered,turnId);output.emotion=db.mood(System.currentTimeMillis()).optString("emotion","calm");}
+                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,rememberEnabled(),true,null,null,turnId,observed,null,true,null,output.plan,output.moodLevel,rememberEnabled()?output.moodCause:"",output.moodChanged)){release(token);return;}db.markFollowed(offered,turnId);output.emotion=db.mood(System.currentTimeMillis()).optString("emotion","calm");}
                             release(token);listener.saved(turnId);listener.done(output.reply,output.emotion);
                         }catch(Exception e){release(token);listener.error("主动消息未能保存");}
                     });return;

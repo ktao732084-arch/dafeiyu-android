@@ -65,6 +65,11 @@ public final class CharacterTest {
   String tail=last(PromptBuilder.build(in,"在吗",false,db.snapshot(),null));
   check(tail.contains("你此刻的心情：开心（很强烈）")&&!tail.contains("上次情绪"),"the carried-over mood reaches the next turn");
   String sys=PromptBuilder.build(in,"在吗",false,db.snapshot(),null).getJSONObject(0).getString("content");check(sys.contains("mood_level")&&sys.contains("mood_cause"),"the reply format asks for strength and cause");
+  db.commit(db.epoch(),"我考过了","哼，我早说你可以。","happy",null,true,false,null,null,"m5",t+200*60000,null,false,null,null,2,"替TA考过高兴",true);
+  db.commit(db.epoch(),"","晚上要不要庆祝一下？","happy",null,true,true,null,null,"p1",t+202*60000,null,false,null,null,2,"",false);
+  check("替TA考过高兴".equals(db.snapshot().optString("moodCause"))&&"m5".equals(db.snapshot().optString("moodSource")),"a proactive turn that carries the mood keeps its cause");
+  db.commit(db.epoch(),"","还在吗","happy",null,false,true,null,null,"p2",t+203*60000,null,false,null,null,2,"",false);
+  check(!db.snapshot().has("moodCause"),"memory off: the cause is not kept");
   db.clear(false);check(!db.snapshot().has("moodCause"),"clearing chats clears the mood's cause");
 
   // Understanding: formed in the diary call, every step backed by the user's own words that day.
