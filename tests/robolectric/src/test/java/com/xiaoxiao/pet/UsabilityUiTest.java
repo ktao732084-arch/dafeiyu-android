@@ -30,6 +30,14 @@ public class UsabilityUiTest {
         GrowthPanel.show(a);View story=root();assertTrue(UiTest.texts(story).contains("泡泡瓶"));assertFalse(UiTest.texts(story).contains("记忆泡泡"));assertNull(UiTest.find(story,"她的日记"));
         AgentPanel.settings(a);View settings=root();assertNotNull(UiTest.find(settings,"记忆引擎"));assertNull(UiTest.find(settings,"手机悬浮权限"));
     }
+    /** The home portrait is her animated clip: one player kept across re-renders, the still portrait under it, a tap reaction. */
+    @Test public void homePortraitIsHerAnimatedClip()throws Exception{
+        a.render();a.render();assertEquals("one player across re-renders",1,UiTest.all(a.content,AlphaVideo.class).size());
+        AlphaVideo video=UiTest.all(a.content,AlphaVideo.class).get(0);assertSame(a.pet.video,video);assertEquals(Data.idle("main"),video.pending);
+        View stage=(View)video.getParent();assertEquals("蓝色鲸鱼娘大肥鱼",stage.getContentDescription());assertEquals(1,UiTest.all(stage,ImageView.class).size());
+        stage.performClick();CountDownLatch played=new CountDownLatch(1);video.queueEvent(played::countDown);assertTrue(played.await(5,TimeUnit.SECONDS));assertTrue(video.pending,ActionPlan.TAPS.contains(video.pending));
+        a.pet.pause();assertTrue(video.suspended);a.pet.resume();assertFalse(video.suspended);
+    }
     @Test public void clearingTheDiaryAsksFirst()throws Exception{
         java.time.LocalDate day=java.time.LocalDate.now().minusDays(1);assertTrue(AgentRuntime.store().addDiary(AgentRuntime.store().epoch(),Diary.entry(day,"今天陪他聊了晚饭。",new java.util.ArrayList<>(),System.currentTimeMillis())));
         MemoryPanel.diary(a);AlertDialog diary=(AlertDialog)UiTest.dialog();diary.getButton(AlertDialog.BUTTON_POSITIVE).performClick();ShadowLooper.idleMainLooper();
