@@ -45,3 +45,5 @@
 `DiaryTest` 检查真实棋谱来源、超过最近 8 局、旧经历检索、格式拒绝、时区、未展示回复、来源删除、单篇删除、清空截止点及导出往返。`SharedExperienceUiTest` 检查入口触发、每天一次、开关、整理中清空、分页搜索和删除回调。
 
 `ExperienceInstrumentation` 在独立包中使用合成历史和受控模型，运行实际 Android 主界面、后台调用、依据页与删除流程，并截图检查文字布局。未改设备时间，未使用正式应用数据。测试证明存取、检索、隔离与界面流程；不证明真实模型的情绪价值或长期陪伴质量。最终结果见 `docs/test-reports/shared-experiences.json`。
+
+随后用真实 `deepseek-flash` 跑了两种风格、各两次的试聊及对照。来源存储正常，但旧经历的换说法检索、回想中的未记录细节、无记忆时仍声称记得等效果问题尚未通过验收；当前不建议据功能测试通过就合并。汇总见 [真实模型试聊结果](test-reports/shared-experiences-live.json)。可选入口为 `tests/com/xiaoxiao/pet/SharedExperienceLiveEval.java`，不进入默认测试；使用环境变量或隐藏输入接收 Key。完整报告和回复只留在忽略目录 `build/live-experience-checks/`。

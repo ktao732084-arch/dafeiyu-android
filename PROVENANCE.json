@@ -1368,7 +1368,7 @@
       "path": "docs/SHARED_EXPERIENCES.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "a3f43535279de204c75b9a98d89a7ea7113ed4de09bcec5064c356729348f770"
+      "sha256": "72f41bd1b3869906969cd69e311557ff77c92cf2101c5f2b836149a70076d055"
     },
     {
       "path": "docs/TOUCH_REPLIES.md",
@@ -1555,6 +1555,12 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "a6d9a30b0d301e1455be5a5c8c29a1e47ed4c65237066342c1c6bd09e038c2f5"
+    },
+    {
+      "path": "docs/test-reports/shared-experiences-live.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "1d87f3c873dff2938499d84249401007dddc8c617bd5bd8f015cc55a466651cb"
     },
     {
       "path": "docs/test-reports/shared-experiences.json",
@@ -2807,6 +2813,12 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "81b13e4e592f2bb0cc62a705fc455eefbf44f8ab5ad484f86a025c290dfc7982"
+    },
+    {
+      "path": "tests/com/xiaoxiao/pet/SharedExperienceLiveEval.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "6959cb2d2baa206dafa465d39d78c6815cbc9f310dfcb8b9f2c332cbbce604f4"
     },
     {
       "path": "tests/com/xiaoxiao/pet/TouchReplyTest.java",
