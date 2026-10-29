@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "3a7e77e567cba6eb391cfac6ce5163aa95364e661c2819f4175cdff1752c7ee7"
+      "sha256": "2ae4d787473765a6d730c91ba805ca26e43beb139a0705e6f3d9db7040efaa58"
     },
     {
       "path": "LICENSE",
@@ -1302,7 +1302,7 @@
       "path": "docs/CHAT_HISTORY.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "d15c7362e67d4d989e465e3cb84e5352b85f5da09478134dbc36b4f433275a7f"
+      "sha256": "09b3eb49f891add90fff198b89aa7d2fc6ff6f86d2b3b5a48829610cdfed1563"
     },
     {
       "path": "docs/CHAT_PRESENTATION_ACCEPTANCE.md",
@@ -2552,7 +2552,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "8843c9394c4beb832cc206ceffabfd50343b03f4bc0a5c477a8eb2da5a683ec0"
+      "sha256": "aa08b18eb5995b4ba37e39acb2d7ff5b0ed4c696e0d37daf789808b884b95898"
     },
     {
       "path": "src/com/xiaoxiao/pet/ReplySegments.java",
@@ -2689,7 +2689,7 @@
       "path": "tests/com/xiaoxiao/pet/CharacterStateTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "b3003e8be0624137a0612d6a09b70b98bb47e53e7ec349f347f5ea185b2b332b"
+      "sha256": "d83d8dd48178333ca5852cc71a037382ec13f5ee04cecf310c84c051f260e298"
     },
     {
       "path": "tests/com/xiaoxiao/pet/CharacterTest.java",
@@ -3026,7 +3026,7 @@
       "path": "tests/scenarios/character-state.json",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "be7dc6f75b6fc89f6c5dd6af2a618826ca49c873652aa7766c9ad0e9668512b8"
+      "sha256": "bcadc1bd8fa4795f2b651e5005e7ff2c1c51903f5a6a908c000f4bb90fd36046"
     },
     {
       "path": "tests/test_release_sync.py",
