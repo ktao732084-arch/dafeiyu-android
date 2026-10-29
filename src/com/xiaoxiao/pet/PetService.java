@@ -170,7 +170,7 @@ public class PetService extends Service {
  }
  /** Nothing else is going on: visible, awake, no chat, no speech, no drag, Do Not Disturb off, daytime. */
  boolean quietMoment(Pet p){
-  if(!p.visible||p.frame==null||p.docked||p.docking||p.dragging||p.moving||p.thrown||!animating()||inMotion()||p.bubble!=null||p.scene!=null||p.speech!=null&&p.speech.active)return false;
+  if(!p.visible||p.frame==null||p.docked||p.docking||p.dragging||p.moving||p.thrown||p.busy||!animating()||inMotion()||p.bubble!=null||p.scene!=null||p.speech!=null&&p.speech.active)return false;
   if(AgentRuntime.busy()||Chat.isPetChatOpen(p.id)||moment().night()||!PersonaManager.isInitialized("main"))return false;
   NotificationManager nm=getSystemService(NotificationManager.class);return nm==null||nm.getCurrentInterruptionFilter()==NotificationManager.INTERRUPTION_FILTER_ALL;
  }

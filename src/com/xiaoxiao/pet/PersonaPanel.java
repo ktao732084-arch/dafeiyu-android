@@ -78,7 +78,7 @@ final class PersonaPanel {
             try {
                 String chosen = selection[0];
                 if (PersonaManager.RANDOM.equals(chosen)) PersonaManager.initializeRandom(role);else PersonaManager.initialize(role, chosen);
-                a.render();dialog.dismiss();
+                a.meet();a.render();dialog.dismiss();
                 Toast.makeText(a, "遇见啦！她是「" + PersonaManager.label(role) + "」", Toast.LENGTH_LONG).show();
             } catch (Exception error) { AgentPanel.fail(a, error); }
         });
