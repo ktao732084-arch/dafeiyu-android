@@ -132,10 +132,14 @@ final class ChatPage {
     }
     /** Each shown segment is its own bubble, like several short messages in a row; the rest waits behind the full-text pill. */
     void segments(JSONObject t){
-        List<String> parts=ReplySegments.split(t.optString("reply"));int shown=t.has("displayed")?Math.min(parts.size(),t.optInt("displayed")):parts.size();
+        List<String> parts=ReplySegments.parts(t);int shown=t.has("displayed")?Math.min(parts.size(),t.optInt("displayed")):parts.size();
         JSONObject pending=ReplySegments.label(t).isEmpty()?null:t;boolean proactive=t.optBoolean("proactive");
         if(shown==0){message("回复已经保存好了，点开看看全文吧。",false,pending,proactive);return;}
-        for(int i=0;i<shown;i++){boolean last=i==shown-1;message(i==0?AgentPolicy.replyText(parts.get(i).trim()):parts.get(i).trim(),false,last?pending:null,last&&proactive);}
+        for(int i=0;i<shown;i++){
+            String text=i==0?AgentPolicy.replyText(parts.get(i)):parts.get(i);
+            List<String> bubbles=t.optInt("segmentVersion",1)>=ReplySegments.VERSION?Collections.singletonList(text):ReplySegments.split(text);
+            for(int j=0;j<bubbles.size();j++){boolean last=i==shown-1&&j==bubbles.size()-1;message(bubbles.get(j).trim(),false,last?pending:null,last&&proactive);}
+        }
     }
     void empty(){
         LinearLayout hello=column();hello.setGravity(Gravity.CENTER_HORIZONTAL);hello.setPadding(dp(24),dp(overlay?12:56),dp(24),dp(24));

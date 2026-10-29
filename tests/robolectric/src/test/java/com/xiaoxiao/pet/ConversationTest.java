@@ -41,7 +41,20 @@ public class ConversationTest {
     @Test public void oneModelCallCreatesProgressiveSegmentsAndDisplayedTimestamps()throws Exception{
         ModelSettings.save("https://example.invalid/v1","mock","test-key",false);java.util.concurrent.atomic.AtomicInteger calls=new java.util.concurrent.atomic.AtomicInteger();AgentRuntime.model=(m,t,p)->{calls.incrementAndGet();return new JSONObject().put("reply",REPLY).toString();};open();page.input.setText("聊聊今天");page.send();UiTest.awaitIdle();
         assertEquals(1,calls.get());assertEquals(1,last().getInt("displayed"));assertTrue(last().has("repliedAt"));assertTrue(last().has("segmentDisplayedAt"));assertFalse(UiTest.texts(page.rows).contains("特别重要的小事"));
-        ShadowLooper.idleMainLooper(30,TimeUnit.SECONDS);assertEquals(3,last().getInt("displayed"));assertTrue(UiTest.texts(page.rows).contains("特别重要的小事"));
+        ShadowLooper.idleMainLooper(60,TimeUnit.SECONDS);assertEquals(ReplySegments.split(REPLY).size(),last().getInt("displayed"));assertTrue(UiTest.texts(page.rows).contains("特别重要的小事"));
+    }
+    @Test public void screenshotReplyAppearsAsThreeSeparateBubblesAndSurvivesReload()throws Exception{
+        String reply="会一点，不算大厨。煮面、炒个蛋、炖点简单的汤还行，复杂的就得边看教程边手忙脚乱了。";
+        ModelSettings.save("https://example.invalid/v1","mock","test-key",false);java.util.concurrent.atomic.AtomicInteger calls=new java.util.concurrent.atomic.AtomicInteger();AgentRuntime.model=(m,t,p)->{calls.incrementAndGet();return reply;};open();page.input.setText("你会做饭吗");page.send();UiTest.awaitIdle();
+        assertEquals(1,calls.get());assertEquals(ReplySegments.VERSION,last().getInt("segmentVersion"));assertNotNull(UiTest.find(page.rows,"会一点，不算大厨。"));assertNull(UiTest.find(page.rows,"复杂的就得边看教程边手忙脚乱了。"));
+        ShadowLooper.idleMainLooper(30,TimeUnit.SECONDS);assertEquals(3,last().getInt("displayed"));assertEquals(3,last().getJSONArray("segmentDisplayedAt").length());
+        for(String part:ReplySegments.split(reply))assertNotNull(UiTest.find(page.rows,part));assertNull(UiTest.find(page.rows,reply));
+        page.loadLatest();for(String part:ReplySegments.split(reply))assertNotNull(UiTest.find(page.rows,part));assertEquals(reply,ReplySegments.visible(last()));
+    }
+    @Test public void oldDisplayedCountsDoNotHideOrExposeTextWhenRendered()throws Exception{
+        open();JSONObject old=new JSONObject().put("reply",REPLY).put("displayed",1);page.rows.removeAllViews();page.segments(old);
+        for(String part:ReplySegments.split(ReplySegments.legacySplit(REPLY).get(0)))assertNotNull(UiTest.find(page.rows,part));assertFalse(UiTest.texts(page.rows).contains("特别重要的小事"));
+        old.put("displayed",3);page.rows.removeAllViews();page.segments(old);assertTrue(UiTest.texts(page.rows).contains("特别重要的小事"));assertTrue(ReplySegments.label(old).isEmpty());
     }
     @Test public void newMessageCancelsOldSegmentsWithoutLosingCompleteRecord()throws Exception{
         ModelSettings.save("https://example.invalid/v1","mock","test-key",false);AgentRuntime.model=(m,t,p)->REPLY;open();page.input.setText("说说看");page.send();UiTest.awaitIdle();String old=last().getString("id");
