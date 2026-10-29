@@ -176,6 +176,18 @@ public final class AgentCoreTest {
   check(MemoryLedger.currentCount(many,r0)>MemoryLedger.CORE+10,"sixteen distinct facts are kept");
   NativeMemoryEngine.evaluate(many,new JSONArray(),"哈哈",r0,ZoneOffset.UTC,counting,new AgentTransport.Token());check(recalls[0]==0,"chatter: no recall call");
   NativeMemoryEngine.evaluate(many,new JSONArray(),"我的学校在哪里",r0,ZoneOffset.UTC,counting,new AgentTransport.Token());check(recalls[0]==1,"many memories and a real question: one recall call");
+  // Capacity: hundreds of memories fit, while the model only ever sees a bounded shortlist.
+  JSONObject big=MemoryLedger.copy(AgentStore.empty(0));String[] cities={"成都","西安","厦门","大理","青岛","桂林","苏州","哈尔滨","拉萨","重庆"};
+  for(int i=0;i<300;i++)MemoryLedger.addLocal(big,MemoryLedger.record("big"+i,"我第"+i+"次去"+cities[i%10]+"玩的时候住在"+(i*7%97)+"号民宿","tb"+i,false,r0+i));
+  MemoryLedger.addLocal(big,MemoryLedger.record("allergy","我对青霉素过敏","ta",true,r0));
+  check(big.getJSONArray("memories").length()==301&&big.toString().getBytes("UTF-8").length<AgentStore.MAX_FILE_BYTES,"three hundred memories fit in the state budget");
+  JSONArray judge=NativeMemoryEngine.judgeCandidates(big,"我第42次去厦门玩的时候住在3号民宿");
+  check(judge.length()==NativeMemoryEngine.JUDGE_SIMILAR+NativeMemoryEngine.JUDGE_RECENT&&judge.getJSONObject(0).getString("id").equals("big42"),"write judgement sees the most similar and recent memories, not all 301");
+  JSONArray recall=NativeMemoryEngine.recallCandidates(big,"西安",r0+400);boolean hasAllergy=false;int longest=0;for(int i=0;i<recall.length();i++){hasAllergy|=recall.getJSONObject(i).getString("id").equals("allergy");longest=Math.max(longest,recall.getJSONObject(i).getString("quote").length());}
+  check(recall.length()<=NativeMemoryEngine.RECALL_RELEVANT+NativeMemoryEngine.RECALL_RECENT+MemoryLedger.CORE*3&&hasAllergy&&longest<=81,"recall shortlist is bounded, keeps core facts, clips quotes");
+  MemoryBridge.Config service=new MemoryBridge.Config(true,new MemoryBridge.Address("http://127.0.0.1:8787"),"x".repeat(32),false,false);
+  MemoryBridge.Client saved=MemoryBridge.client;MemoryBridge.client=(c,p,b,t)->{throw new AssertionError("service has a 120-memory protocol limit");};
+  try{MemoryBridge.Result over=MemoryBridge.evaluate(service,big,new JSONArray(),"",r0,new AgentTransport.Token());check(!over.remote&&over.status.contains("120"),"over the service limit the phone engine answers without a doomed request");}finally{MemoryBridge.client=saved;}
   System.out.println("PASS: "+checks+" core checks");
  }
 }

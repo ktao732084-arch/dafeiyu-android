@@ -15,8 +15,8 @@ import java.util.WeakHashMap;
 final class Apple {
     static boolean dark;
     private static boolean initialized;
-    static int BACK, INK, SECONDARY, BLUE, LINE, TINT, PANEL, SUCCESS, SUCCESS_BACK, DANGER;
-    static final int PRIMARY = Color.rgb(0, 101, 220);
+    static int BACK, INK, SECONDARY, BLUE, LINE, TINT, PANEL, FILL, SUCCESS, SUCCESS_BACK, DANGER;
+    static final int PRIMARY = Color.rgb(22, 112, 239);
     private static final WeakHashMap<TextView, Boolean> texts = new WeakHashMap<>();
     private static final WeakHashMap<GradientDrawable, Boolean> shapes = new WeakHashMap<>();
     private static final WeakHashMap<GradientDrawable, Integer> materials = new WeakHashMap<>();
@@ -30,7 +30,8 @@ final class Apple {
         // Retain the old explicit choice, while new installations follow Android.
         if (Data.prefs().contains("appearance.night"))
             return Data.prefs().getBoolean("appearance.night", false) ? "night" : "day";
-        return "system";
+        // The white appearance is the default; night stays one tap away in 陪伴设置.
+        return "day";
     }
     static String modeLabel() {
         String value = mode();
@@ -48,13 +49,15 @@ final class Apple {
         int[] previous = palette();
         boolean wasInitialized = initialized;
         dark = next;
-        BACK = dark ? Color.rgb(16,16,20) : Color.rgb(242,242,247);
+        // Light: white pages and cards, with one quiet grey (FILL) for inputs, groups and the chat backdrop.
+        BACK = dark ? Color.rgb(14,14,17) : Color.WHITE;
         PANEL = dark ? Color.rgb(28,28,32) : Color.WHITE;
-        INK = dark ? Color.rgb(245,245,247) : Color.rgb(28,28,30);
-        SECONDARY = dark ? Color.rgb(200,200,208) : Color.rgb(66,66,72);
-        BLUE = dark ? Color.rgb(143,191,255) : PRIMARY;
-        LINE = dark ? Color.rgb(58,58,64) : Color.rgb(229,229,234);
-        TINT = dark ? Color.rgb(25,48,77) : Color.rgb(235,243,255);
+        FILL = dark ? Color.rgb(38,38,44) : Color.rgb(244,245,247);
+        INK = dark ? Color.rgb(242,242,245) : Color.rgb(25,27,31);
+        SECONDARY = dark ? Color.rgb(166,170,178) : Color.rgb(100,105,114);
+        BLUE = dark ? Color.rgb(125,172,255) : PRIMARY;
+        LINE = dark ? Color.rgb(50,50,57) : Color.rgb(233,235,239);
+        TINT = dark ? Color.rgb(27,43,70) : Color.rgb(236,243,255);
         SUCCESS = dark ? Color.rgb(139,225,173) : Color.rgb(30,120,65);
         SUCCESS_BACK = dark ? Color.rgb(24,58,41) : Color.rgb(232,247,237);
         DANGER = dark ? Color.rgb(255,117,110) : Color.rgb(193,42,40);
@@ -87,7 +90,8 @@ final class Apple {
         FrostedPanel.refresh();
         return true;
     }
-    private static int[] palette() { return new int[]{BACK,INK,SECONDARY,BLUE,LINE,TINT,PANEL,SUCCESS,SUCCESS_BACK,DANGER}; }
+    private static int[] palette() { // PANEL precedes BACK: both are white in the light palette, and white surfaces are mostly cards.
+        return new int[]{PANEL,BACK,INK,SECONDARY,BLUE,LINE,TINT,FILL,SUCCESS,SUCCESS_BACK,DANGER}; }
     private static int mapped(int color, int[] previous) {
         int[] current = palette();
         for (int i=0; i<previous.length; i++) if (color == previous[i]) return current[i];
@@ -111,13 +115,27 @@ final class Apple {
         Context c=b.getContext(); b.setAllCaps(false); b.setTextSize(15);
         b.setTypeface(Typeface.create("sans-serif-medium",Typeface.NORMAL));
         b.setTextColor(primary?Color.WHITE:BLUE); b.setLetterSpacing(0); b.setMinWidth(0); b.setMinimumWidth(0);
-        b.setMinHeight(dp(c,44)); b.setPadding(dp(c,12),0,dp(c,12),0); b.setElevation(0); b.setStateListAnimator(null);
+        b.setMinHeight(dp(c,44)); b.setPadding(dp(c,14),0,dp(c,14),0); b.setElevation(0); b.setStateListAnimator(null);
         // Saturated primary blue and its white text are constant in both appearances.
-        GradientDrawable background=primary?rawShape(c,PRIMARY,12):shape(c,TINT,12);
+        GradientDrawable background=primary?rawShape(c,PRIMARY,14):shape(c,TINT,14);
         RippleDrawable ripple=new RippleDrawable(ColorStateList.valueOf(primary?0x33ffffff:(BLUE&0xffffff)|0x24000000),background,null);
         b.setBackground(ripple); ripples.put(ripple,primary); texts.put(b,primary);
         UiMotion.press(b);
     }
+    /** Corners in dp, clockwise from top-left; used by chat bubbles that point at their speaker. */
+    static GradientDrawable corners(Context c,int color,int topLeft,int topRight,int bottomRight,int bottomLeft) {
+        GradientDrawable d=new GradientDrawable(); d.setColor(color); shapes.put(d,true);
+        float a=dp(c,topLeft),b=dp(c,topRight),r=dp(c,bottomRight),l=dp(c,bottomLeft);
+        d.setCornerRadii(new float[]{a,a,b,b,r,r,l,l}); return d;
+    }
+    /** Selectable card for radio choices: grey at rest, tinted with a blue outline once chosen. */
+    static void choice(CompoundButton b) {
+        Context c=b.getContext(); GradientDrawable on=shape(c,TINT,16); on.setStroke(Math.max(1,dp(c,1)+dp(c,1)/2),BLUE);
+        StateListDrawable states=new StateListDrawable(); states.addState(new int[]{android.R.attr.state_checked},on); states.addState(new int[]{},shape(c,FILL,16));
+        b.setBackground(states); b.setTextColor(INK); b.setTextSize(15); b.setLineSpacing(dp(c,3),1); b.setPadding(dp(c,12),dp(c,14),dp(c,14),dp(c,14));
+        b.setButtonTintList(controlColors()); texts.put(b,false);
+    }
+    static View hairline(Context c) { View line=new View(c); line.setBackground(shape(c,LINE,0)); return line; }
     static TextView label(Context c,String value,int size,boolean bold) {
         TextView t=new TextView(c); t.setText(value); t.setTextColor(INK); t.setTextSize(size);
         t.setTypeface(Typeface.create(bold?"sans-serif-medium":"sans-serif",Typeface.NORMAL));
@@ -126,7 +144,7 @@ final class Apple {
     static void dialog(Dialog d) {
         Window w=d.getWindow(); if(w==null)return;
         if(UiMotion.enabled())w.setWindowAnimations(com.dafeiyu.companion.R.style.PanelMotion);
-        w.setBackgroundDrawable(shape(d.getContext(),PANEL,24)); w.setDimAmount(.25f);
+        w.setBackgroundDrawable(shape(d.getContext(),PANEL,22)); w.setDimAmount(.32f);
         w.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); dialogs.put(d,true);
         bindDialogText(w.getDecorView());
         w.getDecorView().post(()->{if(d.isShowing())bindDialogText(w.getDecorView());});

@@ -22,6 +22,40 @@ final class NativeMemoryEngine {
     }
     /** Interjections, acknowledgements, emoji and very short messages: the upstream fallback noise patterns. */
     static boolean casual(String text){String t=strip(text).replaceAll("[\\p{P}\\p{S}\\s]+$","");/* "好的！": upstream allows only half-width ! and ? */JSONObject fallback=RULES.optJSONObject("FALLBACK_NOISE");if(fallback==null)return false;Iterator<String> keys=fallback.keys();while(keys.hasNext())if(patterns(t,fallback.optJSONArray(keys.next()),true))return true;return false;}
+    // Momentary states and fillers that carry fact markers ("我在吃饭", "我不知道") but are not worth keeping.
+    static final Pattern TRANSIENT=Pattern.compile("^我(也|还|就|都|又|只是)?(不知道|没事|没什么|没关系|不想|不要|不用|不懂|不清楚|不行|不是很|不确定|没听|没看|没想|没懂|觉得|感觉|猜|想想|马上"
+        +"|(正在|现在在|在)(吃|喝|看|玩|睡|洗|躺|想|等|路上|忙|加班|开会|上课|打游戏|追剧|发呆|上班|听|聊|做饭|做作业|写作业|家)"
+        +"|刚(到|回|醒|起|下班|下课|吃完|洗完|开完|忙完)|先(去|睡|吃|洗|走|忙))"
+        +"|^你猜|(笑|气|累|困|饿|热|冷|烦|吓|乐|馋|美)死|叫我(吃|起|回|睡)|(这样|那样|随便|无所谓|一样|也是|还行|差不多)$");
+    // Family, pets, abilities, habits and life events: what a friend would remember even without a fact marker.
+    static final Pattern LIFE=Pattern.compile("(女儿|儿子|老公|老婆|男朋友|女朋友|对象|爸|妈|爷爷|奶奶|外公|外婆|姥姥|姥爷|哥哥|姐姐|弟弟|妹妹|亲戚|孩子|宝宝|闺蜜|室友|同事|同学|老师|领导|老板|猫|狗|宠物|养了|养只|养一只"
+        +"|读(研|博|大|高|初|小)|上(大学|高中|初中|小学|幼儿园)|身高|体重|离职|入职|辞职|跳槽|实习|平时|主力|经常|常常|一般都"
+        +"|会(弹|做|说|游|开|画|唱|写)|一直|从小|小时候|长大|住院|生病|搬到|搬家|毕业|工作|上学|读书|在学|学(吉他|钢琴|游泳|日语|英语|画画|编程|开车)|能吃|不能|爱吃|过敏|约好|约了)");
+    static final Pattern PLAN=Pattern.compile("(要|得|准备|打算|计划|约了|约好|去|考|面试|开会|出差|搬|报名|体检|手术|复诊|答辩|上班|上课|交|出发|回家|回来|飞|见|过生日|结婚|入职|离职|放假)");
+    static final Pattern SENTENCE=Pattern.compile("([^。！？!?；;\\n]+)([。！？!?；;\\n]*)"),ASKING=Pattern.compile("(什么|怎么|为什么|哪里|哪儿|哪个|哪些|多少|几点|几个|谁)|[吗呢么][\\s~～…]*$");
+    // Changes and outcomes Chinese often states without "我": "最近改喝美式了", "实验报告已经交完了".
+    static final Pattern CHANGE=Pattern.compile("^(最近|以后|从今天起|从现在起|现在)(改|换|开始|不再|戒|都不)|已经.{0,8}(交|完成|做完|考完|搬完|结束|取消|改期|离职|毕业|分手)");
+    /**
+     * Sentences of the user's message worth keeping even if the chat model did not quote them: a fact marker
+     * or an identity/preference/goal keyword, or a dated plan; never questions, hypotheticals, secrets,
+     * noise or momentary states. The memory engine still deduplicates and resolves corrections.
+     */
+    static List<String> autoFacts(String user){
+        List<String> out=new ArrayList<>();
+        Matcher sentence=SENTENCE.matcher(user);
+        while(sentence.find()){
+            // Splitting drops the "？", so questions are recognised from their own end mark and question words.
+            if(sentence.group(2).matches(".*[?？].*")||ASKING.matcher(sentence.group(1)).find())continue;
+            String s=strip(sentence.group(1)).replaceAll("^[，,、~～\\s]+|[，,、~～…\\s]+$","");int n=s.codePointCount(0,s.length());
+            if(n<4||n>240||!AgentPolicy.validEvidence(user,s)||noise(s)||TRANSIENT.matcher(s).find()||s.startsWith("你")&&!s.contains("我"))continue;
+            String c;try{c=category(s);}catch(Exception e){continue;}
+            boolean fact=contains(s,RULES.optJSONArray("FACT_MARKERS"))||c.equals("identity_health_safety")||c.equals("preference_relation_status")||c.equals("project_task_goal");
+            boolean plan=NativeMemoryTime.TOKENS.matcher(s).find()&&PLAN.matcher(s).find();
+            boolean firstPerson=s.contains("我")||s.contains("咱");if(!fact&&firstPerson&&LIFE.matcher(s).find()||CHANGE.matcher(s).find())fact=true;
+            if((fact||plan)&&!out.contains(s))out.add(s);if(out.size()==3)break;
+        }
+        return out;
+    }
     static String category(String text)throws Exception {JSONObject rules=RULES.getJSONObject("IMPORTANCE_RULES");for(String c:new String[]{"identity_health_safety","preference_relation_status","project_task_goal","temporary"})if(contains(text,rules.getJSONObject(c).getJSONArray("keywords")))return c;return "general_fact";}
     static double importance(String text,String category)throws Exception {
         double score=RULES.getJSONObject("IMPORTANCE_RULES").getJSONObject(category).getDouble("score"),boost=0;JSONObject signals=RULES.getJSONObject("EXPLICIT_SIGNALS");
@@ -71,6 +105,26 @@ final class NativeMemoryEngine {
         if(target!=null&&best>=0.6&&!substitution(content(row),content(target))){merge(state,target,row,now,false);return "MERGE";}
         MemoryLedger.addLocal(state,row);return "ADD";
     }
+    // With hundreds of memories, the model sees a bounded shortlist instead of the whole notebook: the most
+    // similar and the most recent ones, so corrections that share no words with the old fact still have a chance.
+    static final int JUDGE_ALL=40,JUDGE_SIMILAR=25,JUDGE_RECENT=15,RECALL_ALL=80,RECALL_RELEVANT=40,RECALL_RECENT=25;
+    static JSONArray judgeCandidates(JSONObject state,String text)throws Exception {
+        JSONArray all=state.getJSONArray("memories");if(all.length()<=JUDGE_ALL)return describe(all);
+        List<JSONObject> rows=new ArrayList<>();for(int i=0;i<all.length();i++)rows.add(all.getJSONObject(i));
+        LinkedHashMap<String,JSONObject> pick=new LinkedHashMap<>();
+        rows.sort((a,b)->Double.compare(similarity(text,content(b)),similarity(text,content(a))));for(int i=0;i<JUDGE_SIMILAR;i++)pick.put(rows.get(i).optString("id"),rows.get(i));
+        for(int i=all.length()-1;i>=0&&pick.size()<JUDGE_SIMILAR+JUDGE_RECENT;i--)pick.putIfAbsent(all.getJSONObject(i).optString("id"),all.getJSONObject(i));
+        return describe(new JSONArray(pick.values()));
+    }
+    static JSONArray recallCandidates(JSONObject state,String query,long now)throws Exception {
+        JSONArray all=state.getJSONArray("memories");if(all.length()<=RECALL_ALL)return describe(all);
+        List<JSONObject> rows=new ArrayList<>();for(int i=0;i<all.length();i++)rows.add(all.getJSONObject(i));
+        LinkedHashMap<String,JSONObject> pick=new LinkedHashMap<>();
+        for(JSONObject r:rows)if(MemoryLedger.core(r)&&pick.size()<MemoryLedger.CORE*3)pick.put(r.optString("id"),r);
+        rows.sort((a,b)->Double.compare(rankScore(query,b,now),rankScore(query,a,now)));for(int i=0;i<RECALL_RELEVANT;i++)pick.putIfAbsent(rows.get(i).optString("id"),rows.get(i));
+        for(int i=all.length()-1,added=0;i>=0&&added<RECALL_RECENT;i--)if(pick.putIfAbsent(all.getJSONObject(i).optString("id"),all.getJSONObject(i))==null)added++;
+        JSONArray out=describe(new JSONArray(pick.values()));for(int i=0;i<out.length();i++)out.getJSONObject(i).put("quote",AgentPolicy.clip(out.getJSONObject(i).getString("quote"),80));return out;
+    }
     static JSONArray describe(JSONArray rows)throws Exception {JSONArray out=new JSONArray();for(int i=0;i<rows.length();i++){JSONObject r=rows.getJSONObject(i);out.put(new JSONObject().put("id",r.getString("id")).put("quote",content(r)).put("observed_at",r.optLong("at")));}return out;}
     static void decisions(JSONObject state,JSONArray plans,JSONObject response,long now)throws Exception {
         JSONArray decisions=response.getJSONArray("decisions");if(decisions.length()>plans.length())throw new IOException("过多的记忆判断");Set<String> seen=new HashSet<>();
@@ -90,14 +144,14 @@ final class NativeMemoryEngine {
     static double rankScore(String query,JSONObject row,long now){JSONObject e=row.optJSONObject("engine");double days=Math.max(0,(now-row.optLong("at"))/86400000.0);return similarity(query,content(row))*5+(row.optBoolean("pinned")?0.5:0)+(e==null?0.5:e.optDouble("importance",0.5))*0.35+Math.exp(-days*0.1)*0.35;}
     static MemoryBridge.Result evaluate(JSONObject original,JSONArray incoming,String query,long now,ZoneId zone,Intelligence intelligence,AgentTransport.Token token)throws Exception {
         JSONObject state=MemoryLedger.copy(original);prepare(state,now,zone);JSONArray plans=new JSONArray(),rejected=new JSONArray();boolean degraded=false,smart=false;
-        for(int i=0;i<incoming.length();i++){token.check();JSONObject row=new JSONObject(incoming.getJSONObject(i).toString());JSONArray candidates=describe(state.getJSONArray("memories"));String op=writeRules(state,row,now,zone);if(op.equals("REJECT"))rejected.put(new JSONObject().put("id",row.getString("id")));else if(op.equals("ADD")&&candidates.length()>0)plans.put(new JSONObject().put("new_id",row.getString("id")).put("quote",content(row)).put("candidates",candidates));}
+        for(int i=0;i<incoming.length();i++){token.check();JSONObject row=new JSONObject(incoming.getJSONObject(i).toString());JSONArray candidates=judgeCandidates(state,row.getString("text"));String op=writeRules(state,row,now,zone);if(op.equals("REJECT"))rejected.put(new JSONObject().put("id",row.getString("id")));else if(op.equals("ADD")&&candidates.length()>0)plans.put(new JSONObject().put("new_id",row.getString("id")).put("quote",content(row)).put("candidates",candidates));}
         if(intelligence!=null&&plans.length()>0)try{JSONObject response=intelligence.request("judge",new JSONObject().put("plans",plans),token);token.check();JSONObject checked=MemoryLedger.copy(state);decisions(checked,plans,response,now);state=checked;smart=true;}catch(Exception e){token.check();degraded=true;}
         MemoryLedger.expire(state,now);JSONArray hits=rank(state,query,now);
         // Retrieval uses the same chat model to select grounded IDs by meaning, not an extra vector server.
         // One extra model round-trip per message only when it can matter: more memories than the prompt carries
         // anyway (MemoryLedger.context sends them all up to CORE+10), and not for chatter like "哈哈" or "嗯".
         if(intelligence!=null&&incoming.length()==0&&!query.isEmpty()&&MemoryLedger.currentCount(state,now)>MemoryLedger.CORE+10&&!casual(query))try{
-            JSONObject response=intelligence.request("recall",new JSONObject().put("query",query).put("memories",describe(state.getJSONArray("memories"))),token);token.check();JSONArray selected=response.getJSONArray("ids");if(selected.length()>10)throw new IOException("检索过多");Set<String> unique=new HashSet<>();for(int i=0;i<selected.length();i++){Object id=selected.get(i);if(!(id instanceof String)||!unique.add((String)id)||find(state,(String)id)==null)throw new IOException("无依据的检索");}hits=selected;smart=true;
+            JSONObject response=intelligence.request("recall",new JSONObject().put("query",query).put("memories",recallCandidates(state,query,now)),token);token.check();JSONArray selected=response.getJSONArray("ids");if(selected.length()>10)throw new IOException("检索过多");Set<String> unique=new HashSet<>();for(int i=0;i<selected.length();i++){Object id=selected.get(i);if(!(id instanceof String)||!unique.add((String)id)||find(state,(String)id)==null)throw new IOException("无依据的检索");}hits=selected;smart=true;
         }catch(Exception e){token.check();degraded=true;}
         for(int i=0;i<hits.length();i++){JSONObject r=find(state,hits.getString(i));if(r!=null){JSONObject e=r.getJSONObject("engine");e.put("last_accessed",Instant.ofEpochMilli(now).toString()).put("access_count",e.optInt("access_count")+1);}}
         if(incoming.length()>0)state.put("vector_cache",new JSONObject());token.check();

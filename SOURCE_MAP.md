@@ -117,7 +117,7 @@ DeepSeek地址、模型别名、Key入口、非思考参数和错误码依据202
 
 ## 0.4.4 分段与聊天历史
 
-ReplySegments、SpeechQueue、ChatArchive、ChatPage与新增测试由本项目编写，负责本地无损断句、可取消的展示队列、按轮归档与时间范围查询、Android聊天界面。
+ReplySegments、SpeechQueue、ChatArchive、ChatPage与新增测试由本项目编写，负责本地无损断句、可取消的展示队列、按轮归档与时间范围查询、Android聊天界面。Avatar由本项目编写，从角色立绘裁出聊天和首页使用的圆形头像。
 
 交互思路参考既有微信客服的split_message / typing_delay / send_message_split（按句意拆分、串行发送、短暂停顿），并查阅 [AstrBot分段配置](https://github.com/AstrBotDevs/AstrBot/blob/master/docs/zh/dev/astrbot-config.md)。未复制AstrBot的AGPL代码，也未引入其Python框架、微信桌面自动化、客户数据或配置。Android实现、归档、毫秒时间戳和未展示状态与记忆整合在本项目完成；桌宠底座及素材归属保持原标注。
 
@@ -126,3 +126,5 @@ ReplySegments、SpeechQueue、ChatArchive、ChatPage与新增测试由本项目�
 HistoryRecall.java及新增测试由本项目实现，使用java.time解析日历范围、ChatArchive读取已保存对话、AgentPolicy做字面相关度选择；未引入额外框架、向量服务或独立分段/检索模型。无字面命中时由现有回答模型依据同一时段的候选原话判断，不声称本地字面检索等同完整语义检索。
 
 AgentRuntime、PromptBuilder和AgentStore的改动将检索证据接入正常回复，保留已删除/未展示内容的约束，并禁止把历史引用重新提炼成当前事实。继续包含本仓库 [aab1428合并](https://github.com/ktao732084-arch/dafeiyu-android/commit/aab1428) 的原生记忆兼容与优化；上游原许可和素材约束不变。
+
+本轮发布还合入主分支的白色界面与社交式聊天页、EpisodeIndex全历史关键词回忆、规则自动提炼、500/1000记忆容量与陪伴日记（合并点59d69c9）。它们来自本仓库既有优化分支；日期查询与普通关键词回忆共存，日期查询避免混入其他时段的回忆和日记，也不因这次查询额外生成日记。

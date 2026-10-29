@@ -90,7 +90,7 @@ public class PetService extends Service {
    clearBubble();speechTurn=turnId;
    if(speech==null)speech=new SpeechQueue(new SpeechQueue.Clock(){public void later(Runnable task,long delay){handler.postDelayed(task,delay);}public void remove(Runnable task){handler.removeCallbacks(task);}},new SpeechQueue.Sink(){
     public boolean visible(){return Pet.this.visible&&!docked&&frame!=null&&animating();}
-    public void show(String text,int shown,boolean preview){showBubble(text+"\n\n点此查看聊天记录",false);try{AgentRuntime.store().shown(speechTurn,shown);}catch(Exception e){Data.log(role,"气泡展示状态暂未保存");}}
+    public void show(String text,int shown,boolean preview){showBubble(text+"\n\n点此查看聊天记录",false);try{AgentRuntime.store().shown(speechTurn,shown);Chat.historyChanged(Pet.this.id);}catch(Exception e){Data.log(role,"气泡展示状态暂未保存");}}
     public void stop(int shown){clearBubbleVisual();}
    });speech.start(text);
   }
@@ -99,7 +99,7 @@ public class PetService extends Service {
    clearBubbleVisual();String visibleText=Chat.displayText(text);bubble=Apple.label(PetService.this,"",15,false);bubble.setLineSpacing(0f,1f);bubble.setText(visibleText);bubble.setOnClickListener(v->Chat.openHistory(PetService.this));
    bubble.setPadding(Apple.dp(PetService.this,12),Apple.dp(PetService.this,8),Apple.dp(PetService.this,12),Apple.dp(PetService.this,8));
    int bubbleWidth=Math.min(sw()-Apple.dp(PetService.this,24),Apple.dp(PetService.this,260));bubble.measure(View.MeasureSpec.makeMeasureSpec(bubbleWidth,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));bubbleHeight=bubble.getMeasuredHeight();
-   bubbleDialog=CompactPanel.create(PetService.this);bubbleDialog.setContentView(bubble);Window bw=bubbleDialog.getWindow();bw.setWindowAnimations(0);bw.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);bw.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN|WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);bw.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);bubbleDialog.show();bw.getDecorView().setPadding(0,0,0,0);FrostedPanel.configure(bubbleDialog,12,false);blp=bw.getAttributes();blp.width=bubbleWidth;blp.height=-2;
+   bubbleDialog=CompactPanel.create(PetService.this);bubbleDialog.setContentView(bubble);Window bw=bubbleDialog.getWindow();bw.setWindowAnimations(0);bw.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);bw.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN|WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);bw.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);bubbleDialog.show();bw.getDecorView().setPadding(0,0,0,0);FrostedPanel.configure(bubbleDialog,16,false);blp=bw.getAttributes();blp.width=bubbleWidth;blp.height=-2;
    if(Build.VERSION.SDK_INT>=30)blp.setFitInsetsTypes(0);if(Build.VERSION.SDK_INT>=34)blp.setCanPlayMoveAnimation(false);blp.setTitle("大肥鱼-气泡/"+id);blp.gravity=Gravity.TOP|Gravity.LEFT;
    bubble.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{if(b-t!=bubbleHeight){bubbleHeight=b-t;update();}});
    bubbleDialog.getWindow().setAttributes(blp);update();if(UiMotion.enabled()){bubble.setAlpha(.4f);bubble.animate().alpha(1).setDuration(160).start();}if(MainActivity.active)bubbleDialog.hide();bubbleEnd=()->clearBubble();if(autoHide&&!Chat.isPetChatOpen(id))handler.postDelayed(bubbleEnd,10000);

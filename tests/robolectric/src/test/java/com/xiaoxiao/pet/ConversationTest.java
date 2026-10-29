@@ -13,7 +13,7 @@ public class ConversationTest {
     void seed(int count)throws Exception{long time=System.currentTimeMillis()-count*60000;for(int i=0;i<count;i++)AgentRuntime.store().commit(AgentRuntime.store().epoch(),"历史问题"+i,"历史回复"+i,"calm",null,false,false,null,null,"seed"+i,time+i*60000,null,false);}
     JSONObject last()throws Exception{JSONArray rows=AgentRuntime.store().snapshot().getJSONArray("turns");return rows.getJSONObject(rows.length()-1);}
     @Test public void historyPageLoadsEarlierTurnsWithDateTimeAndCopy()throws Exception{
-        seed(25);open();assertEquals(20,page.records.length());assertFalse(UiTest.texts(page.rows).contains("历史问题0\n"));page.loadOlder();assertEquals(25,page.records.length());assertTrue(UiTest.texts(page.rows).contains("历史问题0"));assertTrue(UiTest.texts(page.rows).contains("你 · "));
+        seed(25);open();assertEquals(20,page.records.length());assertFalse(UiTest.texts(page.rows).contains("历史问题0\n"));page.loadOlder();assertEquals(25,page.records.length());assertTrue(UiTest.texts(page.rows).contains("历史问题0"));assertNotNull(UiTest.find(page.rows,ChatPage.when(page.records.getJSONObject(0),page.records.getJSONObject(0).getLong("at"))));
         TextView message=UiTest.find(page.rows,"历史回复0");assertNotNull(message);message.performLongClick();android.content.ClipboardManager clipboard=(android.content.ClipboardManager)activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);assertEquals("历史回复0",clipboard.getPrimaryClip().getItemAt(0).getText().toString());
     }
     @Test public void oneModelCallCreatesProgressiveSegmentsAndDisplayedTimestamps()throws Exception{

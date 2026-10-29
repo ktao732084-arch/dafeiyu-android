@@ -1,7 +1,7 @@
 {
   "version": "0.4.5",
   "version_code": 9,
-  "apk_sha256": "cee389adcdf3aad5a3e3e341eb75d2c7b876bf96176b2c2ecde8b37976c86a8f",
+  "apk_sha256": "5cd52a2201b6bd8867b2b30fb1068891ae1ba2c48675da663a3b8a53fa914fd9",
   "merged_branch_commit": "8e34e3322565b4c5769133a1f3e3f11604e44c2a",
   "default_memory_runtime": "Android-native in APK; no Python/PC/ADB required",
   "android_framework_tests": {
@@ -28,7 +28,7 @@
     "passed": 145,
     "total": 166
   },
-  "core_checks": 137,
+  "core_checks": 141,
   "endpoint_checks": 13,
   "action_plan_assertions": 10708,
   "physics": "passed",
@@ -52,5 +52,16 @@
     "max_scan_bytes": 8388608,
     "max_evidence_turns": 24,
     "max_evidence_chars": 14000
+  },
+  "latest_main_merge": "59d69c966004502f043fad6bd5082e756c136d8d",
+  "episodic_recall_checks": 11,
+  "diary_checks": 19,
+  "rule_capture": {
+    "tuning_facts": "47/48",
+    "tuning_false_positives": "0/60",
+    "blind_facts": "22/25",
+    "blind_false_positives": "2/25",
+    "shared_facts": "113/114",
+    "privacy_leaks": 0
   }
 }

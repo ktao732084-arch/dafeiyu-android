@@ -68,7 +68,8 @@ final class MemoryBridge {
     }
     static Result evaluate(Config config,JSONObject original,JSONArray incoming,String query,long now,AgentTransport.Token token)throws Exception {
         JSONObject state=MemoryLedger.copy(original);MemoryLedger.expire(state,now);token.check();
-        if(config.enabled)try {
+        boolean fits=state.getJSONArray("memories").length()<=MemoryLedger.SERVICE_ACTIVE&&state.getJSONArray("archive").length()<=MemoryLedger.SERVICE_ARCHIVE;
+        if(config.enabled&&fits)try {
             JSONObject wireState=new JSONObject();for(String k:new String[]{"memories","archive","audit","vector_cache"})wireState.put(k,state.get(k));
             JSONObject body=new JSONObject().put("protocol",1).put("now",now).put("utc_offset_minutes",TimeZone.getDefault().getOffset(now)/60000).put("query",query).put("state",wireState).put("incoming",incoming).put("semantic",config.semantic).put("judge",config.judge);
             JSONObject response=client.call(config,"/v1/evaluate",body,token);token.check();validate(response,state,incoming);
@@ -80,14 +81,14 @@ final class MemoryBridge {
         }catch(Exception failure){token.check();lastStatus="记忆服务暂不可用，本轮使用手机本地记忆";}
         NativeMemoryEngine.Intelligence intelligence=null;try{intelligence=NativeMemoryIntelligence.configured();}catch(Exception unavailable){token.check();}
         Result result=NativeMemoryEngine.evaluate(state,incoming,query,now,java.time.ZoneId.systemDefault(),intelligence,token);
-        String status=(config.enabled?"联调服务不可用 · ":"")+result.status;lastStatus=status;return new Result(result.state,result.hits,false,status,result.rejected);
+        String status=(config.enabled?(fits?"联调服务不可用 · ":"记忆超过电脑服务的"+MemoryLedger.SERVICE_ACTIVE+"条上限 · "):"")+result.status;lastStatus=status;return new Result(result.state,result.hits,false,status,result.rejected);
     }
     static void validate(JSONObject response,JSONObject previous,JSONArray incoming)throws Exception {
         if(response.optInt("protocol")!=1)throw new IOException("不兼容的记忆服务协议");
         JSONObject state=response.getJSONObject("state");Map<String,JSONObject> known=new HashMap<>();Set<String> knownSources=new HashSet<>();
         for(JSONArray rows:new JSONArray[]{previous.getJSONArray("memories"),previous.getJSONArray("archive"),incoming})for(int i=0;i<rows.length();i++){JSONObject r=rows.getJSONObject(i);known.put(r.getString("id"),r);JSONArray sources=MemoryLedger.sources(r);for(int j=0;j<sources.length();j++)knownSources.add(sources.optString(j));}
         Set<String> returned=new HashSet<>(),active=new HashSet<>();
-        for(String pool:new String[]{"memories","archive"}){JSONArray rows=state.getJSONArray(pool);if(rows.length()>(pool.equals("memories")?120:240))throw new IOException("服务返回过多记忆");for(int i=0;i<rows.length();i++){
+        for(String pool:new String[]{"memories","archive"}){JSONArray rows=state.getJSONArray(pool);if(rows.length()>(pool.equals("memories")?MemoryLedger.SERVICE_ACTIVE:MemoryLedger.SERVICE_ARCHIVE))throw new IOException("服务返回过多记忆");for(int i=0;i<rows.length();i++){
             JSONObject r=rows.getJSONObject(i);String id=r.getString("id");if(!known.containsKey(id)||!returned.add(id))throw new IOException("服务返回未知记忆");if(pool.equals("memories"))active.add(id);
             boolean evidence=false;for(JSONObject k:known.values())if(k.optString("text").equals(r.optString("text"))&&k.optString("source").equals(r.optString("source"))&&k.optLong("at")==r.optLong("at")){evidence=true;break;}
             if(!evidence)throw new IOException("服务返回的记忆没有用户原话依据");

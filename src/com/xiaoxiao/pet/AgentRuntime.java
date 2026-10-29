@@ -24,7 +24,7 @@ final class AgentRuntime {
     static long lastTouch,lastEventAt;
     static boolean touched;
     static String lastEvent="第一次见面";
-    static synchronized AgentStore store()throws Exception{if(memory==null)memory=new AgentStore(new java.io.File(Data.app.getFilesDir(),"agent"));return memory;}
+    static synchronized AgentStore store()throws Exception{if(memory==null){memory=new AgentStore(new java.io.File(Data.app.getFilesDir(),"agent"));final AgentStore opened=memory;Thread warm=new Thread(opened::warm,"recall-index");warm.setDaemon(true);warm.setPriority(Thread.MIN_PRIORITY);warm.start();}return memory;}
     static synchronized boolean busy(){return active!=null;}
     static synchronized void cancel(){if(active!=null){AgentTransport.Token token=active;Listener l=activeListener;active=null;activeListener=null;activeProactive=false;if(token.completed!=null){main.post(token.completed);}else{token.cancel();if(l!=null)main.post(()->l.error("已停止回复"));}}}
     static synchronized void interruptProactive(){if(activeProactive)cancel();}
@@ -56,8 +56,29 @@ final class AgentRuntime {
         PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.historyRecall=history==null?null:history.evidence;
         in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.nickname=Data.prefs().getString("agent.nickname","");
         in.mood=mood();in.timeZone=TimeZone.getDefault().getID();in.now=System.currentTimeMillis();in.initializedAt=PersonaManager.initializedAt("main");
-        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}in.remember=rememberEnabled();
+        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}in.remember=rememberEnabled();in.diary=diaryEnabled();
+        if(in.remember&&!proactive&&history==null){
+            // Whole-conversation recall, minus what the history window already carries and corrected sources.
+            Set<String> exclude=MemoryLedger.staleSources(s,in.now);JSONArray turns=s.getJSONArray("turns");for(int i=Math.max(0,turns.length()-12);i<turns.length();i++)exclude.add(ChatArchive.id(turns.getJSONObject(i)));
+            in.episodes=store().episodes(user,exclude,in.now);
+        }
         return PromptBuilder.build(in,user,proactive,s,hits);
+    }
+    // The diary has its own low-priority thread, so writing it never delays the next chat message.
+    static final ExecutorService diaryWorker=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"diary");t.setDaemon(true);t.setPriority(Thread.MIN_PRIORITY);return t;});
+    static final java.util.concurrent.atomic.AtomicBoolean writingDiary=new java.util.concurrent.atomic.AtomicBoolean();
+    static boolean diaryEnabled(){return Data.prefs().getBoolean("agent.diary",true);}
+    /** After a chat reply: if a recent day has enough turns and no entry, write one (one model call, one attempt per day). */
+    static void writeDiaryIfDue(){
+        if(!diaryEnabled()||!rememberEnabled()||!configured()||!writingDiary.compareAndSet(false,true))return;
+        diaryWorker.execute(()->{try{
+            AgentStore db=store();java.time.ZoneId zone=java.time.ZoneId.systemDefault();java.time.LocalDate day=Diary.due(db.snapshot(),java.time.LocalDate.now(zone),zone);
+            if(day==null||day.toString().equals(Data.prefs().getString("diary.attempted","")))return;
+            Data.prefs().edit().putString("diary.attempted",day.toString()).apply();
+            long epoch=db.epoch();List<JSONObject> turns=db.dayTurns(day,zone);if(turns.isEmpty())return;
+            String text=Diary.parse(AgentTransport.request(ModelSettings.read(),Diary.request(day,turns,Data.name("main")),new AgentTransport.Token(),raw->{},false,Diary.MAX_TOKENS));
+            if(text!=null&&db.addDiary(epoch,Diary.entry(day,text,turns,System.currentTimeMillis())))Data.log("main","陪伴日记已写好："+day);
+        }catch(Exception e){Data.log("main","陪伴日记暂未写成");}finally{writingDiary.set(false);}});
     }
     static boolean send(String user,boolean proactive,Listener listener) {
         final long receivedAt=System.currentTimeMillis();final AgentTransport.Token token; synchronized(AgentRuntime.class){if(active!=null)return false;token=new AgentTransport.Token();active=token;activeListener=listener;activeProactive=proactive;}
@@ -108,9 +129,9 @@ final class AgentRuntime {
                 }
                 token.check();
                 if(history!=null){result.memories=new JSONArray();result.self=new JSONArray();}
-                final AgentReply output=result;final long completedEpoch=epoch;
+                final AgentReply output=result;final long completedEpoch=epoch;final String explicitWas=explicit;
                 final java.util.concurrent.atomic.AtomicBoolean delivered=new java.util.concurrent.atomic.AtomicBoolean();
-                Runnable completion=()->{if(!delivered.compareAndSet(false,true))return;release(token);if(db.epoch()!=completedEpoch){listener.error("记录已修改，本次已完成的回复不再显示");return;}listener.saved(turnId);listener.done(output.reply,output.emotion);};
+                Runnable completion=()->{if(!delivered.compareAndSet(false,true))return;release(token);if(db.epoch()!=completedEpoch){listener.error("记录已修改，本次已完成的回复不再显示");return;}listener.saved(turnId);listener.done(output.reply,output.emotion);if(explicitWas==null&&history==null)writeDiaryIfDue();};
                 synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");token.completed=completion;}
                 main.post(completion);
             }catch(Exception e){String msg=e instanceof java.net.SocketTimeoutException?"等模型回复超时了，消息还在，可以重试。":e.getMessage();main.post(()->{if(current(token)){release(token);listener.error(msg==null?"连接失败，请检查网络和模型配置":msg);}});}
