@@ -119,6 +119,10 @@ public final class AgentCoreTest {
   List<String> notes=AgentPolicy.styleNotes(drift);
   check(notes.toString().contains("「才不」")&&notes.toString().contains("才不是")&&notes.toString().contains("括号"),"repeated opener, catchphrase and stage directions are flagged: "+notes);
   check(AgentPolicy.styleNotes(java.util.Arrays.asList("今天下雨了。","那就在家看书吧。","好呀，晚安。","明天见！")).isEmpty(),"varied replies get no reminder");
+  check(AgentPolicy.styleNotes(java.util.Arrays.asList("下雨了。","那你今天还出门吗？","伞带了没～","你是不是又没吃饭？")).toString().contains("问句收尾"),"two of the last three ending in a question draw a reminder");
+  check(!AgentPolicy.styleNotes(java.util.Arrays.asList("你吃了吗？","下雨了。","那就在家看书吧。","晚安。")).toString().contains("问句收尾"),"an older question does not count");
+  check(AgentPolicy.asks("真的吗？……")&&AgentPolicy.asks("好不好嘛？～")&&!AgentPolicy.asks("我问你个事。"),"question endings ignore trailing ellipses and tildes");
+  check(AgentPolicy.styleNotes(java.util.Arrays.asList("听起来好累。","嗯，先歇会儿。","听起来你今天很忙。")).toString().contains("「听起来」"),"stock comfort used twice draws a reminder");
   check("先说结论。再补一句。".equals(AgentPolicy.compressReply("先说结论。再补一句。后面还有很长的解释和例子。"))&&AgentPolicy.compressReply("没有标点的一段很长很长的话".repeat(10)).length()==90,"older replies keep their first two sentences");
   int prev=-1,moves=0;for(int total=9;total<=40;total++){int start=AgentPolicy.windowStart(total,total);int size=total-start;check(size>=8&&size<=11,"window holds 8-11 turns: "+size);if(prev>=0&&start!=prev)moves++;prev=start;}
   check(moves==8,"window advances four turns at a time, not every turn: "+moves);

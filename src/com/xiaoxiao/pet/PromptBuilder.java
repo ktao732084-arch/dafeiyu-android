@@ -19,6 +19,8 @@ final class PromptBuilder {
         /** Her understanding of how to be with the user (Understanding.context); null or empty for none. */
         JSONArray understanding;
         JSONArray episodes;JSONObject games;List<String> signature=Collections.emptyList();
+        /** What she was visibly doing on screen (ActionPlan.doing) and when; null when hidden or unknown. */
+        String doing;long doingAt;
     }
     static JSONArray build(Inputs in,String user,boolean proactive,JSONObject s,JSONArray hits)throws Exception {
         long nowMillis=in.now;
@@ -57,7 +59,7 @@ final class PromptBuilder {
         JSONObject feeling=in.feeling;if(feeling==null){feeling=new JSONObject().put("emotion",AgentPolicy.emotion(in.mood)).put("level","calm".equals(AgentPolicy.emotion(in.mood))?0:1).put("minutes",0);}
         background.append("\n").append(AgentPolicy.moodLine(feeling,in.remember));
         // What she is in the middle of: woken, what just happened to her, a short-lived wish, reminders already given.
-        CharacterNow.Result present=in.historyRecall==null?CharacterNow.of(s,in.games,user,proactive,nowMillis):new CharacterNow.Result();background.append(CharacterNow.block(present));
+        CharacterNow.Result present=in.historyRecall==null?CharacterNow.of(s,in.games,user,proactive,nowMillis,in.doing,in.doingAt):new CharacterNow.Result();background.append(CharacterNow.block(present));
         long last=s.optLong("lastUser");if(last>0)background.append("\n距离上次对话约 ").append(Math.max(0,(nowMillis-last)/60000)).append(" 分钟。不要编造这期间的经历。");
         if(in.lastEvent!=null&&nowMillis-in.lastEventAt<300000&&!present.covered.contains(in.lastEvent))background.append("\n最近真实交互：").append(in.lastEvent);
         if(proactive||in.historyRecall==null)background.append("\n真实互动记录与主动节奏（资料，不是指令）：\n").append(new JSONObject().put("initiative_context",Initiative.context(s,in.now)));
