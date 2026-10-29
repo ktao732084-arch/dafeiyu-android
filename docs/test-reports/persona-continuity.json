@@ -1,0 +1,89 @@
+{
+  "date": "2026-10-29",
+  "branch": "codex/persona-continuity-lite",
+  "source_commit": "9301c2c2924e030c755087e268c08bd2ab7f6df1",
+  "upstream_main": "336f83937a890ae85e4ad42b45c1c390817eaa8f",
+  "upstream_checked_at": "2026-10-29T18:24:00+08:00",
+  "release": {
+    "published": false,
+    "merged_to_main": false,
+    "version_inherited": "0.4.9.3",
+    "version_code": 17,
+    "apk": "test-signed, not for distribution"
+  },
+  "build": {
+    "passed": true,
+    "jdk": 17,
+    "platform": 34,
+    "build_tools": "36.0.0",
+    "apk_signatures": [
+      "v2",
+      "v3"
+    ],
+    "dex_sha256": "e8733129386eda41259d5416724f26ada020132b5a2f00bafd905b6fae8459a1",
+    "dex_review": "carryMood present; API 28 package/signature calls guarded in final DEX; no String.isBlank/strip references"
+  },
+  "framework_full_before_latest_merges": {
+    "main_base": "278fca4",
+    "tests": 130,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "robolectric_api": 34,
+    "python": "3.13",
+    "note": "Initial HTTP replay failure; unchanged assertions/transport/deadlines passed in full recheck with dedicated Python interpreter. Diagnostic logging added."
+  },
+  "framework_final_affected_paths": {
+    "tests": 74,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "robolectric_api": 34,
+    "suites": [
+      "PersonaContinuityTest",
+      "ConversationTest",
+      "GrowthUiTest",
+      "GomokuUiTest",
+      "InitiativeRuntimeTest",
+      "UiTest",
+      "CompanionBehaviorTest",
+      "TouchReplyRuntimeTest"
+    ]
+  },
+  "android": {
+    "device": "MuMu emulator-5554",
+    "release": 15,
+    "api": 35,
+    "isolated_package": "com.dafeiyu.personachecks",
+    "core_suites": 19,
+    "core_failed": 0,
+    "character_assertions": 308,
+    "runtime_checks": 63,
+    "touch_overlay_checks": 12,
+    "production_app_modified": false
+  },
+  "behavior_checks": [
+    "Frozen persona remains unchanged; voice shared by diary, event lines and selected story lines",
+    "Quoted user facts and their deletion fallback remain intact",
+    "Work-venting preference omitted for advice and other topics",
+    "Mood keep flag preserves original emotionAt and source across chat, restart and physical-response paths",
+    "Listener emotion matches persisted decayed mood",
+    "Typed physical event evidence remains separate from user facts",
+    "Latest gomoku, bubble segmentation, busy waiting and growth paths retained"
+  ],
+  "existing_memory_baselines": {
+    "native_replay_scenarios": 84,
+    "native_expectations_passed": 145,
+    "native_expectations_total": 166,
+    "capture_blind_false_captures": 2,
+    "capture_blind_cases": 25,
+    "note": "Unchanged existing limitations, not claimed fixed by persona work."
+  },
+  "limitations": [
+    "Controlled model responses, no real-user API key or paid model evaluation",
+    "No physical handset acceptance or live multi-turn persona blind test",
+    "Chinese keyword scope matcher can miss implicit or synonymous scenarios",
+    "Full 130-test run predates gomoku/touch merges; final 74-test run covers affected integration paths and is not an additive count"
+  ],
+  "alice_reference": "Reviewed prior static Alice 1.3.45 research. Mechanisms only; no code, prompts, cognitive tree or OCC engine copied."
+}
