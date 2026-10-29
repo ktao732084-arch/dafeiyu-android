@@ -40,6 +40,8 @@ final class AgentRuntime {
     static void touch(String type){
         touch(type,"touch","main",System.currentTimeMillis());
     }
+    /** An experience of hers with its own kind (wake, trip, story), which CharacterNow and the diary read. */
+    static void touch(String note,String kind){touch(note,kind,"main",System.currentTimeMillis());}
     static long touch(String note,String kind,String pet,long at){
         lastEventAt=at;lastEvent=note;touched=true;lastTouch=at;interruptProactive();
         try{final AgentStore db=store();final long epoch=db.epoch();worker.execute(()->{try{if(memory==db)db.interaction(epoch,note,at,kind,pet);}catch(Exception e){Data.log("main","互动记录暂未保存");}});return epoch;}catch(Exception e){Data.log("main","互动记录暂不可用");return -1;}
@@ -110,7 +112,8 @@ final class AgentRuntime {
             Data.prefs().edit().putString("diary.attempted",day.toString()).apply();
             long epoch=db.epoch();List<JSONObject> turns=db.dayTurns(day,zone);if(turns.isEmpty())return;JSONObject before=db.snapshot();
             // The same call is her slow loop: besides the diary it may add, confirm or retire her understanding of the user.
-            String raw=AgentTransport.request(ModelSettings.read(),Diary.request(day,turns,Data.name("main"),Understanding.offered(before),PersonaManager.diaryGuidance("main")),new AgentTransport.Token(),partial->{},false,Diary.MAX_TOKENS);
+            JSONObject games=null;try{games=GomokuPage.store().context();}catch(Exception unavailable){}
+            String raw=AgentTransport.request(ModelSettings.read(),Diary.request(day,turns,Data.name("main"),Understanding.offered(before),PersonaManager.diaryGuidance("main"),CharacterNow.experiences(before,games,day,zone)),new AgentTransport.Token(),partial->{},false,Diary.MAX_TOKENS);
             String text=Diary.parse(raw);Understanding.Update update=Understanding.parse(raw,turns,before,day.toString());
             if(text!=null&&db.addDiary(epoch,Diary.entry(day,text,turns,System.currentTimeMillis()),update))Data.log("main","陪伴日记已写好："+day+(update.empty()?"":"，相处理解已更新"));
         }catch(Exception e){Data.log("main","陪伴日记暂未写成");}finally{writingDiary.set(false);}});
