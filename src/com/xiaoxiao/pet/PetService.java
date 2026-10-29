@@ -44,7 +44,7 @@ public class PetService extends Service {
  public void onDestroy(){GrowthStore.changed=null;AgentRuntime.interruptProactive();if(started)save();instance=null;Choreographer.getInstance().removeFrameCallback(motionFrame);handler.removeCallbacksAndMessages(null);if(started)unregisterReceiver(screen);for(Pet p:pets.values())p.detach();Data.log("app","悬浮服务停止");super.onDestroy();}
  void control(boolean active){if(active){frameTime=0;for(Pet p:pets.values())p.clearBubble();}else requestMotion();syncVideo();for(Pet p:pets.values())if(p.frame!=null){p.lp.alpha=active?0:1;p.lp.flags=WINDOW_FLAGS|(p.docked?WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH|WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL:0)|(active?WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE:0);wm.updateViewLayout(p.frame,p.lp);if(p.bubbleDialog!=null){if(active)p.bubbleDialog.hide();else p.bubbleDialog.show();}}}
  int sw(){return screenWidth;}int sh(){return screenHeight;}
- Pet show(String role){Pet p=pets.get(role);if(p==null){p=new Pet(role,role);pets.put(role,p);}p.visible=true;if(p.docked){p.docked=false;p.detach();}p.attach();save();control(MainActivity.active);p.userInteraction("show","用户让你出现在桌面上",false);final Pet shown=p;if(p.away())handler.postDelayed(()->finishTrip(shown),450);return p;}
+ Pet show(String role){Pet p=pets.get(role);if(p==null){p=new Pet(role,role);pets.put(role,p);}p.visible=true;if(p.docked){p.docked=false;p.detach();}p.attach();save();control(MainActivity.active);p.userInteraction("show","用户让你出现在桌面上",false);return p;}
  void cloneRole(String role){int total=0;for(Pet p:pets.values())if(p.role.equals(role)&&!p.id.equals(role))total++;if(total>=8){Toast.makeText(this,"每个角色最多8个分身",0).show();return;}int n=1;while(pets.containsKey(role+"#"+n))n++;Pet p=new Pet(role+"#"+n,role);pets.put(p.id,p);p.visible=true;p.attach();save();control(MainActivity.active);Data.log(role,"添加分身 "+p.id);}
  void remove(String id){Pet p=pets.get(id);if(p==null)return;p.hide();if(!p.id.equals(p.role))pets.remove(id);save();stopIfEmpty();}
  void save(){JSONArray a=new JSONArray();for(Pet p:pets.values())a.put(p.json());Data.instances(a);}
@@ -81,16 +81,16 @@ public class PetService extends Service {
    x=restoreX;y=restoreY;state.x=x;state.y=y;
    Runnable finish=()->{docking=false;detach();docked=true;attach();save();control(MainActivity.active);if(frame!=null)UiMotion.enter(frame);Data.log(role,"拖动收起到屏幕边缘 "+id);
     // Dragging to the edge is easy to do by accident; the first time, say how she comes back.
-    if(!away()&&!Data.prefs().getBoolean("hint.dock",false)){Data.prefs().edit().putBoolean("hint.dock",true).apply();Toast.makeText(PetService.this,Data.name(role)+"躲到屏幕边上啦：点一下露出来，再点一下她就回来",Toast.LENGTH_LONG).show();}};
+    if(!Data.prefs().getBoolean("hint.dock",false)){Data.prefs().edit().putBoolean("hint.dock",true).apply();Toast.makeText(PetService.this,Data.name(role)+"躲到屏幕边上啦：点一下露出来，再点一下她就回来",Toast.LENGTH_LONG).show();}};
    if(!UiMotion.enabled()||frame==null){finish.run();return;}
    docking=true;if(video!=null)video.suspend(true);final FrameLayout surface=frame;final int from=lp.x,to=right?sw()-lp.width+Apple.dp(PetService.this,8):-Apple.dp(PetService.this,8);surface.setPivotX(right?surface.getWidth():0);surface.setPivotY(surface.getHeight()/2f);
    dockTransition=android.animation.ValueAnimator.ofFloat(0,1);dockTransition.setDuration(460);dockTransition.setInterpolator(new android.view.animation.PathInterpolator(.4f,0f,.2f,1f));
    dockTransition.addUpdateListener(a->{if(!docking||frame!=surface)return;float t=(Float)a.getAnimatedValue();lp.x=Math.round(from+(to-from)*t);lp.alpha=MainActivity.active?0:1-t;surface.setScaleX(1-.78f*t);surface.setScaleY(1-.78f*t);wm.updateViewLayout(surface,lp);});
    dockTransition.addListener(new android.animation.AnimatorListenerAdapter(){public void onAnimationEnd(android.animation.Animator a){if(dockTransition!=a||!docking)return;dockTransition=null;finish.run();}});dockTransition.start();
   }
-  void restoreDock(){if(!docked)return;detach();docked=false;attach();save();control(MainActivity.active);if(frame!=null)UiMotion.enter(frame);Data.log(role,"恢复边缘角色 "+id);if(away())handler.postDelayed(()->finishTrip(this),450);}
+  void restoreDock(){if(!docked)return;detach();docked=false;attach();save();control(MainActivity.active);if(frame!=null)UiMotion.enter(frame);Data.log(role,"恢复边缘角色 "+id);}
   void positionDock(){int h=Apple.dp(PetService.this,64);lp.x=dockRight?sw()-lp.width:0;lp.y=Math.max(safeTop,Math.min(safeBottom-h,Math.round(dockY*sh()-h/2f)));wm.updateViewLayout(frame,lp);}
-  void expandDock(boolean expand){if(!docked||frame==null||dockTab==null)return;dockExpanded=expand;if(dockCollapse!=null)handler.removeCallbacks(dockCollapse);if(dockAnimator!=null)dockAnimator.cancel();dockTab.setText(dockLabel(expand));dockTab.setContentDescription(Data.name(role)+(away()?"出门了，"+(expand?"再次点击叫她回来":"点击展开"):expand?"，再次点击恢复":"，已收起，点击展开"));int target=Apple.dp(PetService.this,expand?148:28);if(!UiMotion.enabled()){lp.width=target;positionDock();}else{dockAnimator=android.animation.ValueAnimator.ofInt(lp.width,target);dockAnimator.setDuration(360);dockAnimator.setInterpolator(new android.view.animation.OvershootInterpolator(1.1f));dockAnimator.addUpdateListener(a->{if(docked&&frame!=null){lp.width=Math.max(Apple.dp(PetService.this,24),(Integer)a.getAnimatedValue());positionDock();}});dockAnimator.start();}if(expand){dockCollapse=()->expandDock(false);handler.postDelayed(dockCollapse,4000);}}
+  void expandDock(boolean expand){if(!docked||frame==null||dockTab==null)return;dockExpanded=expand;if(dockCollapse!=null)handler.removeCallbacks(dockCollapse);if(dockAnimator!=null)dockAnimator.cancel();dockTab.setText(dockLabel(expand));dockTab.setContentDescription(Data.name(role)+(expand?"，再次点击恢复":"，已收起，点击展开"));int target=Apple.dp(PetService.this,expand?148:28);if(!UiMotion.enabled()){lp.width=target;positionDock();}else{dockAnimator=android.animation.ValueAnimator.ofInt(lp.width,target);dockAnimator.setDuration(360);dockAnimator.setInterpolator(new android.view.animation.OvershootInterpolator(1.1f));dockAnimator.addUpdateListener(a->{if(docked&&frame!=null){lp.width=Math.max(Apple.dp(PetService.this,24),(Integer)a.getAnimatedValue());positionDock();}});dockAnimator.start();}if(expand){dockCollapse=()->expandDock(false);handler.postDelayed(dockCollapse,4000);}}
   void attachDock(){dockExpanded=false;int w=Apple.dp(PetService.this,28),h=Apple.dp(PetService.this,64);lp=new WindowManager.LayoutParams(w,h,WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,WINDOW_FLAGS|WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH|WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,PixelFormat.TRANSLUCENT);if(Build.VERSION.SDK_INT>=30)lp.setFitInsetsTypes(0);if(Build.VERSION.SDK_INT>=34)lp.setCanPlayMoveAnimation(false);lp.gravity=Gravity.TOP|Gravity.LEFT;lp.setTitle("大肥鱼-边缘/"+id);frame=new FrameLayout(PetService.this){public boolean dispatchTouchEvent(MotionEvent event){if(event.getActionMasked()==MotionEvent.ACTION_OUTSIDE){if(dockExpanded)expandDock(false);return false;}return super.dispatchTouchEvent(event);}};dockTab=Apple.label(PetService.this,dockLabel(false),12,true);dockTab.setGravity(Gravity.CENTER);dockTab.setTextColor(Apple.INK);dockTab.setBackground(Apple.shape(PetService.this,Apple.PANEL,12));dockTab.setContentDescription(Data.name(role)+"，已收起，点击展开");frame.addView(dockTab,new FrameLayout.LayoutParams(-1,-1));dockTab.setOnClickListener(v->{if(dockExpanded){userInteraction("restore","用户把你从屏幕边缘叫了回来",false);restoreDock();}else{userInteraction("menu","用户点开了你的屏幕边缘标签",false);expandDock(true);}});wm.addView(frame,lp);positionDock();}
   void hide(){if(visible)userInteraction("hide","用户暂时把你收了起来",false);visible=false;detach();Data.log(role,"隐藏 "+id);}
   void detach(){docking=false;if(dockTransition!=null){android.animation.ValueAnimator transition=dockTransition;dockTransition=null;transition.cancel();}if(frame!=null)frame.animate().cancel();if(edgeDock!=null){handler.removeCallbacks(edgeDock);edgeDock=null;}if(dockCollapse!=null)handler.removeCallbacks(dockCollapse);if(dockAnimator!=null){dockAnimator.cancel();dockAnimator=null;}dockExpanded=false;dockTab=null;if(hold!=null)handler.removeCallbacks(hold);if(video!=null){video.release();video=null;}if(frame!=null){wm.removeView(frame);frame=null;}clearBubble();Chat.closePet(id);SizePanel.close(id);busy=false;}
@@ -124,19 +124,14 @@ public class PetService extends Service {
 
   void menu(){dragging=false;if(frame==null)return;PetMenu.show(PetService.this,this);}
 
-  // ---- growth: chapter scenes, postcards and the trip tab (GrowthStore holds the state) ----
+  // ---- growth: chapter scenes and the daily greeting (GrowthStore holds the state) ----
   Growth.Scene scene;int sceneStep;boolean sceneSaved;Runnable sceneNext;
-  boolean away(){if(!id.equals("main"))return false;GrowthStore g=GrowthStore.quiet();return g!=null&&g.trip()!=null;}
-  String dockLabel(boolean expand){
-   String name=Data.name(role);
-   if(away()){JSONObject t=GrowthStore.quiet().trip();String back=t==null?"":new java.text.SimpleDateFormat("HH:mm",Locale.ROOT).format(new Date(t.optLong("end")));return expand?"约"+back+"回来\n再点叫她回来":"出门";}
-   return expand?name+"\n再次点击恢复":name.substring(0,Math.min(2,name.length()));
-  }
+  String dockLabel(boolean expand){String name=Data.name(role);return expand?name+"\n再次点击恢复":name.substring(0,Math.min(2,name.length()));}
   /** Daily first meeting (with a greeting) and the tap reward; poking her into a sulk earns nothing. */
   void grow(String reaction){
    GrowthStore g=GrowthStore.quiet();if(g==null||!id.equals("main"))return;
    try{Growth.Award met=g.met();if(!ActionPlan.ANNOYED.equals(reaction))g.touched();
-    if(met.first&&PersonaManager.isInitialized("main")&&scene==null)showBubble(Growth.greeting(GrowthStore.story(),java.time.LocalTime.now().getHour(),Data.random,you())+(met.fish>0?"（小鱼干 +"+met.fish+"）":""),true);}
+    if(met.first&&PersonaManager.isInitialized("main")&&scene==null)showBubble(Growth.greeting(GrowthStore.story(),java.time.LocalTime.now().getHour(),Data.random,you()),true);}
    catch(Exception e){Data.log(role,"成长记录暂未保存");}
   }
   /** Plays a chapter scene line by line; a tap or a tap on the bubble moves on. Marked as seen at its last line. */
@@ -151,25 +146,18 @@ public class PetService extends Service {
    sceneNext=this::nextLine;handler.postDelayed(sceneNext,Math.max(3500,Math.min(10000,2200+step[1].length()*180)));
   }
   void endScene(){if(sceneNext!=null){handler.removeCallbacks(sceneNext);sceneNext=null;}scene=null;}
-  void showPostcard(JSONObject card,String lead){
-   showBubble(lead+"\n\n"+Growth.postcardText(card),false);if(bubble!=null)bubble.setOnClickListener(v->clearBubble());
-   bubbleEnd=()->clearBubble();handler.postDelayed(bubbleEnd,15000);
-   GrowthStore g=GrowthStore.quiet();if(g!=null)try{g.read(card.optString("id"));AgentRuntime.touch("你"+("away".equals(card.optString("kind"))?"在用户不在时":"")+"去了「"+card.optString("place")+"」，带回了一张明信片和"+card.optString("item"));}catch(Exception e){Data.log(role,"明信片记录暂未保存");}
-  }
  }
 
  static String you(){try{String n=Nickname.current();return n==null||n.trim().isEmpty()?"你":n.trim();}catch(Exception e){return "你";}}
  /** Unlocks after a chapter change. */
  void refreshGrowth(){for(Pet p:pets.values())p.plan.available(GrowthStore.unlockedOrAll(Data.actions(p.role)));}
- /** Every five seconds with the screen on: trips that are due, then a waiting chapter scene or postcard. */
+ /** Every five seconds with the screen on: hunger for idle picks, then a waiting chapter scene. */
  void growthTick(){
   GrowthStore g=GrowthStore.quiet();Pet p=pets.get("main");if(g==null)return;
   try{
    if(p!=null){p.plan.hungry=g.hungry();p.plan.fedAt=g.lastFed()>0?g.lastFed():-1;}
-   if(g.tripDue()){if(p!=null&&p.docked&&p.visible&&!p.docking)p.restoreDock();else if(p==null||!p.docking)finishTrip(p);return;}
    if(p==null||!quietMoment(p))return;
-   Growth.Scene scene=g.nextScene();if(scene!=null){p.playScene(scene);return;}
-   JSONObject card=g.unread();if(card!=null&&g.trip()==null)p.showPostcard(card,Growth.pick(GrowthStore.story().trip.optJSONArray("away".equals(card.optString("kind"))?"away":"back"),Data.random,you()));
+   Growth.Scene scene=g.nextScene();if(scene!=null)p.playScene(scene);
   }catch(Exception e){Data.log("main","成长剧情暂不可用");}
  }
  /** Nothing else is going on: visible, awake, no chat, no speech, no drag, Do Not Disturb off, daytime. */
@@ -178,34 +166,11 @@ public class PetService extends Service {
   if(AgentRuntime.busy()||Chat.isPetChatOpen(p.id)||moment().night()||!PersonaManager.isInitialized("main"))return false;
   NotificationManager nm=getSystemService(NotificationManager.class);return nm==null||nm.getCurrentInterruptionFilter()==NotificationManager.INTERRUPTION_FILTER_ALL;
  }
- /** Feeding from the menu: pays in fish, plays the eating clip, and she hears about it. */
+ /** Feeding from the menu (free): plays the eating clip, and she hears about it. */
  void feed(Pet p,Growth.Food food){
   GrowthStore g=GrowthStore.quiet();if(g==null)return;
   try{Growth.Award a=new Growth.Award();String error=g.feed(food,a);if(error!=null){Toast.makeText(this,error,Toast.LENGTH_SHORT).show();return;}g.met();
    if(!Data.file(p.role,food.clip).isEmpty())p.play(food.clip);p.plan.hungry=false;p.plan.fedAt=System.currentTimeMillis();p.userInteraction("feed","用户喂你吃了"+food.name,true);
   }catch(Exception e){Toast.makeText(this,"喂食暂未保存，请重试",Toast.LENGTH_SHORT).show();}
  }
- /** Sets off on a trip: a departure line, then she tucks herself into the nearer screen edge until she is back. */
- void goOut(Pet p,boolean snack){
-  GrowthStore g=GrowthStore.quiet();if(g==null)return;
-  try{String error=g.startTrip(snack);if(error!=null){Toast.makeText(this,"locked".equals(error)?GrowthStore.story().trip.optString("locked"):error,Toast.LENGTH_SHORT).show();return;}
-   JSONObject t=g.trip();String back=new java.text.SimpleDateFormat("HH:mm",Locale.ROOT).format(new Date(t.optLong("end")));
-   AgentRuntime.touch("用户送你出门旅行，约"+back+"回来");if(!Data.file(p.role,"原地左转奔跑").isEmpty())p.play("原地左转奔跑");
-   p.showBubble(Growth.pick(GrowthStore.story().trip.optJSONArray("depart"),Data.random,you()).replace("{time}",back),false);
-   handler.postDelayed(()->{if(p.visible&&!p.docked&&p.frame!=null&&p.away()){p.clearBubble();p.dockAtEdge(p.x+p.width/2f>sw()/2f,(p.y+p.width*.375f)/sh(),p.x,p.y);}},2800);
-  }catch(Exception e){Toast.makeText(this,"出门暂未成功，请重试",Toast.LENGTH_SHORT).show();}
- }
- /** Ends the trip (on time, or early when you call her back) and shows what she brought. */
- void finishTrip(Pet p){
-  GrowthStore g=GrowthStore.quiet();if(g==null)return;
-  try{Growth.Award a=new Growth.Award();String result=g.endTrip(a);if(result==null)return;Data.log("main","旅行结束 "+result);
-   // Hidden, still tucked away, or a chat is starting: the postcard waits, unread, for the next quiet moment.
-   if(p==null||!p.visible||p.frame==null||p.docked||AgentRuntime.busy()||Chat.isPetChatOpen(p.id))return;
-   if(!Data.file(p.role,"原地漂浮踏步").isEmpty())p.play("原地漂浮踏步");
-   String lead=Growth.pick(GrowthStore.story().trip.optJSONArray(result),Data.random,you());
-   if(a.postcard!=null)p.showPostcard(a.postcard,lead);else p.showBubble(lead,true);
-  }catch(Exception e){Data.log("main","旅行记录暂未保存");}
- }
- /** A chat message calls her back from a trip (chat comes first). Main thread. */
- void callBack(){Pet p=pets.get("main");if(p==null||!p.away())return;if(p.docked&&p.visible&&p.frame!=null)p.restoreDock();else finishTrip(p);}
 }
