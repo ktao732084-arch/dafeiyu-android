@@ -18,21 +18,23 @@ public final class ScenarioEval {
   List<PersonaManager.Persona> styles=PersonaManager.load(new JSONObject(read(args[0])));JSONArray scenarios=new JSONObject(read(args[1])).getJSONArray("scenarios");int repeats=args.length>3?Integer.parseInt(args[3]):1;
   ExecutorService pool=Executors.newFixedThreadPool(4);List<Future<JSONObject>> runs=new ArrayList<>();
   for(int i=0;i<scenarios.length();i++)for(PersonaManager.Persona p:styles)for(int r=0;r<repeats;r++){JSONObject sc=scenarios.getJSONObject(i);runs.add(pool.submit(()->conversation(sc,p)));}
-  JSONArray out=new JSONArray();Map<String,int[]> score=new LinkedHashMap<>();
-  for(Future<JSONObject> f:runs){JSONObject c=f.get();out.put(c);int[] s=score.computeIfAbsent(c.getString("scenario"),k->new int[3]);JSONArray checks=c.getJSONArray("checks");for(int i=0;i<checks.length();i++){String v=checks.getJSONObject(i).getString("verdict");s["pass".equals(v)?0:"fail".equals(v)?1:2]++;}}
+  JSONArray out=new JSONArray();Map<String,int[]> score=new LinkedHashMap<>(),asks=new LinkedHashMap<>();
+  for(Future<JSONObject> f:runs){JSONObject c=f.get();out.put(c);int[] q=asks.computeIfAbsent(c.getString("scenario"),k->new int[2]);JSONArray tr=c.getJSONArray("transcript");for(int i=0;i<tr.length();i++){JSONObject t=tr.getJSONObject(i);if(t.optBoolean("setup")||t.isNull("reply"))continue;q[1]++;if(question(t.getString("reply")))q[0]++;}int[] s=score.computeIfAbsent(c.getString("scenario"),k->new int[3]);JSONArray checks=c.getJSONArray("checks");for(int i=0;i<checks.length();i++){String v=checks.getJSONObject(i).getString("verdict");s["pass".equals(v)?0:"fail".equals(v)?1:2]++;}}
   pool.shutdown();Files.write(Paths.get(args[2]),out.toString(1).getBytes(StandardCharsets.UTF_8));
-  int pass=0,total=0;for(Map.Entry<String,int[]> e:score.entrySet()){int[] s=e.getValue();pass+=s[0];total+=s[0]+s[1]+s[2];System.out.println(String.format("  %-18s %d/%d passed%s",e.getKey(),s[0],s[0]+s[1]+s[2],s[2]>0?" ("+s[2]+" errors)":""));}
+  int pass=0,total=0;for(Map.Entry<String,int[]> e:score.entrySet()){int[] s=e.getValue();pass+=s[0];total+=s[0]+s[1]+s[2];int[] q=asks.get(e.getKey());System.out.println(String.format("  %-18s %d/%d passed%s; question endings %d/%d",e.getKey(),s[0],s[0]+s[1]+s[2],s[2]>0?" ("+s[2]+" errors)":"",q[0],q[1]));}
+  int qa=0,qn=0;for(int[] q:asks.values()){qa+=q[0];qn+=q[1];}System.out.println("QUESTION ENDINGS "+qa+"/"+qn);
   System.out.println("TOTAL "+pass+"/"+total+"; report written to "+args[2]);
  }
  static JSONObject conversation(JSONObject sc,PersonaManager.Persona style)throws Exception{
   File dir=Files.createTempDirectory("scenario").toFile();AgentStore db=new AgentStore(dir);long t0=OffsetDateTime.parse(sc.getString("start")).toInstant().toEpochMilli();
-  List<long[]> games=new ArrayList<>();List<String> outcomes=new ArrayList<>();String[] last={null};long[] lastAt={0};
+  List<long[]> games=new ArrayList<>();List<String> outcomes=new ArrayList<>();String[] last={null},doing={null};long[] lastAt={0},doingAt={0};
   JSONArray transcript=new JSONArray(),checks=new JSONArray();JSONArray setup=sc.optJSONArray("setup");
   if(setup!=null)for(int i=0;i<setup.length();i++){JSONObject s=setup.getJSONObject(i);long at=t0+s.getLong("minutes")*60000;
    switch(s.getString("type")){
     case "event":db.interaction(db.epoch(),s.getString("note"),at,s.getString("kind"),"main");last[0]=s.getString("note");lastAt[0]=at;break;
     case "game":games.add(new long[]{t0+s.getLong("started")*60000,at});outcomes.add(s.getString("outcome"));break;
-    case "turn":db.commit(db.epoch(),s.getString("user"),s.getString("reply"),"calm",null,true,false,null,null,"setup"+i,at,null,false,null,null,1,"",Boolean.FALSE);transcript.put(new JSONObject().put("user",s.getString("user")).put("reply",s.getString("reply")).put("setup",true));break;
+    case "doing":doing[0]=s.getString("doing");doingAt[0]=at;break;
+    case "turn":db.commit(db.epoch(),s.getString("user"),s.getString("reply"),"calm",s.optJSONArray("memories"),true,false,null,null,"setup"+i,at,null,false,null,null,1,"",Boolean.FALSE);transcript.put(new JSONObject().put("user",s.getString("user")).put("reply",s.getString("reply")).put("setup",true));break;
     default:throw new IOException("unknown setup "+s);
    }}
   JSONArray turns=sc.getJSONArray("turns");
@@ -40,6 +42,8 @@ public final class ScenarioEval {
    PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona=PersonaManager.presetPrompt(style);in.guidance=PersonaManager.guidance(style);in.signature=style.signature;
    in.timeZone=ZoneId.systemDefault().getId();in.now=now;in.initializedAt=t0-21*86_400_000L;in.remember=true;in.diary=true;in.feeling=db.mood(now);in.mood=in.feeling.optString("emotion","calm");in.games=games(games,outcomes,now);
    if(last[0]!=null){in.lastEvent=last[0];in.lastEventAt=lastAt[0];}
+   // Older builds have no on-screen activity input: set it only where it exists, so baselines run unchanged.
+   if(doing[0]!=null)try{PromptBuilder.Inputs.class.getDeclaredField("doing").set(in,doing[0]);PromptBuilder.Inputs.class.getDeclaredField("doingAt").setLong(in,doingAt[0]);}catch(NoSuchFieldException absent){}
    String reply;JSONObject row=new JSONObject().put("user",user).put("minutes",t.getLong("minutes"));
    String raw=null;
    try{raw=call(PromptBuilder.build(in,user,false,db.snapshot(),null),1.3,1200);AgentReply r=AgentReply.parse(raw);reply=r.reply;
@@ -79,6 +83,8 @@ public final class ScenarioEval {
   }catch(IOException e){failure=e;Thread.sleep(2000L<<attempt);}}
   throw failure;
  }
+ /** A reply that hands the turn back with a question, ignoring trailing tildes, ellipses and closing brackets. */
+ static boolean question(String reply){String t=reply.trim().replaceAll("[～~…。）)\\s]+$","");return t.endsWith("？")||t.endsWith("?");}
  static byte[] readAll(InputStream in)throws IOException{ByteArrayOutputStream b=new ByteArrayOutputStream();byte[] buf=new byte[8192];int n;while((n=in.read(buf))>0)b.write(buf,0,n);return b.toByteArray();}
  static String read(String path)throws IOException{return new String(Files.readAllBytes(Paths.get(path)),StandardCharsets.UTF_8);}
 }
