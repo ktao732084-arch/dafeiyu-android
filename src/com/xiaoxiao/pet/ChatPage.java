@@ -8,7 +8,7 @@ final class ChatPage {
     static java.lang.ref.WeakReference<ChatPage> current=new java.lang.ref.WeakReference<>(null);
     final Context c;final String role,id;final boolean overlay;final Dialog dialog;final Handler handler=new Handler(Looper.getMainLooper());
     final LinearLayout rows;final ScrollView scroll;final EditText input;TextView status;final TextView presence,filter,setup;final Button send,older,jump,retry;final FrameLayout stage;final int bubbleWidth,listHeight;int lifted;
-    final SpeechQueue speech;final Runnable interrupt,refresh;JSONArray records=new JSONArray();boolean sending,paged,nearBottom=true;String draft="",turnId,lastDay,anchor,focus;long from=Long.MIN_VALUE,to=Long.MAX_VALUE,lastStamp;View typing;
+    final SpeechQueue speech;final Runnable interrupt,refresh;JSONArray records=new JSONArray();boolean sending,paged,nearBottom=true;AgentRuntime.Listener listener;String more,draft="",turnId,lastDay,anchor,focus;long from=Long.MIN_VALUE,to=Long.MAX_VALUE,lastStamp;View typing;
     ChatPage(Context context,String role,String id){
         this.c=context;this.role=role;this.id=id;overlay=!(c instanceof Activity);dialog=overlay?CompactPanel.create(c):ClientPage.create(c);
         bubbleWidth=Math.round(Math.min(c.getResources().getDisplayMetrics().widthPixels,overlay?dp(360):Integer.MAX_VALUE)*.66f);
@@ -100,7 +100,7 @@ final class ChatPage {
         if(y>a.y){lifted+=y-a.y;a.y=y;w.setAttributes(a);}
         if(height!=list.height){list.height=height;stage.setLayoutParams(list);}
     }
-    void sendState(){boolean typed=input.getText().toString().trim().length()>0;send.setAlpha(sending||typed?1f:.45f);if(retry!=null&&!typed)retry.setVisibility(View.GONE);}
+    void sendState(){boolean typed=input.getText().toString().trim().length()>0;send.setAlpha(sending||typed?1f:.45f);send.setText(sending&&!typed?"停止":"发送");if(retry!=null&&!typed)retry.setVisibility(View.GONE);}
     void menu(View anchor){
         PopupMenu menu=new PopupMenu(c,anchor);menu.getMenu().add(0,3,0,"搜索聊天");menu.getMenu().add(0,1,1,"按日期查看");menu.getMenu().add(0,2,2,"回到最新");
         menu.setOnMenuItemClickListener(item->{if(item.getItemId()==3)search();else if(item.getItemId()==1)pickDate();else latest();return true;});menu.show();
@@ -256,20 +256,40 @@ final class ChatPage {
         AlertDialog details=new Apple.Builder(c).setTitle("她的完整回复").setView(view).setPositiveButton("看完了",null).create();if(overlay)details.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);details.show();
         try{AgentRuntime.store().shown(turn.getString("id"),ReplySegments.count(turn));turn.put("displayed",ReplySegments.count(turn));render();}catch(Exception e){status.setText("展示状态暂时没保存上");}
     }
+    /**
+     * While she answers, the box stays open: an empty box stops her, a typed one adds a message. Added messages join the
+     * unfinished one and both are answered together, like a person reading what you sent in a row; once her answer is
+     * saved they return to the box after it, so it is not cut off unseen.
+     */
     void send(){
-        if(sending){AgentRuntime.cancel();return;}String message=input.getText().toString().trim();if(message.isEmpty())return;
-        speech.cancel();from=Long.MIN_VALUE;to=Long.MAX_VALUE;anchor=focus=null;filter.setVisibility(View.GONE);PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();draft=message;turnId=null;
-        AgentRuntime.Listener listener=new AgentRuntime.Listener(){
+        String message=input.getText().toString().trim();
+        if(sending){
+            if(message.isEmpty()){AgentRuntime.cancel();return;}
+            input.setText("");message(message,true,null,false);scroll.post(()->scroll.fullScroll(View.FOCUS_DOWN));
+            if(AgentRuntime.interject(listener)){draft=draft+"\n"+message;ask(draft);}else more=more==null?message:more+"\n"+message;
+            return;
+        }
+        if(message.isEmpty())return;
+        speech.cancel();from=Long.MIN_VALUE;to=Long.MAX_VALUE;anchor=focus=null;filter.setVisibility(View.GONE);PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();
+        if(!ask(message))return;
+        if(records.length()==0)rows.removeAllViews();stamp(new JSONObject(),System.currentTimeMillis());message(message,true,null,false);typing(true);scroll.post(()->scroll.fullScroll(View.FOCUS_DOWN));if(owner!=null&&owner.visible)owner.thinking();
+    }
+    /** Sends one user turn (possibly several messages joined) and wires the reply back into the page. */
+    boolean ask(String message){
+        draft=message;turnId=null;
+        AgentRuntime.Listener l=new AgentRuntime.Listener(){
             public void saved(String id){turnId=id;}
             public void partial(String text){if(dialog.isShowing())presence.setText("正在组织语言…");}
-            public void done(String reply,String emotion){if(!dialog.isShowing())return;from=Long.MIN_VALUE;to=Long.MAX_VALUE;anchor=focus=null;sending=false;send.setText("发送");input.setEnabled(true);sendState();idle();status.setText("");loadLatest();
+            public void done(String reply,String emotion){if(!dialog.isShowing()||listener!=this)return;from=Long.MIN_VALUE;to=Long.MAX_VALUE;anchor=focus=null;sending=false;sendState();idle();status.setText("");loadLatest();
                 PetService.Pet p=pet();if(p!=null)p.clearBubble();if(overlay&&p!=null&&p.visible&&!p.docked){AgentRuntime.express(id,emotion,reply,turnId);}else speech.start(reply);
+                // Her answer was already saved when these arrived: leave them in the box rather than cut her off mid-bubble.
+                if(more!=null){input.setText(more);more=null;}
             }
-            public void error(String message){if(!dialog.isShowing())return;sending=false;send.setText("发送");input.setEnabled(true);input.setText(draft);sendState();idle();status.setText(message);retry.setVisibility(draft.isEmpty()?View.GONE:View.VISIBLE);loadLatest();PetService.Pet p=pet();if(p!=null)p.clearBubble();}
+            public void error(String message){if(!dialog.isShowing()||listener!=this)return;sending=false;input.setText(more==null?draft:draft+"\n"+more);more=null;sendState();idle();status.setText(message);retry.setVisibility(draft.isEmpty()?View.GONE:View.VISIBLE);loadLatest();PetService.Pet p=pet();if(p!=null)p.clearBubble();}
         };
-        if(!AgentRuntime.send(message,false,listener)){status.setText("她还在回上一句，稍等一下哦");return;}
-        sending=true;retry.setVisibility(View.GONE);input.setText("");input.setEnabled(false);send.setText("停止");sendState();status.setText("");presence.setText("对方正在输入…");presence.setTextColor(Apple.BLUE);
-        if(records.length()==0)rows.removeAllViews();stamp(new JSONObject(),System.currentTimeMillis());message(message,true,null,false);typing(true);scroll.post(()->scroll.fullScroll(View.FOCUS_DOWN));if(owner!=null&&owner.visible)owner.thinking();
+        if(!AgentRuntime.send(message,false,l)){status.setText("她还在回上一句，稍等一下哦");return false;}
+        listener=l;sending=true;retry.setVisibility(View.GONE);input.setText("");sendState();status.setText("");presence.setText("对方正在输入…");presence.setTextColor(Apple.BLUE);
+        return true;
     }
     void stopSpeaking(){speech.cancel();PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();}
     LinearLayout column(){LinearLayout l=new LinearLayout(c);l.setOrientation(1);return l;}

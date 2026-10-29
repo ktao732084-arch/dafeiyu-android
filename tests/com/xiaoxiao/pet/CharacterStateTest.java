@@ -77,6 +77,10 @@ public final class CharacterStateTest {
   check("小提琴演奏".equals(ActionPlan.said("等等，我去拉会儿小提琴。"))&&"吃冰淇淋融化".equals(ActionPlan.said("哼，我正在吃冰淇淋，别吵。"))&&"鲸鱼吐泡泡特效".equals(ActionPlan.said("我吐个泡泡给你看"))&&"原地专心玩魔方".equals(ActionPlan.said("我刚在玩魔方")),"she says she is doing it: the matching clip");
   check(ActionPlan.said("你在吃西瓜吗？")==null&&ActionPlan.said("我不想吃冰淇淋")==null&&ActionPlan.said("我陪你吃西瓜")==null&&ActionPlan.said("小提琴好听吗")==null&&ActionPlan.said("我觉得，你该去放风筝")==null,"questions, negations, the user's doing and other clauses start nothing");
 
+  // Several messages sent in a row arrive as one turn; she answers them together.
+  in=new PromptBuilder.Inputs();in.persona="你是大肥鱼。";in.now=noon;in.timeZone="Asia/Shanghai";
+  check(tail(PromptBuilder.build(in,"今天好累\n领导又让我加班",false,AgentStore.empty(0),null)).contains("连着发了几条")&&!tail(PromptBuilder.build(in,"今天好累",false,AgentStore.empty(0),null)).contains("连着发了几条"),"messages sent in a row are answered together");
+
   // Her own experiences for the diary: that local day only, with times; taps are not experiences.
   JSONObject day=AgentStore.empty(0);
   Initiative.interaction(day,"用户喂你吃了小鱼干",noon,"feed","main");Initiative.interaction(day,"用户轻轻碰了碰你",noon+M,"tap","main");Initiative.interaction(day,"用户喂你吃了冰淇淋",noon+86_400_000L,"feed","main");

@@ -2103,7 +2103,7 @@
       "path": "src/com/xiaoxiao/pet/AgentRuntime.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "08d94c9ca52ce2b855841cfe33f04b0aa02154fbd2999a789f3ac89782eae0f2",
+      "sha256": "6ed8eb88774c4db536203a48029d695755dfcad04aa7f018550b2cfd7815702f",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2203,7 +2203,7 @@
       "path": "src/com/xiaoxiao/pet/ChatPage.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "4c966a6666603599411c7e3da1955ba8ee73cb56de87e84a758e41c35e977b1e"
+      "sha256": "024b45304e1a15a32dc7bd3163ccfb8dce3eb28b657d3cdfc0888a2c8b141583"
     },
     {
       "path": "src/com/xiaoxiao/pet/ClientPage.java",
@@ -2546,7 +2546,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "8ccb62209635d8e717eef3ad9b0187db8c2fb8149f864b6cacbe15d50822b8cd"
+      "sha256": "ac77bbbca8e4d332e735e7cb91346deaad6c5b2e0dd2ed1330ab62e5828caba0"
     },
     {
       "path": "src/com/xiaoxiao/pet/ReplySegments.java",
@@ -2683,7 +2683,7 @@
       "path": "tests/com/xiaoxiao/pet/CharacterStateTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "d83d8dd48178333ca5852cc71a037382ec13f5ee04cecf310c84c051f260e298"
+      "sha256": "b3003e8be0624137a0612d6a09b70b98bb47e53e7ec349f347f5ea185b2b332b"
     },
     {
       "path": "tests/com/xiaoxiao/pet/CharacterTest.java",
@@ -2954,7 +2954,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/UiTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "756ef2b3b5935a50debe087ac8239a2660007f026a4c75f24d437dca385beeb3",
+      "sha256": "e315d97654ee391044a5048e91e0b5a7a353bf33b7ef75913af6776dc475d544",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],

@@ -28,6 +28,15 @@ final class AgentRuntime {
     static synchronized AgentStore store()throws Exception{if(memory==null){memory=new AgentStore(new java.io.File(Data.app.getFilesDir(),"agent"));final AgentStore opened=memory;Thread warm=new Thread(opened::warm,"recall-index");warm.setDaemon(true);warm.setPriority(Thread.MIN_PRIORITY);warm.start();}return memory;}
     static synchronized boolean busy(){return active!=null;}
     static synchronized void cancel(){if(active!=null){AgentTransport.Token token=active;Listener l=activeListener;active=null;activeListener=null;activeProactive=false;activeTouch=null;if(token.completed!=null){main.post(token.completed);}else{token.cancel();if(l!=null)main.post(()->l.error("已停止回复"));}}}
+    /**
+     * The user sent another message while she was still answering: stop that answer quietly, without an error, so
+     * both messages can be answered together. False once the answer is saved (it is then delivered as usual), and
+     * for proactive or touch replies, which are not the user's chat.
+     */
+    static synchronized boolean interject(Listener listener){
+        if(active==null||activeListener!=listener||activeProactive||active.completed!=null)return false;
+        AgentTransport.Token token=active;active=null;activeListener=null;activeTouch=null;token.cancel();return true;
+    }
     static synchronized void interruptProactive(){if(activeProactive)cancel();}
     static synchronized void interruptTouch(PetService.Pet pet){if(activeTouch==pet)cancel();}
     static synchronized boolean current(AgentTransport.Token t){return active==t&&!t.cancelled;}
