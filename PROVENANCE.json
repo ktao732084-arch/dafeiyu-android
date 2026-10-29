@@ -1266,7 +1266,7 @@
       "path": "docs/CHARACTER_INTEGRATION.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "c265ee859afb7e4f20570ae9362b1c737867e4b5ed7fabe86f01b011a9814c75"
+      "sha256": "e8b22de8db046756bfea2b3e93d7c9d83747bbfef314812674644684eff7a449"
     },
     {
       "path": "docs/CHAT_HISTORY.md",
@@ -1279,6 +1279,12 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "1e593cc2cc44d7efde3bea5d359119453f3b3753f8c364a7ce9cd3d1f2f2df17"
+    },
+    {
+      "path": "docs/LEGACY_MEMORY_BRANCH.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "b7a66df2a68d5b3152305084b209b6643214d94e8f92d22f96460fcef350b884"
     },
     {
       "path": "docs/NICKNAME_SYNC.md",
