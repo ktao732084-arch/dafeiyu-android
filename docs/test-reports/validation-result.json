@@ -1,44 +1,43 @@
 {
-  "version": "0.4.6",
-  "version_code": 10,
-  "apk_sha256": "e08152f52db00644405568c3bd932018ce961b0713990bc8c97d8332e7dffeef",
-  "android_framework_tests": {
-    "passed": 43,
-    "failed": 0,
-    "skipped": 0,
-    "suites": [
-      "NativeMemoryTest",
-      "HistoryRecallIntegrationTest",
-      "UiTest",
-      "ConversationTest"
-    ],
-    "controlled_model": true
-  },
-  "android_art_regex_checks": {
-    "passed": 83,
-    "sdk": 35,
-    "abi": "x86_64",
-    "environment": "MuMu Android emulator, app_process, product DEX; no user app storage or keys accessed",
-    "old_version": "0.4.5 reproduces IllegalArgumentException in NativeMemoryEngine.pattern"
-  },
-  "jvm_regex_checks": 83,
+  "version": "0.4.7",
+  "version_code": 11,
+  "apk_sha256": "b7c636bb54efc1b5842089c6149779d94990ef2bdf415246ba43bca55aab9f85",
+  "framework_unique_passed": 72,
+  "framework_failed": 0,
+  "framework_skipped": 0,
+  "final_build_framework_rechecked": 22,
+  "final_rechecked_suites": [
+    "ChatPolishTest",
+    "UiTest"
+  ],
+  "android_art_core_suites": 12,
+  "android_runtime_instrumentation_checks": 26,
+  "nickname_and_reply_checks": 33,
+  "unicode_checks": 83,
   "core_checks": 141,
-  "history_segment_timestamp_checks": 556,
-  "temporal_history_recall_checks": 38,
-  "endpoint_checks": 13,
-  "action_plan_assertions": 10708,
-  "episodic_recall_checks": 11,
+  "history_checks": 556,
+  "temporal_history_checks": 38,
+  "action_assertions": 10708,
+  "episodic_checks": 11,
   "diary_checks": 19,
-  "native_offline_replay": {
+  "endpoint_checks": 13,
+  "native_memory": {
     "scenarios": 84,
     "passed": 145,
     "total": 166,
     "known_unmet": 21
   },
+  "live_model_smoke": {
+    "environment": "MuMu Android API35 x86_64; existing user model via app UI",
+    "nickname_migration": "kk appeared without manual filling",
+    "unique_setting": "no nickname EditText in companion settings",
+    "reply": "name and today-history replies complete, no leading tool marker",
+    "interrupted_bubble": "complete first segment visually verified beside unshown footer",
+    "home_preview": "updated to latest completed reply after chat dismissal"
+  },
   "not_verified": [
-    "real cloud model quality",
-    "physical phone installation and OEM background behavior",
-    "API 26-34 ART matrix"
-  ],
-  "previous_full_framework_run": "v0.4.5: 75 scenarios; not claimed as rerun in this patch"
+    "all Android versions",
+    "physical phones",
+    "broad real-model accuracy or battery benchmarks"
+  ]
 }

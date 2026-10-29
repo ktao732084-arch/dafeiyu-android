@@ -27,6 +27,8 @@ historyRange(fromInclusive, toExclusive, beforeCursor, limit)使用半开区间[
 
 历史保留受设备存储空间限制，无云同步。手账导出暂不包含全部历史文件。展示时间表示内容曾呈现或全文已打开，不等于用户已经阅读理解。
 
+0.4.7起，助手旧记录的前导`[tool]`/`[assistant]`通道标记在界面与可见上下文中隐藏，原始`reply`及时间戳不改写。新回复在解析时移除这些前导标记后保存。分段仍根据该轮保存的完整文本计算，未展示部分仍不能冒充已展示；修复了未展示按钮导致首段截字的问题。称呼同步与历史回顾互不混用，规则见[NICKNAME_SYNC.md](NICKNAME_SYNC.md)。
+
 ## 0.4.5 回复阶段自动使用历史
 
 HistoryRecall.plan识别明确的时间回顾请求；普通无时间的记忆提问仍走原路径。AgentRuntime在模型调用前通过AgentStore.recallHistory查询ChatArchive，再将historical_chat_search放入最后一条用户消息的背景数据。

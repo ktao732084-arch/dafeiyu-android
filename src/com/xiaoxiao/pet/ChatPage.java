@@ -49,7 +49,7 @@ final class ChatPage {
             public void show(String text,int shown,boolean preview){try{AgentRuntime.store().shown(turnId,shown);loadLatest();status.setText(preview?"她写了一段长长的回复，点气泡下方就能看全文":"");}catch(Exception e){status.setText("展示状态没保存上，可以在聊天记录里查看。");}}
             public void stop(int shown){}
         });interrupt=()->speech.cancel();refresh=()->{if(dialog.isShowing()&&!sending&&!paged&&from==Long.MIN_VALUE)loadLatest();};
-        dialog.setOnDismissListener(d->{if(Chat.historyViews.get(id)==refresh)Chat.historyViews.remove(id);speech.cancel();handler.removeCallbacksAndMessages(null);if(sending){sending=false;AgentRuntime.cancel();}PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();if(Chat.petChats.get(id)==dialog)Chat.petChats.remove(id);if(Chat.presentations.get(id)==interrupt)Chat.presentations.remove(id);});
+        dialog.setOnDismissListener(d->{if(Chat.historyViews.get(id)==refresh)Chat.historyViews.remove(id);speech.cancel();handler.removeCallbacksAndMessages(null);if(sending){sending=false;AgentRuntime.cancel();}PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();if(Chat.petChats.get(id)==dialog)Chat.petChats.remove(id);if(Chat.presentations.get(id)==interrupt)Chat.presentations.remove(id);if(c instanceof MainActivity&&!((MainActivity)c).isFinishing()&&!((MainActivity)c).isDestroyed())((MainActivity)c).render();});
         // Returning from 模型连接 hides the banner straight away.
         box.getViewTreeObserver().addOnWindowFocusChangeListener(focused->{if(focused)setup.setVisibility(AgentRuntime.configured()?View.GONE:View.VISIBLE);});
         dialog.setContentView(box);send.setOnClickListener(v->send());
@@ -125,7 +125,7 @@ final class ChatPage {
         List<String> parts=ReplySegments.split(t.optString("reply"));int shown=t.has("displayed")?Math.min(parts.size(),t.optInt("displayed")):parts.size();
         JSONObject pending=ReplySegments.label(t).isEmpty()?null:t;boolean proactive=t.optBoolean("proactive");
         if(shown==0){message("回复已经保存好了，点开看看全文吧。",false,pending,proactive);return;}
-        for(int i=0;i<shown;i++){boolean last=i==shown-1;message(parts.get(i).trim(),false,last?pending:null,last&&proactive);}
+        for(int i=0;i<shown;i++){boolean last=i==shown-1;message(i==0?AgentPolicy.replyText(parts.get(i).trim()):parts.get(i).trim(),false,last?pending:null,last&&proactive);}
     }
     void empty(){
         LinearLayout hello=column();hello.setGravity(Gravity.CENTER_HORIZONTAL);hello.setPadding(dp(24),dp(overlay?12:56),dp(24),dp(24));
@@ -162,7 +162,8 @@ final class ChatPage {
         content.setMaxWidth(bubbleWidth);content.setLineSpacing(dp(3),1);content.setPadding(dp(13),dp(10),dp(13),dp(10));
         content.setOnLongClickListener(v->{android.content.ClipboardManager clipboard=(android.content.ClipboardManager)c.getSystemService(Context.CLIPBOARD_SERVICE);clipboard.setPrimaryClip(ClipData.newPlainText("聊天内容",text));Toast.makeText(c,"已复制",0).show();return true;});
         if(pending!=null)content.setOnClickListener(v->expand(pending));
-        body.addView(content);
+        // Let the text measure its own width and height; MATCH_PARENT can inherit the short footer width.
+        body.addView(content,new LinearLayout.LayoutParams(-2,-2));
         if(proactive){TextView note=Apple.label(c,"她主动来找你",11,false);note.setTextColor(Apple.SECONDARY);note.setPadding(dp(4),dp(5),0,0);body.addView(note);}
         if(pending!=null){Button expand=new Button(c);expand.setText(ReplySegments.label(pending));Apple.button(expand,false);expand.setTextSize(12);expand.setMinHeight(dp(30));expand.setPadding(dp(12),0,dp(12),0);expand.setOnClickListener(v->expand(pending));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-2,dp(30));p.topMargin=dp(6);body.addView(expand,p);}
         View face=new View(c);face.setBackground(user?Avatar.me(c,36):Avatar.of(c,role,36));LinearLayout.LayoutParams faceSize=new LinearLayout.LayoutParams(dp(36),dp(36));
@@ -180,7 +181,7 @@ final class ChatPage {
     }
     void expand(JSONObject turn){
         stopSpeaking();
-        TextView full=Apple.label(c,turn.optString("reply"),16,false);full.setLineSpacing(dp(4),1);full.setPadding(dp(20),dp(12),dp(20),dp(12));full.setTextIsSelectable(true);ScrollView view=new SpringScrollView(c);view.addView(full);
+        TextView full=Apple.label(c,AgentPolicy.replyText(turn.optString("reply")),16,false);full.setLineSpacing(dp(4),1);full.setPadding(dp(20),dp(12),dp(20),dp(12));full.setTextIsSelectable(true);ScrollView view=new SpringScrollView(c);view.addView(full);
         AlertDialog details=new Apple.Builder(c).setTitle("她的完整回复").setView(view).setPositiveButton("看完了",null).create();if(overlay)details.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);details.show();
         try{AgentRuntime.store().shown(turn.getString("id"),ReplySegments.count(turn));turn.put("displayed",ReplySegments.count(turn));render();}catch(Exception e){status.setText("展示状态暂时没保存上");}
     }

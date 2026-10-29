@@ -42,10 +42,14 @@ public class AgentInstrumentation extends Instrumentation {
     check("点击回应-开心跃动".equals(AgentRuntime.action("happy")),"emotion animation mapping");
     // Exercise the reported sentence through the real Android Handler/Keystore/runtime, not a JVM shadow.
     AgentRuntime.store().clear(true);Chat.secret("test-only-key");
-    AgentRuntime.model=(messages,token,progress)->"好的，kk，我记住啦。";
+    AgentRuntime.model=(messages,token,progress)->"[tool] 好的，kk，我记住啦。";
     Reply named=new Reply();check(AgentRuntime.send("我叫k你以后就叫我kk吧",false,named),"name turn starts");named.await();
     check(named.error==null&&named.text.contains("kk"),"name turn completes on Android");
     check(AgentRuntime.store().memoryContext("kk").contains("我叫k你以后就叫我kk吧"),"name stored on Android");
+    check("kk".equals(Nickname.current()),"chat nickname synchronizes on Android");
+    check(!named.text.contains("[tool]"),"role prefix removed before Android display");
+    Nickname.manual("小K");check("小K".equals(Nickname.current()),"manual nickname takes precedence");
+    Nickname.manual("");check(Nickname.current().isEmpty(),"cleared nickname is not restored from old memory");
     runOnMainSync(()->{AlphaVideo video=new AlphaVideo(getTargetContext(),"main");try{video.vertices.position(2);check(video.vertices.position()==2,"video buffer links on Android");check(Avatar.of(getTargetContext(),"main",36)!=null,"avatar resource loads on Android");}finally{video.release();}});
     result.putString("stream","PASS: "+checks+" Android runtime checks\n");
    }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;MemoryBridge.client=MemoryBridge::http;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}

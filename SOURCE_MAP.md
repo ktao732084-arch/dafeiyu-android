@@ -134,3 +134,7 @@ AgentRuntime、PromptBuilder和AgentStore的改动将检索证据接入正常回
 追加审查中的DeviceCoreChecks、run-core-device.ps1、build-isolated-tests.ps1和测试扩展由本项目编写，复用既有产品代码、语料、测试断言与资源；没有引入第三方运行框架。既有素材与记忆项目的来源、许可保持原标注。
 
 UnicodeRegex、NativeRegexTest和设备检查脚本为本项目新增实现。Android默认Unicode字符类但不支持显式UNICODE_CHARACTER_CLASS的行为依据[Android官方文档](https://developer.android.com/reference/java/util/regex/Pattern#UNICODE_CHARACTER_CLASS)。对NativeMemoryEngine与NativeMemoryTime的兼容修正保持原记忆项目MIT归属；没有复制外部实现。
+
+## 0.4.7 称呼同步与聊天展示
+
+Nickname、ChatPolishRulesTest和ChatPolishTest由本项目新增，称呼识别采用本机保守规则，不引入额外模型或外部库。AgentRuntime、ProfilePage、AgentPanel、AgentPolicy、AgentReply、ReplySegments、ChatPage和PromptBuilder在既有实现上修改；保留原上游与优化分支归属。修复来自2026-10-29真实Android聊天实测反馈；用户对话截图仅保存在本地，不随源码公开。

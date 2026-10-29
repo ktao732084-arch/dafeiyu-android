@@ -1,26 +1,32 @@
-# 0.4.6 Android 正则兼容性修复验证
+# 0.4.7 称呼同步与聊天展示验证
 
-追加兼容性检查：同一已发布产品DEX在Android API35上通过11组核心套件；独立测试App通过22项实际Android Runtime/Keystore检查。未发现新的同类兼容性错误，未改产品或重发APK。范围和边界见[追加检查报告](docs/ANDROID_COMPATIBILITY_AUDIT.md)。
+2026-10-29，versionCode 11，APK SHA-256：b7c636bb54efc1b5842089c6149779d94990ef2bdf415246ba43bca55aab9f85。
 
-2026-10-29，versionCode 10，APK SHA-256：e08152f52db00644405568c3bd932018ce961b0713990bc8c97d8332e7dffeef。
+## 已验证的改动
 
-## 原因与修复
+- 明确称呼成功保存后同步到唯一的“名字与称呼”设置；迁移有效记忆中的旧称呼一次，不覆盖现有非空设置或手动清空。慢迁移与手动修改的竞态、失败、取消和迟到结果均有测试。
+- “陪伴设置”移除重复称呼输入框；修改称呼不改初始化人格。
+- 新助手回复清理前导[tool]/[assistant]标记，正文中间与引号/代码引用保留；旧存档只在显示与上下文引用时清理，不改写原始文本或时间戳。
+- 气泡文本独立测量宽高，避免短的“未展示”按钮挤窄文本；关闭聊天后重绘首页最新预览。
 
-用户发送“我叫k你以后就叫我kk吧”触发姓名记忆提取，0.4.5 的 NativeMemoryEngine.pattern 显式传入 UNICODE_CHARACTER_CLASS，Android 抛出 IllegalArgumentException。NativeMemoryTime 的静态编译与内嵌 (?sU) 同样不兼容。Android 本身默认采用 Unicode 字符类，桌面 JVM 则需显式开启。依据 [Android Pattern 文档](https://developer.android.com/reference/java/util/regex/Pattern#UNICODE_CHARACTER_CLASS)，新增 UnicodeRegex 对运行环境能力只探测一次：Android 使用默认行为，桌面 JVM 保留 Unicode 标志；日期已解析后缀改为同一兼容入口，保留 DOTALL。
+## 自动化验证
 
-此前 Robolectric 使用宿主 JVM 的正则实现，因此75项通过并未证明 Android 正则兼容。此版增加实际 Android ART 检查，不再只靠桌面测试判断该问题。
+本批72个不同框架场景通过，0失败/错误/跳过。最终迁移加锁调整后重新运行ChatPolishTest与UiTest共22项，其余50项在本批此前构建通过。布局场景使用Robolectric native graphics测量真实字体，检查换行后的全部高度；取消断言、显示状态、历史删除、人格冻结、连接与余额回归保留。没有重复运行本轮未改动的Python HTTP对照套件。
 
-## 验证结果
+最终产品DEX在Android API35 / x86_64上跑12组核心套件，0组失败：核心141项、历史/时间戳/分段556项、时间检索38项、地址13项、动作10708次断言、往事11项、日记19项、Unicode83项、称呼/展示33项及物理回归通过。原生记忆84场景保持145/166，21项既有不足仍在；规则提炼盲测22/25、误记2/25，未把这轮修复说成记忆准确率提升。
 
-- 在当前 MuMu 模拟器 Android API35 / x86_64 的 app_process 中，旧0.4.5 DEX 复现原异常；新0.4.6 DEX 的同一套83项检查通过，进程正常退出。覆盖原句、记忆写入、全部记忆规则编译、全角数字/空格、Unicode单词、大小写、敏感字段过滤、全角日期与已解析后缀。
-- 同一83项检查在桌面 JVM 通过；Android不接受该标志而桌面接受，两个分支均实测。
-- 当前构建43项Robolectric回归通过：NativeMemoryTest 12（含原句发送完成与保存）、HistoryRecallIntegrationTest 8、UiTest 14、ConversationTest 9。模型为受控响应，未用用户Key。
-- 核心141项、完整历史/时间戳/分段556项、日期检索38项、API地址13项、动作10708次断言、往事检索11项、日记19项与物理回归通过。
-- 原生共享记忆84场景保持145/166，21项已知不足未变化；规则提炼盲测仍为22/25、误记2/25。未因这个修复重复运行未改变的Python HTTP对照套件。
-- APK编译与v2/v3签名校验通过，沿用旧版签名，支持覆盖安装。
+独立测试包在真实Android Handler与Keystore上通过26项运行时检查，使用受控回复，无真实Key与网络访问。新增称呼落盘、手动优先/清空和前缀过滤验证。测试包运行后已卸载。
 
-Android测试只在独立临时进程使用产品DEX与合成输入，没有读取或修改已安装App的数据、Key、配置或未发送草稿。实际聊天Runtime路径由受控模型框架测试覆盖；未宣称已用真实DeepSeek完成该句聊天。实体手机及其他Android版本仍待体验。
+## 真实模型与界面复验
 
-证据：[Android结果](docs/test-reports/android-regex-results.txt)、[框架结果](docs/test-reports/robolectric-results.txt)、[汇总](docs/test-reports/validation-result.json)。之前完整验证见 [v0.4.5报告](https://github.com/ktao732084-arch/dafeiyu-android/blob/v0.4.5/VALIDATION.md)。
+在用户授权的模拟器正式App中覆盖升级0.4.7，沿用已配置模型并真实发送消息。确认原有kk记忆补入空的称呼设置；陪伴设置已无重复输入；再次要求称呼和回顾当天聊天均正常完成，回顾显示无[tool]前缀。
 
-复现脚本：`tests/run-regex-device.ps1 -Sdk <SDK路径> -Jdk <JDK路径> -Serial <adb设备>`；先构建产品。脚本只在设备`/data/local/tmp/dafeiyu-regex-*`内放置临时DEX并运行，不安装、清空或操作用户App。
+发送无记录时段查询后，在分段未播完时发送下一条消息，保留的首段完整显示，未展示按钮仍可用。退出聊天后首页预览更新到09:54的最新回复。通过界面与截图核验，未读取Key、清空正式数据或手动填入称呼冒充同步。用户截图仅保存在本机outputs。
+
+本次验证是有限场景的真实模型冒烟，不保证每次回答质量。尚未覆盖所有Android版本、实体手机、厂商后台/耗电或完整GPU解码矩阵。APK沿用原体验签名，可覆盖安装；已在模拟器完成覆盖。
+
+## 证据与使用
+
+[框架清单](docs/test-reports/robolectric-results.txt) · [Android与实测摘要](docs/test-reports/android-polish-results.txt) · [汇总JSON](docs/test-reports/validation-result.json) · [称呼规则](docs/NICKNAME_SYNC.md) · [历史格式](docs/CHAT_HISTORY.md)。
+
+称呼属于个人设置；删除聊天或忘记记忆不会自动清空它，需在唯一入口手动清空。旧版有效称呼仅补入一次。此前版本验证保留在[0.4.6报告](https://github.com/ktao732084-arch/dafeiyu-android/blob/v0.4.6/VALIDATION.md)。

@@ -54,7 +54,8 @@ final class AgentRuntime {
     }
     static JSONArray context(String user,boolean proactive,JSONObject s,JSONArray hits,HistoryRecall.Result history)throws Exception {
         PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.historyRecall=history==null?null:history.evidence;
-        in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.nickname=Data.prefs().getString("agent.nickname","");
+        in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.nickname=Nickname.current();
+        String requested=!proactive&&history==null?Nickname.requested(user):null;if(requested!=null)in.nickname=requested;
         in.mood=mood();in.timeZone=TimeZone.getDefault().getID();in.now=System.currentTimeMillis();in.initializedAt=PersonaManager.initializedAt("main");
         if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}in.remember=rememberEnabled();in.diary=diaryEnabled();
         if(in.remember&&!proactive&&history==null){
@@ -132,7 +133,7 @@ final class AgentRuntime {
                 final AgentReply output=result;final long completedEpoch=epoch;final String explicitWas=explicit;
                 final java.util.concurrent.atomic.AtomicBoolean delivered=new java.util.concurrent.atomic.AtomicBoolean();
                 Runnable completion=()->{if(!delivered.compareAndSet(false,true))return;release(token);if(db.epoch()!=completedEpoch){listener.error("记录已修改，本次已完成的回复不再显示");return;}listener.saved(turnId);listener.done(output.reply,output.emotion);if(explicitWas==null&&history==null)writeDiaryIfDue();};
-                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");token.completed=completion;}
+                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");if(history==null)Nickname.committed(user);token.completed=completion;}
                 main.post(completion);
             }catch(Exception e){String msg=e instanceof java.net.SocketTimeoutException?"等模型回复超时了，消息还在，可以重试。":e.getMessage();main.post(()->{if(current(token)){release(token);listener.error(msg==null?"连接失败，请检查网络和模型配置":msg);}});}
         });return true;

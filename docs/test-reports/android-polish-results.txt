@@ -1,0 +1,7 @@
+0.4.7 final product / MuMu Android API35 x86_64
+DEVICE SUITES: 12 passed, 0 failed
+PASS: 33 nickname and reply presentation checks (also desktop JVM)
+PASS: 83 native Unicode regex checks
+PASS: 26 Android runtime checks; real Keystore and Handler, controlled responses, isolated package
+Live app: nickname migrated to kk; companion setting duplicate removed; real-model name/history replies successful; interrupted bubble shows full first segment; home preview updated.
+Temporary test packages removed. User screenshots remain local, not published.

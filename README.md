@@ -1,8 +1,8 @@
-# 大肥鱼 · Android 兼容性修复版 0.4.6
+# 大肥鱼 · 称呼同步与聊天修复版 0.4.7
 
-[下载 APK](https://github.com/ktao732084-arch/dafeiyu-android/releases/tag/v0.4.6) · [来源清单](SOURCE_MAP.md) · [逐文件溯源](PROVENANCE.json) · [验证记录](VALIDATION.md)
+[下载 APK](https://github.com/ktao732084-arch/dafeiyu-android/releases/tag/v0.4.7) · [来源清单](SOURCE_MAP.md) · [逐文件溯源](PROVENANCE.json) · [验证记录](VALIDATION.md)
 
-0.4.6修复Android上姓名/偏好等消息触发记忆处理时的 `UNICODE_CHARACTER_CLASS flag not supported` 错误。已在Android ART中复现旧版异常并验证修复；聊天记录、固定人格和配置保留。
+0.4.7支持明确称呼指令同步到「名字与称呼」，删除「陪伴设置」里的重复入口；修复回复开头的通道标签、未展示按钮导致气泡截字，以及退出聊天后首页预览不刷新的问题。0.4.6的Android正则兼容修复继续保留。
 
 版本号与发布节奏遵循根目录的 [项目协作约定](AGENTS.md)。
 
@@ -14,7 +14,7 @@
 
 ## 安装与使用
 
-1. 在 Android 8.0+ 安装 `dafeiyu-android-0.4.6.apk`。与0.2/0.3/0.4.0/0.4.1沿用同一体验签名，可覆盖安装保留数据。
+1. 在 Android 8.0+ 安装 `dafeiyu-android-0.4.7.apk`。与0.2/0.3/0.4.0/0.4.1沿用同一体验签名，可覆盖安装保留数据。
 2. 初次相遇时，手动选择一种性格或随机一次。确认后固定，后期没有重选人格入口。
 3. 「模型连接」默认选择 **DeepSeek V4.1 Flash**。点「去 DeepSeek 官网获取 Key」，登录后创建并复制 API Key，回到 App 粘贴，点「连接并保存」即可。地址和模型自动填写，测试成功才保存；API需有可用余额，测试与聊天会使用自己的额度。其他服务商选「其他模型 / 自定义」，旧配置保留。
 4. 「记忆手账」查看、编辑、固定或忘记记忆；「共同经历与记忆变化」查看历史。无需额外设置记忆服务器。
@@ -22,6 +22,12 @@
 6. 想悬浮显示时，开启显示在其他应用上层和通知权限，再点「让她住到屏幕上」。
 
 从0.3升级时，旧电脑服务地址不会自动激活。手机内置引擎是默认运行路径；人格与已保存的记忆保持原有数据。
+
+## 称呼只设置一次
+
+可以直接说「我叫kk，以后就叫我kk吧」；本轮保存成功后，称呼会同步到「名字与称呼 → 她怎么称呼你」。手动修改也会用于之后的聊天。升级时空设置可从已有明确称呼记忆补入一次，非空设置保留；手动清空后不从旧记忆反复恢复。模型猜测、历史引用和失败/取消的请求不会改称呼。
+
+「陪伴设置」不再重复放称呼输入框。复杂表达可手动填写；详细规则见[称呼同步说明](docs/NICKNAME_SYNC.md)。
 
 ## DeepSeek 简便接入
 
@@ -103,7 +109,7 @@ $env:XIAOXIAO_STORE_PASS='你的签名密码'
 ./tests/robolectric/run-tests.ps1 -AndroidRoot '.' -Sdk 'D:/Android/Sdk' -Jdk 'C:/Program Files/Java/jdk-17'
 ```
 
-产物为 `build/dafeiyu-0.4.6.apk`。原生规则由 `tools/generate-native-memory-rules.py` 从已固定的上游源码 AST 生成，不执行 Python 引擎；生成后的 Java 常量随 APK 编译。
+产物为 `build/dafeiyu-0.4.7.apk`。原生规则由 `tools/generate-native-memory-rules.py` 从已固定的上游源码 AST 生成，不执行 Python 引擎；生成后的 Java 常量随 APK 编译。
 
 `NativeMemoryTest` 在不启动Python服务的条件下运行84个共享场景，并覆盖默认设置、旧版升级、离线更正、模型配置复用、非法输出回退、批量原子性、时区和删除竞态。`MemoryIntegrationTest` 另保留Python HTTP对照；普通用户运行App不需要这些测试依赖。
 

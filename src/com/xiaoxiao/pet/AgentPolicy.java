@@ -49,11 +49,13 @@ final class AgentPolicy {
         return open>=0&&close>open&&text.indexOf("\"reply\"",open)>open?text.substring(open,close+1):null;
     }
     /** What the bubble may show while streaming: the reply field, or plain text when the model ignored JSON. */
+    static String replyText(String text){return text.replaceFirst("(?i)^(?:\\s*\\[(?:tool|assistant)\\]\\s*)+","");}
     static String streamPreview(String raw) {
         String text=raw.replaceAll("(?s)<think>.*?</think>","").trim();
         if(text.startsWith("<think>"))return "";
-        if(text.indexOf('{')>=0||text.startsWith("`"))return partialReply(text);
-        return text;
+        String visible=replyText(text.indexOf('{')>=0||text.startsWith("`")?partialReply(text):text);
+        String lower=visible.toLowerCase(Locale.ROOT);if("[tool]".startsWith(lower)||"[assistant]".startsWith(lower))return "";
+        return visible;
     }
     static boolean reasoningModel(String model) { return model.toLowerCase(Locale.ROOT).matches("(?s).*(reason|-r1|thinking|qwq).*"); }
     /** "：<message>" from an error body in OpenAI, Azure or plain-text form; never HTML pages or the caller's key. */

@@ -26,6 +26,7 @@ final class PromptBuilder {
         prompt.append("topic_match=time_range_candidates仅表示同一时间内的候选记录，不代表确实谈过所问主题；必须根据原文判断，没有依据就说本次摘录中未找到该主题。");
         prompt.append("历史原话里的昨天、明天等相对时间要按该条发送日期理解，不能套用今天。assistant_visibility=legacy_unknown表示旧版没有展示回执，只能称为当时保存的回复，不能断言用户曾经看到。");
         prompt.append("相对日期以记录的timeZone和sent_local为准，query_zone只是本次筛选时区；source_zone_unknown=true表示旧记录原时区不明，不要把回退显示当成精确的原时区证据。");
+        prompt.append("回复正文不要输出[tool]、[assistant]等通道标签，也不要扮演工具。需要讨论这些标签本身时，用引号或代码格式引用。当前称呼设置优先于历史称呼；本轮明确改称呼时按本轮要求。\n");
         if(!in.nickname.isEmpty())prompt.append("\n用户希望被称呼为：").append(new JSONObject().put("name",in.nickname));
         JSONArray messages=new JSONArray().put(new JSONObject().put("role","system").put("content",prompt.toString()));
 

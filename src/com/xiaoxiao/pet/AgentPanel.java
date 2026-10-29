@@ -5,7 +5,6 @@ final class AgentPanel {
  static void fail(MainActivity a,Exception e){Toast.makeText(a,e.getMessage()==null?"保存失败，请重试":e.getMessage(),Toast.LENGTH_LONG).show();}
  static void settings(MainActivity a){
   LinearLayout l=a.column();l.setPadding(a.dp(18),a.dp(4),a.dp(18),a.dp(16));GroupedList.note(l,"按你舒服的节奏来。她主动开口时也会用到你配置的模型额度。");
-  EditText nickname=Chat.field(a,l,"她怎么称呼你（可以不填）",Data.prefs().getString("agent.nickname",""),false);nickname.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(30)});
   GroupedList.toggle(GroupedList.group(l),"记住重要的事",AgentRuntime.rememberEnabled(),(v,on)->{AgentRuntime.cancel();Data.prefs().edit().putBoolean("agent.memory",on).apply();});
   GroupedList.note(l,"开着时，她会从你的原话里记下喜好和约定。关掉后不再自动记下或主动翻找旧事，已有记忆仍可在手账里删。你明确问某段时间聊过什么时，仍会按请求查本机聊天记录。最近的对话照样用来接话。");
   GroupedList.toggle(GroupedList.group(l),"偶尔主动和我说话",Data.prefs().getBoolean("agent.proactive",false),(v,on)->{if(!on)AgentRuntime.cancel();Data.prefs().edit().putBoolean("agent.proactive",on).apply();});
@@ -20,7 +19,7 @@ final class AgentPanel {
   GroupedList.row(more,"记忆引擎",GroupedList.BOOK,GroupedList.ORANGE,v->MemoryPanel.settings(a));
   GroupedList.row(more,"切换明暗外观 · 现在是"+Apple.modeLabel(),GroupedList.MOON,GroupedList.GREY,v->{Data.prefs().edit().putString("appearance.mode",Apple.dark?"day":"night").apply();Apple.load();a.render();});
   GroupedList.row(more,"手机悬浮权限",GroupedList.PHONE,GroupedList.SKY,v->PermissionsPanel.show(a));
-  ScrollView scroll=new SpringScrollView(a);scroll.addView(l);new Apple.Builder(a).setTitle("陪伴设置").setView(scroll).setPositiveButton("完成",(d,w)->Data.prefs().edit().putString("agent.nickname",nickname.getText().toString().trim()).apply()).show();
+  ScrollView scroll=new SpringScrollView(a);scroll.addView(l);new Apple.Builder(a).setTitle("陪伴设置").setView(scroll).setPositiveButton("完成",null).show();
  }
  static final int PAGE=60;
  static void memories(MainActivity a){memories(a,PAGE);}
