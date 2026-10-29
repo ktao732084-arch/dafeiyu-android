@@ -14,6 +14,7 @@ public class AgentInstrumentation extends Instrumentation {
   try{
    runOnMainSync(()->Data.init(getTargetContext()));
    originalContext=Data.app;
+   UpdateInstrumentationChecks.run(this,getTargetContext());
    final String namespace="runtime-tests-"+java.util.UUID.randomUUID();
    final java.io.File isolatedFiles=new java.io.File(getTargetContext().getCacheDir(),namespace);isolatedFiles.mkdirs();
    Data.app=new android.content.ContextWrapper(getTargetContext()){

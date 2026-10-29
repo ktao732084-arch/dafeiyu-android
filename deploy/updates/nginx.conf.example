@@ -1,0 +1,20 @@
+# Include these locations in your EXISTING HTTPS server block.
+# Replace the root with the directory containing stable.json and releases/.
+# TLS certificate / server_name belong to your actual domain configuration.
+root /srv/dafeiyu-updates;
+
+location = /stable.json {
+    default_type application/json;
+    add_header Cache-Control "no-cache, max-age=0" always;
+    try_files $uri =404;
+}
+
+location /releases/ {
+    types { application/vnd.android.package-archive apk; }
+    add_header Cache-Control "public, max-age=31536000, immutable";
+    try_files $uri =404;
+    autoindex off;
+}
+
+# Never expose publishing intermediates or lock files.
+location ~ (\.part$|\.tmp$|/\.) { deny all; }

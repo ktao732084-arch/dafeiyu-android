@@ -84,8 +84,10 @@ final class Initiative {
         JSONObject out=new JSONObject().put("now",now).put("last_user_at",s.optLong("lastUser")).put("last_check_at",s.optLong("lastAttempt"));
         out.put("recent_interactions",recentInteractions(s)).put("waiting_for_user",s.optBoolean("proactiveWaiting")).put("previous_plan",s.optJSONObject("initiativePlan")).put("topics_already_raised_without_reply",s.optJSONArray("initiativeTopics"));
         JSONArray turns=s.optJSONArray("turns"),exchanges=new JSONArray();int unanswered=0;
+        java.util.Set<String> stale=MemoryLedger.staleSources(s,now);
         if(turns!=null){for(int i=Math.max(0,turns.length()-6);i<turns.length();i++){
-            JSONObject t=turns.getJSONObject(i);exchanges.put(new JSONObject().put("at",t.optLong("at")).put("timeZone",t.optString("timeZone")).put("local_time",localTime(t.optLong("at"),t.optString("timeZone"))).put("proactive",t.optBoolean("proactive")).put("user",AgentPolicy.clip(t.optString("user"),140)).put("shown_reply",AgentPolicy.clip(ReplySegments.visible(t),140)));
+            JSONObject t=turns.getJSONObject(i);if(stale.contains(t.optString("id")))continue;
+            exchanges.put(new JSONObject().put("at",t.optLong("at")).put("timeZone",t.optString("timeZone")).put("local_time",localTime(t.optLong("at"),t.optString("timeZone"))).put("proactive",t.optBoolean("proactive")).put("user",AgentPolicy.clip(t.optString("user"),140)).put("shown_reply",AgentPolicy.clip(ReplySegments.visible(t),140)));
         }for(int i=turns.length()-1;i>=0;i--){JSONObject t=turns.getJSONObject(i);if(!t.optString("user").isEmpty())break;if(t.optBoolean("proactive")&&!ReplySegments.visible(t).isEmpty())unanswered++;}}
         out.put("recent_exchanges",exchanges).put("unanswered_proactive_messages",unanswered).put("last_outcome",s.optString("proactiveOutcome"));return out;
     }

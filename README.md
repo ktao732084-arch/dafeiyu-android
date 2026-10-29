@@ -1,8 +1,10 @@
-# 大肥鱼 · 忙闲主动安排修复版 0.4.9.1
+# 大肥鱼 · 应用内检查更新 0.4.9.2
 
-[下载 APK](https://github.com/ktao732084-arch/dafeiyu-android/releases/tag/v0.4.9.1) · [来源清单](SOURCE_MAP.md) · [逐文件溯源](PROVENANCE.json) · [验证记录](VALIDATION.md)
+[下载 APK](https://github.com/ktao732084-arch/dafeiyu-android/releases/tag/v0.4.9.2) · [来源清单](SOURCE_MAP.md) · [逐文件溯源](PROVENANCE.json) · [验证记录](VALIDATION.md)
 
-0.4.9.1把“先忙、等我回来”保存成真正的等待状态，忙完后按模型本轮返回的时间恢复主动考虑。删除缺字段时暗中回退15分钟的行为；“最近互动”显示安排来源。主动说“不催、不打扰”改为真正安静，已展示却未回应的话题不反复追问。包含主分支已合并的聊天搜索、长按记住、手账搜索等界面优化。
+0.4.9.2新增“关于 → 检查更新”，内置北京 IP HTTPS 地址。先覆盖安装一次，以后可在 App 内检查、确认下载并交给系统安装。默认每天最多自动检查一次，可关闭自动检查或忽略某个版本；正常覆盖安装保留人格、记忆、聊天和模型配置。
+
+保留0.4.9.1：把“先忙、等我回来”保存成真正的等待状态，忙完后按模型本轮返回的时间恢复主动考虑。删除缺字段时暗中回退15分钟的行为；“最近互动”显示安排来源。主动说“不催、不打扰”改为真正安静，已展示却未回应的话题不反复追问。包含主分支已合并的聊天搜索、长按记住、手账搜索等界面优化。
 
 版本号与发布节奏遵循根目录的 [项目协作约定](AGENTS.md)。
 
@@ -14,7 +16,7 @@
 
 ## 安装与使用
 
-1. 在 Android 8.0+ 安装 `dafeiyu-android-0.4.9.1.apk`。与0.2/0.3/0.4.0/0.4.1沿用同一体验签名，可覆盖安装保留数据。
+1. 在 Android 8.0+ 安装 `dafeiyu-android-0.4.9.2.apk`。与0.2/0.3/0.4.0/0.4.1沿用同一体验签名，可覆盖安装保留数据。
 2. 初次相遇时，手动选择一种性格或随机一次。确认后固定，后期没有重选人格入口。
 3. 「模型连接」默认选择 **DeepSeek V4.1 Flash**。点「去 DeepSeek 官网获取 Key」，登录后创建并复制 API Key，回到 App 粘贴（或点「粘贴剪贴板里的 Key」），点「连接并保存」即可。地址和模型自动填写，测试成功才保存；API需有可用余额，测试与聊天会使用自己的额度。其他服务商选「其他模型 / 自定义」，旧配置保留。
 4. 「记忆手账」查看、搜索、编辑、固定或忘记记忆，可只看自己写的或聊天里自动记下的；「共同经历与记忆变化」查看历史。无需额外设置记忆服务器。
@@ -100,6 +102,8 @@ App在手机本地解析时间范围，查询近期和归档对话，筛选有�
 
 ## 构建与复现
 
+本版已加入轻量版本检查：“关于 → 检查更新”可手动检查；配置更新站点后，启动或桌宠亮屏运行时每天最多自动检查一次，确认后下载并交给系统安装。默认构建已经内置北京公网 IP 的 HTTPS 地址；`-UpdateUrl` 可覆盖为其他受信任 HTTPS 入口。国内服务器仅需托管版本 JSON 和 APK；构建配置、发布脚本和部署步骤见 [更新站点部署](deploy/updates/README.md)，验证范围见 [更新功能验证](docs/UPDATES.md)。
+
 JDK17、Android SDK Platform34、Build Tools36.0.0、PowerShell7；无需 Gradle。签名私钥不随源码分发：
 
 ```powershell
@@ -109,7 +113,7 @@ $env:XIAOXIAO_STORE_PASS='你的签名密码'
 ./tests/robolectric/run-tests.ps1 -AndroidRoot '.' -Sdk 'D:/Android/Sdk' -Jdk 'C:/Program Files/Java/jdk-17'
 ```
 
-产物为 `build/dafeiyu-0.4.9.1.apk`。原生规则由 `tools/generate-native-memory-rules.py` 从已固定的上游源码 AST 生成，不执行 Python 引擎；生成后的 Java 常量随 APK 编译。
+产物为 `build/dafeiyu-0.4.9.2.apk`。原生规则由 `tools/generate-native-memory-rules.py` 从已固定的上游源码 AST 生成，不执行 Python 引擎；生成后的 Java 常量随 APK 编译。
 
 `NativeMemoryTest` 在不启动Python服务的条件下运行84个共享场景，并覆盖默认设置、旧版升级、离线更正、模型配置复用、非法输出回退、批量原子性、时区和删除竞态。`MemoryIntegrationTest` 另保留Python HTTP对照；普通用户运行App不需要这些测试依赖。
 

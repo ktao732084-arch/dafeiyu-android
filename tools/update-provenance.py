@@ -48,7 +48,7 @@ for name in sorted(set(paths) - {'', 'PROVENANCE.json'}):
         data = data.replace(b'\r\n', b'\n')
     row['sha256'] = hashlib.sha256(data).hexdigest()
     rows.append(row)
-previous.update(version='0.4.9.1', memory_engine_commit=upstream['revision'],
+previous.update(version='0.4.9.2', memory_engine_commit=upstream['revision'],
                 scope='Publication inventory, excluding this self-referential manifest and ignored build/user files. Text SHA-256 uses Git LF-normalized contents.', files=rows)
 path.write_text(json.dumps(previous, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 print(f'Updated {len(rows)} attributed file checksums.')
