@@ -1,5 +1,7 @@
 # 轻量更新实现与验证
 
+**发布状态：0.4.9.2 / versionCode 15 已合入最新主分支并内置北京更新地址。当前验收见 [VALIDATION.md](../VALIDATION.md)。以下首轮记录保留开发阶段的范围，不代表当前构建仍留空地址。**
+
 开发分支 `codex/lightweight-updates` 基于 `f6203eb`，与记忆实验及其他工作区隔离。版本仍为 0.4.6 / code 10，没有发布新版本。通用构建默认配置为空；后续已按用户选择接入北京公网 IP + HTTPS，使用独立构建入口，见 [部署记录](../deploy/updates/BEIJING.md)。
 
 ## 实现范围

@@ -8,7 +8,8 @@ import java.io.*;
 /** A tiny same-signer APK fixture is parsed and shared; it is never installed over any app. */
 final class UpdateInstrumentationChecks {
     static void run(AgentInstrumentation test,Context context)throws Exception {
-        test.check(UpdateRuntime.channel(context).isEmpty(),"unconfigured build does not contain an update host");
+        String channel=UpdateRuntime.channel(context);
+        test.check(channel.isEmpty()||AppUpdate.https(channel)!=null,"build channel is empty or valid HTTPS");
         File dir=UpdateApk.directory(context);dir.mkdirs();File downloaded=new File(dir,"fixture.apk");
         try(InputStream in=context.getAssets().open("update-fixture.apk");OutputStream out=new FileOutputStream(downloaded)){byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1)out.write(b,0,n);}
         PackageInfo candidate=context.getPackageManager().getPackageArchiveInfo(downloaded.getAbsolutePath(),UpdateApk.signatureFlags());

@@ -2,7 +2,7 @@
 
 现有北京服务器已选定使用公网 IP + HTTPS，入口为 `https://81.70.79.133/dafeiyu-updates/stable.json`。部署与验证记录见 [北京更新入口](BEIJING.md)。无需先买域名。
 
-通用构建的 `assets/update-channel.json` 仍为空，避免开发测试自动访问线上。接入北京入口时使用 `deploy/updates/build-beijing.ps1`（参数同下方 SDK、JDK、KeyStore），或显式传入 `-UpdateUrl`。配置进入 APK，用户不需要自己填写服务器地址。
+从 0.4.9.2 起，`assets/update-channel.json` 默认内置北京入口。普通构建和 `deploy/updates/build-beijing.ps1` 均可直接使用；显式 `-UpdateUrl` 可更换地址。用户不需要填写服务器地址。框架单测通过 OfflineTestApplication 隔离更新网络，真实网络验收显式执行。
 
 服务器只需通过HTTPS提供两个路径：
 
@@ -21,7 +21,7 @@
 ./deploy/updates/build-beijing.ps1 -Sdk 'D:/Android/Sdk' -Jdk 'C:/Program Files/Java/jdk-17' -KeyStore 'D:/Keys/release.keystore'
 ```
 
-地址只写入本次构建的 `fish-assets/update-channel.json`。不传 `-UpdateUrl` 会恢复为空，不沿用上一次构建地址。正式发布仍须遵循AGENTS.md的版本递增和签名连续性要求。
+地址只写入本次构建的 `fish-assets/update-channel.json`。不传 `-UpdateUrl` 会恢复仓库默认的北京地址，不沿用上一次构建覆盖值。正式发布仍须遵循AGENTS.md的版本递增和签名连续性要求。
 
 ## 准备发布文件
 
@@ -71,4 +71,4 @@ python tools/prepare-update.py --apk build/dafeiyu-新版本.apk --build-tools '
 - 没有安装权限时引导至系统设置，返回后点击安装；系统仍要求用户确认。不会卸载旧App或清空记忆。
 - 旧版没有检测逻辑，用户必须先手动覆盖安装一次带更新功能且配置了真实地址的正式版本。
 
-更新站点可先镜像已有发布包，但该包不因此自动获得更新功能。独立分支中的客户端功能仍需合入后续正式签名版本；不要将开发测试签名 APK 当作正式升级包分发。当前部署状态和实测边界以 BEIJING.md 为准。
+更新站点可先镜像已有发布包，但该包不因此自动获得更新功能。0.4.9.2 已合入客户端功能并沿用发布签名；不要将其他开发测试签名 APK 当作升级包分发。当前部署状态和实测边界以 BEIJING.md 为准。

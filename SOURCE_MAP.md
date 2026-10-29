@@ -149,8 +149,8 @@ Nickname、ChatPolishRulesTest和ChatPolishTest由本项目新增，称呼识别
 
 发布前再合并[后台存储与上手优化](https://github.com/ktao732084-arch/dafeiyu-android/commit/59c04c7)：展示记录异步写盘、归档缓存、编辑手账后台执行、首次使用提示与隐藏桌宠等。`AgentStore.shown`的合并同时保留后台写盘和本轮已展示话题记录；新增对异步写盘后主题恢复的验证。
 
-## 开发分支：轻量更新
+## 0.4.9.2 轻量更新
 
-AppUpdate、UpdateTransport、UpdateApk、UpdateFileProvider、UpdateRuntime、UpdatePanel、prepare-update.py、部署模板及相应测试均为本项目新增实现。使用 Android 平台网络、包管理器、ContentProvider 和系统安装界面；没有引入第三方更新 SDK、动态服务端或外部 Agent 代码。版本仍为 0.4.6，仅作开发验证，尚未发布。
+AppUpdate、UpdateTransport、UpdateApk、UpdateFileProvider、UpdateRuntime、UpdatePanel、prepare-update.py、部署模板及相应测试均为本项目新增实现。使用 Android 平台网络、包管理器、ContentProvider 和系统安装界面；没有引入第三方更新 SDK、动态服务端或外部 Agent 代码。合入当前主分支后以 0.4.9.2 发布，保留原产品与素材归属。
 
-公网 IP 接入的 Nginx 路径配置、北京构建入口与 UpdateNetworkInstrumentation 为本项目新增；复用用户已有北京服务器和 IP 证书续期配置。镜像安装包来自本仓库已发布的 v0.4.7，保持原字节、签名及上游素材归属；没有重新打包或另行发布开发 APK。
+公网 IP 接入的 Nginx 路径配置、北京构建入口与 UpdateNetworkInstrumentation 为本项目新增；复用用户已有北京服务器和 IP 证书续期配置。站点最初镜像 v0.4.7；本次以原签名发布 0.4.9.2，保留上游素材归属。UpgradeAcceptance 与 OfflineTestApplication 为本项目新增验证代码：前者仅在新建模拟器使用合成数据验证真实 APK 覆盖安装，后者阻止框架单测意外访问线上更新站点。
