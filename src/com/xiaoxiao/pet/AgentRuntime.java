@@ -61,6 +61,7 @@ final class AgentRuntime {
         String requested=!proactive&&history==null?Nickname.requested(user):null;if(requested!=null)in.nickname=requested;
         in.feeling=store().mood(System.currentTimeMillis());in.mood=in.feeling.optString("emotion","calm");in.timeZone=TimeZone.getDefault().getID();in.now=System.currentTimeMillis();in.initializedAt=PersonaManager.initializedAt("main");
         if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}in.remember=rememberEnabled();in.diary=diaryEnabled();if(in.remember&&in.diary&&history==null)in.understanding=Understanding.context(s);
+        GrowthStore growth=GrowthStore.quiet();if(growth!=null){in.chapter=growth.chapter();in.lore=growth.lore();}
         if(in.remember&&history==null){
             // Whole-conversation recall, minus what the history window already carries and corrected sources.
             Set<String> exclude=MemoryLedger.staleSources(s,in.now);JSONArray turns=s.getJSONArray("turns");for(int i=Math.max(0,turns.length()-12);i<turns.length();i++)exclude.add(ChatArchive.id(turns.getJSONObject(i)));
@@ -91,6 +92,8 @@ final class AgentRuntime {
         if(!proactive){if(Looper.myLooper()==Looper.getMainLooper())Chat.interruptPresentation("main");else main.post(()->Chat.interruptPresentation("main"));}
         // Wake a dozing pet before the prompt is built, so the reply can sound freshly woken.
         if(!proactive&&PetService.instance!=null){if(Looper.myLooper()==Looper.getMainLooper())PetService.instance.heard("main");else main.post(()->{if(PetService.instance!=null)PetService.instance.heard("main");});}
+        // Chat comes first: she cuts a trip short to answer.
+        if(!proactive&&PetService.instance!=null){if(Looper.myLooper()==Looper.getMainLooper())PetService.instance.callBack();else main.post(()->{if(PetService.instance!=null)PetService.instance.callBack();});}
         worker.execute(()->{
             AgentStore attemptStore=null;long attemptEpoch=-1;
             try {
@@ -157,9 +160,12 @@ final class AgentRuntime {
                 Runnable completion=()->{if(!delivered.compareAndSet(false,true))return;release(token);if(db.epoch()!=completedEpoch){listener.error("记录已修改，本次已完成的回复不再显示");return;}listener.saved(turnId);listener.done(output.reply,output.emotion);if(explicitWas==null&&history==null)writeDiaryIfDue();};
                 synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true,null,history==null&&explicit==null?result.plan:null,result.moodLevel,rememberEnabled()?result.moodCause:""))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");if(history==null)Nickname.committed(user);token.completed=completion;}
                 main.post(completion);
+                // Growth counts only a committed turn of yours; proactive turns and history questions earn nothing.
+                if(history==null)grow();
             }catch(Exception e){if(proactive&&attemptStore!=null)try{synchronized(AgentRuntime.class){if(current(token))attemptStore.initiativeDecision(attemptEpoch,"error",Initiative.DEFAULT_MINUTES,System.currentTimeMillis());}}catch(Exception ignored){}String msg=e instanceof java.net.SocketTimeoutException?"等模型回复超时了，消息还在，可以重试。":e.getMessage();main.post(()->{if(current(token)){release(token);listener.error(msg==null?"连接失败，请检查网络和模型配置":msg);}});}
         });return true;
     }
+    static void grow(){GrowthStore g=GrowthStore.quiet();if(g==null)return;try{g.met();g.chatted();g.sync();}catch(Exception e){Data.log("main","成长记录暂未保存");}}
     static boolean nightQuiet(){return nightQuiet(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));}
     static boolean nightQuiet(int hour){return Data.prefs().getBoolean("agent.quietNight",false)&&AgentPolicy.quiet(hour);}
     static boolean canSpeakNow(){

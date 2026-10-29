@@ -154,3 +154,8 @@ Nickname、ChatPolishRulesTest和ChatPolishTest由本项目新增，称呼识别
 AppUpdate、UpdateTransport、UpdateApk、UpdateFileProvider、UpdateRuntime、UpdatePanel、prepare-update.py、部署模板及相应测试均为本项目新增实现。使用 Android 平台网络、包管理器、ContentProvider 和系统安装界面；没有引入第三方更新 SDK、动态服务端或外部 Agent 代码。合入当前主分支后以 0.4.9.2 发布，保留原产品与素材归属。
 
 公网 IP 接入的 Nginx 路径配置、北京构建入口与 UpdateNetworkInstrumentation 为本项目新增；复用用户已有北京服务器和 IP 证书续期配置。站点最初镜像 v0.4.7；本次以原签名发布 0.4.9.2，保留上游素材归属。UpgradeAcceptance 与 OfflineTestApplication 为本项目新增验证代码：前者仅在新建模拟器使用合成数据验证真实 APK 覆盖安装，后者阻止框架单测意外访问线上更新站点。
+
+## 养成主线（源码集成，未独立发布）
+
+`Growth.java`、`GrowthStore.java`、`GrowthSheets.java`、`GrowthPanel.java`、`assets/story.json`和`GrowthTest.java`为本项目AI辅助新增：羁绊值与小鱼干、章节门槛与剧情、动作解锁、喂食、出门与明信片、泡泡瓶与图鉴、旧版回溯。世界观、剧情台词和40个旅行地点为本项目新写，不来自上游人格或素材；玩法思路参考了 VPet、Finch、旅行青蛙、女神异闻录协力者、星露谷好感事件等公开产品的设计理念，没有复制其代码、文案或素材。`PetService`、`PetMenu`、`ActionSheet`、`ActionPlan`、`AgentRuntime`、`AgentStore`、`AgentPolicy`、`PromptBuilder`、`MainActivity`与`AgentPanel`在既有实现上接线，沿用各自来源。动画全部使用原有角色素材，素材许可不变。
+

@@ -97,7 +97,10 @@ final class ActionPlan {
     static final long ATTENTIVE_FOR=90_000L,SULKS_FOR=2*MINUTE,LONELY_AFTER=180*MINUTE,AWAKE_AFTER_WAKING=10*MINUTE;
     static final int RECENT=8;
 
-    private final Set<String> available;
+    private volatile Set<String> available;
+    // Growth: no meal yet today makes the meal-time grumbling likelier; just fed, she is content for half an hour.
+    volatile boolean hungry; volatile long fedAt=-1;
+    static final List<String> HUNGRY=Arrays.asList("是啊，吃什么","偷吃零食被抓住"), FULL=Arrays.asList("悠闲哼歌","超大伸懒腰");
     private final ArrayDeque<String> recent=new ArrayDeque<>();
     private final Map<String,Long> played=new HashMap<>();
     private final ArrayDeque<Long> taps=new ArrayDeque<>();
@@ -106,6 +109,8 @@ final class ActionPlan {
     private volatile long lastInteraction=-1,annoyedAt=-1,awakeUntil=0;
 
     ActionPlan(Collection<String> available){ this.available=new HashSet<>(available); }
+    /** Clips unlocked by the growth chapter; locked ones leave the idle pools and the emotion choices. */
+    void available(Collection<String> available){ this.available=new HashSet<>(available); }
 
     /** Festival clips for this day; daytime only, applied by idle(). */
     static List<String> festival(Moment m) {
@@ -198,6 +203,8 @@ final class ActionPlan {
             if(m.between(8,0,22,30)) add(pools,weights,festival(m),3,now);
             add(pools,weights,slot(m),m.late()?6:4,now);
             if(m.between(8,0,22,30)) add(pools,weights,season(m),1,now);
+            if(hungry&&(m.between(11,0,11,30)||m.between(15,0,16,30)||m.between(17,0,17,30))) add(pools,weights,HUNGRY,3,now);
+            if(fedAt>0&&now>=fedAt&&now-fedAt<30*MINUTE) add(pools,weights,FULL,4,now);
             add(pools,weights,m.weekend()||m.between(19,30,22,30)?merge(EVERYDAY,PLAY):EVERYDAY,3,now);
             if(annoyedAt>=0&&now-annoyedAt<SULKS_FOR) add(pools,weights,SULKING,8,now);
             else if(now-lastInteraction<ATTENTIVE_FOR) add(pools,weights,ATTENTION,6,now);
