@@ -173,8 +173,9 @@ final class ChatPage {
         body.addView(content,new LinearLayout.LayoutParams(-2,-2));
         if(proactive){TextView note=Apple.label(c,"她主动来找你",11,false);note.setTextColor(Apple.SECONDARY);note.setPadding(dp(4),dp(5),0,0);body.addView(note);}
         if(pending!=null){Button expand=new Button(c);expand.setText(ReplySegments.label(pending));Apple.button(expand,false);expand.setTextSize(12);expand.setMinHeight(dp(30));expand.setPadding(dp(12),0,dp(12),0);expand.setOnClickListener(v->expand(pending));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-2,dp(30));p.topMargin=dp(6);body.addView(expand,p);}
-        View face=new View(c);face.setBackground(user?Avatar.me(c,36):Avatar.of(c,role,36));LinearLayout.LayoutParams faceSize=new LinearLayout.LayoutParams(dp(36),dp(36));
-        if(user){faceSize.leftMargin=dp(8);line.addView(body);line.addView(face,faceSize);}else{faceSize.rightMargin=dp(8);line.addView(face,faceSize);line.addView(body);}
+        // Only her side carries an avatar; your messages are bubbles alone on the right.
+        if(user)line.addView(body);
+        else{View face=new View(c);face.setBackground(Avatar.of(c,role,36));LinearLayout.LayoutParams faceSize=new LinearLayout.LayoutParams(dp(36),dp(36));faceSize.rightMargin=dp(8);line.addView(face,faceSize);line.addView(body);}
         rows.addView(line,new LinearLayout.LayoutParams(-1,-2));return line;
     }
     /** Three breathing dots in her bubble while the reply is on its way. */
