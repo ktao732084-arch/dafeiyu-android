@@ -25,7 +25,14 @@ public class GomokuUiTest {
         String shown=UiTest.texts(p.dialog.getWindow().getDecorView());for(String level:Gomoku.LEVELS)assertFalse(shown.contains(Gomoku.levelLabel(level)));
     }
     @Test public void invitationButtonRoutesToSameRealBoard()throws Exception{
-        ChatPage chat=new ChatPage(a,"main","main");chat.open();chat.message("陪我下盘五子棋吧",false,null,true);UiTest.click(chat.rows,"开始对局 · 五子棋");idle();assertFalse(chat.dialog.isShowing());assertTrue(GomokuPage.current.get().dialog.isShowing());
+        ChatPage chat=new ChatPage(a,"main","main");chat.open();chat.segments(new org.json.JSONObject().put("reply","陪我下盘五子棋吧").put("proactive",true));UiTest.click(chat.rows,"开始对局 · 五子棋");idle();assertFalse(chat.dialog.isShowing());assertTrue(GomokuPage.current.get().dialog.isShowing());
+    }
+    @Test public void commentaryDoesNotOfferGameAndExplicitIntentOffersOnlyOnce()throws Exception{
+        ChatPage chat=new ChatPage(a,"main","main");chat.open();chat.rows.removeAllViews();
+        chat.segments(new org.json.JSONObject().put("reply","这盘五子棋是你赢了。我输了两局，还要继续练练。"));assertFalse(UiTest.texts(chat.rows).contains("开始对局"));assertTrue(chat.rows.getChildCount()>=2);
+        chat.rows.removeAllViews();chat.segments(new org.json.JSONObject().put("user","我想玩五子棋").put("reply","好呀，准备好了。我们来一盘吧。"));String labels=UiTest.texts(chat.rows);assertEquals(1,labels.split("开始对局",-1).length-1);
+        chat.rows.removeAllViews();String reply="先聊聊刚才的棋局。陪我再下盘五子棋吧。";chat.segments(new org.json.JSONObject().put("reply",reply).put("segmentVersion",3).put("displayed",1));assertFalse(UiTest.texts(chat.rows).contains("开始对局"));assertFalse(UiTest.texts(chat.rows).contains("再下盘"));
+        chat.dialog.dismiss();
     }
     @Test public void endIsConfirmedAndHistoryCountsItOnce()throws Exception{
         GomokuPage.show(a);idle();GomokuPage p=GomokuPage.current.get();p.play(112);idle();p.finish();assertFalse(p.game.over());AlertDialog confirm=(AlertDialog)UiTest.dialog();confirm.getButton(-1).performClick();idle();assertTrue(p.game.abandoned);assertEquals(1,GomokuPage.store().context().getInt("abandoned"));assertTrue(p.again.getText().toString().contains("再来"));
