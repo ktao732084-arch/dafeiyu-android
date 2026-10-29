@@ -22,7 +22,7 @@ public class ConversationTest {
     }
     @Test public void longPressOnYourOwnWordsRemembersThem()throws Exception{
         seed(3);open();TextView mine=UiTest.find(page.rows,"历史问题1");mine.performLongClick();PopupMenu menu=ShadowPopupMenu.getLatestPopupMenu();assertEquals(2,menu.getMenu().size());
-        Shadows.shadowOf(menu).getOnMenuItemClickListener().onMenuItemClick(menu.getMenu().getItem(1));JSONArray memories=AgentRuntime.store().snapshot().getJSONArray("memories");
+        Shadows.shadowOf(menu).getOnMenuItemClickListener().onMenuItemClick(menu.getMenu().getItem(1));UiTest.storage();JSONArray memories=AgentRuntime.store().snapshot().getJSONArray("memories");
         assertEquals(1,memories.length());assertEquals("历史问题1",memories.getJSONObject(0).getString("text"));assertFalse(memories.getJSONObject(0).getBoolean("pinned"));assertTrue(MemoryLedger.manual(memories.getJSONObject(0)));
     }
     @Test public void searchFindsArchivedWordsAndOpensThatDayAtTheTurn()throws Exception{
@@ -31,6 +31,12 @@ public class ConversationTest {
         open();JSONArray hits=AgentRuntime.store().searchChat("老码头",40);assertEquals(1,hits.length());page.jump(hits.getJSONObject(0),"老码头");
         assertTrue(UiTest.texts(page.rows).contains("楼下新开的火锅店叫老码头"));assertTrue(UiTest.texts(page.rows).contains("— 搜索到的这一句 —"));assertEquals(android.view.View.VISIBLE,page.filter.getVisibility());
         assertFalse("other days stay out",UiTest.texts(page.rows).contains("日常11"));page.latest();assertTrue(UiTest.texts(page.rows).contains("日常199"));assertFalse(UiTest.texts(page.rows).contains("— 搜索到的这一句 —"));
+    }
+    @Test public void failedReplyOffersResendWithTheDraft()throws Exception{
+        ModelSettings.save("https://example.invalid/v1","mock","test-key",false);AgentRuntime.model=(m,t,p)->{throw new java.io.IOException("controlled failure");};open();
+        page.input.setText("在吗");page.send();UiTest.awaitIdle();assertEquals("在吗",page.input.getText().toString());assertEquals(android.view.View.VISIBLE,page.retry.getVisibility());
+        AgentRuntime.model=(m,t,p)->"在呢。";page.retry.performClick();assertNotEquals(android.view.View.VISIBLE,page.retry.getVisibility());UiTest.awaitIdle();assertEquals("在吗",last().getString("user"));
+        page.input.setText("x");page.input.setText("");assertNotEquals(android.view.View.VISIBLE,page.retry.getVisibility());
     }
     @Test public void oneModelCallCreatesProgressiveSegmentsAndDisplayedTimestamps()throws Exception{
         ModelSettings.save("https://example.invalid/v1","mock","test-key",false);java.util.concurrent.atomic.AtomicInteger calls=new java.util.concurrent.atomic.AtomicInteger();AgentRuntime.model=(m,t,p)->{calls.incrementAndGet();return new JSONObject().put("reply",REPLY).toString();};open();page.input.setText("聊聊今天");page.send();UiTest.awaitIdle();

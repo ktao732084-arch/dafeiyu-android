@@ -7,7 +7,7 @@ final class ChatPage {
     static final long STAMP_GAP=5*60*1000L;static final int PAGE=20,SEARCH_LIMIT=40;
     static java.lang.ref.WeakReference<ChatPage> current=new java.lang.ref.WeakReference<>(null);
     final Context c;final String role,id;final boolean overlay;final Dialog dialog;final Handler handler=new Handler(Looper.getMainLooper());
-    final LinearLayout rows;final ScrollView scroll;final EditText input;TextView status;final TextView presence,filter,setup;final Button send,older,jump;final FrameLayout stage;final int bubbleWidth,listHeight;int lifted;
+    final LinearLayout rows;final ScrollView scroll;final EditText input;TextView status;final TextView presence,filter,setup;final Button send,older,jump,retry;final FrameLayout stage;final int bubbleWidth,listHeight;int lifted;
     final SpeechQueue speech;final Runnable interrupt,refresh;JSONArray records=new JSONArray();boolean sending,paged,nearBottom=true;String draft="",turnId,lastDay,anchor,focus;long from=Long.MIN_VALUE,to=Long.MAX_VALUE,lastStamp;View typing;
     ChatPage(Context context,String role,String id){
         this.c=context;this.role=role;this.id=id;overlay=!(c instanceof Activity);dialog=overlay?CompactPanel.create(c):ClientPage.create(c);
@@ -37,6 +37,9 @@ final class ChatPage {
         setup=Apple.label(c,"还没接通模型，现在她只能帮你记东西（用「记住：」开头）。点这里去连接 ›",13,false);setup.setTextColor(Apple.BLUE);setup.setLineSpacing(dp(2),1);setup.setPadding(dp(16),dp(10),dp(16),dp(10));setup.setBackground(Apple.shape(c,Apple.TINT,0));setup.setOnClickListener(v->connect());box.addView(setup);
         status=Apple.label(c,"",12,false);status.setTextColor(Apple.SECONDARY);status.setGravity(Gravity.CENTER);status.setLineSpacing(dp(2),1);status.setPadding(dp(16),dp(8),dp(16),dp(8));status.setBackgroundColor(Apple.FILL);status.setVisibility(View.GONE);
         status.addTextChangedListener(new Watcher(()->status.setVisibility(status.getText().length()==0?View.GONE:View.VISIBLE)));box.addView(status);
+        // After a failed or stopped reply the draft is back in the field; one tap sends it again.
+        retry=new Button(c);retry.setText("重新发送");Apple.button(retry,false);retry.setTextSize(13);retry.setMinHeight(dp(36));retry.setVisibility(View.GONE);retry.setOnClickListener(v->send());
+        LinearLayout.LayoutParams again=new LinearLayout.LayoutParams(-2,dp(36));again.gravity=Gravity.CENTER_HORIZONTAL;again.bottomMargin=dp(6);box.addView(retry,again);
         // Composer: a rounded field and a pill-shaped send button.
         box.addView(Apple.hairline(c),new LinearLayout.LayoutParams(-1,1));
         LinearLayout compose=new LinearLayout(c);compose.setGravity(Gravity.BOTTOM);compose.setPadding(dp(12),dp(8),dp(12),dp(10));
@@ -97,7 +100,7 @@ final class ChatPage {
         if(y>a.y){lifted+=y-a.y;a.y=y;w.setAttributes(a);}
         if(height!=list.height){list.height=height;stage.setLayoutParams(list);}
     }
-    void sendState(){send.setAlpha(sending||input.getText().toString().trim().length()>0?1f:.45f);}
+    void sendState(){boolean typed=input.getText().toString().trim().length()>0;send.setAlpha(sending||typed?1f:.45f);if(retry!=null&&!typed)retry.setVisibility(View.GONE);}
     void menu(View anchor){
         PopupMenu menu=new PopupMenu(c,anchor);menu.getMenu().add(0,3,0,"搜索聊天");menu.getMenu().add(0,1,1,"按日期查看");menu.getMenu().add(0,2,2,"回到最新");
         menu.setOnMenuItemClickListener(item->{if(item.getItemId()==3)search();else if(item.getItemId()==1)pickDate();else latest();return true;});menu.show();
@@ -198,8 +201,7 @@ final class ChatPage {
         if(sending||AgentRuntime.busy()){Toast.makeText(c,"她还在回话，等她说完再记吧",0).show();return;}
         String text=raw.trim().replaceFirst("^记住[:：]\\s*","");
         if(text.length()>240){Toast.makeText(c,"这句有点长，可以去记忆手账写一条精简的",1).show();return;}
-        try{AgentRuntime.store().remember(text,false);Toast.makeText(c,"记下了，可以在记忆手账里修改或固定",0).show();}
-        catch(Exception e){Toast.makeText(c,e.getMessage()==null?"没记上，请稍后再试":e.getMessage(),1).show();}
+        Chat.store(c,()->AgentRuntime.store().remember(text,false),()->Toast.makeText(c,"记下了，可以在记忆手账里修改或固定",0).show(),e->Toast.makeText(c,e.getMessage()==null?"没记上，请稍后再试":e.getMessage(),1).show());
     }
     /** Searches everything you said and everything she showed, across the whole history; a result opens the chat there. */
     void search(){
@@ -251,10 +253,10 @@ final class ChatPage {
             public void done(String reply,String emotion){if(!dialog.isShowing())return;from=Long.MIN_VALUE;to=Long.MAX_VALUE;anchor=focus=null;sending=false;send.setText("发送");input.setEnabled(true);sendState();idle();status.setText("");loadLatest();
                 PetService.Pet p=pet();if(p!=null)p.clearBubble();if(overlay&&p!=null&&p.visible&&!p.docked){AgentRuntime.express(id,emotion,reply,turnId);}else speech.start(reply);
             }
-            public void error(String message){if(!dialog.isShowing())return;sending=false;send.setText("发送");input.setEnabled(true);input.setText(draft);sendState();idle();status.setText(message);loadLatest();PetService.Pet p=pet();if(p!=null)p.clearBubble();}
+            public void error(String message){if(!dialog.isShowing())return;sending=false;send.setText("发送");input.setEnabled(true);input.setText(draft);sendState();idle();status.setText(message);retry.setVisibility(draft.isEmpty()?View.GONE:View.VISIBLE);loadLatest();PetService.Pet p=pet();if(p!=null)p.clearBubble();}
         };
         if(!AgentRuntime.send(message,false,listener)){status.setText("她还在回上一句，稍等一下哦");return;}
-        sending=true;input.setText("");input.setEnabled(false);send.setText("停止");sendState();status.setText("");presence.setText("对方正在输入…");presence.setTextColor(Apple.BLUE);
+        sending=true;retry.setVisibility(View.GONE);input.setText("");input.setEnabled(false);send.setText("停止");sendState();status.setText("");presence.setText("对方正在输入…");presence.setTextColor(Apple.BLUE);
         if(records.length()==0)rows.removeAllViews();stamp(new JSONObject(),System.currentTimeMillis());message(message,true,null,false);typing(true);scroll.post(()->scroll.fullScroll(View.FOCUS_DOWN));if(owner!=null&&owner.visible)owner.thinking();
     }
     void stopSpeaking(){speech.cancel();PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();}
