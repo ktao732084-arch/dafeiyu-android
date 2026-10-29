@@ -143,8 +143,15 @@ final class AgentPolicy {
         if(brackets>=3)notes.add("最近括号里的动作描写多了，这次不用或只用一处。");
         if(length/n>140)notes.add("最近回复偏长，日常闲聊一到三句就好。");
         if(emoji>=3)notes.add("表情符号用得多了，这次少用。");
+        // Handing every turn back with a question, and stock comfort, are what make a reply read like an assistant.
+        int asked=0;for(int i=Math.max(0,n-3);i<n;i++)if(asks(replies.get(i)))asked++;
+        if(asked>=2)notes.add("最近几句都用问句收尾，这次说完自己的话就停，不用再问对方。");
+        for(String stock:STOCK){int used=0;for(String r:replies)if(r.contains(stock))used++;if(used>=2){notes.add("「"+stock+"」这类安慰的套话最近说过了，这次换成具体的反应。");break;}}
         return notes;
     }
+    static final String[] STOCK={"听起来","我在这儿","我在这里","我在呢","抱抱","辛苦了","你已经很棒","我理解你","我懂你","别太累"};
+    /** A reply that ends by handing the turn back with a question, ignoring trailing tildes, ellipses and brackets. */
+    static boolean asks(String reply){String t=reply.trim().replaceAll("[～~…。）)\\s]+$","");return t.endsWith("？")||t.endsWith("?");}
     /** A 3–6 character phrase (not mere punctuation) that appears in at least three of the replies. */
     static String catchphrase(List<String> replies) {
         String best=null;for(Map.Entry<String,Integer> e:phrases(replies).entrySet())if(e.getValue()>=3&&(best==null||e.getKey().length()>best.length()))best=e.getKey();
