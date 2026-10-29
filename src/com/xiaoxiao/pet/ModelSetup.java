@@ -20,7 +20,7 @@ final class ModelSetup {
     static final class Screen {
         final Activity a;final Handler main=new Handler(Looper.getMainLooper());
         final LinearLayout body,advanced,guide;final RadioGroup providers;final RadioButton deepseek,custom;
-        final EditText url,model,key;final Switch header;final TextView status,balance;final Button test,clear,refreshBalance;
+        final EditText url,model,key;final Switch header,stream;final TextView status,balance;final Button test,clear,refreshBalance,paste;
         AlertDialog dialog;AgentTransport.Token active;Runnable deadline;
         Screen(Activity activity){
             a=activity;body=column();body.setPadding(dp(16),dp(8),dp(16),dp(12));
@@ -37,8 +37,11 @@ final class ModelSetup {
             url=Chat.field(a,advanced,"API 地址（https://…/v1）",Data.prefs().getString("api.url",""),false);url.setContentDescription("API 地址");
             model=Chat.field(a,advanced,"模型名称",Data.prefs().getString("api.model",""),false);model.setContentDescription("模型名称");
             header=new Switch(a);header.setText("使用 api-key 请求头");header.setTextColor(Apple.INK);header.setChecked(Data.prefs().getBoolean("api.header",false));advanced.addView(header);
+            // Only some compatible servers lack streaming, so the switch lives with the custom address rather than in 陪伴设置.
+            stream=new Switch(a);stream.setText("流式接收（接口不支持时关闭）");stream.setTextColor(Apple.INK);stream.setChecked(Data.prefs().getBoolean("agent.stream",true));advanced.addView(stream);
             key=Chat.field(a,body,Data.prefs().getString("api.secret","").isEmpty()?"在这里粘贴 API Key":"已保存 Key；留空继续使用","",true);key.setContentDescription("API Key");
             key.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
+            paste=button(body,"粘贴剪贴板里的 Key",this::paste);
             label(body,"Key 加密存在这台手机里。聊天内容和相关记忆会发给你选的模型服务商。",12);
             test=button(body,"测试连接",()->connect(false));
             status=label(body,"连接测试会发送一条简短消息，使用你的 API 额度。",12);status.setContentDescription("模型连接状态");status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
@@ -60,12 +63,21 @@ final class ModelSetup {
         void mode(){boolean simple=deepseek.isChecked();guide.setVisibility(simple?View.VISIBLE:View.GONE);advanced.setVisibility(simple?View.GONE:View.VISIBLE);test.setVisibility(simple?View.GONE:View.VISIBLE);if(dialog!=null)dialog.getButton(-1).setText(simple?"连接并保存":"保存");}
         ModelSettings.Config config()throws Exception {
             String base=deepseek.isChecked()?ModelPresets.DEEPSEEK_URL:url.getText().toString().trim();
-            return new ModelSettings.Config(base,deepseek.isChecked()?ModelPresets.DEEPSEEK_MODEL:model.getText().toString().trim(),ModelSettings.selectedSecret(base,key.getText().toString()),!deepseek.isChecked()&&header.isChecked(),Data.prefs().getBoolean("agent.stream",true));
+            return new ModelSettings.Config(base,deepseek.isChecked()?ModelPresets.DEEPSEEK_MODEL:model.getText().toString().trim(),ModelSettings.selectedSecret(base,key.getText().toString()),!deepseek.isChecked()&&header.isChecked(),deepseek.isChecked()?Data.prefs().getBoolean("agent.stream",true):stream.isChecked());
         }
         void saveCustom(){try{save(config());}catch(Exception e){error(e);}}
+        /** Pasting a long key on a phone keyboard is fiddly; this takes the first clipboard item and shows only its ends. */
+        void paste(){
+            ClipboardManager board=a.getSystemService(ClipboardManager.class);ClipData clip=board==null?null:board.getPrimaryClip();
+            CharSequence text=clip==null||clip.getItemCount()==0?null:clip.getItemAt(0).coerceToText(a);String value=text==null?"":text.toString().trim();
+            if(value.isEmpty()){status.setText("剪贴板里没有文字。先去官网复制 Key，再回来点这里。");return;}
+            if(value.matches("(?s).*\\s.*")||value.length()>512){status.setText("剪贴板里的内容不像一枚 Key，请只复制 Key 本身。");return;}
+            key.setText(value);key.setSelection(value.length());
+            status.setText("已粘贴 Key（"+(value.length()>10?value.substring(0,3)+"…"+value.substring(value.length()-4):"已隐藏")+"）。"+(deepseek.isChecked()?"点「连接并保存」试试。":"可以测试或保存了。"));
+        }
         void clearKey(){cancel();try{ModelSettings.clear();key.setText("");key.setHint("在这里粘贴 API Key");balance.setText("余额尚未查询");status.setText("已清除 Key，重新粘贴后即可连接。");clear.setVisibility(View.GONE);refresh();}catch(Exception e){error(e);}}
         void save(ModelSettings.Config config)throws Exception {
-            ModelSettings.save(config.address.base,config.model,config.secret,config.keyHeader);
+            ModelSettings.save(config.address.base,config.model,config.secret,config.keyHeader);Data.prefs().edit().putBoolean("agent.stream",config.stream).apply();
             dialog.dismiss();refresh();Toast.makeText(a,"模型设置已保存，可以开始聊天啦",Toast.LENGTH_SHORT).show();
         }
         void refresh(){if(a instanceof MainActivity&&!a.isFinishing()&&!a.isDestroyed())((MainActivity)a).render();}
@@ -103,7 +115,7 @@ final class ModelSetup {
         boolean current(AgentTransport.Token token){return active==token&&!token.cancelled&&dialog.isShowing()&&!a.isFinishing()&&!a.isDestroyed();}
         void finish(){if(deadline!=null)main.removeCallbacks(deadline);active=null;enabled(true);}
         void cancel(){if(active!=null)active.cancel();finish();}
-        void enabled(boolean value){key.setEnabled(value);url.setEnabled(value);model.setEnabled(value);header.setEnabled(value);deepseek.setEnabled(value);custom.setEnabled(value);test.setEnabled(value);clear.setEnabled(value);refreshBalance.setEnabled(value);if(dialog!=null)dialog.getButton(-1).setEnabled(value);}
+        void enabled(boolean value){key.setEnabled(value);url.setEnabled(value);model.setEnabled(value);header.setEnabled(value);deepseek.setEnabled(value);custom.setEnabled(value);test.setEnabled(value);clear.setEnabled(value);paste.setEnabled(value);stream.setEnabled(value);refreshBalance.setEnabled(value);if(dialog!=null)dialog.getButton(-1).setEnabled(value);}
         void error(Exception e){String message=e.getMessage();String entered=key.getText().toString().trim();if(message==null)message="请检查网络和 API Key 后重试。";if(!entered.isEmpty())message=message.replace(entered,"***");status.setText(message);}
         void open(String address){try{a.startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(address)));}catch(ActivityNotFoundException e){status.setText("未找到浏览器，请用浏览器打开："+address);}}
         int dp(int value){return Apple.dp(a,value);}

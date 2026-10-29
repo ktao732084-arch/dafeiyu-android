@@ -1,5 +1,5 @@
 package com.xiaoxiao.pet;
-import android.app.*;import android.widget.*;import org.json.*;
+import android.app.*;import android.view.View;import android.widget.*;import org.json.*;
 
 final class MemoryPanel {
     static void interactions(MainActivity a){try{
@@ -13,13 +13,16 @@ final class MemoryPanel {
     static Switch toggle(MainActivity a,LinearLayout l,String label,boolean value){Switch s=new Switch(a);s.setText(label);s.setTextColor(Apple.INK);s.setChecked(value);l.addView(s);return s;}
     static void settings(MainActivity a){
         LinearLayout l=a.column();l.setPadding(a.dp(18),a.dp(8),a.dp(18),a.dp(18));
-        GroupedList.note(l,"记忆引擎就装在手机里。理解时间、去重、更正、归档和查找都在本机完成，不需要电脑，也不用另外部署服务。");
+        TextView intro=GroupedList.note(l,"记忆引擎就装在手机里。理解时间、去重、更正、归档和查找都在本机完成，不需要电脑，也不用另外部署服务。");
         GroupedList.toggle(GroupedList.group(l),"用当前模型辅助理解记忆",Data.prefs().getBoolean("memory.smart",true),(v,on)->{AgentRuntime.cancel();Data.prefs().edit().putBoolean("memory.smart",on).apply();});
         GroupedList.note(l,"默认开启。直接用「模型连接」里的模型和 Key，帮她听懂换种说法、喜好变化这些事，可能多用一点模型请求。没网或模型不可用时用本机规则，记忆照样存在手机里。");
         GroupedList.note(l,"上次整理："+MemoryBridge.lastStatus);
         LinearLayout rows=GroupedList.group(l);GroupedList.row(rows,"共同经历与记忆变化",v->history(a));
-        GroupedList.row(rows,"开发联调（可选）",v->serviceSettings(a));
-        GroupedList.row(rows,"使用手机内置引擎",v->{try{MemoryBridge.save(false,"","",false,false);MemoryBridge.lastStatus="手机内置记忆 · 默认运行";Toast.makeText(a,"已使用手机内置记忆",Toast.LENGTH_SHORT).show();}catch(Exception e){AgentPanel.fail(a,e);}});
+        // Python comparison is for developers: hidden unless already in use, and revealed by long-pressing the first paragraph.
+        LinearLayout dev=GroupedList.group(l);dev.setVisibility("python-debug".equals(Data.prefs().getString("memory.mode","native"))?View.VISIBLE:View.GONE);
+        intro.setOnLongClickListener(v->{dev.setVisibility(View.VISIBLE);return true;});
+        GroupedList.row(dev,"开发联调（可选）",v->serviceSettings(a));
+        GroupedList.row(dev,"使用手机内置引擎",v->{try{MemoryBridge.save(false,"","",false,false);MemoryBridge.lastStatus="手机内置记忆 · 默认运行";Toast.makeText(a,"已使用手机内置记忆",Toast.LENGTH_SHORT).show();}catch(Exception e){AgentPanel.fail(a,e);}});
         ScrollView scroll=new SpringScrollView(a);scroll.addView(l);new Apple.Builder(a).setTitle("手机记忆").setView(scroll).setPositiveButton("完成",null).show();
     }
     static void serviceSettings(MainActivity a){

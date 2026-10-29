@@ -79,6 +79,13 @@ final class EpisodeIndex {
         List<Episode> out=new ArrayList<>();for(int i=0;i<Math.min(limit,scored.size());i++)out.add((Episode)scored.get(i)[1]);
         out.sort(Comparator.comparingLong(e->e.at));return out;
     }
+    /** Literal search for the chat page: turns whose words or shown reply contain the text (case and spaces ignored), newest first. */
+    List<Episode> find(String text,int limit) {
+        String q=fold(text);if(q.isEmpty())return Collections.emptyList();List<Episode> out=new ArrayList<>();
+        for(Episode e:episodes.values())if(fold(e.user).contains(q)||fold(e.reply).contains(q))out.add(e);
+        out.sort((x,y)->Long.compare(y.at,x.at));return out.size()>limit?new ArrayList<>(out.subList(0,limit)):out;
+    }
+    static String fold(String s){return s.toLowerCase(Locale.ROOT).replaceAll("\\s+","");}
     /** Prompt form: when, what the user said, and the first sentence of what she replied. */
     static JSONArray describe(List<Episode> found)throws Exception {
         JSONArray out=new JSONArray();SimpleDateFormat when=new SimpleDateFormat("yyyy-MM-dd E HH:mm",Locale.CHINA);

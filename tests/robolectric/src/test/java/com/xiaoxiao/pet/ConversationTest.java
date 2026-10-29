@@ -14,7 +14,23 @@ public class ConversationTest {
     JSONObject last()throws Exception{JSONArray rows=AgentRuntime.store().snapshot().getJSONArray("turns");return rows.getJSONObject(rows.length()-1);}
     @Test public void historyPageLoadsEarlierTurnsWithDateTimeAndCopy()throws Exception{
         seed(25);open();assertEquals(20,page.records.length());assertFalse(UiTest.texts(page.rows).contains("历史问题0\n"));page.loadOlder();assertEquals(25,page.records.length());assertTrue(UiTest.texts(page.rows).contains("历史问题0"));assertNotNull(UiTest.find(page.rows,ChatPage.when(page.records.getJSONObject(0),page.records.getJSONObject(0).getLong("at"))));
-        TextView message=UiTest.find(page.rows,"历史回复0");assertNotNull(message);message.performLongClick();android.content.ClipboardManager clipboard=(android.content.ClipboardManager)activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);assertEquals("历史回复0",clipboard.getPrimaryClip().getItemAt(0).getText().toString());
+        TextView message=UiTest.find(page.rows,"历史回复0");assertNotNull(message);message.performLongClick();PopupMenu menu=ShadowPopupMenu.getLatestPopupMenu();assertEquals("her reply offers copy only",1,menu.getMenu().size());Shadows.shadowOf(menu).getOnMenuItemClickListener().onMenuItemClick(menu.getMenu().getItem(0));android.content.ClipboardManager clipboard=(android.content.ClipboardManager)activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);assertEquals("历史回复0",clipboard.getPrimaryClip().getItemAt(0).getText().toString());
+    }
+    @Test public void shortHistoryHidesOlderButton()throws Exception{seed(5);open();assertNotEquals(android.view.View.VISIBLE,page.older.getVisibility());}
+    @Test public void pagingMarksTheEarliestPage()throws Exception{
+        seed(25);open();assertEquals(android.view.View.VISIBLE,page.older.getVisibility());page.loadOlder();assertFalse(page.older.isEnabled());assertEquals("已经翻到最早的聊天啦",page.older.getText().toString());
+    }
+    @Test public void longPressOnYourOwnWordsRemembersThem()throws Exception{
+        seed(3);open();TextView mine=UiTest.find(page.rows,"历史问题1");mine.performLongClick();PopupMenu menu=ShadowPopupMenu.getLatestPopupMenu();assertEquals(2,menu.getMenu().size());
+        Shadows.shadowOf(menu).getOnMenuItemClickListener().onMenuItemClick(menu.getMenu().getItem(1));JSONArray memories=AgentRuntime.store().snapshot().getJSONArray("memories");
+        assertEquals(1,memories.length());assertEquals("历史问题1",memories.getJSONObject(0).getString("text"));assertFalse(memories.getJSONObject(0).getBoolean("pinned"));assertTrue(MemoryLedger.manual(memories.getJSONObject(0)));
+    }
+    @Test public void searchFindsArchivedWordsAndOpensThatDayAtTheTurn()throws Exception{
+        long day=86_400_000L,start=System.currentTimeMillis()-200*day;
+        for(int i=0;i<200;i++)AgentRuntime.store().commit(AgentRuntime.store().epoch(),i==10?"楼下新开的火锅店叫老码头":"日常"+i,"嗯嗯"+i,"calm",null,false,false,null,null,"d"+i,start+i*day,null,false);
+        open();JSONArray hits=AgentRuntime.store().searchChat("老码头",40);assertEquals(1,hits.length());page.jump(hits.getJSONObject(0),"老码头");
+        assertTrue(UiTest.texts(page.rows).contains("楼下新开的火锅店叫老码头"));assertTrue(UiTest.texts(page.rows).contains("— 搜索到的这一句 —"));assertEquals(android.view.View.VISIBLE,page.filter.getVisibility());
+        assertFalse("other days stay out",UiTest.texts(page.rows).contains("日常11"));page.latest();assertTrue(UiTest.texts(page.rows).contains("日常199"));assertFalse(UiTest.texts(page.rows).contains("— 搜索到的这一句 —"));
     }
     @Test public void oneModelCallCreatesProgressiveSegmentsAndDisplayedTimestamps()throws Exception{
         ModelSettings.save("https://example.invalid/v1","mock","test-key",false);java.util.concurrent.atomic.AtomicInteger calls=new java.util.concurrent.atomic.AtomicInteger();AgentRuntime.model=(m,t,p)->{calls.incrementAndGet();return new JSONObject().put("reply",REPLY).toString();};open();page.input.setText("聊聊今天");page.send();UiTest.awaitIdle();

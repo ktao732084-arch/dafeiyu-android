@@ -32,6 +32,15 @@ public class ModelSetupTest {
     EditText field(String name){return (EditText)UiTest.description(dialog.getWindow().getDecorView(),name);}
     String status(){return ((TextView)UiTest.description(dialog.getWindow().getDecorView(),"模型连接状态")).getText().toString();}
     void drainUntil(java.util.function.BooleanSupplier done)throws Exception {long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);while(!done.getAsBoolean()&&System.nanoTime()<end){ShadowLooper.idleMainLooper();Thread.sleep(10);}ShadowLooper.idleMainLooper();assertTrue("async setup did not finish",done.getAsBoolean());}
+    @Test public void keyPasteAndCustomStreamingSwitch()throws Exception{
+        open();UiTest.click(dialog,"其他模型 / 自定义");Switch stream=(Switch)UiTest.find(dialog.getWindow().getDecorView(),"流式接收（接口不支持时关闭）");assertTrue(stream.isShown());assertTrue(stream.isChecked());
+        android.content.ClipboardManager board=activity.getSystemService(android.content.ClipboardManager.class);
+        board.setPrimaryClip(android.content.ClipData.newPlainText("key","  sk-test-only-1234567890  "));UiTest.click(dialog,"粘贴剪贴板里的 Key");
+        assertEquals("sk-test-only-1234567890",field("API Key").getText().toString());assertFalse("the status never shows the whole key",status().contains("test-only-1234567890"));
+        board.setPrimaryClip(android.content.ClipData.newPlainText("key","这不是 一枚 key"));UiTest.click(dialog,"粘贴剪贴板里的 Key");assertTrue(status().contains("不像"));assertEquals("sk-test-only-1234567890",field("API Key").getText().toString());
+        field("API 地址").setText("https://example.invalid/v1");field("模型名称").setText("mock");stream.setChecked(false);dialog.getButton(-1).performClick();ShadowLooper.idleMainLooper();
+        assertTrue(ModelSettings.complete());assertFalse(Data.prefs().getBoolean("agent.stream",true));
+    }
     @Test public void firstRunOnlyShowsKeyAndOfficialLinks(){
         open();assertTrue(((RadioButton)UiTest.find(dialog.getWindow().getDecorView(),"DeepSeek（推荐）")).isChecked());
         assertFalse(field("API 地址").isShown());assertFalse(field("模型名称").isShown());assertTrue(field("API Key").isShown());
