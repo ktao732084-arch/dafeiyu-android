@@ -19,6 +19,7 @@ public final class GrowthTest {
   JSONObject catalog=new JSONArray(new String(Files.readAllBytes(new File(root,"assets/catalog.json").toPath()),"UTF-8")).getJSONObject(0);
   Set<String> clips=new LinkedHashSet<>();for(Iterator<String> k=catalog.getJSONObject("files").keys();k.hasNext();)clips.add(k.next());
   story(s,clips);
+  voices(s,new JSONObject(new String(Files.readAllBytes(new File(root,"assets/personas.json").toPath()),"UTF-8")));
   daily(s);
   chapters(s);
   unlocks(s,clips);
@@ -51,6 +52,29 @@ public final class GrowthTest {
   check("games".equals(s.chapter(2).goals.get(0).kind)&&"wins".equals(s.chapter(4).goals.get(0).kind),"gomoku is the thing to do in chapters 2 and 4");
   for(String slot:new String[]{"morning","noon","afternoon","evening","night"})check(s.greetings.getJSONArray(slot).length()>0,"greetings for "+slot);
  }
+
+ /**
+  * Each style's rewording of chapter lines: it rewrites a line that exists in story.json, keeps its placeholders
+  * (or PersonaManager.storyLine falls back to the original), and every intro and the lines answering a game or a
+  * win have their own wording in all five styles.
+  */
+ static void voices(Growth.Story s,JSONObject personas)throws Exception{
+  Set<String> lines=new HashSet<>();for(Growth.Chapter c:s.chapters)for(List<String[]> part:Arrays.asList(c.scene,c.neutral,c.intro))for(String[] step:part){lines.add(step[1]);if(step[2]!=null)lines.add(step[2]);}
+  Set<String> answers=new LinkedHashSet<>();for(Growth.Chapter c:s.chapters){for(String[] step:c.intro)answers.add(step[1]);for(String[] step:c.scene)if(step[1].contains("{viagame}")||step[1].contains("{viawin}")){answers.add(step[1]);answers.add(step[2]);}}
+  check(answers.size()==8,"four intros and two answering lines with their fallbacks");
+  JSONArray presets=personas.getJSONArray("presets");Map<String,Set<String>> worded=new HashMap<>();
+  for(int i=0;i<presets.length();i++){JSONObject style=presets.getJSONObject(i),map=style.getJSONObject("storyLines");
+   for(Iterator<String> k=map.keys();k.hasNext();){String key=k.next(),value=map.getString(key);
+    check(lines.contains(key),style.getString("id")+" rewords a line that is not in story.json: "+key);
+    check(slots(key).equals(slots(value)),style.getString("id")+" keeps the placeholders of: "+key);}
+   for(String line:answers){check(map.has(line)&&!map.getString(line).equals(line),style.getString("id")+" has its own wording for: "+line);worded.computeIfAbsent(line,x->new HashSet<>()).add(map.getString(line));}}
+  for(Map.Entry<String,Set<String>> e:worded.entrySet())check(e.getValue().size()==presets.length(),"five different wordings for: "+e.getKey());
+  // Through the real scene builder: the classic style's chapter 2 intro and the chapter 3 line answering a game.
+  PersonaManager.Persona classic=new PersonaManager.Persona(presets.getJSONObject(0));Growth.Material m=new Growth.Material(new JSONArray(),"kk",9,120,3);m.viaGame=true;
+  check("classic".equals(classic.id)&&Growth.scene(s,2,false,m,classic).lines().toString().contains("哼，来一局")&&Growth.scene(s,3,false,m,classic).lines().toString().contains("哼，输赢都算"),"a style's wording reaches the scene");
+  check(Growth.scene(s,2,true,m,classic).lines().toString().contains("这一章：")&&!Growth.scene(s,2,true,m,classic).lines().toString().contains("哼"),"custom personas stay neutral");
+ }
+ static Set<String> slots(String line){Set<String> out=new HashSet<>();java.util.regex.Matcher m=java.util.regex.Pattern.compile("\\{[a-z]+\\}").matcher(line);while(m.find())out.add(m.group());return out;}
 
  /** Caps: one chat reward however many turns; five taps; three feeds; one meeting; a clock turned back earns nothing. */
  static void daily(Growth.Story s)throws Exception{
