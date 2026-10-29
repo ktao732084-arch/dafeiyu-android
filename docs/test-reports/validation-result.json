@@ -1,46 +1,43 @@
 {
-  "version": "0.4.9.1",
-  "version_code": 14,
-  "apk_sha256": "c5290f1843afe9421bbb7cb5abe318a752d3deb12202a41b9f97f7a9af429c87",
-  "framework_unique_passed": 97,
+  "version": "0.4.9.3",
+  "version_code": 16,
+  "apk_sha256": "ac8b5951f6f1a3223a8d727a6ad3ba7a043f46c4742f8484faf4d3ddcd110f15",
+  "framework_unique_passed": 124,
   "framework_failed": 0,
   "framework_skipped": 0,
-  "final_build_framework_rechecked": 97,
-  "android_art_core_suites": 14,
-  "android_runtime_instrumentation_checks": 39,
-  "initiative_checks": 60,
-  "nickname_and_reply_checks": 33,
-  "unicode_checks": 83,
+  "full_run_before_final_isolation_change": 123,
+  "final_build_framework_rechecked": 18,
+  "android_art_core_suites": 17,
+  "android_runtime_checks": 55,
+  "gomoku_checks": 327,
+  "initiative_checks": 62,
+  "character_checks": 217,
+  "update_checks": 30,
+  "usability_checks": 21,
   "core_checks": 141,
   "history_checks": 556,
-  "temporal_history_checks": 38,
-  "action_assertions": 10708,
-  "episodic_checks": 11,
-  "diary_checks": 19,
-  "endpoint_checks": 13,
-  "usability_checks": 21,
+  "unicode_checks": 83,
   "native_memory": {
-    "scenarios": 84,
+    "cases": 84,
     "passed": 145,
     "total": 166,
     "known_unmet": 21
   },
-  "live_model_smoke": {
-    "environment": "MuMu Android API35 x86_64; existing configured model via normal app UI",
-    "busy": "13:02 declaration produced persistent waiting with no next-check countdown; no extra chat during roughly three-minute busy observation",
-    "restart": "13:05 process restart and restoring desktop service preserved waiting; physical show event did not resume proactive checks",
-    "available": "around 13:06 declaration cleared waiting; UI showed model-origin next consideration at 13:10, rather than fifteen minutes later",
-    "natural_followup": "after scheduled consideration a new playful board-game topic was recorded and displayed; no lunch chase or announcing silence; next model-origin consideration was 13:19",
-    "timing": "No device clock, model response, stored schedule, or API key was directly changed to manufacture the result",
-    "post_merge_repeat": "Final merged APK: 13:24 busy -> persistent wait; about two minutes on desktop without new message; 13:31 free -> model-origin 13:35 consideration. First candidate additionally verified a spontaneous new topic followed by quiet with a repaired schedule to 14:06."
+  "live_smoke": {
+    "device": "emulator-5554 / Android API35 x86_64",
+    "entry": "actual previous invitation exposed a start-game button; home also opened the same board",
+    "resume": "candidate game restored the same four stones and black turn after process restart; final update preserved both completed and ended games",
+    "complete": "candidate and merged game each finished legally after 12 moves with white/pet win",
+    "abandon": "one separately ended two-move game was not counted as defeat",
+    "model_recall": "real configured model reported pet 1 win after the first game; separately identified an ended game; after merged full-game test and restart reported pet 2 wins, 0 draws, 1 ended, latest completed game 12 moves/pet win"
   },
-  "not_verified": [
-    "all Android versions",
-    "physical phones",
-    "every language or phrasing of availability",
-    "long-term real-model repetition or battery benchmarks"
-  ],
-  "known_issues": [
-    "Earlier zero-byte handbook-export issue is unchanged; do not treat that export as a reliable full backup."
+  "distribution": {
+    "github": "v0.4.9.3",
+    "beijing_mirror": "not deployed: SSH authentication unavailable; prepared bundle supplied locally"
+  },
+  "limits": [
+    "basic local heuristic opponent, not a strong tournament engine",
+    "model context gets latest 8 results and lifetime totals, not arbitrary-date game search",
+    "not all Android devices or physical phones tested"
   ]
 }

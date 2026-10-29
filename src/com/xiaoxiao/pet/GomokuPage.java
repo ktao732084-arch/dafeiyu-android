@@ -10,7 +10,7 @@ final class GomokuPage {
     final TextView status,remark;final Button again,end;final Board board;Gomoku game;boolean working;
     static GomokuStore store()throws Exception{return new GomokuStore(new File(Data.app.getFilesDir(),"agent"));}
     static void launch(Context c){if(c instanceof Activity)show((Activity)c);else c.startActivity(new Intent(c,MainActivity.class).putExtra("openGomoku",true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP));}
-    static void show(Activity a){GomokuPage old=current.get();if(old!=null&&old.dialog.isShowing())return;AgentRuntime.interruptProactive();Chat.interruptPresentation("main");GomokuPage page=new GomokuPage(a);current=new java.lang.ref.WeakReference<>(page);ClientPage.show(page.dialog,"大肥鱼-五子棋");page.run(()->store().open(),false);}
+    static void show(Activity a){GomokuPage old=current.get();if(old!=null&&old.dialog.isShowing())return;AgentRuntime.interruptProactive();Chat.interruptPresentation("main");GomokuPage page=new GomokuPage(a);current=new java.lang.ref.WeakReference<>(page);ClientPage.show(page.dialog,"大肥鱼-五子棋");page.run(()->store().open());}
     interface Task{Gomoku run()throws Exception;}
     GomokuPage(Activity a){
         activity=a;dialog=ClientPage.create(a);LinearLayout root=new LinearLayout(a);root.setOrientation(1);root.setBackgroundColor(Apple.BACK);root.setPadding(dp(12),dp(8),dp(12),dp(10));
@@ -25,12 +25,12 @@ final class GomokuPage {
     }
     int dp(int n){return Apple.dp(activity,n);}
     Button button(String title,View.OnClickListener click){Button b=new Button(activity);b.setText(title);b.setTextSize(13);Apple.button(b,false);b.setOnClickListener(click);return b;}
-    void run(Task task,boolean played){
-        if(working)return;working=true;render();WORK.execute(()->{Gomoku g=null;Exception error=null;try{g=task.run();if(played&&g.over())AgentRuntime.touch("五子棋本局结束："+Gomoku.label(g.outcome())+"，共"+g.moves.size()+"手");}catch(Exception e){error=e;}
+    void run(Task task){
+        if(working)return;working=true;render();WORK.execute(()->{Gomoku g=null;Exception error=null;try{g=task.run();}catch(Exception e){error=e;}
             final Gomoku result=g;final Exception failure=error;main.post(()->{working=false;if(!dialog.isShowing()||activity.isFinishing()||activity.isDestroyed())return;if(failure!=null){status.setText("棋局没有保存成功");remark.setText(failure.getMessage());again.setEnabled(true);end.setEnabled(false);board.update();return;}game=result;render();if(!game.over()&&game.turn()==2)main.postDelayed(this::computer,450);});});
     }
-    void play(int p){if(working||game==null||game.over()||game.turn()!=1||game.board[p]!=0)return;String id=game.id;int rev=game.moves.size();run(()->store().move(id,rev,p,false),true);}
-    void computer(){if(!dialog.isShowing()||working||game==null||game.over()||game.turn()!=2)return;String id=game.id;int rev=game.moves.size();run(()->store().move(id,rev,-1,true),true);}
+    void play(int p){if(working||game==null||game.over()||game.turn()!=1||game.board[p]!=0)return;String id=game.id;int rev=game.moves.size();run(()->store().move(id,rev,p,false));}
+    void computer(){if(!dialog.isShowing()||working||game==null||game.over()||game.turn()!=2)return;String id=game.id;int rev=game.moves.size();run(()->store().move(id,rev,-1,true));}
     void render(){
         again.setEnabled(!working);end.setEnabled(!working&&game!=null&&!game.over()&&!game.moves.isEmpty());board.update();if(game==null)return;
         again.setText(game.over()?"再来一局":"重新开局");
@@ -38,8 +38,8 @@ final class GomokuPage {
         String line=game.over()?game.winner==1?"这局你赢啦，我记下了。":game.winner==2?"这局是我赢了，想再来一盘吗？":game.abandoned?"这局先到这里，不算谁输。":"势均力敌，平局也记下啦。":"第 "+(game.moves.size()+1)+" 手 · 点交点落子，收起后可以继续";
         remark.setText(line);
     }
-    void restart(){if(working)return;if(game!=null&&!game.over()&&!game.moves.isEmpty())new Apple.Builder(activity).setTitle("结束这局，重新开始？").setMessage("当前这局会记为主动结束，不计胜负。").setNegativeButton("继续下",null).setPositiveButton("重新开局",(d,w)->run(()->store().fresh(),false)).show();else run(()->store().fresh(),false);}
-    void finish(){if(working||game==null||game.over())return;String id=game.id;new Apple.Builder(activity).setTitle("结束这局？").setMessage("记为主动结束，不会算你输。只想暂时离开，可以用收起棋盘。").setNegativeButton("继续下",null).setPositiveButton("结束本局",(d,w)->run(()->store().finish(id),true)).show();}
+    void restart(){if(working)return;if(game!=null&&!game.over()&&!game.moves.isEmpty())new Apple.Builder(activity).setTitle("结束这局，重新开始？").setMessage("当前这局会记为主动结束，不计胜负。").setNegativeButton("继续下",null).setPositiveButton("重新开局",(d,w)->run(()->store().fresh())).show();else run(()->store().fresh());}
+    void finish(){if(working||game==null||game.over())return;String id=game.id;new Apple.Builder(activity).setTitle("结束这局？").setMessage("记为主动结束，不会算你输。只想暂时离开，可以用收起棋盘。").setNegativeButton("继续下",null).setPositiveButton("结束本局",(d,w)->run(()->store().finish(id))).show();}
     void history(){WORK.execute(()->{String text;try{JSONObject s=store().context();StringBuilder b=new StringBuilder("你赢 "+s.getInt("user_wins")+" 局 · 她赢 "+s.getInt("pet_wins")+" 局 · 平局 "+s.getInt("draws")+" 局\n主动结束 "+s.getInt("abandoned")+" 局，不计胜负\n\n最近对局：\n");JSONArray rows=s.getJSONArray("recent_results");if(rows.length()==0)b.append("还没有结束的棋局。\n");for(int i=0;i<rows.length();i++){JSONObject row=rows.getJSONObject(i);java.text.SimpleDateFormat f=new java.text.SimpleDateFormat("MM-dd HH:mm",java.util.Locale.CHINA);f.setTimeZone(java.util.TimeZone.getTimeZone(row.getString("timeZone")));b.append(f.format(new java.util.Date(row.getLong("finishedAt")))).append("  ").append(Gomoku.label(row.getString("outcome"))).append(" · ").append(row.getInt("moves")).append("手\n");}if(s.optInt("unreadable")>0)b.append("部分记录暂不可读，以上统计不完整。\n");b.append("\n完整棋谱保存在本机。开启记忆时，她聊天会参考战绩和最近8局。忘记全部对话和记忆会一起清除棋局。");text=b.toString();}catch(Exception e){text="对局记录暂时打不开："+e.getMessage();}final String shown=text;main.post(()->{if(dialog.isShowing()&&!activity.isFinishing())new Apple.Builder(activity).setTitle("五子棋对局记录").setMessage(shown).setPositiveButton("知道了",null).show();});});}
     final class Board extends android.view.ViewGroup {
         final Paint pen=new Paint(Paint.ANTI_ALIAS_FLAG);final View[] cells=new View[Gomoku.CELLS];float margin,step,start;

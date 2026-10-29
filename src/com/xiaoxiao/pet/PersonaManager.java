@@ -15,14 +15,19 @@ final class PersonaManager {
     static final String MANUAL = "manual", RANDOM = "random", CUSTOM = "custom", LEGACY = "legacy";
     static final String DEFAULT_ID = "classic";
     private static List<Persona> loaded;
-    private static String sharedPrompt, selfCanon;
+    private static String sharedPrompt, selfCanon, characterNote;
 
     static final class Persona {
-        final String id, name, description, prompt;
+        final String id, name, description, prompt, character;
         final List<String[]> examples = new ArrayList<>();
+        /** Her recognisable expressions: drift reminders let these recur instead of flagging them as a tic. */
+        final List<String> signature = new ArrayList<>();
         Persona(JSONObject value) throws Exception {
             id = value.getString("id");name = value.getString("name");
             description = value.getString("description");prompt = value.getString("prompt");
+            character = value.optString("character", "");
+            JSONArray marks = value.optJSONArray("signature");
+            if (marks != null) for (int i = 0; i < marks.length(); i++) signature.add(marks.getString(i));
             JSONArray pairs = value.optJSONArray("examples");
             if (pairs != null) for (int i = 0; i < pairs.length(); i++)
                 examples.add(new String[]{pairs.getJSONArray(i).getString(0), pairs.getJSONArray(i).getString(1)});
@@ -36,24 +41,29 @@ final class PersonaManager {
     static synchronized List<Persona> presets() {
         if (loaded != null) return loaded;
         try {
-            JSONObject resource = new JSONObject(Data.read(Data.app.getAssets().open("personas.json")));
-            if (resource.getInt("schemaVersion") != 1) throw new IOException("人格预设版本不支持");
-            sharedPrompt = resource.getString("sharedPrompt");
-            selfCanon = resource.optString("selfCanon", "");
-            JSONArray values = resource.getJSONArray("presets");
-            ArrayList<Persona> result = new ArrayList<>();
-            java.util.HashSet<String> ids = new java.util.HashSet<>();
-            for (int i = 0; i < values.length(); i++) {
-                Persona item = new Persona(values.getJSONObject(i));
-                if (!ids.add(item.id)) throw new IOException("人格预设编号重复");
-                result.add(item);
-            }
-            if (result.size() < 2 || !ids.contains(DEFAULT_ID)) throw new IOException("人格预设不完整");
-            loaded = Collections.unmodifiableList(result);
-            return loaded;
+            return load(new JSONObject(Data.read(Data.app.getAssets().open("personas.json"))));
         } catch (Exception error) {
             throw new IllegalStateException("人格预设读取失败，请重新安装完整 APK", error);
         }
+    }
+
+    /** Parses the bundled presets; also how JVM tests and the persona eval read assets/personas.json. */
+    static synchronized List<Persona> load(JSONObject resource) throws Exception {
+        if (resource.getInt("schemaVersion") != 1) throw new IOException("人格预设版本不支持");
+        JSONArray values = resource.getJSONArray("presets");
+        ArrayList<Persona> result = new ArrayList<>();
+        java.util.HashSet<String> ids = new java.util.HashSet<>();
+        for (int i = 0; i < values.length(); i++) {
+            Persona item = new Persona(values.getJSONObject(i));
+            if (!ids.add(item.id)) throw new IOException("人格预设编号重复");
+            result.add(item);
+        }
+        if (result.size() < 2 || !ids.contains(DEFAULT_ID)) throw new IOException("人格预设不完整");
+        sharedPrompt = resource.getString("sharedPrompt");
+        selfCanon = resource.optString("selfCanon", "");
+        characterNote = resource.optString("characterNote", "");
+        loaded = Collections.unmodifiableList(result);
+        return loaded;
     }
 
     static Persona find(String id) {
@@ -62,19 +72,35 @@ final class PersonaManager {
     }
 
     /**
-     * Her fixed traits and the active style's example dialogues. Unlike the frozen prompt these are read at
-     * request time, so companions initialized before they existed get them too; a custom persona gets neither.
+     * Her fixed traits, the active style's character sheet and its example dialogues. Unlike the frozen prompt
+     * these are read at request time, so companions initialized before they existed get them too (the same
+     * personality, described in more detail); a custom persona gets none of them.
      */
     static String guidance(String role) {
         presets();
         if (!isInitialized(role) || CUSTOM.equals(mode(role))) return "";
+        return guidance(find(activeId(role)));
+    }
+
+    static String guidance(Persona item) {
         StringBuilder out = new StringBuilder(selfCanon);
-        Persona item = find(activeId(role));
+        if (item != null && !item.character.isEmpty()) {
+            out.append(out.length() > 0 ? "\n\n" : "").append("你的性格细节（").append(item.name).append("）：\n").append(item.character);
+            if (!characterNote.isEmpty()) out.append("\n").append(characterNote);
+        }
         if (item != null && !item.examples.isEmpty()) {
-            out.append(out.length() > 0 ? "\n\n" : "").append("更多口吻参考（体会语气，不要照抄）：");
+            out.append(out.length() > 0 ? "\n\n" : "").append("同一种你在不同情境下的口吻（体会语气和立场，不要照抄）：");
             for (String[] pair : item.examples) out.append("\n用户：").append(pair[0]).append("\n你：").append(pair[1]);
         }
         return out.toString();
+    }
+
+    /** The active style's signature expressions; empty for a custom persona. */
+    static List<String> signature(String role) {
+        presets();
+        if (!isInitialized(role) || CUSTOM.equals(mode(role))) return Collections.emptyList();
+        Persona item = find(activeId(role));
+        return item == null ? Collections.<String>emptyList() : item.signature;
     }
 
     static long initializedAt(String role) { return Data.prefs().getLong(key(role, "initializedAt"), 0); }
@@ -167,7 +193,7 @@ final class PersonaManager {
         if (ensureInitialized(role)) throw new IOException("她的性格已经在初次相遇时确定，不能再次选择");
     }
 
-    private static String presetPrompt(Persona item) {
+    static String presetPrompt(Persona item) {
         return sharedPrompt + "\n\n你的稳定性格：" + item.name + "。\n" + item.prompt
                 + "\n这是你与用户初次相遇时确定的稳定性格。你可以有自然的情绪起伏，也会从共同经历中更了解用户，但不会突然变成另一种人格；不要主动解释系统设定。";
     }

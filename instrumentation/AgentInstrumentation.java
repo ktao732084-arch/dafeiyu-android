@@ -14,6 +14,7 @@ public class AgentInstrumentation extends Instrumentation {
   try{
    runOnMainSync(()->Data.init(getTargetContext()));
    originalContext=Data.app;
+   UpdateInstrumentationChecks.run(this,getTargetContext());
    final String namespace="runtime-tests-"+java.util.UUID.randomUUID();
    final java.io.File isolatedFiles=new java.io.File(getTargetContext().getCacheDir(),namespace);isolatedFiles.mkdirs();
    Data.app=new android.content.ContextWrapper(getTargetContext()){
@@ -73,6 +74,12 @@ public class AgentInstrumentation extends Instrumentation {
     check(AgentRuntime.context("刚才五子棋谁赢了",false).toString().contains(game.id),"actual Android model context receives completed game");
     check(new GomokuStore(new java.io.File(isolatedFiles,"agent")).load().outcome().equals(game.outcome()),"terminal game survives Android store reopen");
     AgentRuntime.store().clear(true);check(games.context().getJSONArray("recent_results").length()==0,"forget all also clears game history on Android");
+    AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"好，等你忙完。\",\"emotion\":\"concerned\",\"mood_level\":2,\"mood_cause\":\"想让你安心忙完\",\"next_check_minutes\":45,\"availability\":\"busy\",\"availability_evidence\":\"我在忙，等忙完再聊\",\"initiative\":\"speak\",\"topic\":\"等你回来\"}";
+    Reply combined=new Reply();AgentRuntime.send("我在忙，等忙完再聊",false,combined);combined.await();
+    check(combined.error==null,"character reply keeps initiative protocol on Android");
+    JSONObject mergedState=AgentRuntime.store().snapshot();check(mergedState.optInt("moodLevel")==2&&"想让你安心忙完".equals(mergedState.optString("moodCause")),"mood strength and cause saved beside schedule");
+    check(mergedState.optBoolean("proactiveWaiting"),"busy wait survives character integration");
+    check(AgentRuntime.context("你好",false).toString().contains("相处理解")||AgentRuntime.context("你好",false).toString().contains("想让你安心忙完"),"carried mood reaches next request");
     result.putString("stream","PASS: "+checks+" Android runtime checks\n");
    }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;MemoryBridge.client=MemoryBridge::http;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}
   }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e.toString());result.putString("stack",android.util.Log.getStackTraceString(e));}

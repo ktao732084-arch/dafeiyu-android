@@ -64,6 +64,12 @@ public final class InitiativeTest {
         db.awaitWrites();check(lunch.quiet("想好午饭了吗？",new AgentStore(dir).snapshot()),"background display flush persists unanswered topics");
         long oldEpoch=db.epoch();db.clear(false);check(!db.initiativeDecision(oldEpoch,"quiet",freePlan,now),"new metadata still obeys deletion epoch");
         check(!db.snapshot().has("initiativePlan")&&!db.snapshot().has("proactiveWaiting"),"clear removes availability and plan metadata");
+        JSONObject corrected=AgentStore.empty(0);
+        corrected.getJSONArray("turns").put(new JSONObject().put("id","old-turn").put("user","我喜欢红色").put("reply","记住红色了").put("at",now-1));
+        corrected.getJSONArray("turns").put(new JSONObject().put("id","new-turn").put("user","更正：我喜欢蓝色").put("reply","记住蓝色了").put("at",now));
+        corrected.put("archive",new JSONArray().put(MemoryLedger.record("old","我喜欢红色","old-turn",false,now-1)));
+        check(!Initiative.context(corrected,now).toString().contains("红色")&&Initiative.context(corrected,now).toString().contains("蓝色"),"corrected source excluded from interaction context too");
+        check(corrected.getJSONArray("turns").length()==2,"context filtering preserves original chat archive");
         System.out.println("PASS: "+checks+" model initiative checks");
     }
 }

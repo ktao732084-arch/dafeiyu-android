@@ -20,4 +20,8 @@ public class GomokuUiTest {
         p.restart();idle();assertFalse(p.game.over());assertEquals(0,p.game.moves.size());assertEquals(1,GomokuPage.store().context().getInt("abandoned"));
     }
     @Test public void visibleBoardFitsPortraitAndLandscape(){GomokuPage p=new GomokuPage(a);for(int[] size:new int[][]{{360,500},{1500,500}}){p.board.measure(View.MeasureSpec.makeMeasureSpec(size[0],View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(size[1],View.MeasureSpec.EXACTLY));p.board.layout(0,0,p.board.getMeasuredWidth(),p.board.getMeasuredHeight());assertEquals(p.board.getMeasuredWidth(),p.board.getMeasuredHeight());assertTrue(p.board.cells[224].getRight()<=p.board.getWidth());assertTrue(p.board.cells[224].getBottom()<=p.board.getHeight());}}
+    @Test public void endingGameKeepsResultsSeparateFromChatAndTouchRecords()throws Exception{
+        String before=AgentRuntime.store().snapshot().toString();GomokuPage.show(a);idle();GomokuPage p=GomokuPage.current.get();p.play(112);idle();p.finish();((AlertDialog)UiTest.dialog()).getButton(-1).performClick();idle();
+        AgentRuntime.worker.submit(()->{}).get(10,TimeUnit.SECONDS);assertTrue(p.game.abandoned);assertEquals(before,AgentRuntime.store().snapshot().toString());assertEquals(1,GomokuPage.store().context().getInt("abandoned"));
+    }
 }

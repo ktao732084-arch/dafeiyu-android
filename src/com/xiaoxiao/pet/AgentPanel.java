@@ -60,7 +60,7 @@ final class AgentPanel {
   if(snapshot.optBoolean("recovered")){TextView warn=GroupedList.note(l,"上次数据出了点状况，已经从本机备份恢复。建议导出一份手账。");warn.setTextColor(Apple.DANGER);}
   GroupedList.note(l,snapshot.optString("memoryStatus",MemoryBridge.lastStatus));
   final AlertDialog[] dialog=new AlertDialog[1];
-  LinearLayout story=GroupedList.group(l);GroupedList.row(story,"共同经历与记忆变化",GroupedList.CLOCK,GroupedList.TEAL,v->MemoryPanel.history(a));GroupedList.row(story,"最近互动",GroupedList.CHAT,GroupedList.SKY,v->MemoryPanel.interactions(a));GroupedList.row(story,"她说过的自己",GroupedList.HEART,GroupedList.PINK,v->MemoryPanel.self(a));GroupedList.row(story,"她的日记",GroupedList.BOOK,GroupedList.VIOLET,v->MemoryPanel.diary(a));
+  LinearLayout story=GroupedList.group(l);GroupedList.row(story,"共同经历与记忆变化",GroupedList.CLOCK,GroupedList.TEAL,v->MemoryPanel.history(a));GroupedList.row(story,"最近互动",GroupedList.CHAT,GroupedList.SKY,v->MemoryPanel.interactions(a));GroupedList.row(story,"她说过的自己",GroupedList.HEART,GroupedList.PINK,v->MemoryPanel.self(a));GroupedList.row(story,"她的日记",GroupedList.BOOK,GroupedList.VIOLET,v->MemoryPanel.diary(a));GroupedList.row(story,"她对你的了解",GroupedList.TAG,GroupedList.ORANGE,v->MemoryPanel.understanding(a));
   TextView count=GroupedList.section(l,"她记得的事 · "+entries.length()+" 条");
   LinearLayout holder=a.column();final JSONArray[] list={entries};Runnable[] fill=new Runnable[1];
   // The editor opens on top of the notebook; after a save or forget the list refreshes in place.
