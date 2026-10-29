@@ -7,6 +7,7 @@ final class MemoryPanel {
         if(events==null||events.length()==0)text.append("还没有记录到桌宠互动。");
         else for(int i=events.length()-1;i>=0;i--){JSONObject e=events.getJSONObject(i);java.text.SimpleDateFormat f=new java.text.SimpleDateFormat("MM-dd HH:mm:ss",java.util.Locale.ROOT);f.setTimeZone(java.util.TimeZone.getTimeZone(e.optString("timeZone",java.util.TimeZone.getDefault().getID())));text.append(f.format(new java.util.Date(e.optLong("at")))).append("  ").append(e.optString("note")).append('\n');}
         String outcome=state.optString("proactiveOutcome");if(!outcome.isEmpty())text.append("\n上次考虑：").append("quiet".equals(outcome)?"选择先安静陪着你":"speak".equals(outcome)?"决定和你说句话":"error".equals(outcome)?"模型连接未完成，稍后再试":"窗口暂不可见，没有展示").append('\n');
+        text.append("\n主动安排：").append(Initiative.status(state)).append("\n");
         if(state.has("proactiveNextAt"))text.append("\n下次考虑开口：").append(new java.text.SimpleDateFormat("MM-dd HH:mm",java.util.Locale.ROOT).format(new java.util.Date(state.optLong("proactiveNextAt")))).append("（开启主动陪伴并满足可见和勿扰设置后才会考虑，不保证届时发消息）");
         new Apple.Builder(a).setTitle("最近互动").setMessage(text).setPositiveButton("知道了",null).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}
@@ -70,6 +71,18 @@ final class MemoryPanel {
         ScrollView scroll=new SpringScrollView(a);scroll.addView(l);
         new Apple.Builder(a).setTitle("她的日记").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->confirm(a,"清空她的日记？","已经写下的日记会全部删除，聊天记录和记忆还在。之后她只会给最近几天补写日记。",()->AgentRuntime.store().clearDiary())).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}
+    /** Her understanding of how to be with you, each with the words it came from; deletable one by one. */
+    static void understanding(MainActivity a){try{
+        JSONArray rows=Understanding.entries(AgentRuntime.store().snapshot());LinearLayout l=a.column();l.setPadding(a.dp(18),0,a.dp(18),a.dp(18));final AlertDialog[] dialog=new AlertDialog[1];
+        GroupedList.note(l,"这是她从你们的聊天里慢慢摸索出来的相处方式，只用来拿捏说话的分寸和时机，不会当成关于你的事实。每一条都附着你当时的原话；说得不对就点开删掉，之后的聊天也能改变它。忘记相关记忆或清空聊天时会一起删掉。");
+        if(rows.length()==0){TextView empty=a.text(AgentRuntime.diaryEnabled()?"还没有哦。她写陪伴日记的时候，会顺便想想怎样和你相处更舒服。":"陪伴日记关着呢。打开后，她会在写日记时慢慢形成对你的了解。",15);empty.setTextColor(Apple.SECONDARY);empty.setPadding(a.dp(6),a.dp(16),a.dp(6),a.dp(8));l.addView(empty);}
+        else{LinearLayout list=GroupedList.group(l);for(int i=rows.length()-1;i>=0;i--){JSONObject u=rows.getJSONObject(i);JSONArray ev=u.optJSONArray("evidence");JSONObject last=ev==null||ev.length()==0?null:ev.optJSONObject(ev.length()-1);
+            String basis=last==null?"":"\n依据："+"「"+last.optString("quote")+"」 · "+last.optString("date")+(u.optInt("confirmed",1)>1?" · 印证 "+u.optInt("confirmed",1)+" 天":"");
+            Button row=GroupedList.entry(list,u.optString("text")+basis,v->new Apple.Builder(a).setMessage("删掉这条了解？她之后不会再按它来拿捏分寸。").setNegativeButton("留着",null).setPositiveButton("删掉",(d,w)->Chat.store(a,()->AgentRuntime.store().forgetUnderstanding(u.optString("id")),()->{dialog[0].dismiss();understanding(a);},e->AgentPanel.fail(a,e))).show());row.setMaxLines(6);}}
+        ScrollView scroll=new SpringScrollView(a);scroll.addView(l);
+        dialog[0]=new Apple.Builder(a).setTitle("她对你的了解").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->confirm(a,"清空她对你的了解？","这些相处理解清空后无法恢复，之后可从新的日记重新形成。",()->AgentRuntime.store().clearUnderstanding())).show();
+    }catch(Exception e){AgentPanel.fail(a,e);}}
+
     /** Clearing a whole list cannot be undone, so it always asks once more. */
     static void confirm(MainActivity a,String title,String message,Chat.Change action){new Apple.Builder(a).setTitle(title).setMessage(message).setNegativeButton("取消",null).setPositiveButton("确认清空",(d,w)->Chat.store(a,action,()->Toast.makeText(a,"已清空",Toast.LENGTH_SHORT).show(),e->AgentPanel.fail(a,e))).show();}
     static void historicalEntry(MainActivity a,JSONObject r){

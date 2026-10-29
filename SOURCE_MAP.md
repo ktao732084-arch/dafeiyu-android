@@ -117,7 +117,7 @@ DeepSeek地址、模型别名、Key入口、非思考参数和错误码依据202
 
 ## 0.4.4 分段与聊天历史
 
-ReplySegments、SpeechQueue、ChatArchive、ChatPage与新增测试由本项目编写，负责本地无损断句、可取消的展示队列、按轮归档与时间范围查询、Android聊天界面。Avatar由本项目编写，从角色立绘裁出聊天和首页使用的圆形头像。
+ReplySegments、SpeechQueue、ChatArchive、ChatPage与新增测试由本项目编写，负责本地无损断句、可取消的展示队列、按轮归档与时间范围查询、Android聊天界面。Avatar由本项目编写，从角色立绘裁出聊天和首页使用的圆形头像。Understanding、CharacterTest、PersonaEvalDump与tools/persona-eval.py由本项目编写，负责有原话依据的相处理解、性格与心情回归，以及性格辨识度盲测；personas.json中的性格细节与示例对话为本项目撰写。
 
 交互思路参考既有微信客服的split_message / typing_delay / send_message_split（按句意拆分、串行发送、短暂停顿），并查阅 [AstrBot分段配置](https://github.com/AstrBotDevs/AstrBot/blob/master/docs/zh/dev/astrbot-config.md)。未复制AstrBot的AGPL代码，也未引入其Python框架、微信桌面自动化、客户数据或配置。Android实现、归档、毫秒时间戳和未展示状态与记忆整合在本项目完成；桌宠底座及素材归属保持原标注。
 
@@ -143,7 +143,19 @@ Nickname、ChatPolishRulesTest和ChatPolishTest由本项目新增，称呼识别
 
 `Initiative.java`、`InitiativeTest.java`、`InitiativeRuntimeTest.java`为本项目AI辅助新增：模型安排下次考虑、物理事件时间线、主动决定记录、防循环与错误退避。`AgentRuntime`、`AgentStore`、`AgentReply`、`PromptBuilder`、`MemoryPanel`、`AgentPanel`与测试接入这些能力，沿用各自既有来源；`PetService`在小小桌宠悬浮交互基础上增加事件接线。无新增第三方运行依赖或外部Agent框架；原有素材、人格参考和Claude协作提交归属不变。
 
-## 0.5.0 养成主线
+## 0.4.9.1 忙闲调度修复
+
+`InitiativePlan.java`为本项目AI辅助新增：验证模型调度字段、明确忙闲意图、安排来源与主动催问过滤。`Initiative`、runtime/store/prompt和设置界面在原项目模块上继续修改，未引入额外Agent框架或新第三方依赖。保留了[主分支合并的可用性优化](https://github.com/ktao732084-arch/dafeiyu-android/commit/e3a1da1)：聊天搜索、长按记住、手账搜索与设置精简；本轮另修复其中的空手账提前返回，并修正分页测试夹具。上述界面改动不署为本轮独立原创。
+
+发布前再合并[后台存储与上手优化](https://github.com/ktao732084-arch/dafeiyu-android/commit/59c04c7)：展示记录异步写盘、归档缓存、编辑手账后台执行、首次使用提示与隐藏桌宠等。`AgentStore.shown`的合并同时保留后台写盘和本轮已展示话题记录；新增对异步写盘后主题恢复的验证。
+
+## 0.4.9.2 轻量更新
+
+AppUpdate、UpdateTransport、UpdateApk、UpdateFileProvider、UpdateRuntime、UpdatePanel、prepare-update.py、部署模板及相应测试均为本项目新增实现。使用 Android 平台网络、包管理器、ContentProvider 和系统安装界面；没有引入第三方更新 SDK、动态服务端或外部 Agent 代码。合入当前主分支后以 0.4.9.2 发布，保留原产品与素材归属。
+
+公网 IP 接入的 Nginx 路径配置、北京构建入口与 UpdateNetworkInstrumentation 为本项目新增；复用用户已有北京服务器和 IP 证书续期配置。站点最初镜像 v0.4.7；本次以原签名发布 0.4.9.2，保留上游素材归属。UpgradeAcceptance 与 OfflineTestApplication 为本项目新增验证代码：前者仅在新建模拟器使用合成数据验证真实 APK 覆盖安装，后者阻止框架单测意外访问线上更新站点。
+
+## 养成主线（源码集成，未独立发布）
 
 `Growth.java`、`GrowthStore.java`、`GrowthSheets.java`、`GrowthPanel.java`、`assets/story.json`和`GrowthTest.java`为本项目AI辅助新增：羁绊值与小鱼干、章节门槛与剧情、动作解锁、喂食、出门与明信片、泡泡瓶与图鉴、旧版回溯。世界观、剧情台词和40个旅行地点为本项目新写，不来自上游人格或素材；玩法思路参考了 VPet、Finch、旅行青蛙、女神异闻录协力者、星露谷好感事件等公开产品的设计理念，没有复制其代码、文案或素材。`PetService`、`PetMenu`、`ActionSheet`、`ActionPlan`、`AgentRuntime`、`AgentStore`、`AgentPolicy`、`PromptBuilder`、`MainActivity`与`AgentPanel`在既有实现上接线，沿用各自来源。动画全部使用原有角色素材，素材许可不变。
 

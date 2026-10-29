@@ -7,6 +7,35 @@ import java.util.*;
 final class AgentPolicy {
     static final Set<String> EMOTIONS = new HashSet<>(Arrays.asList("calm","happy","shy","curious","concerned","playful","sleepy"));
     static String emotion(String value) { return EMOTIONS.contains(value) ? value : "calm"; }
+    /**
+     * Her mood carries over between turns: the model names it with a strength (1–3) and a short cause in its
+     * own words; it fades one step every MOOD_FADE_MINUTES without new events, back to calm. A simple model
+     * of continuity, not an appraisal engine: the cause is her reading of this turn, never a memory.
+     */
+    static final int MOOD_FADE_MINUTES=40;
+    static String moodName(String emotion){switch(emotion(emotion)){case "happy":return "开心";case "shy":return "害羞";case "curious":return "好奇";case "concerned":return "担心";case "playful":return "想闹一闹";case "sleepy":return "犯困";default:return "平静";}}
+    static int moodLevel(Object value){int n=value instanceof Number?((Number)value).intValue():0;if(value instanceof String)try{n=Integer.parseInt(((String)value).trim());}catch(NumberFormatException e){n=0;}return n>=1&&n<=3?n:0;}
+    static String moodCause(String value){
+        if(value==null)return "";String t=value.replaceAll("[\\p{Cntrl}\\s]+"," ").trim();int n=t.codePointCount(0,t.length());
+        return n<2||n>30||sensitive(t)?"":t;
+    }
+    /** {emotion, level, cause, minutes} as of now; level 0 and calm once it has faded. */
+    static JSONObject moodNow(JSONObject state,long now){
+        JSONObject out=new JSONObject();String e=emotion(state.optString("emotion"));long at=state.optLong("emotionAt");
+        // Moods saved before strengths existed count as mild.
+        int level=state.has("moodLevel")?Math.max(1,Math.min(3,state.optInt("moodLevel",1))):1;long minutes=at>0?Math.max(0,(now-at)/60000):0;int left=level-(int)(minutes/MOOD_FADE_MINUTES);
+        try{
+            if(at<=0||"calm".equals(e)||left<=0)return out.put("emotion","calm").put("level",0);
+            return out.put("emotion",e).put("level",left).put("cause",state.optString("moodCause","")).put("minutes",minutes);
+        }catch(JSONException impossible){return out;}
+    }
+    /** The background line about her mood; the cause only when memory is on, since it may echo the chat. */
+    static String moodLine(JSONObject mood,boolean withCause){
+        int level=mood.optInt("level");if(level<=0)return "你此刻心情平静，这轮发生的事可以让它起变化。";
+        String cause=withCause?mood.optString("cause"):"";
+        return "你此刻的心情："+moodName(mood.optString("emotion"))+"（"+(level>=3?"很强烈":level==2?"比较明显":"淡淡的")+"）"+(cause.isEmpty()?"":"，起因："+cause)
+            +"，约 "+mood.optLong("minutes")+" 分钟前。心情会延续，也会慢慢淡去，这轮发生的事可以改变它；不必说出来，让它自然带进语气里。";
+    }
     static boolean quiet(int hour) { return hour >= 23 || hour < 8; }
     static Set<String> tokens(String s) {
         Set<String> out=new HashSet<>(); String clean=s.toLowerCase(Locale.ROOT).replaceAll("[^\\p{L}\\p{N}]", " ");
@@ -85,12 +114,18 @@ final class AgentPolicy {
      * Reminders against drift, from her last few replies: one opener over and over, the same catchphrase,
      * stage directions in brackets, or chat replies growing long. Cheap to compute; no extra model call.
      */
-    static List<String> styleNotes(List<String> replies) {
+    static List<String> styleNotes(List<String> replies) {return styleNotes(replies,Collections.<String>emptyList());}
+    /**
+     * As above, but her style's signature expressions ("哼", "才不是") are part of who she is: they may recur,
+     * and only draw a reminder when every one of the recent replies leans on them.
+     */
+    static List<String> styleNotes(List<String> replies,Collection<String> signature) {
         List<String> notes=new ArrayList<>();int n=replies.size();if(n<3)return notes;
         Map<String,Integer> openers=new HashMap<>();int brackets=0,length=0,emoji=0;
         for(String r:replies){String t=r.trim();if(t.length()>=2)openers.merge(t.substring(0,2),1,Integer::sum);if(t.matches("(?s).*[（(][^）)]{1,30}[）)].*"))brackets++;length+=t.length();emoji+=t.codePoints().filter(c->c>=0x1F300).count()>0?1:0;}
-        for(Map.Entry<String,Integer> e:openers.entrySet())if(e.getValue()>=3)notes.add("最近几句都以「"+e.getKey()+"」开头，这次换个开头。");
-        String phrase=catchphrase(replies);if(phrase!=null)notes.add("「"+phrase+"」最近用得多了，这次别用。");
+        for(Map.Entry<String,Integer> e:openers.entrySet())if(e.getValue()>=(signed(e.getKey(),signature)?n:3))notes.add("最近几句都以「"+e.getKey()+"」开头，这次换个开头。");
+        String phrase=null;for(Map.Entry<String,Integer> e:phrases(replies).entrySet())if(e.getValue()>=(signed(e.getKey(),signature)?n:3)&&(phrase==null||e.getKey().length()>phrase.length()))phrase=e.getKey();
+        if(phrase!=null)notes.add("「"+phrase+"」最近用得多了，这次别用。");
         if(brackets>=3)notes.add("最近括号里的动作描写多了，这次不用或只用一处。");
         if(length/n>140)notes.add("最近回复偏长，日常闲聊一到三句就好。");
         if(emoji>=3)notes.add("表情符号用得多了，这次少用。");
@@ -98,17 +133,36 @@ final class AgentPolicy {
     }
     /** A 3–6 character phrase (not mere punctuation) that appears in at least three of the replies. */
     static String catchphrase(List<String> replies) {
-        Map<String,Integer> seen=new HashMap<>();
-        for(String r:replies){Set<String> once=new HashSet<>();for(int len=6;len>=3;len--)for(int i=0;i+len<=r.length();i++){String p=r.substring(i,i+len);if(p.matches("[\\p{L}\\p{N}…]+")&&p.matches(".*\\p{L}.*"))once.add(p);}for(String p:once)seen.merge(p,1,Integer::sum);}
-        String best=null;for(Map.Entry<String,Integer> e:seen.entrySet())if(e.getValue()>=3&&(best==null||e.getKey().length()>best.length()))best=e.getKey();
+        String best=null;for(Map.Entry<String,Integer> e:phrases(replies).entrySet())if(e.getValue()>=3&&(best==null||e.getKey().length()>best.length()))best=e.getKey();
         return best;
     }
-    /** Older replies in the prompt keep their first sentence only, so her own past wording does not snowball. */
-    static String compressReply(String reply) {
-        String t=reply.trim();java.util.regex.Matcher m=java.util.regex.Pattern.compile("[。！？!?…\\n]").matcher(t);
-        int end=m.find()?m.end():t.length();String first=t.substring(0,end).trim();
-        return first.length()<=60?first:first.substring(0,60);
+    /** Each 3–6 character phrase and the number of replies it appears in. */
+    private static Map<String,Integer> phrases(List<String> replies) {
+        Map<String,Integer> seen=new HashMap<>();
+        for(String r:replies){Set<String> once=new HashSet<>();for(int len=6;len>=3;len--)for(int i=0;i+len<=r.length();i++){String p=r.substring(i,i+len);if(p.matches("[\\p{L}\\p{N}…]+")&&p.matches(".*\\p{L}.*"))once.add(p);}for(String p:once)seen.merge(p,1,Integer::sum);}
+        return seen;
     }
+    /** Whether a repeated opener or phrase is one of her signature expressions, or part of one. */
+    private static boolean signed(String text,Collection<String> signature) {
+        for(String mark:signature){String m=mark.trim();if(!m.isEmpty()&&(text.startsWith(m)||m.contains(text)||m.length()>=2&&text.contains(m)))return true;}
+        return false;
+    }
+    /**
+     * Older replies in the prompt keep their first two sentences, so her own past wording does not snowball;
+     * the second is kept because that is often where her character shows ("谁偷吃了。……分你一半。").
+     */
+    static String compressReply(String reply) {
+        String t=reply.trim();java.util.regex.Matcher m=java.util.regex.Pattern.compile("[。！？!?…\\n]+").matcher(t);
+        int end=t.length();for(int found=0;found<2&&m.find();found++)end=m.end();
+        String kept=t.substring(0,end).trim();
+        return kept.length()<=COMPRESSED_CHARS?kept:kept.substring(0,COMPRESSED_CHARS);
+    }
+    static final int COMPRESSED_CHARS=90,COMPRESSED_TURNS=4;
+    /**
+     * Whether history position i (of a window of size turns) is sent compressed: only the window's first
+     * four, so the boundary moves with the window, four turns at a time, and the cached prefix holds.
+     */
+    static boolean compressed(int i,int size){return i<Math.min(COMPRESSED_TURNS,size-3);}
     /**
      * First turn index to send, given turns.length() and the lifetime turn count. The window holds 8–11
      * turns and moves four at a time, so consecutive requests share a prefix the provider can cache.

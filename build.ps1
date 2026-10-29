@@ -1,4 +1,4 @@
-param([string]$Sdk='',[string]$Jdk='',[string]$KeyStore='')
+param([string]$Sdk='',[string]$Jdk='',[string]$KeyStore='',[string]$UpdateUrl='')
 $ErrorActionPreference='Stop'
 $Root=$PSScriptRoot
 if(-not $Sdk){$Sdk=if($env:ANDROID_HOME){$env:ANDROID_HOME}else{Join-Path $env:USERPROFILE 'diauto-android-sdk'}}
@@ -15,7 +15,12 @@ foreach($Required in @("$Jdk\bin\javac.exe",$Jar,"$Bt\aapt.exe",$KeyStore)){if(-
 function RunChecked($Exe,$Arguments){ & $Exe @Arguments; if($LASTEXITCODE -ne 0){throw "Failed: $Exe ($LASTEXITCODE)"} }
 New-Item -ItemType Directory -Force "$Root\fish-assets" | Out-Null
 Copy-Item -LiteralPath "$Root\assets\main" -Destination "$Root\fish-assets" -Recurse -Force
-Copy-Item -LiteralPath "$Root\assets\catalog.json","$Root\assets\persona-default.txt","$Root\assets\personas.json","$Root\assets\story.json" -Destination "$Root\fish-assets" -Force
+Copy-Item -LiteralPath "$Root\assets\catalog.json","$Root\assets\persona-default.txt","$Root\assets\personas.json","$Root\assets\update-channel.json","$Root\assets\story.json" -Destination "$Root\fish-assets" -Force
+if($UpdateUrl){
+ $UpdateUri=$null
+ if(-not [Uri]::TryCreate($UpdateUrl,[UriKind]::Absolute,[ref]$UpdateUri) -or $UpdateUri.Scheme -ne 'https' -or -not $UpdateUri.Host -or $UpdateUri.UserInfo -or $UpdateUri.Fragment){throw 'UpdateUrl must be an HTTPS manifest URL without credentials or fragment.'}
+ [IO.File]::WriteAllText("$Root\fish-assets\update-channel.json",(@{manifest_url=$UpdateUrl} | ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
+}
 New-Item -ItemType Directory -Force "$Root\build\classes","$Root\build\dex","$Root\build\generated" | Out-Null
 $ClassesDir=[IO.Path]::GetFullPath((Join-Path $Root 'build\classes'))
 if(-not $ClassesDir.StartsWith([IO.Path]::GetFullPath($Root)+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw 'Invalid class output directory'}
@@ -29,9 +34,9 @@ $D8Args=@('-cp',"$Bt\lib\d8.jar",'com.android.tools.r8.D8','--lib',$Jar,'--min-a
 $ArgFile=Join-Path $Root 'build\d8.args'
 [IO.File]::WriteAllLines($ArgFile,($D8Args | ForEach-Object {'"'+$_.Replace('\','/')+'"'}),[Text.UTF8Encoding]::new($false))
 RunChecked "$Jdk\bin\java.exe" @("@$ArgFile")
-RunChecked "$Bt\aapt.exe" @('package','-f','-M',"$Root\AndroidManifest.xml",'-I',$Jar,'-A',"$Root\fish-assets",'-S',"$Root\res",'-0','mp4','-F',"$Root\build\unsigned.apk",'--version-code','13','--version-name','0.5.0')
+RunChecked "$Bt\aapt.exe" @('package','-f','-M',"$Root\AndroidManifest.xml",'-I',$Jar,'-A',"$Root\fish-assets",'-S',"$Root\res",'-0','mp4','-F',"$Root\build\unsigned.apk",'--version-code','15','--version-name','0.4.9.2')
 Push-Location "$Root\build\dex"
 try {RunChecked "$Bt\aapt.exe" @('add',"$Root\build\unsigned.apk",'classes.dex')} finally {Pop-Location}
 RunChecked "$Bt\zipalign.exe" @('-f','4',"$Root\build\unsigned.apk", "$Root\build\aligned.apk")
-RunChecked "$Bt\apksigner.bat" @('sign','--ks',$KeyStore,'--ks-pass',"pass:$StorePass",'--out',"$Root\build\dafeiyu-0.5.0.apk", "$Root\build\aligned.apk")
-RunChecked "$Bt\apksigner.bat" @('verify','--verbose',"$Root\build\dafeiyu-0.5.0.apk")
+RunChecked "$Bt\apksigner.bat" @('sign','--ks',$KeyStore,'--ks-pass',"pass:$StorePass",'--out',"$Root\build\dafeiyu-0.4.9.2.apk", "$Root\build\aligned.apk")
+RunChecked "$Bt\apksigner.bat" @('verify','--verbose',"$Root\build\dafeiyu-0.4.9.2.apk")

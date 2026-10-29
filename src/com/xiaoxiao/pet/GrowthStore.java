@@ -74,7 +74,9 @@ final class GrowthStore {
         final String json=g.toString();
         writer.execute(()->{try{
             File tmp=new File(file+".tmp");try(FileOutputStream out=new FileOutputStream(tmp)){out.write(json.getBytes(StandardCharsets.UTF_8));out.getFD().sync();}
-            if(file.exists())Files.copy(file.toPath(),new File(file+".bak").toPath(),StandardCopyOption.REPLACE_EXISTING);
+            // Back up the validated new snapshot, not the previous one: deleted quotes must not return
+            // through recovery after the primary file is damaged. Both writes use atomic replacement.
+            if(file.exists())ChatArchive.write(new File(file+".bak"),json.getBytes(StandardCharsets.UTF_8));
             try{Files.move(tmp.toPath(),file.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.ATOMIC_MOVE);}
             catch(AtomicMoveNotSupportedException e){Files.move(tmp.toPath(),file.toPath(),StandardCopyOption.REPLACE_EXISTING);}
         }catch(Exception e){Data.log("main","成长记录写入失败");}});

@@ -18,6 +18,15 @@ final class ModelPresets {
             (DEEPSEEK_MODEL.equals(model)||model.startsWith("deepseek-v4-"))))
             payload.put("thinking",new JSONObject().put("type","disabled"));
     }
+    /**
+     * Companion replies only. DeepSeek's parameter guide suggests 1.3 for general conversation (its default is
+     * 1.0, which reads flatter in character); memory, diary and connection calls keep the default. Other
+     * providers use different temperature ranges, so they keep their own defaults.
+     */
+    static final double DEEPSEEK_CHAT_TEMPERATURE=1.3;
+    static void chat(String host,String model,JSONObject payload)throws Exception {
+        if("api.deepseek.com".equals(host)&&!AgentPolicy.reasoningModel(model))payload.put("temperature",DEEPSEEK_CHAT_TEMPERATURE);
+    }
     static String httpError(int code){
         switch(code){
             case 401:return "API Key 无效或已失效，请重新复制完整的 Key。";

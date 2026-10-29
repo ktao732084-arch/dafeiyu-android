@@ -12,6 +12,7 @@ $d8=@('-cp',"$Sdk/build-tools/36.0.0/lib/d8.jar",'com.android.tools.r8.D8','--li
 Run "$Jdk/bin/java.exe" @("@$out/d8.args")
 $remote='/data/local/tmp/dafeiyu-core-'+[guid]::NewGuid().ToString('N')
 Run "$Sdk/platform-tools/adb.exe" @('-s',$Serial,'shell','mkdir','-p',"$remote/memory-service/upstream/eval")
+Run "$Sdk/platform-tools/adb.exe" @('-s',$Serial,'push',"$root/assets/personas.json","$remote/personas.json")
 Run "$Sdk/platform-tools/adb.exe" @('-s',$Serial,'push',"$root/build/dex/classes.dex","$remote/product.dex")
 Run "$Sdk/platform-tools/adb.exe" @('-s',$Serial,'push',"$out/dex/classes.dex","$remote/checks.dex")
 Run "$Sdk/platform-tools/adb.exe" @('-s',$Serial,'push',"$root/memory-service/upstream/eval/cases","$remote/memory-service/upstream/eval/cases")

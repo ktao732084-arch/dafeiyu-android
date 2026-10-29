@@ -34,7 +34,7 @@ public final class GrowthTest {
  }
 
  /** story.json agrees with the catalog: every clip has a chapter, every name it uses exists, places cover every month. */
- static void story(Growth.Story s,Set<String> clips){
+ static void story(Growth.Story s,Set<String> clips)throws Exception{
   for(String c:clips)check(s.unlock.containsKey(c)||ActionPlan.FESTIVALS.contains(c)||ActionPlan.SEASONS.contains(c),"clip without a chapter: "+c);
   for(String c:s.unlock.keySet())check(clips.contains(c),"unlock list names a missing clip: "+c);
   for(String c:ActionPlan.FESTIVALS)check(!s.unlock.containsKey(c),"festival clips are never chapter-locked: "+c);
@@ -227,6 +227,12 @@ public final class GrowthTest {
   reopened.met();reopened.flush();
   Files.write(old.toPath(),"{not json".getBytes("UTF-8"));GrowthStore recovered=new GrowthStore(old,s,host(since,true,agent),new Random(5));
   check(recovered.snapshot().getJSONArray("cards").length()>0&&recovered.snapshot().has("migratedFrom"),"a damaged file is recovered from its backup");
+  recovered.met();recovered.flush();
+  check(new String(Files.readAllBytes(old.toPath()),"UTF-8").contains("下雨天"),"fixture has quoted chapter card before forgetting");
+  agent.put("memories",new JSONArray());recovered.sync();recovered.flush();
+  check(!new String(Files.readAllBytes(new File(old+".bak").toPath()),"UTF-8").contains("下雨天"),"growth backup cannot retain a forgotten quote");
+  Files.write(old.toPath(),"{not json".getBytes("UTF-8"));GrowthStore afterForget=new GrowthStore(old,s,host(since,true,agent),new Random(5));
+  check(!afterForget.snapshot().toString().contains("下雨天"),"corrupt growth file cannot restore forgotten quote from backup");
   AtomicCounter counter=new AtomicCounter();GrowthStore.changed=counter::hit;
   JSONObject young=AgentStore.empty(0).put("archive",new JSONArray());File growing=new File(scratch,"grow-"+System.nanoTime()+".json");
   GrowthStore c=new GrowthStore(growing,s,host(System.currentTimeMillis()-5*Growth.DAY,false,young),new Random(6));
