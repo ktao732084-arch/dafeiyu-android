@@ -134,3 +134,7 @@ AgentRuntime、PromptBuilder和AgentStore的改动将检索证据接入正常回
 追加审查中的DeviceCoreChecks、run-core-device.ps1、build-isolated-tests.ps1和测试扩展由本项目编写，复用既有产品代码、语料、测试断言与资源；没有引入第三方运行框架。既有素材与记忆项目的来源、许可保持原标注。
 
 UnicodeRegex、NativeRegexTest和设备检查脚本为本项目新增实现。Android默认Unicode字符类但不支持显式UNICODE_CHARACTER_CLASS的行为依据[Android官方文档](https://developer.android.com/reference/java/util/regex/Pattern#UNICODE_CHARACTER_CLASS)。对NativeMemoryEngine与NativeMemoryTime的兼容修正保持原记忆项目MIT归属；没有复制外部实现。
+
+## 开发分支：轻量更新
+
+AppUpdate、UpdateTransport、UpdateApk、UpdateFileProvider、UpdateRuntime、UpdatePanel、prepare-update.py、部署模板及相应测试均为本项目新增实现。使用 Android 平台网络、包管理器、ContentProvider 和系统安装界面；没有引入第三方更新 SDK、动态服务端或外部 Agent 代码。版本仍为 0.4.6，仅作开发验证，尚未发布。

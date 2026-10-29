@@ -1,4 +1,4 @@
-param([string]$Sdk='',[string]$Jdk='',[string]$KeyStore='')
+param([string]$Sdk='',[string]$Jdk='',[string]$KeyStore='',[string]$UpdateUrl='')
 $ErrorActionPreference='Stop'
 $Root=$PSScriptRoot
 if(-not $Sdk){$Sdk=if($env:ANDROID_HOME){$env:ANDROID_HOME}else{Join-Path $env:USERPROFILE 'diauto-android-sdk'}}
@@ -15,7 +15,12 @@ foreach($Required in @("$Jdk\bin\javac.exe",$Jar,"$Bt\aapt.exe",$KeyStore)){if(-
 function RunChecked($Exe,$Arguments){ & $Exe @Arguments; if($LASTEXITCODE -ne 0){throw "Failed: $Exe ($LASTEXITCODE)"} }
 New-Item -ItemType Directory -Force "$Root\fish-assets" | Out-Null
 Copy-Item -LiteralPath "$Root\assets\main" -Destination "$Root\fish-assets" -Recurse -Force
-Copy-Item -LiteralPath "$Root\assets\catalog.json","$Root\assets\persona-default.txt","$Root\assets\personas.json" -Destination "$Root\fish-assets" -Force
+Copy-Item -LiteralPath "$Root\assets\catalog.json","$Root\assets\persona-default.txt","$Root\assets\personas.json","$Root\assets\update-channel.json" -Destination "$Root\fish-assets" -Force
+if($UpdateUrl){
+ $UpdateUri=$null
+ if(-not [Uri]::TryCreate($UpdateUrl,[UriKind]::Absolute,[ref]$UpdateUri) -or $UpdateUri.Scheme -ne 'https' -or -not $UpdateUri.Host -or $UpdateUri.UserInfo -or $UpdateUri.Fragment){throw 'UpdateUrl must be an HTTPS manifest URL without credentials or fragment.'}
+ [IO.File]::WriteAllText("$Root\fish-assets\update-channel.json",(@{manifest_url=$UpdateUrl} | ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
+}
 New-Item -ItemType Directory -Force "$Root\build\classes","$Root\build\dex","$Root\build\generated" | Out-Null
 $ClassesDir=[IO.Path]::GetFullPath((Join-Path $Root 'build\classes'))
 if(-not $ClassesDir.StartsWith([IO.Path]::GetFullPath($Root)+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)){throw 'Invalid class output directory'}

@@ -24,6 +24,7 @@ public final class DeviceCoreChecks {
         run("rule capture",()->MemoryCaptureTest.main(new String[]{root+"/memory-capture",root+"/memory-service"}));
         run("diary",()->DiaryTest.main(new String[]{root+"/diary"}));
         run("Unicode regex",NativeRegexTest::run);
+        run("updates",()->UpdateCoreTest.main(new String[]{root+"/updates"}));
         System.out.println("DEVICE SUITES: "+passed+" passed, "+failures+" failed");
         System.exit(failures==0?0:1);
     }
