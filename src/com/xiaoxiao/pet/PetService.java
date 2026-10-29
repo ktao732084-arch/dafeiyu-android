@@ -179,7 +179,7 @@ public class PetService extends Service {
  void feed(Pet p,Growth.Food food){
   GrowthStore g=GrowthStore.quiet();if(g==null)return;
   try{Growth.Award a=new Growth.Award();String error=g.feed(food,a);if(error!=null){Toast.makeText(this,error,Toast.LENGTH_SHORT).show();return;}g.met();
-   if(!Data.file(p.role,food.clip).isEmpty())p.play(food.clip);p.plan.hungry=false;p.plan.fedAt=System.currentTimeMillis();AgentRuntime.touch("用户喂你吃了"+food.name);if(p.visible&&!AgentRuntime.busy()&&!Chat.isPetChatOpen(p.id))p.showBubble(PersonaManager.voice("main","feed","谢谢这份{food}。").replace("{food}",food.name),true);
+   if(!Data.file(p.role,food.clip).isEmpty())p.play(food.clip);p.plan.hungry=false;p.plan.fedAt=System.currentTimeMillis();AgentRuntime.touch("用户喂你吃了"+food.name);if(p.visible&&p.scene==null&&(p.speech==null||!p.speech.active)&&!AgentRuntime.busy()&&!Chat.isPetChatOpen(p.id))p.showBubble(PersonaManager.voice("main","feed","谢谢这份{food}。").replace("{food}",food.name),true);
   }catch(Exception e){Toast.makeText(this,"喂食暂未保存，请重试",Toast.LENGTH_SHORT).show();}
  }
  /** Sets off on a trip: a departure line, then she tucks herself into the nearer screen edge until she is back. */
