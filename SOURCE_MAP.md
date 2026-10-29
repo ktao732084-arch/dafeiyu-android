@@ -168,3 +168,5 @@ Gomoku.java（自由规则、入门棋形策略）、GomokuStore.java（棋谱/�
 
 
 发布前合入[10c1a8d](https://github.com/ktao732084-arch/dafeiyu-android/commit/10c1a8d)及养成主线，保留章节、喂食出门与统一发布实现；五子棋入口独立存在，模型背景同时携带经过来源区分的养成背景和真实棋局结果。
+
+同时保留[278fca4](https://github.com/ktao732084-arch/dafeiyu-android/commit/278fca4)的自然分段、旧展示状态兼容和养成时机修复；相关框架与Android检查在最终DEX上复验。

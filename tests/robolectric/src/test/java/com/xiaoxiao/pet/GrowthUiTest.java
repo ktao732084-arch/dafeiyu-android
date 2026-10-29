@@ -14,5 +14,17 @@ public class GrowthUiTest {
         GrowthSheets.feed(activity,pet);assertNotNull(UiTest.find(UiTest.dialog().getWindow().getDecorView(),"白饭 · 免费"));int before=GrowthStore.get().snapshot().optInt("feeds");UiTest.click(UiTest.dialog(),"白饭 · 免费");GrowthStore.get().flush();assertEquals(before+1,GrowthStore.get().snapshot().optInt("feeds"));assertFalse(GrowthStore.get().hungry());
     }
     @Test public void travelRemainsLockedForNewCompanions(){assertEquals(1,GrowthStore.get().chapter());GrowthSheets.trip(activity,pet);assertNull(GrowthStore.get().trip());assertNotNull(ShadowToast.getTextOfLatestToast());}
+    @Test public void confirmingPersonaImmediatelyCountsTheFirstMeeting()throws Exception{
+        assertTrue(UiTest.texts(activity.content).contains("已见面"));
+        int bond=Growth.bond(GrowthStore.get().snapshot()),fish=Growth.fish(GrowthStore.get().snapshot());assertEquals(5,bond);assertEquals(5,fish);
+        activity.meet();assertEquals(bond,Growth.bond(GrowthStore.get().snapshot()));assertEquals(fish,Growth.fish(GrowthStore.get().snapshot()));
+    }
     @Test public void moreMenuKeepsTheStoryEntry(){GrowthSheets.more(activity,pet);assertNotNull(UiTest.find(UiTest.dialog().getWindow().getDecorView(),"我们的故事"));assertNotNull(UiTest.find(UiTest.dialog().getWindow().getDecorView(),"隐藏"));}
+    @Test public void pendingStoryWaitsForAnAnimationToFinish(){
+        boolean active=MainActivity.active;try{MainActivity.active=false;service.screenOn=true;service.keyguard=false;pet.visible=true;pet.frame=new android.widget.FrameLayout(activity);
+            // Keep the clock-independent part explicit: an active clip must reject a scene even in daytime.
+            pet.busy=true;assertFalse(service.quietMoment(pet));
+            pet.busy=false;if(!PetService.moment().night())assertTrue(service.quietMoment(pet));
+        }finally{MainActivity.active=active;pet.frame=null;}
+    }
 }

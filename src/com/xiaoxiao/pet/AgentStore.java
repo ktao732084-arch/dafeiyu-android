@@ -161,6 +161,7 @@ final class AgentStore {
         next.put("turnCount",next.optInt("turnCount",turns.length())+1);
         java.time.ZoneId zone=java.time.ZoneId.systemDefault();
         JSONObject turn=new JSONObject().put("id",tid).put("at",now).put("receivedAt",now).put("repliedAt",System.currentTimeMillis()).put("timeZone",zone.getId()).put("utcOffsetMinutes",zone.getRules().getOffset(java.time.Instant.ofEpochMilli(now)).getTotalSeconds()/60).put("user",user).put("reply",reply).put("proactive",proactive);
+        turn.put("segmentVersion",ReplySegments.VERSION);
         if(awaitingDisplay)turn.put("displayed",0);turns.put(turn);final JSONObject added=turn;
         while(turns.length()>160)turns.remove(0);
         next.put("emotion",AgentPolicy.emotion(emotion)).put("emotionAt",now).put("moodLevel",moodLevel>=1&&moodLevel<=3?moodLevel:1);

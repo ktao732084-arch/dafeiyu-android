@@ -1,10 +1,12 @@
-0.4.9.3 final integrated product: 128 distinct scenarios passed; final home-entry fix rechecked 23 game/growth/home UI scenarios.
+0.4.9.3 final integrated product: 132 distinct scenarios passed; final bubble/growth integration rechecked 70 affected scenarios.
 PASS com.xiaoxiao.pet.GomokuUiTest.homeOpensPlayableBoardAndResumeRestoresMoves
 PASS com.xiaoxiao.pet.GomokuUiTest.endIsConfirmedAndHistoryCountsItOnce
 PASS com.xiaoxiao.pet.GomokuUiTest.visibleBoardFitsPortraitAndLandscape
 PASS com.xiaoxiao.pet.GomokuUiTest.endingGameKeepsResultsSeparateFromChatAndTouchRecords
 PASS com.xiaoxiao.pet.GomokuUiTest.invitationButtonRoutesToSameRealBoard
 PASS com.xiaoxiao.pet.GrowthUiTest.moreMenuKeepsTheStoryEntry
+PASS com.xiaoxiao.pet.GrowthUiTest.confirmingPersonaImmediatelyCountsTheFirstMeeting
+PASS com.xiaoxiao.pet.GrowthUiTest.pendingStoryWaitsForAnAnimationToFinish
 PASS com.xiaoxiao.pet.GrowthUiTest.storyHomeAndListsRenderWithoutChangingTheFrozenPersona
 PASS com.xiaoxiao.pet.GrowthUiTest.freeFoodButtonUsesRealServiceFeedingAndPersists
 PASS com.xiaoxiao.pet.GrowthUiTest.travelRemainsLockedForNewCompanions
@@ -75,9 +77,11 @@ PASS com.xiaoxiao.pet.UiTest.explicitMemoryAndItsSourceDisappearTogether
 PASS com.xiaoxiao.pet.UiTest.nameAndNicknameUISaveIntoPromptWithoutChangingPersonality
 PASS com.xiaoxiao.pet.UiTest.modelSettingsUIValidatesSavesAndKeepsAtomicConfiguration
 PASS com.xiaoxiao.pet.UiTest.cancelAfterCommittedReplyCompletesExactlyOnce
+PASS com.xiaoxiao.pet.ConversationTest.oldDisplayedCountsDoNotHideOrExposeTextWhenRendered
 PASS com.xiaoxiao.pet.ConversationTest.newMessageCancelsOldSegmentsWithoutLosingCompleteRecord
 PASS com.xiaoxiao.pet.ConversationTest.dateRangeIsStableAcrossDisplayTimezoneChanges
 PASS com.xiaoxiao.pet.ConversationTest.explicitFullReplyViewMarksUnshownPartsAndKeepsTimestamp
+PASS com.xiaoxiao.pet.ConversationTest.screenshotReplyAppearsAsThreeSeparateBubblesAndSurvivesReload
 PASS com.xiaoxiao.pet.ConversationTest.shortHistoryHidesOlderButton
 PASS com.xiaoxiao.pet.ConversationTest.bubbleHistoryIntentOpensExplicitConversationEntry
 PASS com.xiaoxiao.pet.ConversationTest.searchFindsArchivedWordsAndOpensThatDayAtTheTurn
