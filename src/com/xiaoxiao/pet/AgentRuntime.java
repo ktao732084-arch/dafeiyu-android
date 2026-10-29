@@ -63,6 +63,7 @@ final class AgentRuntime {
         if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}in.remember=rememberEnabled();in.diary=diaryEnabled();if(in.remember&&in.diary&&history==null)in.understanding=Understanding.context(s,proactive?"":user);
         GrowthStore growth=GrowthStore.quiet();if(growth!=null){in.chapter=growth.chapter();in.lore=growth.lore();}
         if(in.remember&&history==null){
+            try{in.games=GomokuPage.store().context();}catch(Exception unavailable){in.games=new JSONObject().put("status","unavailable");}
             // Whole-conversation recall, minus what the history window already carries and corrected sources.
             Set<String> exclude=MemoryLedger.staleSources(s,in.now);JSONArray turns=s.getJSONArray("turns");for(int i=Math.max(0,turns.length()-12);i<turns.length();i++)exclude.add(ChatArchive.id(turns.getJSONObject(i)));
             in.episodes=store().episodes(proactive?Initiative.query(s):user,exclude,in.now);

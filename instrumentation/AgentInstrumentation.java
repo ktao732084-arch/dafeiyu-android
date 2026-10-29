@@ -69,6 +69,11 @@ public class AgentInstrumentation extends Instrumentation {
     check("model".equals(AgentRuntime.store().snapshot().getJSONObject("initiativePlan").getString("source")),"schedule provenance persisted on Android");
     int beforeNag=AgentRuntime.history().length();AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"我不催，你还没回复\",\"next_check_minutes\":41}";
     AgentRuntime.send("",true,new Reply());AgentRuntime.worker.submit(()->{}).get(10,TimeUnit.SECONDS);check(AgentRuntime.history().length()==beforeNag,"announcing silence does not send another message");
+    GomokuStore games=GomokuPage.store();Gomoku game=games.fresh();while(!game.over()){if(game.turn()==1){int point=0;while(game.board[point]!=0)point++;game=games.move(game.id,game.moves.size(),point,false);}else game=games.move(game.id,game.moves.size(),-1,true);}
+    check(games.context().getJSONArray("recent_results").length()==1,"real game result persisted on Android");
+    check(AgentRuntime.context("刚才五子棋谁赢了",false).toString().contains(game.id),"actual Android model context receives completed game");
+    check(new GomokuStore(new java.io.File(isolatedFiles,"agent")).load().outcome().equals(game.outcome()),"terminal game survives Android store reopen");
+    AgentRuntime.store().clear(true);check(games.context().getJSONArray("recent_results").length()==0,"forget all also clears game history on Android");
     AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"好，等你忙完。\",\"emotion\":\"concerned\",\"mood_level\":2,\"mood_cause\":\"想让你安心忙完\",\"mood_changed\":true,\"next_check_minutes\":45,\"availability\":\"busy\",\"availability_evidence\":\"我在忙，等忙完再聊\",\"initiative\":\"speak\",\"topic\":\"等你回来\"}";
     Reply combined=new Reply();AgentRuntime.send("我在忙，等忙完再聊",false,combined);combined.await();
     check(combined.error==null,"character reply keeps initiative protocol on Android");
