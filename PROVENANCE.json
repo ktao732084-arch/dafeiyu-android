@@ -1290,13 +1290,7 @@
       "path": "docs/GROWTH_INTEGRATION.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "b068bacd6a22b8baf4c8ae51837ec621d13876badc58f1123a95f2af7c752ec7"
-    },
-    {
-      "path": "docs/LEGACY_MEMORY_BRANCH.md",
-      "relationship": "project-added",
-      "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "b7a66df2a68d5b3152305084b209b6643214d94e8f92d22f96460fcef350b884"
+      "sha256": "d50beda4711584cad05808ed731ecda6e5de9a8f21b8bdf7388eb522a9d7a40b"
     },
     {
       "path": "docs/LEGACY_MEMORY_BRANCH.md",
