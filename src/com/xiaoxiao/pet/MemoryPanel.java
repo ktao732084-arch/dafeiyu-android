@@ -79,8 +79,15 @@ final class MemoryPanel {
         else{LinearLayout list=GroupedList.group(l);for(int i=rows.length()-1;i>=0;i--){JSONObject u=rows.getJSONObject(i);JSONArray ev=u.optJSONArray("evidence");JSONObject last=ev==null||ev.length()==0?null:ev.optJSONObject(ev.length()-1);
             String basis=last==null?"":"\n依据："+"「"+last.optString("quote")+"」 · "+last.optString("date")+(u.optInt("confirmed",1)>1?" · 印证 "+u.optInt("confirmed",1)+" 天":"");
             Button row=GroupedList.entry(list,Understanding.scopeLabel(u)+"："+u.optString("text")+basis,v->new Apple.Builder(a).setMessage("删掉这条了解？她之后不会再按它来拿捏分寸。").setNegativeButton("留着",null).setPositiveButton("删掉",(d,w)->Chat.store(a,()->AgentRuntime.store().forgetUnderstanding(u.optString("id")),()->{dialog[0].dismiss();understanding(a);},e->AgentPanel.fail(a,e))).show());row.setMaxLines(6);}}
+        // The phrases she picked up from you come from the same daily reading, so they live on this page too.
+        JSONArray phrases=Phrases.entries(AgentRuntime.store().snapshot());
+        if(phrases.length()>0){TextView head=a.text("她学会的你的说法",13);head.setTextColor(Apple.SECONDARY);head.setPadding(a.dp(6),a.dp(18),a.dp(6),a.dp(6));l.addView(head);
+            GroupedList.note(l,"你常说的口头禅和梗，她偶尔会借来用。每条都是你原话里的说法；不想让她用就点开删掉。");
+            LinearLayout list=GroupedList.group(l);for(int i=phrases.length()-1;i>=0;i--){JSONObject p=phrases.getJSONObject(i);JSONArray ev=p.optJSONArray("evidence");JSONObject last=ev==null||ev.length()==0?null:ev.optJSONObject(ev.length()-1);
+                String basis=last==null?"":"\n"+last.optString("date")+(p.optInt("seen",1)>1?" · 说过 "+p.optInt("seen",1)+" 天":"");
+                Button row=GroupedList.entry(list,"「"+p.optString("phrase")+"」"+(p.optString("when").isEmpty()?"":"：" +p.optString("when"))+basis,v->new Apple.Builder(a).setMessage("删掉这个说法？她之后不会再用它。").setNegativeButton("留着",null).setPositiveButton("删掉",(d,w)->Chat.store(a,()->AgentRuntime.store().forgetPhrase(p.optString("id")),()->{dialog[0].dismiss();understanding(a);},e->AgentPanel.fail(a,e))).show());row.setMaxLines(4);}}
         ScrollView scroll=new SpringScrollView(a);scroll.addView(l);
-        dialog[0]=new Apple.Builder(a).setTitle("她对你的了解").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->confirm(a,"清空她对你的了解？","这些相处理解清空后无法恢复，之后可从新的日记重新形成。",()->AgentRuntime.store().clearUnderstanding())).show();
+        dialog[0]=new Apple.Builder(a).setTitle("她对你的了解").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->confirm(a,"清空她对你的了解？","这些相处理解和她学会的你的说法清空后无法恢复，之后可从新的日记重新形成。",()->AgentRuntime.store().clearUnderstanding())).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}
 
     /** Clearing a whole list cannot be undone, so it always asks once more. */

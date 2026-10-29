@@ -117,6 +117,34 @@ public final class CharacterTest {
   u.commit(u.epoch(),"晚安","晚安。","sleepy",null,true,false,null,null,"n1",y+86400000L,null);check(Understanding.entries(u.snapshot()).length()==1,"a chat turn keeps the understanding written beside it");
   long beforeClear=u.epoch();u.clearUnderstanding();check(u.epoch()>beforeClear&&!u.addDiary(beforeClear,Diary.entry(day.minusDays(2),"迟到日记不可恢复已清空理解。",turns,y),up),"late diary cannot restore cleared understanding");
   u.clear(false);check(Understanding.entries(u.snapshot()).length()==0,"clearing chats clears the understanding");
+
+  // Phrases: the user's own catchphrases, learned in the same diary call, each one verbatim from that day.
+  AgentStore ph=new AgentStore(new File(root,"phrases"));
+  String[] talk={"离谱他妈给离谱开门，领导又改需求了","哈哈好的","我真的会谢，又要加班"};
+  for(int i=0;i<talk.length;i++)ph.commit(ph.epoch(),talk[i],"嗯。","calm",null,true,false,null,null,"p"+i,y+i*60000L,null);
+  List<JSONObject> pturns=ph.dayTurns(day,zone);
+  String system=Diary.request(day,pturns,"小鲸",Understanding.offered(ph.snapshot())).getJSONObject(0).getString("content");
+  check(system.contains("口头禅")&&system.contains("\"phrases\":[]")&&system.contains("逐字"),"the diary call also asks for the user's own phrases, verbatim");
+  String said2="{\"diary\":\"x\",\"phrases\":[{\"phrase\":\"离谱他妈给离谱开门\",\"when\":\"觉得事情很离谱时\"},{\"phrase\":\"哈哈\",\"when\":\"笑的时候\"},{\"phrase\":\"我编的梗\",\"when\":\"随便\"},{\"phrase\":\"我真的会谢\",\"when\":\"无奈吐槽时\"},{\"phrase\":\"离谱他妈给离谱开门\",\"when\":\"重复\"}]}";
+  List<JSONObject> learned=Phrases.parse(said2,pturns,day.toString());
+  check(learned.size()==2&&learned.get(0).getString("phrase").equals("离谱他妈给离谱开门")&&learned.get(0).getJSONObject("evidence").getString("turn").equals("p0"),"only the user's verbatim, uncommon phrases are kept, once each: "+learned);
+  check(Phrases.parse("{\"phrases\":[{\"phrase\":\"密码是123456\",\"when\":\"x\"}]}",java.util.Collections.singletonList(new JSONObject().put("user","密码是123456").put("id","q")),day.toString()).isEmpty()&&!Phrases.valid("好的")&&!Phrases.valid("？？"),"secrets, common words and punctuation are not phrases");
+  check(ph.addDiary(ph.epoch(),Diary.entry(day,"x",pturns,y+3600000L),null,learned)&&Phrases.entries(ph.snapshot()).length()==2,"phrases are saved with the diary");
+  ph.commit(ph.epoch(),"晚安","晚安。","sleepy",null,true,false,null,null,"p9",y+86400000L,null);check(Phrases.entries(ph.snapshot()).length()==2,"a chat turn keeps the phrases written beside it");
+  JSONObject again2=ph.snapshot();Phrases.apply(again2,Phrases.parse(said2,pturns,"2026-10-29"),y+2*86400000L);Phrases.apply(again2,Phrases.parse(said2,pturns,"2026-10-29"),y+2*86400000L);
+  check(Phrases.entries(again2).getJSONObject(0).optInt("seen")==2,"seen again on another day counts once per day");
+  JSONArray chosen=Phrases.context(ph.snapshot(),"领导又改需求了，太离谱");
+  check(chosen.length()==2&&chosen.getJSONObject(0).getString("phrase").equals("离谱他妈给离谱开门"),"the phrase that fits what the user just said comes first");
+  in=new PromptBuilder.Inputs();in.persona="你是大肥鱼。";in.timeZone="Asia/Shanghai";in.now=y+86400000L;in.remember=true;in.diary=true;in.phrases=chosen;
+  check(last(PromptBuilder.build(in,"太离谱了",false,ph.snapshot(),null)).contains("对方常用的说法")&&last(PromptBuilder.build(in,"太离谱了",false,ph.snapshot(),null)).contains("离谱他妈给离谱开门"),"the phrases reach the prompt as habits to borrow now and then");
+  in.diary=false;check(!last(PromptBuilder.build(in,"太离谱了",false,ph.snapshot(),null)).contains("对方常用的说法"),"diary off: not used");
+  String pid=Phrases.entries(ph.snapshot()).getJSONObject(0).getString("id");long beforePhrase=ph.epoch();ph.forgetPhrase(pid);
+  check(ph.epoch()>beforePhrase&&Phrases.entries(ph.snapshot()).length()==1,"a phrase can be deleted on its own");
+  JSONObject drop2=ph.snapshot();Phrases.dropSources(drop2,java.util.Collections.singleton("p2"));check(Phrases.entries(drop2).length()==0,"forgetting the quoted turn removes the phrase");
+  ph.clearUnderstanding();check(Phrases.entries(ph.snapshot()).length()==0,"clearing her understanding clears the phrases learned with it");
+  ph.addDiary(ph.epoch(),Diary.entry(day.minusDays(1),"x",pturns,y),null,learned);ph.clear(false);check(Phrases.entries(ph.snapshot()).length()==0,"clearing chats clears the phrases");
+  JSONObject many2=AgentStore.empty(0);List<JSONObject> lots=new java.util.ArrayList<>();for(int i=0;i<25;i++)lots.add(new JSONObject().put("phrase","说法"+i+"号").put("when","").put("evidence",new JSONObject().put("quote","说法"+i+"号").put("turn","t"+i).put("date","2026-10-28")));
+  Phrases.apply(many2,lots,1);check(Phrases.entries(many2).length()==Phrases.KEEP,"at most twenty phrases");
   for(PersonaManager.Persona style:styles){
    for(String event:new String[]{"greeting_morning","greeting_noon","greeting_afternoon","greeting_evening","greeting_night","feed","trip_depart","trip_back","trip_early","trip_tooEarly","trip_away"})
     check(!"missing".equals(PersonaManager.voice(style,event,"missing",new Random(1))),style.id+" supplies local event voice "+event);

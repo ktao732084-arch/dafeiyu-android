@@ -50,8 +50,9 @@ final class Understanding {
         +"understanding 最多2条新的，每条 {\"text\":\"……\",\"evidence\":\"用户当天原话片段\"}：text 写成相处分寸（何时多听少说、什么时候适合开玩笑、哪种提醒 TA 不喜欢、TA 更喜欢怎样被安慰或被帮忙），8到60字，用「似乎」「可能」留余地；"
         +"每条还要写 scene（general/venting/advice/celebration/play）和 topic（any/work/study/relationships/health）：分别表示一般相处/倾诉/求建议/分享好消息/玩笑，以及领域。限定在原话支持的范围，吐槽工作不代表所有场合都不要建议；明确的范围不能写成general或any。"
         +"evidence 必须逐字摘自当天用户说的话。只写这一天确实能看出来的，不写性格标签、心理诊断、外貌、隐私或敏感信息，没有把握就留空。"
-        +"your_understanding 是你以前形成的理解：当天原话支持某条时，放进 confirmed：{\"id\":\"…\",\"evidence\":\"原话片段\"}；当天原话明显说明某条不对时，放进 outdated，格式相同。没有就空数组。"
-        +"完整 JSON：{\"diary\":\"日记内容\",\"understanding\":[],\"confirmed\":[],\"outdated\":[]}。";
+        +"your_understanding 是你以前形成的理解：当天原话支持某条时，放进 confirmed：{\"id\":\"…\",\"evidence\":\"原话片段\"}；当天原话明显说明某条不对时，放进 outdated，格式相同。没有就空数组。";
+    /** The whole answer of the diary call when it also reads the user (Diary.request). */
+    static final String FORMAT="完整 JSON：{\"diary\":\"日记内容\",\"understanding\":[],\"confirmed\":[],\"outdated\":[],\"phrases\":[]}。";
 
     /** What one diary answer changes, every step checked against the day's turns. */
     static final class Update {

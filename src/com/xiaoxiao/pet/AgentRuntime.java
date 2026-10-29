@@ -103,7 +103,7 @@ final class AgentRuntime {
         in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.signature=PersonaManager.signature("main");in.nickname=Nickname.current();
         String requested=!proactive&&history==null?Nickname.requested(user):null;if(requested!=null)in.nickname=requested;
         in.feeling=store().mood(System.currentTimeMillis());in.mood=in.feeling.optString("emotion","calm");in.timeZone=TimeZone.getDefault().getID();in.now=System.currentTimeMillis();in.initializedAt=PersonaManager.initializedAt("main");
-        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}onScreen(in);in.remember=rememberEnabled();in.diary=diaryEnabled();if(in.remember&&in.diary&&history==null)in.understanding=Understanding.context(s,proactive?"":user);
+        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}onScreen(in);in.remember=rememberEnabled();in.diary=diaryEnabled();if(in.remember&&in.diary&&history==null){in.understanding=Understanding.context(s,proactive?"":user);in.phrases=Phrases.context(s,proactive?"":user);}
         GrowthStore growth=GrowthStore.quiet();if(growth!=null){in.chapter=growth.chapter();in.lore=growth.lore();}
         if(in.remember&&history==null){
             try{in.games=GomokuPage.store().context();}catch(Exception unavailable){in.games=new JSONObject().put("status","unavailable");}
@@ -128,8 +128,8 @@ final class AgentRuntime {
             // The same call is her slow loop: besides the diary it may add, confirm or retire her understanding of the user.
             JSONObject games=null;try{games=GomokuPage.store().context();}catch(Exception unavailable){}
             String raw=AgentTransport.request(ModelSettings.read(),Diary.request(day,turns,Data.name("main"),Understanding.offered(before),PersonaManager.diaryGuidance("main"),CharacterNow.experiences(before,games,day,zone)),new AgentTransport.Token(),partial->{},false,Diary.MAX_TOKENS);
-            String text=Diary.parse(raw);Understanding.Update update=Understanding.parse(raw,turns,before,day.toString());
-            if(text!=null&&db.addDiary(epoch,Diary.entry(day,text,turns,System.currentTimeMillis()),update))Data.log("main","陪伴日记已写好："+day+(update.empty()?"":"，相处理解已更新"));
+            String text=Diary.parse(raw);Understanding.Update update=Understanding.parse(raw,turns,before,day.toString());List<JSONObject> phrases=Phrases.parse(raw,turns,day.toString());
+            if(text!=null&&db.addDiary(epoch,Diary.entry(day,text,turns,System.currentTimeMillis()),update,phrases))Data.log("main","陪伴日记已写好："+day+(update.empty()?"":"，相处理解已更新"));
         }catch(Exception e){Data.log("main","陪伴日记暂未写成");}finally{writingDiary.set(false);}});
     }
     static boolean send(String user,boolean proactive,Listener listener) {
