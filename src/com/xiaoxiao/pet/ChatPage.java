@@ -4,7 +4,7 @@ import org.json.*;import java.util.*;import java.text.SimpleDateFormat;
 
 /** Paged conversation UI in a messaging-app layout. The model still receives only its bounded recent context. */
 final class ChatPage {
-    static final long STAMP_GAP=5*60*1000L;
+    static final long STAMP_GAP=5*60*1000L;static final int PAGE=20;
     static java.lang.ref.WeakReference<ChatPage> current=new java.lang.ref.WeakReference<>(null);
     final Context c;final String role,id;final boolean overlay;final Dialog dialog;final Handler handler=new Handler(Looper.getMainLooper());
     final LinearLayout rows;final ScrollView scroll;final EditText input;TextView status;final TextView presence,filter,setup;final Button send,older,jump;final FrameLayout stage;final int bubbleWidth,listHeight;int lifted;
@@ -109,10 +109,10 @@ final class ChatPage {
         picker.getDatePicker().setMaxDate(System.currentTimeMillis());if(overlay)picker.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);picker.show();
     }
     void latest(){stopSpeaking();from=Long.MIN_VALUE;to=Long.MAX_VALUE;filter.setVisibility(View.GONE);loadLatest();status.setText("");}
-    void loadLatest(){setup.setVisibility(AgentRuntime.configured()?View.GONE:View.VISIBLE);try{paged=false;older.setText("查看更早的消息");older.setEnabled(true);records=AgentRuntime.store().historyRange(from,to,null,20);render();scroll.post(()->{scroll.fullScroll(View.FOCUS_DOWN);bottom();});}catch(Exception e){status.setText("聊天记录暂时打不开，稍后再试试。");}}
-    void loadOlder(){stopSpeaking();try{if(records.length()==0)return;JSONArray page=AgentRuntime.store().historyRange(from,to,records.getJSONObject(0).getString("pageKey"),20);if(page.length()==0){older.setText("已经翻到最早的聊天啦");older.setEnabled(false);return;}int height=rows.getHeight(),position=scroll.getScrollY();for(int i=0;i<records.length();i++)page.put(records.getJSONObject(i));records=page;paged=true;render();scroll.post(()->scroll.scrollTo(0,position+rows.getHeight()-height));}catch(Exception e){status.setText("更早的聊天没读出来，稍后再试试。");}}
+    void loadLatest(){setup.setVisibility(AgentRuntime.configured()?View.GONE:View.VISIBLE);try{paged=false;older.setText("查看更早的消息");older.setEnabled(true);records=AgentRuntime.store().historyRange(from,to,null,PAGE);render();scroll.post(()->{scroll.fullScroll(View.FOCUS_DOWN);bottom();});}catch(Exception e){status.setText("聊天记录暂时打不开，稍后再试试。");}}
+    void loadOlder(){stopSpeaking();try{if(records.length()==0)return;JSONArray page=AgentRuntime.store().historyRange(from,to,records.getJSONObject(0).getString("pageKey"),PAGE);if(page.length()==0){older.setText("已经翻到最早的聊天啦");older.setEnabled(false);return;}boolean earliest=page.length()<PAGE;int height=rows.getHeight(),position=scroll.getScrollY();for(int i=0;i<records.length();i++)page.put(records.getJSONObject(i));records=page;paged=true;render();if(earliest){older.setText("已经翻到最早的聊天啦");older.setEnabled(false);}scroll.post(()->scroll.scrollTo(0,position+rows.getHeight()-height));}catch(Exception e){status.setText("更早的聊天没读出来，稍后再试试。");}}
     void render()throws Exception {
-        rows.removeAllViews();typing=null;lastDay=null;lastStamp=Long.MIN_VALUE;older.setVisibility(records.length()==0?View.GONE:View.VISIBLE);
+        rows.removeAllViews();typing=null;lastDay=null;lastStamp=Long.MIN_VALUE;older.setVisibility(records.length()==0||!paged&&records.length()<PAGE?View.GONE:View.VISIBLE);
         if(records.length()==0){empty();return;}
         for(int i=0;i<records.length();i++){
             JSONObject t=records.getJSONObject(i);long at=t.optLong("at"),replied=t.optLong("repliedAt",at);

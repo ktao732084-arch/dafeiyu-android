@@ -56,7 +56,7 @@ final class MemoryPanel {
         if(rows==null||rows.length()==0){TextView empty=a.text("还没有哦。聊到她喜欢什么的时候，会慢慢记下来。",15);empty.setTextColor(Apple.SECONDARY);empty.setPadding(a.dp(6),a.dp(16),a.dp(6),a.dp(8));l.addView(empty);}
         else{LinearLayout said=GroupedList.group(l);for(int i=rows.length()-1;i>=0;i--){GroupedList.divider(said);TextView line=a.text(rows.getJSONObject(i).optString("text"),15);line.setLineSpacing(a.dp(3),1);line.setPadding(a.dp(16),a.dp(13),a.dp(16),a.dp(13));said.addView(line);}}
         ScrollView scroll=new SpringScrollView(a);scroll.addView(l);
-        new Apple.Builder(a).setTitle("她说过的自己").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->{try{AgentRuntime.cancel();AgentRuntime.store().clearSelf();}catch(Exception e){AgentPanel.fail(a,e);}}).show();
+        new Apple.Builder(a).setTitle("她说过的自己").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->confirm(a,"清空她说过的自己？","她之前说过的喜好和习惯会全部忘掉，之后可能说出和以前不一样的话。你的记忆和聊天记录不受影响。",()->{AgentRuntime.cancel();AgentRuntime.store().clearSelf();})).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}
     /** Her diary, newest first; her own summaries of past days, clearable as a whole. */
     static void diary(MainActivity a){try{
@@ -65,8 +65,11 @@ final class MemoryPanel {
         if(rows.length()==0){TextView empty=a.text(AgentRuntime.diaryEnabled()?"还没有日记哦。聊过一天之后，下次聊天时她会写下前一天的。":"陪伴日记关着呢，可以在陪伴设置里打开。",15);empty.setTextColor(Apple.SECONDARY);empty.setPadding(a.dp(6),a.dp(16),a.dp(6),a.dp(8));l.addView(empty);}
         else{LinearLayout pages=GroupedList.group(l);for(int i=rows.length()-1;i>=0;i--){JSONObject r=rows.getJSONObject(i);GroupedList.divider(pages);LinearLayout page=a.column();page.setPadding(a.dp(16),a.dp(12),a.dp(16),a.dp(13));TextView date=a.text(r.optString("date"),12);date.setTextColor(Apple.SECONDARY);page.addView(date);TextView text=a.text(r.optString("text"),15);text.setLineSpacing(a.dp(3),1);text.setPadding(0,a.dp(6),0,0);page.addView(text);pages.addView(page);}}
         ScrollView scroll=new SpringScrollView(a);scroll.addView(l);
-        new Apple.Builder(a).setTitle("她的日记").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->{try{AgentRuntime.store().clearDiary();}catch(Exception e){AgentPanel.fail(a,e);}}).show();
+        new Apple.Builder(a).setTitle("她的日记").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->confirm(a,"清空她的日记？","已经写下的日记会全部删除，聊天记录和记忆还在。之后她只会给最近几天补写日记。",()->AgentRuntime.store().clearDiary())).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}
+    interface Action {void run()throws Exception;}
+    /** Clearing a whole list cannot be undone, so it always asks once more. */
+    static void confirm(MainActivity a,String title,String message,Action action){new Apple.Builder(a).setTitle(title).setMessage(message).setNegativeButton("取消",null).setPositiveButton("确认清空",(d,w)->{try{action.run();Toast.makeText(a,"已清空",Toast.LENGTH_SHORT).show();}catch(Exception e){AgentPanel.fail(a,e);}}).show();}
     static void historicalEntry(MainActivity a,JSONObject r){
         String at=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm",java.util.Locale.CHINA).format(new java.util.Date(r.optLong("at")));
         new Apple.Builder(a).setTitle("历史记忆").setMessage(r.optString("text")+"\n\n记录于 "+at+"\n这条记录已过期或被更新，不作为当前事实。").setNegativeButton("关闭",null).setPositiveButton("忘记相关版本",(d,w)->new Apple.Builder(a).setMessage("忘记这件事的当前与历史版本，以及直接来源对话？").setNegativeButton("取消",null).setPositiveButton("忘记",(dd,ww)->{try{AgentRuntime.cancel();AgentRuntime.store().forget(r.optString("id"));history(a);}catch(Exception e){AgentPanel.fail(a,e);}}).show()).show();
