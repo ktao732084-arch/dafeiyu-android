@@ -14,6 +14,7 @@
 | segmentDisplayedAt | 按段顺序记录首次展示时间；打开全文时补记当次时间 |
 | displayTimeZone | 最近一次展示时区 |
 | user / reply / proactive | 用户原文、完整最终回复、是否主动消息 |
+| interaction | 物理互动回应的动作证据；后续源码中聊天UI按此标记隐藏该轮，记录与模型上下文保留 |
 | pageKey | 分页游标，不代替业务ID |
 
 工作状态companion-v1.json仍保留最多160轮及4MiB边界。移出窗口的已提交对话原子写入私有chat-history目录。当前窗口与归档合并去重，按发送时间与稳定ID排序；读取上限40轮，界面每页20轮。

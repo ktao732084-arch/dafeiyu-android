@@ -60,7 +60,7 @@ final class AgentRuntime {
                         if(text==null||SystemClock.uptimeMillis()-request.lastAt>TouchReply.EXPIRE_MS||memory!=db||db.epoch()!=request.epoch||!pet.touchReplies.current(request)||!TouchReply.allowed(service,pet)||!TouchReply.free(pet)){release(token);return;}
                         String id=UUID.randomUUID().toString();
                         synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(request.epoch,"",text,reply.emotion,null,false,true,null,null,id,System.currentTimeMillis(),null,true,null,null,reply.moodLevel,rememberEnabled()?reply.moodCause:"",request.evidence)){release(token);return;}}
-                        release(token);pet.speak(text,id);
+                        release(token);pet.speak(text,id,true);
                     }catch(Exception failed){release(token);Data.log(pet.role,"互动回应暂未保存");}
                 });
             }catch(Exception failed){release(token);Data.log(pet.role,"互动回应连接未完成，不自动重试");}

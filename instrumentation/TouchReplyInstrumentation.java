@@ -26,7 +26,13 @@ public final class TouchReplyInstrumentation extends Instrumentation {
    // Text is assigned before the overlay reaches SurfaceFlinger; wait for actual layout and drawing.
    waitForIdleSync();SystemClock.sleep(600);main(()->check(pet.bubble!=null&&pet.bubble.isShown()&&pet.bubble.getWidth()>0&&pet.bubble.getHeight()>0,"bubble laid out and visible"));
    java.io.File screenshot=new java.io.File(getTargetContext().getExternalFilesDir(null),"touch-reply.png");try(FileOutputStream out=new FileOutputStream(screenshot)){check(getUiAutomation().takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG,100,out),"screenshot saved");}
-   main(()->{pet.clearBubble();Data.prefs().edit().putBoolean("agent.touchReply",false).commit();tap();tap();tap();});SystemClock.sleep(2400);check(calls.get()==1,"disabled setting does not request another reply");
+   check(AgentRuntime.store().conversationRange(Long.MIN_VALUE,Long.MAX_VALUE,null,20).length()==0,"reaction is absent from chat query");
+   check(AgentRuntime.context("刚才怎么了",false).toString().contains("慢点戳"),"shown reaction is still remembered");
+   // Inspect the last segment too: it used to attach an invitation to open chat.
+   boolean[] last={false};for(int i=0;i<200;i++){main(()->last[0]=pet.bubble!=null&&pet.bubble.getText().toString().contains("装凶"));if(last[0])break;SystemClock.sleep(50);}
+   check(last[0],"final reaction segment displayed");
+   main(()->{check(!pet.bubble.getText().toString().contains("聊天记录"),"reaction has no chat footer");pet.bubble.performClick();check(pet.bubble==null,"tap dismisses interaction bubble");check(ChatPage.current.get()==null,"tap does not open chat");
+    ChatPage chat=new ChatPage(activity,"main","main");chat.open();check(chat.records.length()==0,"actual chat page hides stored reaction");chat.dialog.dismiss();Data.prefs().edit().putBoolean("agent.touchReply",false).commit();tap();tap();tap();});SystemClock.sleep(2400);check(calls.get()==1,"disabled setting does not request another reply");
    result.putString("stream","PASS: "+checks+" Android touch-response checks\n");
   }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e);result.putString("stack",android.util.Log.getStackTraceString(e));}
   finally{try{main(()->{AgentRuntime.cancel();if(pet!=null)pet.clearBubble();getTargetContext().stopService(new Intent(getTargetContext(),PetService.class));if(activity!=null)activity.finish();});}catch(Throwable ignored){}}
