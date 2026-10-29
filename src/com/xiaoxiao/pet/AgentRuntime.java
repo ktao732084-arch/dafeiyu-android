@@ -40,7 +40,7 @@ final class AgentRuntime {
     static void touch(String type){
         touch(type,"touch","main",System.currentTimeMillis());
     }
-    /** An experience of hers with its own kind (wake, trip, story), which CharacterNow and the diary read. */
+    /** An experience of hers with its own kind (wake, story), which CharacterNow and the diary read. */
     static void touch(String note,String kind){touch(note,kind,"main",System.currentTimeMillis());}
     static long touch(String note,String kind,String pet,long at){
         lastEventAt=at;lastEvent=note;touched=true;lastTouch=at;interruptProactive();
@@ -123,8 +123,6 @@ final class AgentRuntime {
         if(!proactive){if(Looper.myLooper()==Looper.getMainLooper())Chat.interruptPresentation("main");else main.post(()->Chat.interruptPresentation("main"));}
         // Wake a dozing pet before the prompt is built, so the reply can sound freshly woken.
         if(!proactive&&PetService.instance!=null){if(Looper.myLooper()==Looper.getMainLooper())PetService.instance.heard("main");else main.post(()->{if(PetService.instance!=null)PetService.instance.heard("main");});}
-        // Chat comes first: she cuts a trip short to answer.
-        if(!proactive&&PetService.instance!=null){if(Looper.myLooper()==Looper.getMainLooper())PetService.instance.callBack();else main.post(()->{if(PetService.instance!=null)PetService.instance.callBack();});}
         worker.execute(()->{
             AgentStore attemptStore=null;long attemptEpoch=-1;
             try {

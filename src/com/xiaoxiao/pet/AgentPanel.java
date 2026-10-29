@@ -5,7 +5,7 @@ final class AgentPanel {
  static void fail(MainActivity a,Exception e){Toast.makeText(a,e.getMessage()==null?"保存失败，请重试":e.getMessage(),Toast.LENGTH_LONG).show();}
  static void settings(MainActivity a){
   LinearLayout l=a.column();l.setPadding(a.dp(18),a.dp(4),a.dp(18),a.dp(16));GroupedList.note(l,"按你舒服的节奏来。她主动开口时也会用到你配置的模型额度。");
-  GroupedList.toggle(GroupedList.group(l),"记住重要的事",AgentRuntime.rememberEnabled(),(v,on)->{AgentRuntime.cancel();Data.prefs().edit().putBoolean("agent.memory",on).apply();});
+  LinearLayout memory=GroupedList.group(l);GroupedList.toggle(memory,"记住重要的事",AgentRuntime.rememberEnabled(),(v,on)->{AgentRuntime.cancel();Data.prefs().edit().putBoolean("agent.memory",on).apply();});GroupedList.row(memory,"记忆引擎",v->MemoryPanel.settings(a));
   GroupedList.note(l,"她会从你的原话里记下喜好和约定。关掉后不再自动记下或翻找旧事；你问某段时间聊过什么时，仍会查本机聊天记录。");
   GroupedList.toggle(GroupedList.group(l),"摸摸或挪动后回应我",TouchReply.enabled(),(v,on)->{Data.prefs().edit().putBoolean("agent.touchReply",on).apply();if(!on){PetService service=PetService.instance;if(service!=null)for(PetService.Pet pet:service.pets.values())TouchReply.cancel(pet);}});
   GroupedList.note(l,"连续互动后，她会按自己的性格接一句短话。使用已连接的模型额度；聊天、剧情、安静陪伴和你说正在忙时优先。不接通模型时仍有动作反馈。");
@@ -23,10 +23,6 @@ final class AgentPanel {
   // One row that shows whether quiet time is on and until when, instead of two rows that both always look available.
   Button focus=GroupedList.row(quiet,focusLabel(),GroupedList.MOON,GroupedList.VIOLET,null);
   focus.setOnClickListener(v->{if(focusUntil()>0){Data.prefs().edit().putLong("agent.focusUntil",0).apply();Toast.makeText(a,"她又可以找你说话啦",0).show();}else{Data.prefs().edit().putLong("agent.focusUntil",System.currentTimeMillis()+3600000).apply();AgentRuntime.cancel();Toast.makeText(a,"接下来一小时，她只静静陪着你",0).show();}focus.setText(focusLabel());proactiveHint(hint[0]);});
-  GroupedList.section(l,"更多");LinearLayout more=GroupedList.group(l);
-  GroupedList.row(more,"记忆引擎",GroupedList.BOOK,GroupedList.ORANGE,v->MemoryPanel.settings(a));
-  GroupedList.row(more,"切换明暗外观 · 现在是"+Apple.modeLabel(),GroupedList.MOON,GroupedList.GREY,v->{Data.prefs().edit().putString("appearance.mode",Apple.dark?"day":"night").apply();Apple.load();a.render();});
-  GroupedList.row(more,"手机悬浮权限",GroupedList.PHONE,GroupedList.SKY,v->PermissionsPanel.show(a));
   ScrollView scroll=new SpringScrollView(a);scroll.addView(l);new Apple.Builder(a).setTitle("陪伴设置").setView(scroll).setPositiveButton("完成",null).show();
  }
  /** The end of the current quiet hour, or 0 when it is not on. */
@@ -60,9 +56,8 @@ final class AgentPanel {
   JSONObject snapshot=AgentRuntime.store().snapshot();JSONArray entries=snapshot.getJSONArray("memories");LinearLayout l=a.column();l.setPadding(a.dp(18),a.dp(4),a.dp(18),a.dp(18));
   GroupedList.note(l,"她记得的，都是你亲口说过的事。点开可以修改、固定或忘记；忘记时，那一轮原话也会一起删掉。");
   if(snapshot.optBoolean("recovered")){TextView warn=GroupedList.note(l,"上次数据出了点状况，已经从本机备份恢复。建议导出一份手账。");warn.setTextColor(Apple.DANGER);}
-  GroupedList.note(l,snapshot.optString("memoryStatus",MemoryBridge.lastStatus));
   final AlertDialog[] dialog=new AlertDialog[1];
-  LinearLayout story=GroupedList.group(l);GroupedList.row(story,"我们的故事",GroupedList.WAVE,GroupedList.TEAL,v->GrowthPanel.show(a));GroupedList.row(story,"共同经历与记忆变化",GroupedList.CLOCK,GroupedList.TEAL,v->MemoryPanel.history(a));GroupedList.row(story,"最近互动",GroupedList.CHAT,GroupedList.SKY,v->MemoryPanel.interactions(a));GroupedList.row(story,"她说过的自己",GroupedList.HEART,GroupedList.PINK,v->MemoryPanel.self(a));GroupedList.row(story,"她的日记",GroupedList.BOOK,GroupedList.VIOLET,v->MemoryPanel.diary(a));GroupedList.row(story,"她对你的了解",GroupedList.TAG,GroupedList.ORANGE,v->MemoryPanel.understanding(a));
+  LinearLayout hers=GroupedList.group(l);GroupedList.row(hers,"她的日记",GroupedList.BOOK,GroupedList.VIOLET,v->MemoryPanel.diary(a));GroupedList.row(hers,"她对你的了解",GroupedList.TAG,GroupedList.ORANGE,v->MemoryPanel.understanding(a));GroupedList.row(hers,"她说过的自己",GroupedList.HEART,GroupedList.PINK,v->MemoryPanel.self(a));
   TextView count=GroupedList.section(l,"她记得的事 · "+entries.length()+" 条");
   LinearLayout holder=a.column();final JSONArray[] list={entries};Runnable[] fill=new Runnable[1];
   // The editor opens on top of the notebook; after a save or forget the list refreshes in place.
@@ -84,6 +79,8 @@ final class AgentPanel {
   l.addView(holder);
   LinearLayout actions=GroupedList.group(l);
   GroupedList.row(actions,"写下一条记忆",GroupedList.PLUS,GroupedList.SKY,v->edit(a,null,null,reload));
+  GroupedList.row(actions,"共同经历与记忆变化",GroupedList.CLOCK,GroupedList.TEAL,v->MemoryPanel.history(a));
+  GroupedList.row(actions,"最近互动",GroupedList.CHAT,GroupedList.SKY,v->MemoryPanel.interactions(a));
   GroupedList.row(actions,"导出手账与对话",GroupedList.SHARE,GroupedList.MINT,v->a.startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/json").putExtra(Intent.EXTRA_TITLE,"大肥鱼-手账.json"),42));
   LinearLayout danger=GroupedList.group(l);GroupedList.row(danger,"清空聊天记录，保留记忆",GroupedList.CHAT,GroupedList.GREY,v->confirmClear(a,false,dialog[0]));Button reset=GroupedList.row(danger,"忘记全部对话和记忆",GroupedList.TRASH,GroupedList.RED,v->confirmClear(a,true,dialog[0]));reset.setTextColor(Apple.DANGER);
   ScrollView scroll=new SpringScrollView(a);scroll.addView(l);dialog[0]=new Apple.Builder(a).setTitle("记忆手账").setView(scroll).setPositiveButton("合上手账",null).show();

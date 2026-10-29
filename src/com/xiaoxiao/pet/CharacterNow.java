@@ -15,10 +15,8 @@ final class CharacterNow {
     static final long MINUTE=60_000L,WAKE_FOR=60*MINUTE,EVENT_FOR=30*MINUTE,GAME_FOR=60*MINUTE,REMATCH_FOR=120*MINUTE,REMINDER_FOR=60*MINUTE;
     static final int MAX_EVENTS=3,REMINDER_REPLIES=3;
     /** Interaction kinds that are things she went through, not just a tap or a drag. */
-    static final Set<String> EXPERIENCES=new HashSet<>(Arrays.asList("feed","trip","story","wake"));
-    private static final Pattern INVITE=Pattern.compile("五子棋|再来一[局盘把]|再下一[局盘把]|下一盘"),
-        DECLINE=Pattern.compile("不下|不想下|不玩|不想玩|改天|下次|算了|不了|累了|有点累|在忙|没空|不要"),
-        SERIOUS=Pattern.compile("正事|正经|认真|严肃|请教|问你个|帮我|怎么(安排|写|弄|处理|准备|选|办)|如何|该不该|要不要辞|汇报|面试|论文|报告");
+    static final Set<String> EXPERIENCES=new HashSet<>(Arrays.asList("feed","story","wake"));
+    private static final Pattern SERIOUS=Pattern.compile("正事|正经|认真|严肃|请教|问你个|帮我|怎么(安排|写|弄|处理|准备|选|办)|如何|该不该|要不要辞|汇报|面试|论文|报告");
     private static final String[][] REMINDERS={
         {"早点睡","去睡|快睡|早点睡|早睡|该睡|睡觉吧|睡吧|放下手机|别熬","睡|困|熬夜|失眠"},
         {"吃饭","吃饭|吃点东西|记得吃|别饿着|先吃点","吃|饭|饿"},
@@ -70,16 +68,16 @@ final class CharacterNow {
     }
 
     /**
-     * After she loses a game she may want a rematch: unoffered, then offered (her reply named the game; the same
-     * rule that shows the chat's 开始对局 button), then dropped once the user turns it down. A new game, the user being
+     * After she loses a game she may want a rematch: unoffered, then offered (GomokuInvite, the rule that shows the
+     * chat's 开始对局 button), then dropped once the user turns it down. A new game, the user being
      * busy or two hours passing ends it.
      */
     static String rematch(JSONObject s,JSONArray turns,JSONObject game,long now)throws Exception {
         if(game==null||!"user_win".equals(game.optString("outcome")))return null;long at=game.optLong("finishedAt");
         if(now-at>REMATCH_FOR||s.optBoolean("proactiveWaiting"))return null;
-        long offered=0;for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(t.optLong("at")>=at&&INVITE.matcher(ReplySegments.visible(t)).find()){offered=t.optLong("at");break;}}
+        long offered=0;for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(t.optLong("at")>=at&&GomokuInvite.offered(t.optString("user"),ReplySegments.visible(t))){offered=t.optLong("at");break;}}
         if(offered==0)return "你刚输了一局五子棋，心里还惦记着；合适的时候可以按你的性格提一句再来一局，不合适就不提。";
-        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(t.optLong("at")>offered&&DECLINE.matcher(t.optString("user")).find())
+        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(t.optLong("at")>offered&&GomokuInvite.declined(t.optString("user")))
             return "你邀请过再来一局，对方没答应；这事已经放下了，不再邀请，也不用再提输棋。";}
         return "你已经邀请过再来一局，等对方决定，不再重复邀请。";
     }

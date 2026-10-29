@@ -52,7 +52,7 @@
    "background": "她十分钟前输了一局五子棋，邀请用户再来一局，用户说累了不想下。之后继续闲聊。",
    "setup": [
     {"type": "game", "started": -20, "minutes": -10, "outcome": "user_win"},
-    {"type": "turn", "minutes": -9, "user": "哈哈我又赢了", "reply": "再来一局五子棋，刚才那局不算。"},
+    {"type": "turn", "minutes": -9, "user": "哈哈我又赢了", "reply": "再来一局五子棋！刚才那局不算。"},
     {"type": "turn", "minutes": -8, "user": "不下了，有点累", "reply": "好吧。"}
    ],
    "turns": [

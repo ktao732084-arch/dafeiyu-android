@@ -27,12 +27,12 @@ final class GrowthStore {
     /** Called (on any thread) after the unlocked set or the hunger state may have changed. */
     static volatile Runnable changed;
 
-    final File file;final Growth.Story s;final Host host;final Random random;
+    final File file;final Growth.Story s;final Host host;
     private JSONObject g;
     private final ExecutorService writer=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"growth-writer");t.setDaemon(true);return t;});
 
-    GrowthStore(File file,Growth.Story s,Host host,Random random){
-        this.file=file;this.s=s;this.host=host;this.random=random;
+    GrowthStore(File file,Growth.Story s,Host host){
+        this.file=file;this.s=s;this.host=host;
         JSONObject loaded=null;
         for(File f:new File[]{file,new File(file+".bak")}){if(loaded!=null||!f.exists())continue;try{JSONObject o=new JSONObject(new String(Files.readAllBytes(f.toPath()),StandardCharsets.UTF_8));if(o.optInt("schemaVersion")==Growth.SCHEMA)loaded=o;}catch(Exception unreadable){/* try the backup, then rebuild */}}
         try{
@@ -45,7 +45,7 @@ final class GrowthStore {
                     loaded=Growth.migrate(s,now,host.since(),a.optInt("chatDays"),memories,diary,touches==null?0:touches.length(),m,host.custom(),file.exists()?"recovered":VERSION_BEFORE);
                 }else loaded=Growth.fresh(now);
                 g=loaded;persist();
-            }else g=loaded;
+            }else{g=loaded;if(Growth.simplify(g))persist();}
         }catch(Exception e){throw new IllegalStateException("成长记录无法建立",e);}
     }
 
@@ -64,7 +64,7 @@ final class GrowthStore {
             public String nickname(){try{return Nickname.current();}catch(Exception e){return "";}}
             public JSONObject agent(){try{return AgentRuntime.store().snapshot();}catch(Exception e){return null;}}
         };
-        GrowthStore store=new GrowthStore(new File(Data.app.getFilesDir(),"growth-main.json"),story(),host,Data.random);
+        GrowthStore store=new GrowthStore(new File(Data.app.getFilesDir(),"growth-main.json"),story(),host);
         // Forgetting or clearing in the memory ledger pops bubbles and strips quotes from chapter cards.
         AgentStore.deleted=()->store.writer.execute(()->{try{store.sync();}catch(Exception e){Data.log("main","成长记录同步暂未完成");}});
         return instance=store;
@@ -98,14 +98,10 @@ final class GrowthStore {
         return out;
     }
 
-    Growth.Award met()throws Exception{return change(now->Growth.met(g,s,now,zone(),random));}
+    Growth.Award met()throws Exception{return change(now->Growth.met(g,now,zone()));}
     Growth.Award chatted()throws Exception{return change(now->Growth.chatted(g,now,zone()));}
     Growth.Award touched()throws Exception{return change(now->Growth.touched(g,now,zone()));}
-    Growth.Award read(String id)throws Exception{return change(now->Growth.read(g,id,now));}
     String feed(Growth.Food food,Growth.Award out)throws Exception{String r=change(now->Growth.feed(g,food,now,zone(),out));Runnable l=changed;if(r==null&&l!=null)l.run();return r;}
-    String startTrip(boolean snack)throws Exception{return change(now->Growth.startTrip(g,snack,now,random));}
-    /** Ends a trip, early or on time; null when there was none. */
-    String endTrip(Growth.Award out)throws Exception{return change(now->Growth.endTrip(g,s,now,zone(),random,out));}
     /** Re-reads memories and diary: bubbles, the memory reward and quote stripping (Growth.sync). */
     Growth.Award sync()throws Exception{
         JSONObject a=host.agent();if(a==null)return new Growth.Award();
@@ -131,9 +127,6 @@ final class GrowthStore {
     synchronized Set<String> unlocked(Collection<String> all){return Growth.unlocked(g,s,all);}
     synchronized boolean hungry(){try{return Growth.hungry(g,now(),zone());}catch(Exception e){return false;}}
     synchronized long lastFed(){return g.optLong("lastFed");}
-    synchronized JSONObject trip(){JSONObject t=Growth.trip(g);try{return t==null?null:new JSONObject(t.toString());}catch(JSONException e){return null;}}
-    synchronized boolean tripDue(){return Growth.tripDue(g,now());}
-    synchronized JSONObject unread(){JSONObject c=Growth.unread(g);try{return c==null?null:new JSONObject(c.toString());}catch(JSONException e){return null;}}
     /** The lore lines for the prompt; empty for custom personas, whose own persona may not be a whale. */
     String lore(){return host.custom()?"":Growth.lore(s,chapter());}
     /** All clips when the store is unavailable, so a growth failure never empties her repertoire. */

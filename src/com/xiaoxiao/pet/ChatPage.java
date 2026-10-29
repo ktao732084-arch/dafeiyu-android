@@ -135,10 +135,11 @@ final class ChatPage {
         List<String> parts=ReplySegments.parts(t);int shown=t.has("displayed")?Math.min(parts.size(),t.optInt("displayed")):parts.size();
         JSONObject pending=ReplySegments.label(t).isEmpty()?null:t;String reason=t.has("interaction")?"回应了你的互动":t.optBoolean("proactive")?"她主动来找你":null;
         if(shown==0){message("回复已经保存好了，点开看看全文吧。",false,pending,reason);return;}
+        boolean invite=GomokuInvite.offered(t.optString("user"),ReplySegments.visible(t));
         for(int i=0;i<shown;i++){
             String text=i==0?AgentPolicy.replyText(parts.get(i)):parts.get(i);
             List<String> bubbles=t.optInt("segmentVersion",1)>=ReplySegments.VERSION?Collections.singletonList(text):ReplySegments.split(text);
-            for(int j=0;j<bubbles.size();j++){boolean last=i==shown-1&&j==bubbles.size()-1;message(bubbles.get(j).trim(),false,last?pending:null,last?reason:null);}
+            for(int j=0;j<bubbles.size();j++){boolean last=i==shown-1&&j==bubbles.size()-1;message(bubbles.get(j).trim(),false,last?pending:null,last?reason:null,last&&invite);}
         }
     }
     void empty(){
@@ -166,6 +167,9 @@ final class ChatPage {
     }
     View message(String text,boolean user,JSONObject pending,boolean proactive){return message(text,user,pending,proactive?"她主动来找你":null);}
     View message(String text,boolean user,JSONObject pending,String reason){
+        return message(text,user,pending,reason,false);
+    }
+    View message(String text,boolean user,JSONObject pending,String reason,boolean invite){
         LinearLayout line=new LinearLayout(c);line.setGravity(user?Gravity.END:Gravity.START);line.setPadding(0,dp(5),0,dp(5));
         LinearLayout body=column();body.setGravity(user?Gravity.END:Gravity.START);
         TextView content;
@@ -179,7 +183,7 @@ final class ChatPage {
         if(pending!=null)content.setOnClickListener(v->expand(pending));
         // Let the text measure its own width and height; MATCH_PARENT can inherit the short footer width.
         body.addView(content,new LinearLayout.LayoutParams(-2,-2));
-        if(!user&&text.contains("五子棋")){Button play=new Button(c);play.setText("开始对局 · 五子棋");Apple.button(play,false);play.setTextSize(13);play.setOnClickListener(v->{if(sending){Toast.makeText(c,"等她这句说完再开局吧",0).show();return;}dialog.dismiss();GomokuPage.launch(c);});body.addView(play,new LinearLayout.LayoutParams(-2,dp(42)));}
+        if(!user&&invite){Button play=new Button(c);play.setText("开始对局 · 五子棋");Apple.button(play,false);play.setTextSize(13);play.setOnClickListener(v->{if(sending){Toast.makeText(c,"等她这句说完再开局吧",0).show();return;}dialog.dismiss();GomokuPage.launch(c);});body.addView(play,new LinearLayout.LayoutParams(-2,dp(42)));}
         if(reason!=null){TextView note=Apple.label(c,reason,11,false);note.setTextColor(Apple.SECONDARY);note.setPadding(dp(4),dp(5),0,0);body.addView(note);}
         if(pending!=null){Button expand=new Button(c);expand.setText(ReplySegments.label(pending));Apple.button(expand,false);expand.setTextSize(12);expand.setMinHeight(dp(30));expand.setPadding(dp(12),0,dp(12),0);expand.setOnClickListener(v->expand(pending));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-2,dp(30));p.topMargin=dp(6);body.addView(expand,p);}
         // Only her side carries an avatar; your messages are bubbles alone on the right.

@@ -45,7 +45,7 @@ public final class CharacterStateTest {
   String serious=lines(chess.snapshot(),lost,"对了问你个正事，汇报 PPT 结构怎么安排比较好？",false,nine+4*M);
   check(serious.contains("先放一边")&&!serious.contains("五子棋"),"a serious turn sets the game aside: "+serious);
   check(lines(chess.snapshot(),lost,"",true,nine).contains("再来一局"),"a proactive chance may still use the wish");
-  chess.commit(chess.epoch(),"哈哈我赢了！","哼，再来一局五子棋，刚才是我让你的。","playful",null,true,false,null,null,"c1",nine,null,false,null,null,2,"输了不服",Boolean.TRUE);
+  chess.commit(chess.epoch(),"哈哈我赢了！","哼，再来一局五子棋！刚才是我让你的。","playful",null,true,false,null,null,"c1",nine,null,false,null,null,2,"输了不服",Boolean.TRUE);
   check(lines(chess.snapshot(),lost,"今天天气还挺凉快",false,nine+2*M).contains("已经邀请过再来一局，等对方决定"),"offered: wait, do not ask again");
   chess.commit(chess.epoch(),"不下了，有点累","好吧。","calm",null,true,false,null,null,"c2",nine+3*M,null,false,null,null,1,"",Boolean.TRUE);
   String dropped=lines(chess.snapshot(),lost,"今天上班真的好累啊",false,nine+5*M);

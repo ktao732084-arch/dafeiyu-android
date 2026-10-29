@@ -5,25 +5,24 @@ import java.time.*;
 import java.util.*;
 
 /**
- * The growth main line (docs/GROWTH_DESIGN.md): bond and dried fish earned from real, local interactions,
- * chapters gated by both bond and the days since the first meeting, chapter scenes, unlocked clips, feeding
- * and trips. Pure Java over one JSON state, so every rule runs in the JVM tests; GrowthStore keeps the file.
+ * The growth main line (docs/GROWTH_DESIGN.md): one number, bond, earned from real, local interactions;
+ * chapters gated by both bond and the days since the first meeting; chapter scenes, unlocked clips and free
+ * feeding. Pure Java over one JSON state, so every rule runs in the JVM tests; GrowthStore keeps the file.
  * Nothing here takes model output: the model can neither award bond nor advance a chapter.
  */
 final class Growth {
-    static final int SCHEMA=1, MAX_CHAPTER=5, LEDGER=500, POSTCARDS=200, CARDS=20;
-    static final long MINUTE=60_000L, HOUR=60*MINUTE, DAY=24*HOUR;
-    static final long AWAY_AFTER=72*HOUR, TOO_EARLY=15*MINUTE, FED_FOR=30*MINUTE;
-    static final int EVENT_BOND=20, EVENT_FISH=20, POSTCARD_BOND=5, CHAT_TURNS=3, SNACK_BENTO=3;
+    static final int SCHEMA=1, MAX_CHAPTER=5, LEDGER=500, CARDS=20;
+    static final long MINUTE=60_000L, HOUR=60*MINUTE, DAY=24*HOUR, FED_FOR=30*MINUTE;
+    static final int EVENT_BOND=20, CHAT_TURNS=3;
 
-    /** Per-day rewards: {bond, fish, times a day}. Chat counts once a day however long the conversation. */
+    /** Per-day rewards: {bond, times a day}. Chat counts once a day however long the conversation. */
     static final Map<String,int[]> DAILY=new LinkedHashMap<>();
     static {
-        DAILY.put("met",new int[]{5,5,1});
-        DAILY.put("chat",new int[]{10,3,1});
-        DAILY.put("feed",new int[]{2,0,3});
-        DAILY.put("touch",new int[]{1,0,5});
-        DAILY.put("memory",new int[]{3,0,3});
+        DAILY.put("met",new int[]{5,1});
+        DAILY.put("chat",new int[]{10,1});
+        DAILY.put("feed",new int[]{2,3});
+        DAILY.put("touch",new int[]{1,5});
+        DAILY.put("memory",new int[]{3,3});
     }
 
     static final class Chapter {
@@ -32,13 +31,13 @@ final class Growth {
         String title(){return "第"+id+"章「"+name+"」";}
     }
     static final class Food {
-        final String name,clip;final int price,chapter;
-        Food(JSONObject o)throws Exception{name=o.getString("name");clip=o.getString("clip");price=o.getInt("price");chapter=o.getInt("chapter");}
+        final String name,clip;final int chapter;
+        Food(JSONObject o)throws Exception{name=o.getString("name");clip=o.getString("clip");chapter=o.getInt("chapter");}
     }
-    /** assets/story.json: chapter scripts, which clips each chapter unlocks, foods, greetings and trip places. */
+    /** assets/story.json: chapter scripts, which clips each chapter unlocks, foods and greetings. */
     static final class Story {
         final List<Chapter> chapters=new ArrayList<>();final Map<String,Integer> unlock=new HashMap<>();final List<Food> foods=new ArrayList<>();
-        final JSONObject greetings,trip;final JSONArray places;
+        final JSONObject greetings;
         Story(JSONObject o)throws Exception{
             if(o.getInt("schemaVersion")!=1)throw new IllegalStateException("剧情资源版本不支持");
             JSONArray c=o.getJSONArray("chapters");for(int i=0;i<c.length();i++)chapters.add(new Chapter(c.getJSONObject(i)));
@@ -47,7 +46,7 @@ final class Growth {
             JSONObject u=o.getJSONObject("unlocks");
             for(Iterator<String> k=u.keys();k.hasNext();){String key=k.next();int chapter=key.equals("always")?0:Integer.parseInt(key);JSONArray a=u.getJSONArray(key);for(int i=0;i<a.length();i++)if(unlock.put(a.getString(i),chapter)!=null)throw new IllegalStateException("动作重复归类："+a.getString(i));}
             JSONArray f=o.getJSONArray("foods");for(int i=0;i<f.length();i++)foods.add(new Food(f.getJSONObject(i)));
-            greetings=o.getJSONObject("greetings");trip=o.getJSONObject("trip");places=o.getJSONArray("places");
+            greetings=o.getJSONObject("greetings");
         }
         Chapter chapter(int id){return chapters.get(Math.max(1,Math.min(MAX_CHAPTER,id))-1);}
         Food food(String name){for(Food f:foods)if(f.name.equals(name))return f;return null;}
@@ -60,14 +59,22 @@ final class Growth {
         return base(now).put("pending",new JSONArray().put(1));
     }
     private static JSONObject base(long now)throws Exception {
-        return new JSONObject().put("schemaVersion",SCHEMA).put("createdAt",now).put("bond",0).put("fish",0).put("chapter",1).put("legacy",false)
+        return new JSONObject().put("schemaVersion",SCHEMA).put("createdAt",now).put("bond",0).put("chapter",1).put("legacy",false)
             .put("chapterAt",new JSONObject().put("1",now)).put("pending",new JSONArray()).put("daily",new JSONObject()).put("ledger",new JSONArray())
-            .put("cards",new JSONArray()).put("postcards",new JSONArray()).put("seen",new JSONObject()).put("known",new JSONObject().put("memories",new JSONArray()).put("diary",new JSONArray()))
+            .put("cards",new JSONArray()).put("seen",new JSONObject()).put("known",new JSONObject().put("memories",new JSONArray()).put("diary",new JSONArray()))
             .put("popped",0).put("feeds",0).put("lastFed",0).put("lastMet",0);
+    }
+    /**
+     * Growth once also had dried fish (a currency for food and bentos) and trips with postcards; both were
+     * removed to keep one main line. An older file keeps its bond, chapter, cards and collections; the
+     * removed parts are dropped. Returns whether anything changed.
+     */
+    static boolean simplify(JSONObject g){
+        boolean changed=false;for(String key:new String[]{"fish","trip","postcards"})if(g.has(key)){g.remove(key);changed=true;}
+        return changed;
     }
     static int chapter(JSONObject g){return Math.max(1,Math.min(MAX_CHAPTER,g.optInt("chapter",1)));}
     static int bond(JSONObject g){return g.optInt("bond");}
-    static int fish(JSONObject g){return g.optInt("fish");}
     /** 相识第几天, counted like AgentPolicy.relationship(): the first meeting is day 1. */
     static int day(long since,long now){return since<=0||now<since?0:(int)((now-since)/DAY)+1;}
     static String date(long now,ZoneId zone){return Instant.ofEpochMilli(now).atZone(zone).toLocalDate().toString();}
@@ -81,34 +88,30 @@ final class Growth {
     static int today(JSONObject g,String kind,long now,ZoneId zone)throws Exception{return daily(g,now,zone).optInt(kind);}
 
     static final class Award {
-        int bond,fish;boolean first,chapterUp;JSONObject postcard;
-        boolean any(){return bond>0||fish>0;}
+        int bond;boolean first,chapterUp;
+        boolean any(){return bond>0;}
     }
-    private static void ledger(JSONObject g,long now,String type,int bond,int fish,String ref)throws Exception {
-        JSONArray a=g.getJSONArray("ledger");JSONObject row=new JSONObject().put("at",now).put("type",type).put("bond",bond).put("fish",fish);if(ref!=null)row.put("ref",ref);a.put(row);
+    private static void ledger(JSONObject g,long now,String type,int bond,String ref)throws Exception {
+        JSONArray a=g.getJSONArray("ledger");JSONObject row=new JSONObject().put("at",now).put("type",type).put("bond",bond);if(ref!=null)row.put("ref",ref);a.put(row);
         // Older rows fold into one summary, so the totals stay explainable without an unbounded file.
         while(a.length()>LEDGER){JSONObject first=a.getJSONObject(0),second=a.getJSONObject(1);boolean summary="earlier".equals(first.optString("type"));
-            JSONObject merged=new JSONObject().put("type","earlier").put("at",second.optLong("at")).put("bond",first.optInt("bond")+second.optInt("bond")).put("fish",first.optInt("fish")+second.optInt("fish")).put("count",(summary?first.optInt("count"):1)+1);
+            JSONObject merged=new JSONObject().put("type","earlier").put("at",second.optLong("at")).put("bond",first.optInt("bond")+second.optInt("bond")).put("count",(summary?first.optInt("count"):1)+1);
             a.remove(0);a.put(0,merged);}
     }
-    private static void add(JSONObject g,long now,String type,int bond,int fish,String ref,Award out)throws Exception {
-        if(bond==0&&fish==0)return;g.put("bond",bond(g)+bond).put("fish",Math.max(0,fish(g)+fish));ledger(g,now,type,bond,fish,ref);
-        if(out!=null){out.bond+=bond;out.fish+=fish;}
+    private static void add(JSONObject g,long now,String type,int bond,String ref,Award out)throws Exception {
+        if(bond==0)return;g.put("bond",bond(g)+bond);ledger(g,now,type,bond,ref);
+        if(out!=null)out.bond+=bond;
     }
     /** A capped daily reward; returns whether it was still available today. */
     private static boolean daily(JSONObject g,String kind,long now,ZoneId zone,String ref,Award out)throws Exception {
-        int[] rule=DAILY.get(kind);JSONObject d=daily(g,now,zone);int used=d.optInt(kind);if(used>=rule[2])return false;
-        d.put(kind,used+1);add(g,now,kind,rule[0],rule[1],ref,out);return true;
+        int[] rule=DAILY.get(kind);JSONObject d=daily(g,now,zone);int used=d.optInt(kind);if(used>=rule[1])return false;
+        d.put(kind,used+1);add(g,now,kind,rule[0],ref,out);return true;
     }
 
-    /**
-     * The first time you meet each day: five bond, five fish. After three or more days apart she has been out
-     * on her own and left one postcard (never more than one, so a long absence is not turned into guilt).
-     */
-    static Award met(JSONObject g,Story s,long now,ZoneId zone,Random random)throws Exception {
+    /** The first time you meet each day: five bond. Days apart cost nothing. */
+    static Award met(JSONObject g,long now,ZoneId zone)throws Exception {
         Award out=new Award();long last=g.optLong("lastMet");
         out.first=daily(g,"met",now,zone,null,out);
-        if(last>0&&now-last>=AWAY_AFTER&&chapter(g)>=2&&g.optJSONObject("trip")==null)out.postcard=postcard(g,s,now,zone,random,"away");
         if(now>last)g.put("lastMet",now);
         return out;
     }
@@ -122,12 +125,10 @@ final class Growth {
         Award out=new Award();daily(g,"touch",now,zone,null,out);return out;
     }
     static boolean available(JSONObject g,Food f){return g.optBoolean("legacy")||chapter(g)>=f.chapter;}
-    /** Feeding: plain rice is always free, so she can always be fed. Returns null on success or why not. */
+    /** Feeding is free; foods unlock with the chapters. Returns null on success or why not. */
     static String feed(JSONObject g,Food f,long now,ZoneId zone,Award out)throws Exception {
         if(f==null)return "没有这种食物";
         if(!available(g,f))return f.name+"要到第"+f.chapter+"章才能喂";
-        if(fish(g)<f.price)return "小鱼干不够啦（需要 "+f.price+"，现在有 "+fish(g)+"）";
-        add(g,now,"buy",0,-f.price,f.name,null);if(out!=null)out.fish-=f.price;
         daily(g,"feed",now,zone,f.name,out);g.put("feeds",g.optInt("feeds")+1).put("lastFed",now);return null;
     }
     static boolean hungry(JSONObject g,long now,ZoneId zone)throws Exception{return today(g,"feed",now,zone)==0;}
@@ -159,8 +160,8 @@ final class Growth {
         return out;
     }
     private static Set<String> strings(JSONArray a){Set<String> out=new LinkedHashSet<>();for(int i=0;i<a.length();i++)out.add(a.optString(i));return out;}
-    /** Bubbles in the jar: current memories, diary pages, postcards and chapter cards. */
-    static int bubbles(JSONObject g){JSONObject k=g.optJSONObject("known");return (k==null?0:k.optJSONArray("memories").length()+k.optJSONArray("diary").length())+g.optJSONArray("postcards").length()+g.optJSONArray("cards").length();}
+    /** Bubbles in the jar: current memories, diary pages and chapter cards. */
+    static int bubbles(JSONObject g){JSONObject k=g.optJSONObject("known");JSONArray cards=g.optJSONArray("cards");return (k==null?0:k.optJSONArray("memories").length()+k.optJSONArray("diary").length())+(cards==null?0:cards.length());}
 
     /** Moves up as many chapters as both bond and the days since the first meeting allow. */
     static boolean advance(JSONObject g,Story s,long since,long now)throws Exception {
@@ -255,49 +256,8 @@ final class Growth {
         JSONArray cards=g.getJSONArray("cards");for(int i=0;i<cards.length();i++)if(cards.getJSONObject(i).optInt("chapter")==scene.chapter)return out;
         cards.put(new JSONObject().put("chapter",scene.chapter).put("title",scene.title).put("at",now).put("recap",recap).put("lines",new JSONArray(scene.lines())).put("fallback",new JSONArray(scene.fallback)).put("sources",scene.sources));
         while(cards.length()>CARDS)cards.remove(0);
-        if(!recap)add(g,now,"chapter",EVENT_BOND,EVENT_FISH,String.valueOf(scene.chapter),out);return out;
+        if(!recap)add(g,now,"chapter",EVENT_BOND,String.valueOf(scene.chapter),out);return out;
     }
-
-    // ---- trips (chapter 2) ----
-
-    static boolean canTravel(JSONObject g){return chapter(g)>=2;}
-    static JSONObject trip(JSONObject g){return g.optJSONObject("trip");}
-    /** She sets off for one to four hours with a bento: plain rice is free, a snack bento costs three fish and brings two back. */
-    static String startTrip(JSONObject g,boolean snack,long now,Random random)throws Exception {
-        if(!canTravel(g))return "locked";if(trip(g)!=null)return "她已经出门了";
-        if(snack&&fish(g)<SNACK_BENTO)return "小鱼干不够做零食便当，可以带白饭便当";
-        if(snack)add(g,now,"bento",0,-SNACK_BENTO,null,null);
-        g.put("trip",new JSONObject().put("start",now).put("end",now+HOUR+random.nextInt(181)*MINUTE).put("snack",snack));return null;
-    }
-    static boolean tripDue(JSONObject g,long now){JSONObject t=trip(g);return t!=null&&now>=t.optLong("end");}
-    /** Ends the trip ("back", "early" or "tooEarly"); called back within fifteen minutes she refunds the bento and brings nothing. */
-    static String endTrip(JSONObject g,Story s,long now,ZoneId zone,Random random,Award out)throws Exception {
-        JSONObject t=trip(g);if(t==null)return null;g.remove("trip");
-        long start=t.optLong("start"),end=t.optLong("end"),spent=Math.max(0,now-start);
-        if(spent<TOO_EARLY){if(t.optBoolean("snack"))add(g,now,"refund",0,SNACK_BENTO,null,out);return "tooEarly";}
-        double share=Math.min(1,spent/(double)Math.max(1,end-start));int fish=Math.max(1,(int)Math.round(Math.min(6,2+(end-start)/HOUR)*share))+(t.optBoolean("snack")?2:0);
-        add(g,now,"trip",0,fish,null,out);out.postcard=postcard(g,s,now,zone,random,"trip");
-        return now>=end?"back":"early";
-    }
-    private static JSONObject postcard(JSONObject g,Story s,long now,ZoneId zone,Random random,String kind)throws Exception {
-        int month=Instant.ofEpochMilli(now).atZone(zone).getMonthValue();JSONArray cards=g.getJSONArray("postcards");Set<String> recent=new HashSet<>();
-        for(int i=Math.max(0,cards.length()-8);i<cards.length();i++)recent.add(cards.getJSONObject(i).optString("place"));
-        List<JSONObject> options=new ArrayList<>(),any=new ArrayList<>();
-        for(int i=0;i<s.places.length();i++){JSONObject p=s.places.getJSONObject(i);JSONArray months=p.optJSONArray("months");boolean season=months==null;
-            if(months!=null)for(int j=0;j<months.length();j++)if(months.optInt(j)==month)season=true;
-            if(season){any.add(p);if(!recent.contains(p.optString("name")))options.add(p);}}
-        if(options.isEmpty())options=any;JSONObject p=options.get(random.nextInt(options.size()));
-        JSONObject card=new JSONObject().put("id",UUID.randomUUID().toString()).put("at",now).put("kind",kind).put("place",p.getString("name")).put("item",p.getString("item")).put("text",p.getString("text")).put("read",false);
-        cards.put(card);while(cards.length()>POSTCARDS)cards.remove(0);return card;
-    }
-    static JSONObject unread(JSONObject g){JSONArray a=g.optJSONArray("postcards");if(a!=null)for(int i=0;i<a.length();i++){JSONObject c=a.optJSONObject(i);if(c!=null&&!c.optBoolean("read"))return c;}return null;}
-    /** Reading a postcard: five bond, once per card. */
-    static Award read(JSONObject g,String id,long now)throws Exception {
-        Award out=new Award();JSONArray a=g.getJSONArray("postcards");
-        for(int i=0;i<a.length();i++){JSONObject c=a.getJSONObject(i);if(id.equals(c.optString("id"))&&!c.optBoolean("read")){c.put("read",true);add(g,now,"postcard",POSTCARD_BOND,0,c.optString("place"),out);}}
-        return out;
-    }
-    static String postcardText(JSONObject c){return "明信片 · "+c.optString("place")+"\n"+c.optString("text")+"\n带回了："+c.optString("item");}
 
     // ---- greetings and lines ----
 
@@ -316,8 +276,8 @@ final class Growth {
         JSONObject g=base(now).put("legacy",true).put("migratedFrom",version);int day=Math.max(1,day(since,now));
         int memoryCount=memories==null?0:memories.length(),diaryCount=diary==null?0:diary.length();
         double estimate=chatDays*15+Math.min(memoryCount,100)*3+diaryCount*5+Math.min(interactions,200)*.5;
-        g.put("bond",(int)Math.min(estimate,day*45.0)).put("fish",20+chatDays*3);
-        ledger(g,now,"migrated",g.optInt("bond"),g.optInt("fish"),version);
+        g.put("bond",(int)Math.min(estimate,day*45.0));
+        ledger(g,now,"migrated",g.optInt("bond"),version);
         int chapter=1;for(int i=2;i<=MAX_CHAPTER;i++){Chapter c=s.chapter(i);if(g.optInt("bond")>=c.bond&&day>=c.day)chapter=i;}
         g.put("chapter",chapter);for(int i=2;i<=chapter;i++)g.getJSONObject("chapterAt").put(String.valueOf(i),now);
         Set<String> ids=new LinkedHashSet<>();if(memories!=null)for(int i=0;i<memoryCount;i++)ids.add(memories.getJSONObject(i).optString("id"));

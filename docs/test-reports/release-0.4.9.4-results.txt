@@ -1,0 +1,22 @@
+com.xiaoxiao.pet.ChatPolishTest: 8 passed, 0 failed/errors/skipped
+com.xiaoxiao.pet.CompanionBehaviorTest: 7 passed, 0 failed/errors/skipped
+com.xiaoxiao.pet.ConversationTest: 16 passed, 0 failed/errors/skipped
+com.xiaoxiao.pet.GomokuUiTest: 8 passed, 0 failed/errors/skipped
+com.xiaoxiao.pet.GrowthUiTest: 6 passed, 0 failed/errors/skipped
+com.xiaoxiao.pet.HistoryRecallIntegrationTest: 8 passed, 0 failed/errors/skipped
+com.xiaoxiao.pet.InitiativeRuntimeTest: 13 passed, 0 failed/errors/skipped
+com.xiaoxiao.pet.MemoryIntegrationTest: 12 passed, 0 failed/errors/skipped
+com.xiaoxiao.pet.ModelSetupTest: 15 passed, 0 failed/errors/skipped
+com.xiaoxiao.pet.NativeMemoryTest: 12 passed, 0 failed/errors/skipped
+com.xiaoxiao.pet.TouchReplyRuntimeTest: 9 passed, 0 failed/errors/skipped
+com.xiaoxiao.pet.UiTest: 14 passed, 0 failed/errors/skipped
+com.xiaoxiao.pet.UpdateTest: 10 passed, 0 failed/errors/skipped
+com.xiaoxiao.pet.UsabilityUiTest: 7 passed, 0 failed/errors/skipped
+TOTAL: 145 passed
+Android core: 19 suites passed
+Android runtime: 61 passed
+Android touch: 12 passed
+Android chat portrait/landscape: 36 passed
+Release sync: 18 passed
+Release prepare: 7 passed
+APK SHA256: f1956ac9c546b3a2c5fc98206896c3f04ff50d274494a6b62cc6133295f6542d
