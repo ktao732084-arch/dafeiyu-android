@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * mood in the history would linger. See docs/CHARACTER_STATE.md.
  */
 final class CharacterNow {
-    static final long MINUTE=60_000L,WAKE_FOR=60*MINUTE,EVENT_FOR=30*MINUTE,GAME_FOR=60*MINUTE,REMATCH_FOR=120*MINUTE,REMINDER_FOR=60*MINUTE;
+    static final long DOING_FOR=20*60_000L,MINUTE=60_000L,WAKE_FOR=60*MINUTE,EVENT_FOR=30*MINUTE,GAME_FOR=60*MINUTE,REMATCH_FOR=120*MINUTE,REMINDER_FOR=60*MINUTE;
     static final int MAX_EVENTS=3,REMINDER_REPLIES=3;
     /** Interaction kinds that are things she went through, not just a tap or a drag. */
     static final Set<String> EXPERIENCES=new HashSet<>(Arrays.asList("feed","story","wake"));
@@ -30,7 +30,9 @@ final class CharacterNow {
         boolean isEmpty(){return lines.isEmpty();}
     }
 
-    static Result of(JSONObject s,JSONObject games,String user,boolean proactive,long now)throws Exception {
+    static Result of(JSONObject s,JSONObject games,String user,boolean proactive,long now)throws Exception {return of(s,games,user,proactive,now,null,0);}
+    /** doing: what she was visibly doing on screen (ActionPlan.doing), so her words match what the user saw. */
+    static Result of(JSONObject s,JSONObject games,String user,boolean proactive,long now,String doing,long doingAt)throws Exception {
         Result out=new Result();JSONArray turns=s.optJSONArray("turns");if(turns==null)turns=new JSONArray();
         boolean serious=!proactive&&serious(user);
         // Being woken: just woken until she has said something, then awake, then nothing after an hour.
@@ -38,6 +40,8 @@ final class CharacterNow {
         if(wake!=null){long at=wake.optLong("at");out.covered.add(wake.optString("note"));
             out.lines.add(replies(turns,at)==0?"刚被叫醒（"+ago(now,at)+"）："+wake.optString("note")+"。"
                 :"约"+minutes(now,at)+"分钟前被叫醒，已经回过话、醒过来了；被叫醒这件事不用再提。");}
+        if(doing!=null&&!serious&&doingAt<=now&&now-doingAt<=DOING_FOR&&!(wake!=null&&(doing.contains("打盹")||doing.contains("哈欠"))))
+            out.lines.add((minutes(now,doingAt)<2?"你正在屏幕上"+doing+"（对方可能正看着）":"你"+ago(now,doingAt)+"在屏幕上"+doing+"（对方可能看到了）")+"；被问在干嘛时照这个说，不另编别的事。");
         if(serious)out.lines.add("对方这轮在说正事或心事：刚才发生的事先放一边，专心回应眼前这件。");
         else {
             List<String[]> events=new ArrayList<>();

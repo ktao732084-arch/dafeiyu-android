@@ -70,13 +70,18 @@ final class AgentRuntime {
     }
     /** Context for the next prompt only; unlike touch() it does not postpone proactive chat. */
     static void note(String type){lastEventAt=System.currentTimeMillis();lastEvent=type;touched=true;}
+    /** What she was visibly doing on screen, so "你在干嘛" gets what the user could actually see. */
+    static void onScreen(PromptBuilder.Inputs in){
+        PetService s=PetService.instance;PetService.Pet p=s==null?null:s.pets.get("main");
+        if(p!=null&&p.visible&&!p.docked&&p.doing!=null){in.doing=ActionPlan.doing(p.doing);in.doingAt=p.doingAt;}
+    }
     static String action(String emotion){switch(AgentPolicy.emotion(emotion)){
         case "happy":return "点击回应-开心跃动";case "shy":return "点击回应-害羞惊讶";
         case "curious":return "东张西望";case "concerned":return "碎碎念-对屏碎碎念";
         case "playful":return "鲸鱼吐泡泡特效";case "sleepy":return "原地小憩沉眠";default:return "碎碎念-发呆碎碎念";
     }}
     static void express(String instance,String emotion,String reply){express(instance,emotion,reply,null);}
-    static void express(String instance,String emotion,String reply,String turnId){PetService s=PetService.instance;if(s==null)return;PetService.Pet p=s.pets.get(instance);if(p!=null&&p.visible&&!p.docked){if(!p.dragging&&!p.moving)p.play(p.plan.emotion(AgentPolicy.emotion(emotion),action(emotion),Data.random));p.speak(reply,turnId);}}
+    static void express(String instance,String emotion,String reply,String turnId){PetService s=PetService.instance;if(s==null)return;PetService.Pet p=s.pets.get(instance);if(p!=null&&p.visible&&!p.docked){if(!p.dragging&&!p.moving){String said=ActionPlan.said(reply);p.play(said!=null&&p.plan.has(said)?said:p.plan.emotion(AgentPolicy.emotion(emotion),action(emotion),Data.random));}p.speak(reply,turnId);}}
     static JSONArray context(String user,boolean proactive)throws Exception {
         return context(user,proactive,store().snapshot(),null);
     }
@@ -89,7 +94,7 @@ final class AgentRuntime {
         in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.signature=PersonaManager.signature("main");in.nickname=Nickname.current();
         String requested=!proactive&&history==null?Nickname.requested(user):null;if(requested!=null)in.nickname=requested;
         in.feeling=store().mood(System.currentTimeMillis());in.mood=in.feeling.optString("emotion","calm");in.timeZone=TimeZone.getDefault().getID();in.now=System.currentTimeMillis();in.initializedAt=PersonaManager.initializedAt("main");
-        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}in.remember=rememberEnabled();in.diary=diaryEnabled();if(in.remember&&in.diary&&history==null)in.understanding=Understanding.context(s,proactive?"":user);
+        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}onScreen(in);in.remember=rememberEnabled();in.diary=diaryEnabled();if(in.remember&&in.diary&&history==null)in.understanding=Understanding.context(s,proactive?"":user);
         GrowthStore growth=GrowthStore.quiet();if(growth!=null){in.chapter=growth.chapter();in.lore=growth.lore();}
         if(in.remember&&history==null){
             try{in.games=GomokuPage.store().context();}catch(Exception unavailable){in.games=new JSONObject().put("status","unavailable");}
