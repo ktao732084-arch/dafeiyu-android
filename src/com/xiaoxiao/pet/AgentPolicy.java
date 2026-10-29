@@ -97,13 +97,17 @@ final class AgentPolicy {
         return quote!=null && quote.length()>=4 && quote.length()<=80 && reply.contains(quote) && quote.contains("我")
             && !quote.contains("你") && !sensitive(quote) && !quote.matches("(?s).*[?？\\n].*");
     }
+    static final String STAGE_NEW="你们刚认识不久：友好但有分寸，多了解对方，少用只有老朋友才会说的玩笑和亲昵称呼。",
+        STAGE_FAMILIAR="你们已经熟悉了：可以自然地开玩笑、接上聊过的事，但不要假装认识很久。",
+        STAGE_OLD="你们是老朋友了：说话可以更随意，偶尔提起真实记录里的共同经历；熟悉不等于越界，依然尊重对方的边界。";
     /** How well you know each other, from the first meeting and the days you actually talked; the persona itself never changes. */
-    static String relationship(long since,long now,int chatDays,int userTurns) {
+    static String relationship(long since,long now,int chatDays,int userTurns){return relationship(since,now,chatDays,userTurns,0);}
+    /** With a growth chapter (1–5) the stage follows it, so her familiarity matches the chapter the user sees: 1 new, 2–3 familiar, 4–5 old friends. */
+    static String relationship(long since,long now,int chatDays,int userTurns,int chapter) {
         if(since<=0||now<since)return "";
         long days=(now-since)/86_400_000L+1;
-        String stage=chatDays<3||userTurns<15?"你们刚认识不久：友好但有分寸，多了解对方，少用只有老朋友才会说的玩笑和亲昵称呼。"
-            :chatDays<15?"你们已经熟悉了：可以自然地开玩笑、接上聊过的事，但不要假装认识很久。"
-            :"你们是老朋友了：说话可以更随意，偶尔提起真实记录里的共同经历；熟悉不等于越界，依然尊重对方的边界。";
+        String stage=chapter>0?(chapter==1?STAGE_NEW:chapter<=3?STAGE_FAMILIAR:STAGE_OLD)
+            :chatDays<3||userTurns<15?STAGE_NEW:chatDays<15?STAGE_FAMILIAR:STAGE_OLD;
         return "你们相识第"+days+"天，一起聊过"+chatDays+"天、"+userTurns+"轮。"+stage;
     }
     /**

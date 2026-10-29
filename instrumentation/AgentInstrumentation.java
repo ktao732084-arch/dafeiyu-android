@@ -80,6 +80,13 @@ public class AgentInstrumentation extends Instrumentation {
     JSONObject mergedState=AgentRuntime.store().snapshot();check(mergedState.optInt("moodLevel")==2&&"想让你安心忙完".equals(mergedState.optString("moodCause")),"mood strength and cause saved beside schedule");
     check(mergedState.optBoolean("proactiveWaiting"),"busy wait survives character integration");
     check(AgentRuntime.context("你好",false).toString().contains("相处理解")||AgentRuntime.context("你好",false).toString().contains("想让你安心忙完"),"carried mood reaches next request");
+    GrowthStore growth=GrowthStore.get();check(GrowthStore.story().chapter(1)!=null,"growth assets load on actual Android");
+    int priorFeeds=growth.snapshot().optInt("feeds"),priorFish=Growth.fish(growth.snapshot());
+    check(growth.feed(GrowthStore.story().food("白饭"),new Growth.Award())==null,"free feeding succeeds on Android");growth.flush();
+    check(growth.snapshot().optInt("feeds")==priorFeeds+1&&Growth.fish(growth.snapshot())==priorFish,"feeding changes only expected growth values");
+    check(!growth.hungry(),"feeding state is visible to pet actions");
+    check(new org.json.JSONObject(new String(java.nio.file.Files.readAllBytes(growth.file.toPath()),"UTF-8")).optInt("feeds")==priorFeeds+1,"growth writer persists on Android filesystem");
+    check(growth.unlocked(Data.actions("main")).contains(Data.idle("main")),"idle animation remains available");
     result.putString("stream","PASS: "+checks+" Android runtime checks\n");
    }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;MemoryBridge.client=MemoryBridge::http;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}
   }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e.toString());result.putString("stack",android.util.Log.getStackTraceString(e));}

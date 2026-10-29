@@ -8,16 +8,35 @@ permissions:
   contents: read
 
 jobs:
-  android:
+  release-tools:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
         with:
           sparse-checkout: |
-            src
+            tools
             tests
-            memory-service
-            assets/personas.json
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Release preparation and interrupted synchronization checks
+        run: |
+          python -m unittest discover -s tests -p test_update_publish.py
+          python -m unittest discover -s tests -p test_release_sync.py
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # GrowthTest reads the two JSON assets; the animation videos are not needed.
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /src/
+            /tests/
+            /memory-service/
+            /assets/catalog.json
+            /assets/story.json
+            /assets/personas.json
       - uses: actions/setup-java@v5
         with:
           distribution: temurin

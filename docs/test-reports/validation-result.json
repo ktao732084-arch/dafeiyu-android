@@ -1,14 +1,12 @@
 {
   "version": "0.4.9.3",
   "version_code": 16,
-  "apk_sha256": "ac8b5951f6f1a3223a8d727a6ad3ba7a043f46c4742f8484faf4d3ddcd110f15",
-  "framework_unique_passed": 124,
+  "apk_sha256": "6ccb0cd29dacf39da80aebcd581a795b6a17a353b6a894bb00510a9c5c5bfa12",
+  "framework_unique_passed": 128,
   "framework_failed": 0,
   "framework_skipped": 0,
-  "full_run_before_final_isolation_change": 123,
-  "final_build_framework_rechecked": 18,
-  "android_art_core_suites": 17,
-  "android_runtime_checks": 55,
+  "final_build_framework_rechecked": 23,
+  "android_art_core_suites": 18,
   "gomoku_checks": 327,
   "initiative_checks": 62,
   "character_checks": 217,
@@ -29,15 +27,21 @@
     "resume": "candidate game restored the same four stones and black turn after process restart; final update preserved both completed and ended games",
     "complete": "candidate and merged game each finished legally after 12 moves with white/pet win",
     "abandon": "one separately ended two-move game was not counted as defeat",
-    "model_recall": "real configured model reported pet 1 win after the first game; separately identified an ended game; after merged full-game test and restart reported pet 2 wins, 0 draws, 1 ended, latest completed game 12 moves/pet win"
+    "model_recall": "real configured model reported pet 1 win after the first game; separately identified an ended game; after merged full-game test and restart reported pet 2 wins, 0 draws, 1 ended, latest completed game 12 moves/pet win",
+    "final_integration": "After integrating growth and unified publishing, installed final 0.4.9.3 and confirmed real board and preserved 2 pet wins / 1 ended game. Earlier real-model and complete-game smoke was on same gomoku implementation before final growth merge."
   },
   "distribution": {
+    "method": "release.ps1 -Publish; verify both destinations before completion",
     "github": "v0.4.9.3",
-    "beijing_mirror": "not deployed: SSH authentication unavailable; prepared bundle supplied locally"
+    "domestic_manifest": "https://81.70.79.133/dafeiyu-updates/stable.json"
   },
   "limits": [
     "basic local heuristic opponent, not a strong tournament engine",
     "model context gets latest 8 results and lifetime totals, not arbitrary-date game search",
     "not all Android devices or physical phones tested"
-  ]
+  ],
+  "framework_failed_final_reports": 0,
+  "android_runtime_instrumentation_checks": 61,
+  "growth_checks": 3620,
+  "release_sync_checks": 18
 }

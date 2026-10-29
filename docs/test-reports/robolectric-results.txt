@@ -1,9 +1,13 @@
-0.4.9.3 batch: 124 distinct framework scenarios passed. Full 123 before removing duplicate game-touch events; final build rechecked GomokuUiTest (5) + InitiativeRuntimeTest (13).
+0.4.9.3 final integrated product: 128 distinct scenarios passed; final home-entry fix rechecked 23 game/growth/home UI scenarios.
 PASS com.xiaoxiao.pet.GomokuUiTest.homeOpensPlayableBoardAndResumeRestoresMoves
 PASS com.xiaoxiao.pet.GomokuUiTest.endIsConfirmedAndHistoryCountsItOnce
 PASS com.xiaoxiao.pet.GomokuUiTest.visibleBoardFitsPortraitAndLandscape
 PASS com.xiaoxiao.pet.GomokuUiTest.endingGameKeepsResultsSeparateFromChatAndTouchRecords
 PASS com.xiaoxiao.pet.GomokuUiTest.invitationButtonRoutesToSameRealBoard
+PASS com.xiaoxiao.pet.GrowthUiTest.moreMenuKeepsTheStoryEntry
+PASS com.xiaoxiao.pet.GrowthUiTest.storyHomeAndListsRenderWithoutChangingTheFrozenPersona
+PASS com.xiaoxiao.pet.GrowthUiTest.freeFoodButtonUsesRealServiceFeedingAndPersists
+PASS com.xiaoxiao.pet.GrowthUiTest.travelRemainsLockedForNewCompanions
 PASS com.xiaoxiao.pet.InitiativeRuntimeTest.busySurvivesRestartAndTouchThenFreeUsesModelChoice
 PASS com.xiaoxiao.pet.InitiativeRuntimeTest.touchIsPersistentAndFocusOrDisabledSwitchBlocksChecks
 PASS com.xiaoxiao.pet.InitiativeRuntimeTest.nightHoursAreAnOptionalUserChoice

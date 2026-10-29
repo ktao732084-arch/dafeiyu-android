@@ -28,6 +28,7 @@ public final class DeviceCoreChecks {
         run("model initiative",()->InitiativeTest.main(new String[0]));
         run("chat search and notebook filter",()->UsabilityTest.main(new String[]{root+"/usability"}));
         run("gomoku rules, persistence and context",()->GomokuTest.main(new String[0]));
+        run("growth main line",()->GrowthTest.main(new String[]{root,root+"/growth"}));
 
         run("updates",()->UpdateCoreTest.main(new String[]{root+"/updates"}));
         run("character and mood",()->CharacterTest.main(new String[]{root+"/personas.json",root+"/character"}));

@@ -1,151 +1,157 @@
 <?xml version='1.0' encoding='utf-8'?>
-<testsuites tests="124" failures="0" errors="0" skipped="0">
-  <testsuite name="com.xiaoxiao.pet.GomokuUiTest" tests="5" failures="0" errors="0" skipped="0" time="27.319">
-    <testcase name="homeOpensPlayableBoardAndResumeRestoresMoves" classname="com.xiaoxiao.pet.GomokuUiTest" time="20.397" />
-    <testcase name="endIsConfirmedAndHistoryCountsItOnce" classname="com.xiaoxiao.pet.GomokuUiTest" time="1.63" />
-    <testcase name="visibleBoardFitsPortraitAndLandscape" classname="com.xiaoxiao.pet.GomokuUiTest" time="1.274" />
-    <testcase name="endingGameKeepsResultsSeparateFromChatAndTouchRecords" classname="com.xiaoxiao.pet.GomokuUiTest" time="1.34" />
-    <testcase name="invitationButtonRoutesToSameRealBoard" classname="com.xiaoxiao.pet.GomokuUiTest" time="1.39" />
+<testsuites tests="128" failures="0" errors="0" skipped="0">
+  <testsuite name="com.xiaoxiao.pet.GomokuUiTest" tests="5" failures="0" errors="0" skipped="0" time="55.172">
+    <testcase name="homeOpensPlayableBoardAndResumeRestoresMoves" classname="com.xiaoxiao.pet.GomokuUiTest" time="42.351" />
+    <testcase name="endIsConfirmedAndHistoryCountsItOnce" classname="com.xiaoxiao.pet.GomokuUiTest" time="4.061" />
+    <testcase name="visibleBoardFitsPortraitAndLandscape" classname="com.xiaoxiao.pet.GomokuUiTest" time="2.119" />
+    <testcase name="endingGameKeepsResultsSeparateFromChatAndTouchRecords" classname="com.xiaoxiao.pet.GomokuUiTest" time="2.368" />
+    <testcase name="invitationButtonRoutesToSameRealBoard" classname="com.xiaoxiao.pet.GomokuUiTest" time="3.663" />
   </testsuite>
-  <testsuite name="com.xiaoxiao.pet.InitiativeRuntimeTest" tests="13" failures="0" errors="0" skipped="0" time="5.669">
-    <testcase name="busySurvivesRestartAndTouchThenFreeUsesModelChoice" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="1.123" />
-    <testcase name="touchIsPersistentAndFocusOrDisabledSwitchBlocksChecks" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.401" />
-    <testcase name="nightHoursAreAnOptionalUserChoice" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.318" />
-    <testcase name="errorsBackOffAndDoNotWriteChat" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.429" />
-    <testcase name="ordinaryReplyAlsoChoosesTimingWithoutExtraCall" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.333" />
-    <testcase name="quietUsesRealContextAndSchedulesWithoutCreatingMessage" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.445" />
-    <testcase name="clearedHistoryRejectsPendingQuietDecision" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.382" />
-    <testcase name="cancelledRepairCannotRestoreClearedAvailability" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.357" />
-    <testcase name="missingPlanRepairsOnceWithoutReplacingTheVisibleReply" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.27" />
-    <testcase name="hiddenWhileWaitingDoesNotCommitSpeech" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.348" />
-    <testcase name="speaksBeyondOldDailyCapAndStoresNextChoice" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.433" />
-    <testcase name="failedRepairKeepsChatButDoesNotInventASchedule" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.244" />
-    <testcase name="silenceAnnouncementsNeverBecomeAnotherNotification" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.573" />
+  <testsuite name="com.xiaoxiao.pet.GrowthUiTest" tests="4" failures="0" errors="0" skipped="0" time="14.451">
+    <testcase name="moreMenuKeepsTheStoryEntry" classname="com.xiaoxiao.pet.GrowthUiTest" time="2.233" />
+    <testcase name="storyHomeAndListsRenderWithoutChangingTheFrozenPersona" classname="com.xiaoxiao.pet.GrowthUiTest" time="7.381" />
+    <testcase name="freeFoodButtonUsesRealServiceFeedingAndPersists" classname="com.xiaoxiao.pet.GrowthUiTest" time="3.638" />
+    <testcase name="travelRemainsLockedForNewCompanions" classname="com.xiaoxiao.pet.GrowthUiTest" time="1.176" />
   </testsuite>
-  <testsuite name="com.xiaoxiao.pet.ChatPolishTest" tests="8" failures="0" errors="0" skipped="0" time="76.057">
-    <testcase name="existingExplicitMemoryMigratesOnceAndManualClearSticks" classname="com.xiaoxiao.pet.ChatPolishTest" time="35.503" />
-    <testcase name="failureAndCancellationCannotOverwriteManualNickname" classname="com.xiaoxiao.pet.ChatPolishTest" time="7.669" />
-    <testcase name="slowMigrationCannotOverwriteConcurrentManualEdit" classname="com.xiaoxiao.pet.ChatPolishTest" time="1.847" />
-    <testcase name="oldHistoryAndModelGuessCannotRenameUser" classname="com.xiaoxiao.pet.ChatPolishTest" time="1.824" />
-    <testcase name="dismissingChatRefreshesHomeAndLegacyMarkersStayOutOfDisplay" classname="com.xiaoxiao.pet.ChatPolishTest" time="2.493" />
-    <testcase name="successfulChatUpdatesSingleSettingAndManualChangeWins" classname="com.xiaoxiao.pet.ChatPolishTest" time="2.921" />
-    <testcase name="pendingFooterDoesNotClipTheFirstSegment" classname="com.xiaoxiao.pet.ChatPolishTest" time="21.141" />
-    <testcase name="namingStillWorksWhenAutomaticMemoryIsOff" classname="com.xiaoxiao.pet.ChatPolishTest" time="1.561" />
+  <testsuite name="com.xiaoxiao.pet.InitiativeRuntimeTest" tests="13" failures="0" errors="0" skipped="0" time="4.471">
+    <testcase name="busySurvivesRestartAndTouchThenFreeUsesModelChoice" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.481" />
+    <testcase name="touchIsPersistentAndFocusOrDisabledSwitchBlocksChecks" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.32" />
+    <testcase name="nightHoursAreAnOptionalUserChoice" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.242" />
+    <testcase name="errorsBackOffAndDoNotWriteChat" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.392" />
+    <testcase name="ordinaryReplyAlsoChoosesTimingWithoutExtraCall" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.328" />
+    <testcase name="quietUsesRealContextAndSchedulesWithoutCreatingMessage" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.332" />
+    <testcase name="clearedHistoryRejectsPendingQuietDecision" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.396" />
+    <testcase name="cancelledRepairCannotRestoreClearedAvailability" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.272" />
+    <testcase name="missingPlanRepairsOnceWithoutReplacingTheVisibleReply" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.295" />
+    <testcase name="hiddenWhileWaitingDoesNotCommitSpeech" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.392" />
+    <testcase name="speaksBeyondOldDailyCapAndStoresNextChoice" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.288" />
+    <testcase name="failedRepairKeepsChatButDoesNotInventASchedule" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.273" />
+    <testcase name="silenceAnnouncementsNeverBecomeAnotherNotification" classname="com.xiaoxiao.pet.InitiativeRuntimeTest" time="0.449" />
   </testsuite>
-  <testsuite name="com.xiaoxiao.pet.NativeMemoryTest" tests="12" failures="0" errors="0" skipped="0" time="2.328">
-    <testcase name="malformedOrInventedModelTargetsNeverInvalidate" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.002" />
-    <testcase name="semanticRecallSelectsExistingIdsUsingSameModel" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.263" />
-    <testcase name="batchDecisionsAreAppliedAtomically" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.043" />
-    <testcase name="datesUseObservationZoneAndExpireLocally" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.032" />
-    <testcase name="unchanged84ScenariosRunWithoutPythonOrNetwork" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.103" />
-    <testcase name="lateModelCannotRestoreDeletedPhoneMemory" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.283" />
-    <testcase name="smartWritingReusesExistingPhoneModelByDefault" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.339" />
-    <testcase name="localModelCancellationDoesNotBecomeRuleFallback" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.134" />
-    <testcase name="nativeIsDefaultForNewAndUpgradedInstall" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.338" />
-    <testcase name="offlineConversationCorrectsAndArchivesOnPhone" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.298" />
-    <testcase name="reportedNameMessageCompletesAndPersists" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.43" />
-    <testcase name="phoneMemorySurvivesRestartAndForgetPurgesHistory" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.053" />
+  <testsuite name="com.xiaoxiao.pet.ChatPolishTest" tests="8" failures="0" errors="0" skipped="0" time="74.617">
+    <testcase name="existingExplicitMemoryMigratesOnceAndManualClearSticks" classname="com.xiaoxiao.pet.ChatPolishTest" time="26.326" />
+    <testcase name="failureAndCancellationCannotOverwriteManualNickname" classname="com.xiaoxiao.pet.ChatPolishTest" time="2.763" />
+    <testcase name="slowMigrationCannotOverwriteConcurrentManualEdit" classname="com.xiaoxiao.pet.ChatPolishTest" time="1.614" />
+    <testcase name="oldHistoryAndModelGuessCannotRenameUser" classname="com.xiaoxiao.pet.ChatPolishTest" time="1.717" />
+    <testcase name="dismissingChatRefreshesHomeAndLegacyMarkersStayOutOfDisplay" classname="com.xiaoxiao.pet.ChatPolishTest" time="8.237" />
+    <testcase name="successfulChatUpdatesSingleSettingAndManualChangeWins" classname="com.xiaoxiao.pet.ChatPolishTest" time="7.957" />
+    <testcase name="pendingFooterDoesNotClipTheFirstSegment" classname="com.xiaoxiao.pet.ChatPolishTest" time="23.577" />
+    <testcase name="namingStillWorksWhenAutomaticMemoryIsOff" classname="com.xiaoxiao.pet.ChatPolishTest" time="1.793" />
   </testsuite>
-  <testsuite name="com.xiaoxiao.pet.HistoryRecallIntegrationTest" tests="8" failures="0" errors="0" skipped="0" time="8.885">
-    <testcase name="offlineLookupShowsOriginalExcerptsWithoutPretendingToSummarize" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="0.17" />
-    <testcase name="deletionWhileAnswerIsPendingPreventsLateCommit" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="0.544" />
-    <testcase name="oldQuotesAreNotWrittenBackAsCurrentFacts" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="0.443" />
-    <testcase name="vagueRangeAsksForDateWithoutInventingMemory" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="0.157" />
-    <testcase name="clearedHistoryCannotBeRecalled" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="3.837" />
-    <testcase name="explicitHistoryRequestStillWorksWithAutomaticMemoryDisabled" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="0.485" />
-    <testcase name="emptyRangeAnswersHonestlyWithoutCallingModel" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="0.416" />
-    <testcase name="archivedLastWeekReachesModelAndUsesOneGenerationCall" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="2.819" />
+  <testsuite name="com.xiaoxiao.pet.NativeMemoryTest" tests="12" failures="0" errors="0" skipped="0" time="14.736">
+    <testcase name="malformedOrInventedModelTargetsNeverInvalidate" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.064" />
+    <testcase name="semanticRecallSelectsExistingIdsUsingSameModel" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.953" />
+    <testcase name="batchDecisionsAreAppliedAtomically" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.12" />
+    <testcase name="datesUseObservationZoneAndExpireLocally" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.113" />
+    <testcase name="unchanged84ScenariosRunWithoutPythonOrNetwork" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.455" />
+    <testcase name="lateModelCannotRestoreDeletedPhoneMemory" classname="com.xiaoxiao.pet.NativeMemoryTest" time="3.764" />
+    <testcase name="smartWritingReusesExistingPhoneModelByDefault" classname="com.xiaoxiao.pet.NativeMemoryTest" time="5.525" />
+    <testcase name="localModelCancellationDoesNotBecomeRuleFallback" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.907" />
+    <testcase name="nativeIsDefaultForNewAndUpgradedInstall" classname="com.xiaoxiao.pet.NativeMemoryTest" time="1.068" />
+    <testcase name="offlineConversationCorrectsAndArchivesOnPhone" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.694" />
+    <testcase name="reportedNameMessageCompletesAndPersists" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.822" />
+    <testcase name="phoneMemorySurvivesRestartAndForgetPurgesHistory" classname="com.xiaoxiao.pet.NativeMemoryTest" time="0.239" />
   </testsuite>
-  <testsuite name="com.xiaoxiao.pet.MemoryIntegrationTest" tests="12" failures="0" errors="0" skipped="0" time="255.281">
-    <testcase name="inFlightResultCannotResurrectUserDeletion" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="2.031" />
-    <testcase name="oldSchemaAndDeleteClearArchiveIndexAndBackup" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.15" />
-    <testcase name="settingsUiEncryptsTokenAndBindsOrigin" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="1.142" />
-    <testcase name="correctedSourceExcludedFromBothRecentAndLongTermContext" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="2.182" />
-    <testcase name="fabricatedResponseFailsClosedToLocal" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.085" />
-    <testcase name="failedServiceKeepsLocalQuoteAndDoesNotInventSuccess" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.083" />
-    <testcase name="historicalEntryIsReadOnlyAndCannotRestoreAnOldFact" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.706" />
-    <testcase name="actualHttpCaptureCorrectionAndRestart" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="1.517" />
-    <testcase name="onlyLoopbackAllowsHttp" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.076" />
-    <testcase name="disabledMemoryMakesNoServiceRequests" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.985" />
-    <testcase name="unchanged84ScenarioProtocolReplayMatchesPython" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="246.089" />
-    <testcase name="cancellationDoesNotFallBackAndCommit" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.203" />
+  <testsuite name="com.xiaoxiao.pet.HistoryRecallIntegrationTest" tests="8" failures="0" errors="0" skipped="0" time="6.736">
+    <testcase name="offlineLookupShowsOriginalExcerptsWithoutPretendingToSummarize" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="0.223" />
+    <testcase name="deletionWhileAnswerIsPendingPreventsLateCommit" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="0.534" />
+    <testcase name="oldQuotesAreNotWrittenBackAsCurrentFacts" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="0.493" />
+    <testcase name="vagueRangeAsksForDateWithoutInventingMemory" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="0.164" />
+    <testcase name="clearedHistoryCannotBeRecalled" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="2.641" />
+    <testcase name="explicitHistoryRequestStillWorksWithAutomaticMemoryDisabled" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="0.226" />
+    <testcase name="emptyRangeAnswersHonestlyWithoutCallingModel" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="0.334" />
+    <testcase name="archivedLastWeekReachesModelAndUsesOneGenerationCall" classname="com.xiaoxiao.pet.HistoryRecallIntegrationTest" time="2.113" />
   </testsuite>
-  <testsuite name="com.xiaoxiao.pet.UiTest" tests="14" failures="0" errors="0" skipped="0" time="5.485">
-    <testcase name="manualPersonaOnboardingAndReadOnlyUI" classname="com.xiaoxiao.pet.UiTest" time="0.155" />
-    <testcase name="chatUIRunsPromptRecallStreamingAndCommitsControlledModelReply" classname="com.xiaoxiao.pet.UiTest" time="0.522" />
-    <testcase name="openingManualChatInterruptsPendingProactiveRequest" classname="com.xiaoxiao.pet.UiTest" time="0.44" />
-    <testcase name="activityCreatesAndRenders" classname="com.xiaoxiao.pet.UiTest" time="0.343" />
-    <testcase name="activityDestructionCancelsPendingConversation" classname="com.xiaoxiao.pet.UiTest" time="0.557" />
-    <testcase name="randomChoiceOccursOnlyAtInitialization" classname="com.xiaoxiao.pet.UiTest" time="0.461" />
-    <testcase name="personaPersistenceMigrationAndLockChecks" classname="com.xiaoxiao.pet.UiTest" time="0.297" />
-    <testcase name="failedModelRestoresDraftAndDoesNotCommit" classname="com.xiaoxiao.pet.UiTest" time="0.402" />
-    <testcase name="companionSwitchesPersistAndMemoryFocusControlsAffectRuntime" classname="com.xiaoxiao.pet.UiTest" time="0.295" />
-    <testcase name="memoryEditorPersistsAndForgetsFromUI" classname="com.xiaoxiao.pet.UiTest" time="0.531" />
-    <testcase name="explicitMemoryAndItsSourceDisappearTogether" classname="com.xiaoxiao.pet.UiTest" time="0.296" />
-    <testcase name="nameAndNicknameUISaveIntoPromptWithoutChangingPersonality" classname="com.xiaoxiao.pet.UiTest" time="0.435" />
-    <testcase name="modelSettingsUIValidatesSavesAndKeepsAtomicConfiguration" classname="com.xiaoxiao.pet.UiTest" time="0.459" />
-    <testcase name="cancelAfterCommittedReplyCompletesExactlyOnce" classname="com.xiaoxiao.pet.UiTest" time="0.282" />
+  <testsuite name="com.xiaoxiao.pet.MemoryIntegrationTest" tests="12" failures="0" errors="0" skipped="0" time="283.938">
+    <testcase name="inFlightResultCannotResurrectUserDeletion" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="2.634" />
+    <testcase name="oldSchemaAndDeleteClearArchiveIndexAndBackup" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.086" />
+    <testcase name="settingsUiEncryptsTokenAndBindsOrigin" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.706" />
+    <testcase name="correctedSourceExcludedFromBothRecentAndLongTermContext" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="1.951" />
+    <testcase name="fabricatedResponseFailsClosedToLocal" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.062" />
+    <testcase name="failedServiceKeepsLocalQuoteAndDoesNotInventSuccess" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.044" />
+    <testcase name="historicalEntryIsReadOnlyAndCannotRestoreAnOldFact" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.299" />
+    <testcase name="actualHttpCaptureCorrectionAndRestart" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="1.831" />
+    <testcase name="onlyLoopbackAllowsHttp" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.043" />
+    <testcase name="disabledMemoryMakesNoServiceRequests" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.688" />
+    <testcase name="unchanged84ScenarioProtocolReplayMatchesPython" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="275.342" />
+    <testcase name="cancellationDoesNotFallBackAndCommit" classname="com.xiaoxiao.pet.MemoryIntegrationTest" time="0.235" />
   </testsuite>
-  <testsuite name="com.xiaoxiao.pet.ConversationTest" tests="14" failures="0" errors="0" skipped="0" time="25.677">
-    <testcase name="newMessageCancelsOldSegmentsWithoutLosingCompleteRecord" classname="com.xiaoxiao.pet.ConversationTest" time="3.387" />
-    <testcase name="dateRangeIsStableAcrossDisplayTimezoneChanges" classname="com.xiaoxiao.pet.ConversationTest" time="1.131" />
-    <testcase name="explicitFullReplyViewMarksUnshownPartsAndKeepsTimestamp" classname="com.xiaoxiao.pet.ConversationTest" time="1.312" />
-    <testcase name="shortHistoryHidesOlderButton" classname="com.xiaoxiao.pet.ConversationTest" time="1.156" />
-    <testcase name="bubbleHistoryIntentOpensExplicitConversationEntry" classname="com.xiaoxiao.pet.ConversationTest" time="0.98" />
-    <testcase name="searchFindsArchivedWordsAndOpensThatDayAtTheTurn" classname="com.xiaoxiao.pet.ConversationTest" time="5.415" />
-    <testcase name="undeliveredSelfStatementsDoNotBecomeSpokenMemories" classname="com.xiaoxiao.pet.ConversationTest" time="0.878" />
-    <testcase name="pagingMarksTheEarliestPage" classname="com.xiaoxiao.pet.ConversationTest" time="1.534" />
-    <testcase name="historyPageLoadsEarlierTurnsWithDateTimeAndCopy" classname="com.xiaoxiao.pet.ConversationTest" time="2.496" />
-    <testcase name="oneModelCallCreatesProgressiveSegmentsAndDisplayedTimestamps" classname="com.xiaoxiao.pet.ConversationTest" time="1.43" />
-    <testcase name="closingChatAlsoClearsItsPetBubble" classname="com.xiaoxiao.pet.ConversationTest" time="0.961" />
-    <testcase name="closingPageStopsScheduledSegments" classname="com.xiaoxiao.pet.ConversationTest" time="1.517" />
-    <testcase name="failedReplyOffersResendWithTheDraft" classname="com.xiaoxiao.pet.ConversationTest" time="1.93" />
-    <testcase name="longPressOnYourOwnWordsRemembersThem" classname="com.xiaoxiao.pet.ConversationTest" time="1.53" />
+  <testsuite name="com.xiaoxiao.pet.UiTest" tests="14" failures="0" errors="0" skipped="0" time="46.658">
+    <testcase name="manualPersonaOnboardingAndReadOnlyUI" classname="com.xiaoxiao.pet.UiTest" time="2.141" />
+    <testcase name="chatUIRunsPromptRecallStreamingAndCommitsControlledModelReply" classname="com.xiaoxiao.pet.UiTest" time="7.836" />
+    <testcase name="openingManualChatInterruptsPendingProactiveRequest" classname="com.xiaoxiao.pet.UiTest" time="11.752" />
+    <testcase name="activityCreatesAndRenders" classname="com.xiaoxiao.pet.UiTest" time="3.38" />
+    <testcase name="activityDestructionCancelsPendingConversation" classname="com.xiaoxiao.pet.UiTest" time="3.138" />
+    <testcase name="randomChoiceOccursOnlyAtInitialization" classname="com.xiaoxiao.pet.UiTest" time="2.768" />
+    <testcase name="personaPersistenceMigrationAndLockChecks" classname="com.xiaoxiao.pet.UiTest" time="1.073" />
+    <testcase name="failedModelRestoresDraftAndDoesNotCommit" classname="com.xiaoxiao.pet.UiTest" time="2.033" />
+    <testcase name="companionSwitchesPersistAndMemoryFocusControlsAffectRuntime" classname="com.xiaoxiao.pet.UiTest" time="1.816" />
+    <testcase name="memoryEditorPersistsAndForgetsFromUI" classname="com.xiaoxiao.pet.UiTest" time="2.697" />
+    <testcase name="explicitMemoryAndItsSourceDisappearTogether" classname="com.xiaoxiao.pet.UiTest" time="1.482" />
+    <testcase name="nameAndNicknameUISaveIntoPromptWithoutChangingPersonality" classname="com.xiaoxiao.pet.UiTest" time="2.072" />
+    <testcase name="modelSettingsUIValidatesSavesAndKeepsAtomicConfiguration" classname="com.xiaoxiao.pet.UiTest" time="3.003" />
+    <testcase name="cancelAfterCommittedReplyCompletesExactlyOnce" classname="com.xiaoxiao.pet.UiTest" time="1.428" />
   </testsuite>
-  <testsuite name="com.xiaoxiao.pet.CompanionBehaviorTest" tests="7" failures="0" errors="0" skipped="0" time="2.294">
-    <testcase name="transportKeepsNativeNonStreamingOverrideAndReasoningBudget" classname="com.xiaoxiao.pet.CompanionBehaviorTest" time="0.351" />
-    <testcase name="scheduledChoicesExistInBundledCharacterCatalog" classname="com.xiaoxiao.pet.CompanionBehaviorTest" time="1.213" />
-    <testcase name="selfStatementsNeverReplaceFrozenPersonaAndCanBeDisabled" classname="com.xiaoxiao.pet.CompanionBehaviorTest" time="0.108" />
-    <testcase name="clearSelfInvalidatesInFlightTurnAndPurgesBackup" classname="com.xiaoxiao.pet.CompanionBehaviorTest" time="0.149" />
-    <testcase name="chatWakesVisibleSleepingPetAndReachesPrompt" classname="com.xiaoxiao.pet.CompanionBehaviorTest" time="0.151" />
-    <testcase name="filteredStreamIsRejectedEvenWhenDoneMarkerFollows" classname="com.xiaoxiao.pet.CompanionBehaviorTest" time="0.141" />
+  <testsuite name="com.xiaoxiao.pet.ConversationTest" tests="14" failures="0" errors="0" skipped="0" time="27.324">
+    <testcase name="newMessageCancelsOldSegmentsWithoutLosingCompleteRecord" classname="com.xiaoxiao.pet.ConversationTest" time="3.376" />
+    <testcase name="dateRangeIsStableAcrossDisplayTimezoneChanges" classname="com.xiaoxiao.pet.ConversationTest" time="1.277" />
+    <testcase name="explicitFullReplyViewMarksUnshownPartsAndKeepsTimestamp" classname="com.xiaoxiao.pet.ConversationTest" time="1.495" />
+    <testcase name="shortHistoryHidesOlderButton" classname="com.xiaoxiao.pet.ConversationTest" time="1.163" />
+    <testcase name="bubbleHistoryIntentOpensExplicitConversationEntry" classname="com.xiaoxiao.pet.ConversationTest" time="1.185" />
+    <testcase name="searchFindsArchivedWordsAndOpensThatDayAtTheTurn" classname="com.xiaoxiao.pet.ConversationTest" time="5.973" />
+    <testcase name="undeliveredSelfStatementsDoNotBecomeSpokenMemories" classname="com.xiaoxiao.pet.ConversationTest" time="1.016" />
+    <testcase name="pagingMarksTheEarliestPage" classname="com.xiaoxiao.pet.ConversationTest" time="1.794" />
+    <testcase name="historyPageLoadsEarlierTurnsWithDateTimeAndCopy" classname="com.xiaoxiao.pet.ConversationTest" time="2.71" />
+    <testcase name="oneModelCallCreatesProgressiveSegmentsAndDisplayedTimestamps" classname="com.xiaoxiao.pet.ConversationTest" time="1.554" />
+    <testcase name="closingChatAlsoClearsItsPetBubble" classname="com.xiaoxiao.pet.ConversationTest" time="1.014" />
+    <testcase name="closingPageStopsScheduledSegments" classname="com.xiaoxiao.pet.ConversationTest" time="1.72" />
+    <testcase name="failedReplyOffersResendWithTheDraft" classname="com.xiaoxiao.pet.ConversationTest" time="1.768" />
+    <testcase name="longPressOnYourOwnWordsRemembersThem" classname="com.xiaoxiao.pet.ConversationTest" time="1.252" />
+  </testsuite>
+  <testsuite name="com.xiaoxiao.pet.CompanionBehaviorTest" tests="7" failures="0" errors="0" skipped="0" time="2.555">
+    <testcase name="transportKeepsNativeNonStreamingOverrideAndReasoningBudget" classname="com.xiaoxiao.pet.CompanionBehaviorTest" time="0.333" />
+    <testcase name="scheduledChoicesExistInBundledCharacterCatalog" classname="com.xiaoxiao.pet.CompanionBehaviorTest" time="1.366" />
+    <testcase name="selfStatementsNeverReplaceFrozenPersonaAndCanBeDisabled" classname="com.xiaoxiao.pet.CompanionBehaviorTest" time="0.174" />
+    <testcase name="clearSelfInvalidatesInFlightTurnAndPurgesBackup" classname="com.xiaoxiao.pet.CompanionBehaviorTest" time="0.22" />
+    <testcase name="chatWakesVisibleSleepingPetAndReachesPrompt" classname="com.xiaoxiao.pet.CompanionBehaviorTest" time="0.147" />
+    <testcase name="filteredStreamIsRejectedEvenWhenDoneMarkerFollows" classname="com.xiaoxiao.pet.CompanionBehaviorTest" time="0.129" />
     <testcase name="screenAndKeyguardGateAnimationWithoutPretendingToBeInteraction" classname="com.xiaoxiao.pet.CompanionBehaviorTest" time="0.162" />
   </testsuite>
-  <testsuite name="com.xiaoxiao.pet.ModelSetupTest" tests="15" failures="0" errors="0" skipped="0" time="6.875">
-    <testcase name="cancelledBalanceCannotPopulateCache" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.992" />
-    <testcase name="legacyCustomConfigurationIsNotReplacedByPreset" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.757" />
-    <testcase name="balanceFailureDoesNotDiscardWorkingModelConnection" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.635" />
-    <testcase name="providerSwitchNeverReusesOtherProvidersSavedOrTypedKey" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.333" />
-    <testcase name="refreshBalanceUsesSavedKeyWithoutCallingChatAndClearPurgesCache" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.497" />
-    <testcase name="pastedKeyTestsThenSavesPresetAtomically" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.629" />
-    <testcase name="failedConnectionKeepsPreviousConfigAndMasksEnteredKey" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.397" />
-    <testcase name="timeoutAllowsRetryButCannotSaveLateResult" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.324" />
-    <testcase name="foreignProviderNeverCallsDeepSeekBalanceEndpoint" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.433" />
-    <testcase name="keyPasteAndCustomStreamingSwitch" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.483" />
-    <testcase name="firstRunOnlyShowsKeyAndOfficialLinks" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.404" />
-    <testcase name="balanceParserKeepsCurrenciesSeparateAndRejectsMalformedAmounts" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.2" />
-    <testcase name="closingDuringProbePreventsLateSave" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.243" />
-    <testcase name="insufficientFundsShowsActualZeroAndDoesNotSaveUnusableModel" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.339" />
-    <testcase name="flashDisablesThinkingWithoutChangingOtherProviders" classname="com.xiaoxiao.pet.ModelSetupTest" time="0.197" />
+  <testsuite name="com.xiaoxiao.pet.ModelSetupTest" tests="15" failures="0" errors="0" skipped="0" time="61.723">
+    <testcase name="cancelledBalanceCannotPopulateCache" classname="com.xiaoxiao.pet.ModelSetupTest" time="4.134" />
+    <testcase name="legacyCustomConfigurationIsNotReplacedByPreset" classname="com.xiaoxiao.pet.ModelSetupTest" time="4.669" />
+    <testcase name="balanceFailureDoesNotDiscardWorkingModelConnection" classname="com.xiaoxiao.pet.ModelSetupTest" time="4.009" />
+    <testcase name="providerSwitchNeverReusesOtherProvidersSavedOrTypedKey" classname="com.xiaoxiao.pet.ModelSetupTest" time="5.379" />
+    <testcase name="refreshBalanceUsesSavedKeyWithoutCallingChatAndClearPurgesCache" classname="com.xiaoxiao.pet.ModelSetupTest" time="5.855" />
+    <testcase name="pastedKeyTestsThenSavesPresetAtomically" classname="com.xiaoxiao.pet.ModelSetupTest" time="3.765" />
+    <testcase name="failedConnectionKeepsPreviousConfigAndMasksEnteredKey" classname="com.xiaoxiao.pet.ModelSetupTest" time="1.917" />
+    <testcase name="timeoutAllowsRetryButCannotSaveLateResult" classname="com.xiaoxiao.pet.ModelSetupTest" time="2.729" />
+    <testcase name="foreignProviderNeverCallsDeepSeekBalanceEndpoint" classname="com.xiaoxiao.pet.ModelSetupTest" time="4.278" />
+    <testcase name="keyPasteAndCustomStreamingSwitch" classname="com.xiaoxiao.pet.ModelSetupTest" time="4.557" />
+    <testcase name="firstRunOnlyShowsKeyAndOfficialLinks" classname="com.xiaoxiao.pet.ModelSetupTest" time="4.213" />
+    <testcase name="balanceParserKeepsCurrenciesSeparateAndRejectsMalformedAmounts" classname="com.xiaoxiao.pet.ModelSetupTest" time="4.766" />
+    <testcase name="closingDuringProbePreventsLateSave" classname="com.xiaoxiao.pet.ModelSetupTest" time="4.601" />
+    <testcase name="insufficientFundsShowsActualZeroAndDoesNotSaveUnusableModel" classname="com.xiaoxiao.pet.ModelSetupTest" time="4.009" />
+    <testcase name="flashDisablesThinkingWithoutChangingOtherProviders" classname="com.xiaoxiao.pet.ModelSetupTest" time="2.828" />
   </testsuite>
-  <testsuite name="com.xiaoxiao.pet.UsabilityUiTest" tests="6" failures="0" errors="0" skipped="0" time="2.298">
-    <testcase name="developerMemoryRowsAppearOnlyOnLongPress" classname="com.xiaoxiao.pet.UsabilityUiTest" time="0.214" />
-    <testcase name="emptyNotebookStillOpensAndEditsRefreshItInPlace" classname="com.xiaoxiao.pet.UsabilityUiTest" time="0.425" />
-    <testcase name="notebookSearchFiltersInPlaceAndPagesTheMatches" classname="com.xiaoxiao.pet.UsabilityUiTest" time="0.425" />
-    <testcase name="firstStepsChecklistUntilDoneOrDismissed" classname="com.xiaoxiao.pet.UsabilityUiTest" time="0.469" />
-    <testcase name="clearingTheDiaryAsksFirst" classname="com.xiaoxiao.pet.UsabilityUiTest" time="0.369" />
-    <testcase name="proactiveSettingSaysWhatIsMissing" classname="com.xiaoxiao.pet.UsabilityUiTest" time="0.389" />
+  <testsuite name="com.xiaoxiao.pet.UsabilityUiTest" tests="6" failures="0" errors="0" skipped="0" time="4.982">
+    <testcase name="developerMemoryRowsAppearOnlyOnLongPress" classname="com.xiaoxiao.pet.UsabilityUiTest" time="0.69" />
+    <testcase name="emptyNotebookStillOpensAndEditsRefreshItInPlace" classname="com.xiaoxiao.pet.UsabilityUiTest" time="0.821" />
+    <testcase name="notebookSearchFiltersInPlaceAndPagesTheMatches" classname="com.xiaoxiao.pet.UsabilityUiTest" time="1.395" />
+    <testcase name="firstStepsChecklistUntilDoneOrDismissed" classname="com.xiaoxiao.pet.UsabilityUiTest" time="0.61" />
+    <testcase name="clearingTheDiaryAsksFirst" classname="com.xiaoxiao.pet.UsabilityUiTest" time="0.673" />
+    <testcase name="proactiveSettingSaysWhatIsMissing" classname="com.xiaoxiao.pet.UsabilityUiTest" time="0.788" />
   </testsuite>
-  <testsuite name="com.xiaoxiao.pet.UpdateTest" tests="10" failures="0" errors="0" skipped="0" time="1.246">
-    <testcase name="cachedReleaseFromAnotherBuildChannelIsNotReused" classname="com.xiaoxiao.pet.UpdateTest" time="0.013" />
-    <testcase name="packageVersionSdkAndSignerMustAllMatch" classname="com.xiaoxiao.pet.UpdateTest" time="0.041" />
-    <testcase name="serverFailureDoesNotPretendAlreadyLatestOrRemoveCachedRelease" classname="com.xiaoxiao.pet.UpdateTest" time="0.043" />
-    <testcase name="providerOnlyExposesExactPrivateApkAndReadGrant" classname="com.xiaoxiao.pet.UpdateTest" time="0.141" />
-    <testcase name="downloadDigestFailureNeverSetsReadyOrTouchesCompanionData" classname="com.xiaoxiao.pet.UpdateTest" time="0.047" />
-    <testcase name="installPermissionUsesOwnSettingsAndReturnsToExplicitConfirmation" classname="com.xiaoxiao.pet.UpdateTest" time="0.285" />
-    <testcase name="disabledAutoDuringRequestSuppressesLateNotification" classname="com.xiaoxiao.pet.UpdateTest" time="0.083" />
-    <testcase name="autoChecksOnceDailyManualBypassesAndIgnoreOnlyAffectsNotice" classname="com.xiaoxiao.pet.UpdateTest" time="0.122" />
-    <testcase name="unconfiguredBuildNeverChecksNetworkAndManualCheckExplains" classname="com.xiaoxiao.pet.UpdateTest" time="0.228" />
-    <testcase name="tamperedReadyApkCanBeDownloadedAgainInsteadOfGettingStuck" classname="com.xiaoxiao.pet.UpdateTest" time="0.236" />
+  <testsuite name="com.xiaoxiao.pet.UpdateTest" tests="10" failures="0" errors="0" skipped="0" time="4.144">
+    <testcase name="cachedReleaseFromAnotherBuildChannelIsNotReused" classname="com.xiaoxiao.pet.UpdateTest" time="0.158" />
+    <testcase name="packageVersionSdkAndSignerMustAllMatch" classname="com.xiaoxiao.pet.UpdateTest" time="0.114" />
+    <testcase name="serverFailureDoesNotPretendAlreadyLatestOrRemoveCachedRelease" classname="com.xiaoxiao.pet.UpdateTest" time="0.095" />
+    <testcase name="providerOnlyExposesExactPrivateApkAndReadGrant" classname="com.xiaoxiao.pet.UpdateTest" time="0.551" />
+    <testcase name="downloadDigestFailureNeverSetsReadyOrTouchesCompanionData" classname="com.xiaoxiao.pet.UpdateTest" time="0.192" />
+    <testcase name="installPermissionUsesOwnSettingsAndReturnsToExplicitConfirmation" classname="com.xiaoxiao.pet.UpdateTest" time="0.508" />
+    <testcase name="disabledAutoDuringRequestSuppressesLateNotification" classname="com.xiaoxiao.pet.UpdateTest" time="0.126" />
+    <testcase name="autoChecksOnceDailyManualBypassesAndIgnoreOnlyAffectsNotice" classname="com.xiaoxiao.pet.UpdateTest" time="0.652" />
+    <testcase name="unconfiguredBuildNeverChecksNetworkAndManualCheckExplains" classname="com.xiaoxiao.pet.UpdateTest" time="0.703" />
+    <testcase name="tamperedReadyApkCanBeDownloadedAgainInsteadOfGettingStuck" classname="com.xiaoxiao.pet.UpdateTest" time="1.035" />
   </testsuite>
 </testsuites>

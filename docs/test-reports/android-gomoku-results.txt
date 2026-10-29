@@ -1,6 +1,6 @@
-0.4.9.3 final product / Android API35 x86_64
-PASS 17 Android ART core suites, including 327 gomoku, 217 character, 62 initiative and 30 update checks.
-PASS 55 isolated Android runtime checks: Handler, Keystore, update verification, mood/schedule integration and game-result context.
-Framework: 123 full-run scenarios passed before final game-touch isolation change; final 18 (5 game UI + 13 initiative) passed. 124 distinct scenarios total.
-Live UI: invitation -> board; midgame restart -> same four stones; completed 12-move game -> correct result; ended game -> no defeat; actual model recalled accurate totals after restart.
-No real Key extracted, no production data cleared, no simulated result inserted in the real app. UI test packages removed after completion.
+0.4.9.3 final integrated product / Android API35 x86_64
+PASS 18 Android ART core suites: gomoku 327, growth 3620, character 217, initiative 62, update 30 and existing checks.
+PASS 61 isolated actual Android runtime checks, including game-result context, update verification, mood and growth integration.
+PASS 128 distinct framework scenarios across the batch; final homepage merge fix rechecked 23 UI scenarios. Other 105 passed in the preceding full run, including Python HTTP memory integration.
+PASS 18 release-sync and 7 update-publication Python tests.
+Real app: invitation -> board, restart resumes, actual win and separately ended game; model recalls totals. Final combined install retains board and 2 pet wins / 1 ended game.
