@@ -21,6 +21,15 @@ public class UsabilityUiTest {
         ((EditText)UiTest.description(root,"搜索记忆")).setText("");UiTest.click(root,"再显示 11 条（共 71 条）");assertNotNull(UiTest.find(root,"★ 我喜欢蓝色"));assertNotNull(UiTest.find(root,"第0件小事"));
         UiTest.click(root,"自动记下");assertNotNull(UiTest.find(root,"这一类还没有记忆。"));
     }
+    /** Each place is reachable once from where it belongs: no second story row, chat row or notebook loop. */
+    @Test public void everyEntryAppearsOnceWhereItBelongs()throws Exception{
+        a.render();java.util.Map<String,Integer> seen=new java.util.HashMap<>();for(TextView v:UiTest.all(a.content,TextView.class))seen.merge(v.getText().toString(),1,Integer::sum);
+        for(String entry:new String[]{"和她聊聊","我们的故事","记忆手账","名字与称呼","模型连接","陪伴设置","桌宠设置","检查更新"})assertEquals(entry,Integer.valueOf(1),seen.get(entry));
+        assertNull(UiTest.find(a.content,"最近聊天"));assertNull(UiTest.find(a.content,"她的小动作"));
+        AgentPanel.memories(a);View notebook=root();assertNull(UiTest.find(notebook,"我们的故事"));assertNotNull(UiTest.find(notebook,"她的日记"));assertNotNull(UiTest.find(notebook,"最近互动"));
+        GrowthPanel.show(a);View story=root();assertTrue(UiTest.texts(story).contains("记忆泡泡"));assertNull(UiTest.find(story,"她的日记"));
+        AgentPanel.settings(a);View settings=root();assertNotNull(UiTest.find(settings,"记忆引擎"));assertNull(UiTest.find(settings,"手机悬浮权限"));
+    }
     @Test public void clearingTheDiaryAsksFirst()throws Exception{
         java.time.LocalDate day=java.time.LocalDate.now().minusDays(1);assertTrue(AgentRuntime.store().addDiary(AgentRuntime.store().epoch(),Diary.entry(day,"今天陪他聊了晚饭。",new java.util.ArrayList<>(),System.currentTimeMillis())));
         MemoryPanel.diary(a);AlertDialog diary=(AlertDialog)UiTest.dialog();diary.getButton(AlertDialog.BUTTON_POSITIVE).performClick();ShadowLooper.idleMainLooper();
