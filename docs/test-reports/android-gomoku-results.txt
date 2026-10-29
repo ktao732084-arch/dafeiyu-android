@@ -1,0 +1,6 @@
+0.4.9.3 final integrated product / Android API35 x86_64
+PASS 18 Android ART core suites: gomoku 327, growth 3620, character 217, initiative 62, update 30 and existing checks.
+PASS 61 isolated actual Android runtime checks, including game-result context, update verification, mood and growth integration.
+PASS 132 distinct framework scenarios across the batch; final homepage merge fix rechecked 70 UI scenarios. Other 62 passed in the preceding full run, including Python HTTP memory integration.
+PASS 18 release-sync and 7 update-publication Python tests.
+Real app: invitation -> board, restart resumes, actual win and separately ended game; model recalls totals. Final combined install retains board and 2 pet wins / 1 ended game.

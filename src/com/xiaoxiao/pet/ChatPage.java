@@ -179,6 +179,7 @@ final class ChatPage {
         if(pending!=null)content.setOnClickListener(v->expand(pending));
         // Let the text measure its own width and height; MATCH_PARENT can inherit the short footer width.
         body.addView(content,new LinearLayout.LayoutParams(-2,-2));
+        if(!user&&text.contains("五子棋")){Button play=new Button(c);play.setText("开始对局 · 五子棋");Apple.button(play,false);play.setTextSize(13);play.setOnClickListener(v->{if(sending){Toast.makeText(c,"等她这句说完再开局吧",0).show();return;}dialog.dismiss();GomokuPage.launch(c);});body.addView(play,new LinearLayout.LayoutParams(-2,dp(42)));}
         if(reason!=null){TextView note=Apple.label(c,reason,11,false);note.setTextColor(Apple.SECONDARY);note.setPadding(dp(4),dp(5),0,0);body.addView(note);}
         if(pending!=null){Button expand=new Button(c);expand.setText(ReplySegments.label(pending));Apple.button(expand,false);expand.setTextSize(12);expand.setMinHeight(dp(30));expand.setPadding(dp(12),0,dp(12),0);expand.setOnClickListener(v->expand(pending));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-2,dp(30));p.topMargin=dp(6);body.addView(expand,p);}
         // Only her side carries an avatar; your messages are bubbles alone on the right.

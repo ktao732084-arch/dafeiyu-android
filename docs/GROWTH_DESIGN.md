@@ -450,4 +450,3 @@ fish    = 20 + chatDays × 3
 **还没做（0.5.x）**：约定、纪念日、吃Token 彩蛋、由模型写的明信片。
 
 **验证边界**：编译检查和 JVM 核心测试通过，包括 GrowthTest 的 3617 项检查。没有构建 APK，也没有在 Android 设备或模拟器上运行，见 [VALIDATION-0.5.0.md](VALIDATION-0.5.0.md)。
-

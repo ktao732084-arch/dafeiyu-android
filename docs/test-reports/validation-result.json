@@ -1,32 +1,47 @@
 {
-  "version": "0.4.9.2",
-  "version_code": 15,
-  "apk_sha256": "97dca0a731bab47c1e81bf513f918f05a0b2d04277406676f458440bf7b4d25c",
-  "apk_size": 91505033,
-  "framework_unique_passed": 119,
-  "framework_failed_final_reports": 0,
+  "version": "0.4.9.3",
+  "version_code": 17,
+  "apk_sha256": "12f55aea091ce03a2c1058ceba5d85b33a1d297bc4eaf4bd0d7b27020dd64c02",
+  "framework_unique_passed": 132,
+  "framework_failed": 0,
   "framework_skipped": 0,
-  "framework_note": "Final full run: 118/119; after draining Python subprocess output, HTTP suite 12/12 passed on the same final product build. Aggregate unique scenarios:119.",
-  "android_api": 35,
-  "android_art_core_suites": 15,
-  "android_runtime_instrumentation_checks": 47,
+  "final_build_framework_rechecked": 70,
+  "android_art_core_suites": 18,
+  "gomoku_checks": 327,
   "initiative_checks": 62,
+  "character_checks": 217,
   "update_checks": 30,
-  "publisher_checks": 7,
-  "upgrade_from": "0.4.9.1",
-  "upgrade_preserved": [
-    "persona",
-    "nickname",
-    "memory",
-    "history",
-    "keystore"
-  ],
+  "usability_checks": 21,
+  "core_checks": 141,
+  "history_checks": 556,
+  "unicode_checks": 83,
   "native_memory": {
-    "scenarios": 84,
+    "cases": 84,
     "passed": 145,
     "total": 166,
     "known_unmet": 21
   },
-  "physical_device_tested": false,
-  "live_model_tested_this_release": false
+  "live_smoke": {
+    "device": "emulator-5554 / Android API35 x86_64",
+    "entry": "actual previous invitation exposed a start-game button; home also opened the same board",
+    "resume": "candidate game restored the same four stones and black turn after process restart; final update preserved both completed and ended games",
+    "complete": "candidate and merged game each finished legally after 12 moves with white/pet win",
+    "abandon": "one separately ended two-move game was not counted as defeat",
+    "model_recall": "real configured model reported pet 1 win after the first game; separately identified an ended game; after merged full-game test and restart reported pet 2 wins, 0 draws, 1 ended, latest completed game 12 moves/pet win",
+    "final_integration": "After integrating growth and unified publishing, installed final 0.4.9.3 and confirmed real board and preserved 2 pet wins / 1 ended game. Earlier real-model and complete-game smoke was on same gomoku implementation before final growth merge."
+  },
+  "distribution": {
+    "method": "release.ps1 -Publish; verify both destinations before completion",
+    "github": "v0.4.9.3",
+    "domestic_manifest": "https://81.70.79.133/dafeiyu-updates/stable.json"
+  },
+  "limits": [
+    "basic local heuristic opponent, not a strong tournament engine",
+    "model context gets latest 8 results and lifetime totals, not arbitrary-date game search",
+    "not all Android devices or physical phones tested"
+  ],
+  "framework_failed_final_reports": 0,
+  "android_runtime_instrumentation_checks": 61,
+  "growth_checks": 3620,
+  "release_sync_checks": 18
 }

@@ -230,6 +230,7 @@ final class AgentStore {
         next.put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();
     }
     synchronized void clear(boolean all)throws Exception {
+        if(all)new GomokuStore(file.getParentFile()).clear();
         transcript.clear(state.getJSONArray("turns"));if(episodes!=null)episodes.clear();
         // The diary and her understanding of the user are made from chats, so clearing chats clears them too.
         JSONObject next=all?empty(epoch()+1):snapshot().put("turns",new JSONArray()).put("diary",new JSONArray()).put("understanding",new JSONArray()).put("epoch",epoch()+1);
