@@ -1,0 +1,22 @@
+2026-10-29 / published 0.4.6 product DEX / Android API35 x86_64 MuMu
+Android core audit: Dalvik; SDK 35
+PASS: 141 core checks
+PASS momentum, separation, held drag, screen edges, placement, throw bounce
+PASS: 13 API endpoint checks
+PASS: 10708 action plan checks
+PASS: 556 history, timestamps and segment checks
+PASS: native memory 145/166 product expectations on 84 shared scenarios (baseline 145/166)
+PASS: 38 temporal history recall checks
+PASS: 11 episodic recall checks
+PASS: rule capture tuning 47/48 facts, 0/60 false; blind 22/25, 2/25 false; shared scenarios 113/114, privacy 0
+PASS: 19 diary checks
+Runtime: Dalvik / 2.1.0
+Platform accepts Unicode flag: false
+PASS: 83 native Unicode regex checks
+DEVICE SUITES: 11 passed, 0 failed
+Process exit: 0
+
+Isolated instrumentation package: com.dafeiyu.compatchecks
+PASS: 22 Android runtime checks
+Controlled model, real Android Handler and Keystore. No user data/key access.
+Test package uninstalled after completion.

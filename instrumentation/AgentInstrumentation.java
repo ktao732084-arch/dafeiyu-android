@@ -25,6 +25,9 @@ public class AgentInstrumentation extends Instrumentation {
    AgentRuntime.memory=new AgentStore(new java.io.File(isolatedFiles,"agent"));
    String originalUrl=Data.prefs().getString("api.url",""),originalModel=Data.prefs().getString("api.model",""),originalSecret=Data.prefs().getString("api.secret","");boolean originalMemory=AgentRuntime.rememberEnabled();
    try{
+    NativeMemoryIntelligence.transport=(c,m,t)->{throw new java.io.IOException("isolated audit: model assistance disabled");};
+    MemoryBridge.client=(c,p,b,t)->{throw new AssertionError("isolated audit must not call a Python service");};
+    Data.prefs().edit().putBoolean("agent.diary",false).commit();
     Data.prefs().edit().putString("api.url","https://example.invalid/v1").putString("api.model","test-model").putBoolean("agent.memory",true).commit();Chat.secret("test-only-key");
     check("test-only-key".equals(Chat.secret()),"Android Keystore round trip");check(!Data.prefs().getString("api.secret","").contains("test-only-key"),"key is encrypted");
     AgentRuntime.model=(messages,token,progress)->{check(messages.getJSONObject(0).getString("content").contains("鲸鱼娘"),"persona is loaded");progress.accept("{\"reply\":\"蓝色，我也喜欢。");return "{\"reply\":\"蓝色，我也喜欢。\",\"emotion\":\"happy\",\"memories\":[\"我喜欢蓝色\",\"用户喜欢红色\"]}";};
@@ -37,8 +40,15 @@ public class AgentInstrumentation extends Instrumentation {
     AgentRuntime.model=(messages,token,progress)->{throw new java.io.IOException("test transport failure");};Reply fail=new Reply();AgentRuntime.send("失败测试",false,fail);fail.await();check(fail.error!=null&&AgentRuntime.history().length()==before,"failed turn not committed");
     Data.prefs().edit().remove("api.secret").commit();Reply local=new Reply();AgentRuntime.send("记住：我喜欢小熊",false,local);local.await();check(local.error==null&&AgentRuntime.store().memoryContext("小熊").contains("小熊"),"explicit memory works offline");
     check("点击回应-开心跃动".equals(AgentRuntime.action("happy")),"emotion animation mapping");
+    // Exercise the reported sentence through the real Android Handler/Keystore/runtime, not a JVM shadow.
+    AgentRuntime.store().clear(true);Chat.secret("test-only-key");
+    AgentRuntime.model=(messages,token,progress)->"好的，kk，我记住啦。";
+    Reply named=new Reply();check(AgentRuntime.send("我叫k你以后就叫我kk吧",false,named),"name turn starts");named.await();
+    check(named.error==null&&named.text.contains("kk"),"name turn completes on Android");
+    check(AgentRuntime.store().memoryContext("kk").contains("我叫k你以后就叫我kk吧"),"name stored on Android");
+    runOnMainSync(()->{AlphaVideo video=new AlphaVideo(getTargetContext(),"main");try{video.vertices.position(2);check(video.vertices.position()==2,"video buffer links on Android");check(Avatar.of(getTargetContext(),"main",36)!=null,"avatar resource loads on Android");}finally{video.release();}});
     result.putString("stream","PASS: "+checks+" Android runtime checks\n");
-   }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}
+   }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;MemoryBridge.client=MemoryBridge::http;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}
   }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e.toString());result.putString("stack",android.util.Log.getStackTraceString(e));}
   try{Data.logWriter.submit(()->{}).get(5,TimeUnit.SECONDS);}catch(Exception ignored){}
   if(originalContext!=null)Data.app=originalContext;AgentRuntime.memory=null;

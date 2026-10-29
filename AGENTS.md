@@ -18,3 +18,11 @@
 - `versionName` 遵循以上三段式版本规则。
 - 发布新的 APK 时，`versionCode` 按 Android 覆盖安装要求单调递增；它的增加不意味着要提升 `versionName` 的次版本或主版本。
 - 同步构建脚本、安装包文件名、更新记录和发布说明，确保它们对应同一次发布。
+
+## Android 兼容性验证
+
+- Robolectric和普通JVM测试不等同Android ART：正则、JSON、文件系统、Keystore及Java标准库可能有差异。
+- 修改这些路径或发布涉及它们的APK时，先构建产品，再用`tests/run-core-device.ps1`在实际Android系统中运行同一套核心测试，使用该产品的DEX。
+- 涉及聊天Runtime、Key加密、线程或回调时，补跑`instrumentation/build-isolated-tests.ps1`生成的独立测试包。它的包名为`com.dafeiyu.compatchecks`；不得拿用户正式App做清空数据等测试。
+- 核对最终DEX中的API引用和较新Android API的版本保护；仅检查宿主JVM class文件可能误报，D8会改写部分Java API调用。
+- 报告实测Android版本、受控模型范围和未覆盖项；没有跑实体手机时，不写“真机全部通过”。未发现产品缺陷、仅补测试与报告时，保持现有版本，不另发APK。

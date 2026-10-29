@@ -1,5 +1,7 @@
 # 0.4.6 Android 正则兼容性修复验证
 
+追加兼容性检查：同一已发布产品DEX在Android API35上通过11组核心套件；独立测试App通过22项实际Android Runtime/Keystore检查。未发现新的同类兼容性错误，未改产品或重发APK。范围和边界见[追加检查报告](docs/ANDROID_COMPATIBILITY_AUDIT.md)。
+
 2026-10-29，versionCode 10，APK SHA-256：e08152f52db00644405568c3bd932018ce961b0713990bc8c97d8332e7dffeef。
 
 ## 原因与修复

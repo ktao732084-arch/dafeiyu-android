@@ -30,7 +30,7 @@
       "path": "AGENTS.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "4c44c18871741b8abe7debc451220cb665c6241b473cd1e834ddd10bbda219f5"
+      "sha256": "cb5b0cd6c91875f04bb73659c05bf3c35d50fb945b5997fcc246a05db5476582"
     },
     {
       "path": "ASSET_LICENSE.md",
@@ -85,7 +85,7 @@
       "path": "SOURCE_MAP.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "a74f07a71552eed4ca2655fb11b07a770bb95434156a77129fa0cd272ef45e08"
+      "sha256": "a2b6cc6791d164c441da39506ec9954234ae55b805c3023cfe9fc5db4f27572d"
     },
     {
       "path": "THIRD-PARTY-LICENSE.txt",
@@ -106,7 +106,7 @@
       "path": "VALIDATION.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "49a06281d18af62dfa25f302806eadee50e978ada61e4a075f347e2dc3be3bf3"
+      "sha256": "4225793c524c2cc97e8850a312d0820492f28e6c7fe307df3e726fefa0c291f6"
     },
     {
       "path": "assets/catalog.json",
@@ -1215,6 +1215,12 @@
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
+      "path": "docs/ANDROID_COMPATIBILITY_AUDIT.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "c7bf34169bb2b45d3f08c2a5afece59bb5253bb2138a4b13c5b3e78d97299e59"
+    },
+    {
       "path": "docs/CHAT_HISTORY.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1269,6 +1275,12 @@
       "sha256": "3a4fa85f2210730cdc566c22d3cabd6b033092cb271eb8e86d81b248d76ce2bf"
     },
     {
+      "path": "docs/test-reports/android-core-audit.txt",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "fc701479b4a82c13f352b2544e06814b83f99e4463ef94c966999f21e12af347"
+    },
+    {
       "path": "docs/test-reports/android-regex-results.txt",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1308,7 +1320,7 @@
       "path": "instrumentation/AgentInstrumentation.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "26e4d59e6c70b910dee37797008078013e6fb57dd77d53b7408c649ae7e33c75",
+      "sha256": "91e65c26ef3c09462a3e4e4a36aad872a2cd678841624ff49eec8baee792cd3d",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -1325,6 +1337,12 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "fef24c197679915926182fab2e4ea1c0e7315236b45732f9985b65138ef74a50"
+    },
+    {
+      "path": "instrumentation/build-isolated-tests.ps1",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "6275b513ba64f3c7d620df21dbf590a037afe941ebf72c7578e92519d31dd0b2"
     },
     {
       "path": "instrumentation/build-tests.ps1",
@@ -2236,6 +2254,12 @@
       "sha256": "763ef3e7915367bf2bc363cda0d0aed5de49f90c068cc6cd7f03b6d3a94362f0"
     },
     {
+      "path": "tests/com/xiaoxiao/pet/DeviceCoreChecks.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "2dfd7baabce500e83862a3eba0dbe184411f1c4d31d76402ba6d33bf16e0dd0a"
+    },
+    {
       "path": "tests/com/xiaoxiao/pet/DiaryTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -2407,6 +2431,12 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "970e094324cf4e1df35cae2a0da4aa23971378988a79a658b04943d3b0ae659a"
+    },
+    {
+      "path": "tests/run-core-device.ps1",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "5f602694486561d5f455bf2277f256d0aacfab332680bf246356bd4c75f74749"
     },
     {
       "path": "tests/run-core.ps1",
