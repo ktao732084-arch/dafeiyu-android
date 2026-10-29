@@ -4,12 +4,27 @@ import org.json.*;import java.io.IOException;
 /** The only model-produced fields accepted by the runtime. No executable tools. */
 final class AgentReply {
  String reply,emotion="calm",moodCause="";int moodLevel;Boolean moodChanged;int nextCheckMinutes=Initiative.DEFAULT_MINUTES;InitiativePlan plan=new InitiativePlan();JSONArray memories=new JSONArray(),self=new JSONArray();
+ /** The reply string of a broken envelope, only when it comes first and its closing quote and the next comma arrived. */
+ static String complete(String json){
+  int p=json.indexOf('{')+1;while(p<json.length()&&Character.isWhitespace(json.charAt(p)))p++;
+  if(!json.startsWith("\"reply\"",p))return null;p+=7;while(p<json.length()&&Character.isWhitespace(json.charAt(p)))p++;
+  if(p>=json.length()||json.charAt(p++)!=':')return null;while(p<json.length()&&Character.isWhitespace(json.charAt(p)))p++;
+  if(p>=json.length()||json.charAt(p)!='"')return null;int start=p++;
+  for(;p<json.length();p++){char c=json.charAt(p);if(c=='\\'){p++;continue;}if(c=='"')break;}
+  if(p>=json.length())return null;int end=p++;while(p<json.length()&&Character.isWhitespace(json.charAt(p)))p++;
+  if(p>=json.length()||json.charAt(p)!=',')return null;
+  try{return new JSONObject("{\"r\":"+json.substring(start,end+1).replace("\n","\\n").replace("\r","\\r")+"}").getString("r");}catch(JSONException e){return null;}
+ }
  static AgentReply parse(String raw)throws Exception{
   AgentReply result=new AgentReply();String text=AgentPolicy.replyText(raw.replaceAll("(?s)<think>.*?</think>","").trim());
   if(text.startsWith("```")){int nl=text.indexOf('\n'),end=text.lastIndexOf("```");if(nl>=0&&end>nl)text=text.substring(nl+1,end).trim();}
   String json=AgentPolicy.envelope(text);
   if(json!=null){
-   JSONObject o;try{o=new JSONObject(json);}catch(JSONException e){throw new IOException("模型返回的回复格式不完整，请重试");}
+   JSONObject o;try{o=new JSONObject(json);}catch(JSONException e){
+    // A slip in a later field ("self":["…"}) should not cost a finished reply: keep it like a plain-text answer.
+    String kept=complete(json);if(kept==null)throw new IOException("模型返回的回复格式不完整，请重试");
+    result.reply=AgentPolicy.replyText(kept);result.moodChanged=Boolean.FALSE;
+    if(result.reply.trim().isEmpty())throw new IOException("模型没有返回可显示的回复");result.reply=AgentPolicy.clip(result.reply.trim(),5000);return result;}
    Object reply=o.opt("reply");if(!(reply instanceof String))throw new IOException("模型回复格式不正确，请重试");
    if(o.has("mood_changed"))result.moodChanged=o.opt("mood_changed") instanceof Boolean?(Boolean)o.opt("mood_changed"):Boolean.FALSE;
    else if(!o.has("emotion"))result.moodChanged=Boolean.FALSE;

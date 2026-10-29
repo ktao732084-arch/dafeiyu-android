@@ -41,9 +41,10 @@ public final class ScenarioEval {
    in.timeZone=ZoneId.systemDefault().getId();in.now=now;in.initializedAt=t0-21*86_400_000L;in.remember=true;in.diary=true;in.feeling=db.mood(now);in.mood=in.feeling.optString("emotion","calm");in.games=games(games,outcomes,now);
    if(last[0]!=null){in.lastEvent=last[0];in.lastEventAt=lastAt[0];}
    String reply;JSONObject row=new JSONObject().put("user",user).put("minutes",t.getLong("minutes"));
-   try{AgentReply r=AgentReply.parse(call(PromptBuilder.build(in,user,false,db.snapshot(),null),1.3,1200));reply=r.reply;
+   String raw=null;
+   try{raw=call(PromptBuilder.build(in,user,false,db.snapshot(),null),1.3,1200);AgentReply r=AgentReply.parse(raw);reply=r.reply;
     db.commit(db.epoch(),user,reply,r.emotion,r.memories,true,false,null,null,"turn"+i,now,r.self,false,null,null,r.moodLevel,r.moodCause,r.moodChanged);row.put("emotion",r.emotion);}
-   catch(Exception e){reply=null;row.put("error",e.getClass().getSimpleName()+": "+e.getMessage());}
+   catch(Exception e){reply=null;row.put("error",e.getClass().getSimpleName()+": "+e.getMessage());if(raw!=null)row.put("raw",raw);}
    row.put("reply",reply==null?JSONObject.NULL:reply);transcript.put(row);
    JSONArray want=t.optJSONArray("checks");if(want!=null)for(int k=0;k<want.length();k++){JSONObject w=want.getJSONObject(k);
     String verdict=reply==null?"error":judge(sc,style,transcript,w);checks.put(new JSONObject().put("turn",i).put("rule",w).put("verdict",verdict));}

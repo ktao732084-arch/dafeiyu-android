@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "848010646e30950f60275f98e8bf56ec36dbe09579cd160ee7f8a979ee28e67a"
+      "sha256": "de66670770db77ee04d06e3226fd622141bb9f44ef3ca90b4c22179d91e2bd98"
     },
     {
       "path": "LICENSE",
@@ -2057,7 +2057,7 @@
       "path": "src/com/xiaoxiao/pet/AgentReply.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "541800af14f52ecf7787072241b45e486ffd590bb48cbd654ec1a2f32ffc154c",
+      "sha256": "10068222cf0304e9bf671e3b1cd89a2f16ed8985a3384c9530e776b465306a1b",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2619,7 +2619,7 @@
       "path": "tests/com/xiaoxiao/pet/AgentCoreTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "afd65642cde93f5b69b8a7104b92dd8b35086abe8b039edc1b6482e2c2ad4c04",
+      "sha256": "6604d30ab32fb34a614be069f967377f8d5da8dd7dad54bba2ad0189575c5b7a",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2734,7 +2734,7 @@
       "path": "tests/com/xiaoxiao/pet/ScenarioEval.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "a4daae06ce80c28c8fdf1e8a0d9d0d9888d8aa044c7bd44c4e00da1de8b7fb1e"
+      "sha256": "81b13e4e592f2bb0cc62a705fc455eefbf44f8ab5ad484f86a025c290dfc7982"
     },
     {
       "path": "tests/com/xiaoxiao/pet/TouchReplyTest.java",
