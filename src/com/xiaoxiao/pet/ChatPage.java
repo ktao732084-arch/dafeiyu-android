@@ -4,11 +4,11 @@ import org.json.*;import java.util.*;import java.text.SimpleDateFormat;
 
 /** Paged conversation UI in a messaging-app layout. The model still receives only its bounded recent context. */
 final class ChatPage {
-    static final long STAMP_GAP=5*60*1000L;
+    static final long STAMP_GAP=5*60*1000L;static final int PAGE=20,SEARCH_LIMIT=40;
     static java.lang.ref.WeakReference<ChatPage> current=new java.lang.ref.WeakReference<>(null);
     final Context c;final String role,id;final boolean overlay;final Dialog dialog;final Handler handler=new Handler(Looper.getMainLooper());
     final LinearLayout rows;final ScrollView scroll;final EditText input;TextView status;final TextView presence,filter,setup;final Button send,older,jump;final FrameLayout stage;final int bubbleWidth,listHeight;int lifted;
-    final SpeechQueue speech;final Runnable interrupt,refresh;JSONArray records=new JSONArray();boolean sending,paged,nearBottom=true;String draft="",turnId,lastDay;long from=Long.MIN_VALUE,to=Long.MAX_VALUE,lastStamp;View typing;
+    final SpeechQueue speech;final Runnable interrupt,refresh;JSONArray records=new JSONArray();boolean sending,paged,nearBottom=true;String draft="",turnId,lastDay,anchor,focus;long from=Long.MIN_VALUE,to=Long.MAX_VALUE,lastStamp;View typing;
     ChatPage(Context context,String role,String id){
         this.c=context;this.role=role;this.id=id;overlay=!(c instanceof Activity);dialog=overlay?CompactPanel.create(c):ClientPage.create(c);
         bubbleWidth=Math.round(Math.min(c.getResources().getDisplayMetrics().widthPixels,overlay?dp(360):Integer.MAX_VALUE)*.66f);
@@ -99,23 +99,30 @@ final class ChatPage {
     }
     void sendState(){send.setAlpha(sending||input.getText().toString().trim().length()>0?1f:.45f);}
     void menu(View anchor){
-        PopupMenu menu=new PopupMenu(c,anchor);menu.getMenu().add(0,1,0,"按日期查看");menu.getMenu().add(0,2,1,"回到最新");
-        menu.setOnMenuItemClickListener(item->{if(item.getItemId()==1)pickDate();else latest();return true;});menu.show();
+        PopupMenu menu=new PopupMenu(c,anchor);menu.getMenu().add(0,3,0,"搜索聊天");menu.getMenu().add(0,1,1,"按日期查看");menu.getMenu().add(0,2,2,"回到最新");
+        menu.setOnMenuItemClickListener(item->{if(item.getItemId()==3)search();else if(item.getItemId()==1)pickDate();else latest();return true;});menu.show();
     }
     void pickDate(){
         stopSpeaking();Calendar today=Calendar.getInstance();
         DatePickerDialog picker=new DatePickerDialog(c,(view,year,month,day)->{java.time.ZoneId zone=java.time.ZoneId.systemDefault();java.time.LocalDate date=java.time.LocalDate.of(year,month+1,day);from=date.atStartOfDay(zone).toInstant().toEpochMilli();to=date.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli();
-            filter.setText("只看 "+year+"年"+(month+1)+"月"+day+"日 的聊天（"+zone+"）· 点这里回到最新");filter.setVisibility(View.VISIBLE);status.setText("");loadLatest();},today.get(Calendar.YEAR),today.get(Calendar.MONTH),today.get(Calendar.DAY_OF_MONTH));
+            anchor=focus=null;filter.setText("只看 "+year+"年"+(month+1)+"月"+day+"日 的聊天"+zoneNote(zone)+" · 点这里回到最新");filter.setVisibility(View.VISIBLE);status.setText("");loadLatest();},today.get(Calendar.YEAR),today.get(Calendar.MONTH),today.get(Calendar.DAY_OF_MONTH));
         picker.getDatePicker().setMaxDate(System.currentTimeMillis());if(overlay)picker.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);picker.show();
     }
-    void latest(){stopSpeaking();from=Long.MIN_VALUE;to=Long.MAX_VALUE;filter.setVisibility(View.GONE);loadLatest();status.setText("");}
-    void loadLatest(){setup.setVisibility(AgentRuntime.configured()?View.GONE:View.VISIBLE);try{paged=false;older.setText("查看更早的消息");older.setEnabled(true);records=AgentRuntime.store().historyRange(from,to,null,20);render();scroll.post(()->{scroll.fullScroll(View.FOCUS_DOWN);bottom();});}catch(Exception e){status.setText("聊天记录暂时打不开，稍后再试试。");}}
-    void loadOlder(){stopSpeaking();try{if(records.length()==0)return;JSONArray page=AgentRuntime.store().historyRange(from,to,records.getJSONObject(0).getString("pageKey"),20);if(page.length()==0){older.setText("已经翻到最早的聊天啦");older.setEnabled(false);return;}int height=rows.getHeight(),position=scroll.getScrollY();for(int i=0;i<records.length();i++)page.put(records.getJSONObject(i));records=page;paged=true;render();scroll.post(()->scroll.scrollTo(0,position+rows.getHeight()-height));}catch(Exception e){status.setText("更早的聊天没读出来，稍后再试试。");}}
+    /** Days are cut in the phone's current time zone; only worth saying when the chats were recorded in another one. */
+    static String zoneNote(java.time.ZoneId zone){
+        try{JSONArray last=AgentRuntime.store().historyRange(Long.MIN_VALUE,Long.MAX_VALUE,null,1);if(last.length()==0)return "";String recorded=last.getJSONObject(0).optString("timeZone");
+            if(recorded.isEmpty()||java.time.ZoneId.of(recorded).getRules().equals(zone.getRules()))return "";}catch(Exception unknown){return "";}
+        return "（按手机当前时区 "+TimeZone.getTimeZone(zone).getDisplayName(false,TimeZone.SHORT,Locale.CHINA)+"）";
+    }
+    void latest(){stopSpeaking();from=Long.MIN_VALUE;to=Long.MAX_VALUE;anchor=focus=null;filter.setVisibility(View.GONE);loadLatest();status.setText("");}
+    void loadLatest(){setup.setVisibility(AgentRuntime.configured()?View.GONE:View.VISIBLE);try{paged=false;older.setText("查看更早的消息");older.setEnabled(true);records=AgentRuntime.store().historyRange(from,to,anchor,PAGE);render();scroll.post(()->{scroll.fullScroll(View.FOCUS_DOWN);bottom();});}catch(Exception e){status.setText("聊天记录暂时打不开，稍后再试试。");}}
+    void loadOlder(){stopSpeaking();try{if(records.length()==0)return;JSONArray page=AgentRuntime.store().historyRange(from,to,records.getJSONObject(0).getString("pageKey"),PAGE);if(page.length()==0){older.setText("已经翻到最早的聊天啦");older.setEnabled(false);return;}boolean earliest=page.length()<PAGE;int height=rows.getHeight(),position=scroll.getScrollY();for(int i=0;i<records.length();i++)page.put(records.getJSONObject(i));records=page;paged=true;render();if(earliest){older.setText("已经翻到最早的聊天啦");older.setEnabled(false);}scroll.post(()->scroll.scrollTo(0,position+rows.getHeight()-height));}catch(Exception e){status.setText("更早的聊天没读出来，稍后再试试。");}}
     void render()throws Exception {
-        rows.removeAllViews();typing=null;lastDay=null;lastStamp=Long.MIN_VALUE;older.setVisibility(records.length()==0?View.GONE:View.VISIBLE);
+        rows.removeAllViews();typing=null;lastDay=null;lastStamp=Long.MIN_VALUE;older.setVisibility(records.length()==0||!paged&&records.length()<PAGE?View.GONE:View.VISIBLE);
         if(records.length()==0){empty();return;}
         for(int i=0;i<records.length();i++){
             JSONObject t=records.getJSONObject(i);long at=t.optLong("at"),replied=t.optLong("repliedAt",at);
+            if(focus!=null&&focus.equals(t.optString("id"))){TextView mark=Apple.label(c,"— 搜索到的这一句 —",12,false);mark.setTextColor(Apple.BLUE);mark.setGravity(Gravity.CENTER);mark.setPadding(0,dp(14),0,0);rows.addView(mark,new LinearLayout.LayoutParams(-1,-2));lastDay=null;}
             if(!t.optString("user").isEmpty()){stamp(t,at);message(t.optString("user"),true,null,false);}
             stamp(t,replied);segments(t);
         }
@@ -160,7 +167,7 @@ final class ChatPage {
             GradientDrawable shape=new GradientDrawable();shape.setColor(Apple.PRIMARY);float r=dp(18),tip=dp(6);shape.setCornerRadii(new float[]{r,r,tip,tip,r,r,r,r});content.setBackground(shape);
         }else{content=Apple.label(c,text,16,false);content.setBackground(Apple.corners(c,Apple.PANEL,6,18,18,18));}
         content.setMaxWidth(bubbleWidth);content.setLineSpacing(dp(3),1);content.setPadding(dp(13),dp(10),dp(13),dp(10));
-        content.setOnLongClickListener(v->{android.content.ClipboardManager clipboard=(android.content.ClipboardManager)c.getSystemService(Context.CLIPBOARD_SERVICE);clipboard.setPrimaryClip(ClipData.newPlainText("聊天内容",text));Toast.makeText(c,"已复制",0).show();return true;});
+        content.setOnLongClickListener(v->{bubbleMenu(v,text,user);return true;});
         if(pending!=null)content.setOnClickListener(v->expand(pending));
         // Let the text measure its own width and height; MATCH_PARENT can inherit the short footer width.
         body.addView(content,new LinearLayout.LayoutParams(-2,-2));
@@ -180,6 +187,55 @@ final class ChatPage {
             if(UiMotion.enabled()){AlphaAnimation pulse=new AlphaAnimation(1f,.25f);pulse.setDuration(480);pulse.setStartOffset(i*160L);pulse.setRepeatMode(Animation.REVERSE);pulse.setRepeatCount(Animation.INFINITE);dot.startAnimation(pulse);}}
         line.addView(dots,new LinearLayout.LayoutParams(-2,dp(38)));rows.addView(line,new LinearLayout.LayoutParams(-1,-2));typing=line;
     }
+    /** Long-press: copy, and for your own words, ask her to remember them without typing 「记住：」. */
+    void bubbleMenu(View anchor,String text,boolean user){
+        PopupMenu menu=new PopupMenu(c,anchor);menu.getMenu().add(0,1,0,"复制");if(user)menu.getMenu().add(0,2,1,"让她记住这句");
+        menu.setOnMenuItemClickListener(item->{if(item.getItemId()==1)copy(text);else rememberLine(text);return true;});menu.show();
+    }
+    void copy(String text){android.content.ClipboardManager clipboard=(android.content.ClipboardManager)c.getSystemService(Context.CLIPBOARD_SERVICE);clipboard.setPrimaryClip(ClipData.newPlainText("聊天内容",text));Toast.makeText(c,"已复制",0).show();}
+    /** Saved like a notebook entry (not pinned). Waits while she is replying: saving then would discard that reply. */
+    void rememberLine(String raw){
+        if(sending||AgentRuntime.busy()){Toast.makeText(c,"她还在回话，等她说完再记吧",0).show();return;}
+        String text=raw.trim().replaceFirst("^记住[:：]\\s*","");
+        if(text.length()>240){Toast.makeText(c,"这句有点长，可以去记忆手账写一条精简的",1).show();return;}
+        try{AgentRuntime.store().remember(text,false);Toast.makeText(c,"记下了，可以在记忆手账里修改或固定",0).show();}
+        catch(Exception e){Toast.makeText(c,e.getMessage()==null?"没记上，请稍后再试":e.getMessage(),1).show();}
+    }
+    /** Searches everything you said and everything she showed, across the whole history; a result opens the chat there. */
+    void search(){
+        stopSpeaking();LinearLayout box=column();box.setPadding(dp(18),dp(4),dp(18),dp(8));
+        EditText query=new EditText(c);query.setHint("搜你们聊过的话");query.setTextSize(15);query.setTextColor(Apple.INK);query.setHintTextColor(Apple.SECONDARY);query.setSingleLine(true);query.setImeOptions(android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH);
+        query.setPadding(dp(16),dp(11),dp(16),dp(11));query.setBackground(Apple.shape(c,Apple.FILL,14));query.setContentDescription("搜索聊天");box.addView(query,new LinearLayout.LayoutParams(-1,-2));
+        TextView note=Apple.label(c,"会找你说过的话和她展示出来的回复。",12,false);note.setTextColor(Apple.SECONDARY);note.setLineSpacing(dp(2),1);note.setPadding(dp(4),dp(10),dp(4),dp(6));box.addView(note);
+        LinearLayout results=column();box.addView(results);ScrollView view=new SpringScrollView(c);view.addView(box);
+        AlertDialog found=new Apple.Builder(c).setTitle("搜索聊天").setView(view).setNegativeButton("关闭",null).setPositiveButton("搜索",null).create();
+        if(overlay)found.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);found.show();
+        Runnable run=()->{String q=query.getText().toString().trim();if(q.isEmpty())return;note.setText("正在找…");results.removeAllViews();
+            Chat.executor.execute(()->{JSONArray rows;try{rows=AgentRuntime.store().searchChat(q,SEARCH_LIMIT);}catch(Exception e){rows=null;}final JSONArray hits=rows;
+                handler.post(()->{if(found.isShowing())results(found,note,results,q,hits);});});};
+        found.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v->run.run());
+        query.setOnEditorActionListener((v,action,event)->{run.run();return true;});query.requestFocus();
+    }
+    void results(AlertDialog found,TextView note,LinearLayout results,String q,JSONArray hits){
+        if(hits==null){note.setText("聊天记录暂时打不开，稍后再试试。");return;}
+        if(hits.length()==0){note.setText("没找到包含「"+q+"」的聊天。换个说法试试，或者用「按日期查看」。");return;}
+        note.setText(hits.length()>=SEARCH_LIMIT?"先列出最近的 "+SEARCH_LIMIT+" 条，点一条回到当时的聊天。":"找到 "+hits.length()+" 条，点一条回到当时的聊天。");
+        LinearLayout group=GroupedList.group(results);
+        for(int i=0;i<hits.length();i++){JSONObject hit=hits.optJSONObject(i);if(hit==null)continue;String reply=hit.optString("reply");
+            String line=when(hit,hit.optLong("at"))+"\n你："+HistoryRecall.clip(hit.optString("user"),q,60).replace('\n',' ')+(reply.isEmpty()?"":"\n她："+HistoryRecall.clip(reply,q,60).replace('\n',' '));
+            GroupedList.entry(group,line,v->{found.dismiss();jump(hit,q);});}
+    }
+    /** Opens that day with the found turn and the few that followed it, marked, so it reads in context. */
+    void jump(JSONObject hit,String q){
+        try{java.time.ZoneId zone=java.time.ZoneId.systemDefault();long at=hit.optLong("at");java.time.LocalDate day=java.time.Instant.ofEpochMilli(at).atZone(zone).toLocalDate();
+            from=day.atStartOfDay(zone).toInstant().toEpochMilli();to=day.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli();
+            // Page keys sort by time; ending the page just after the found turn's key includes it. Up to three later turns follow when the day has them.
+            JSONArray after=AgentRuntime.store().historyRange(at+1,to,null,40);String end=hit.getString("pageKey");
+            if(after.length()>0&&after.length()<40)end=after.getJSONObject(Math.min(2,after.length()-1)).getString("pageKey");
+            anchor=end+"\uffff";focus=hit.getString("id");
+            filter.setText("「"+AgentPolicy.clip(q,12)+"」· "+when(hit,at)+" · 点这里回到最新");filter.setVisibility(View.VISIBLE);status.setText("");loadLatest();
+        }catch(Exception e){status.setText("没能打开那段聊天，稍后再试试。");}
+    }
     void expand(JSONObject turn){
         stopSpeaking();
         TextView full=Apple.label(c,AgentPolicy.replyText(turn.optString("reply")),16,false);full.setLineSpacing(dp(4),1);full.setPadding(dp(20),dp(12),dp(20),dp(12));full.setTextIsSelectable(true);ScrollView view=new SpringScrollView(c);view.addView(full);
@@ -188,11 +244,11 @@ final class ChatPage {
     }
     void send(){
         if(sending){AgentRuntime.cancel();return;}String message=input.getText().toString().trim();if(message.isEmpty())return;
-        speech.cancel();from=Long.MIN_VALUE;to=Long.MAX_VALUE;filter.setVisibility(View.GONE);PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();draft=message;turnId=null;
+        speech.cancel();from=Long.MIN_VALUE;to=Long.MAX_VALUE;anchor=focus=null;filter.setVisibility(View.GONE);PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();draft=message;turnId=null;
         AgentRuntime.Listener listener=new AgentRuntime.Listener(){
             public void saved(String id){turnId=id;}
             public void partial(String text){if(dialog.isShowing())presence.setText("正在组织语言…");}
-            public void done(String reply,String emotion){if(!dialog.isShowing())return;from=Long.MIN_VALUE;to=Long.MAX_VALUE;sending=false;send.setText("发送");input.setEnabled(true);sendState();idle();status.setText("");loadLatest();
+            public void done(String reply,String emotion){if(!dialog.isShowing())return;from=Long.MIN_VALUE;to=Long.MAX_VALUE;anchor=focus=null;sending=false;send.setText("发送");input.setEnabled(true);sendState();idle();status.setText("");loadLatest();
                 PetService.Pet p=pet();if(p!=null)p.clearBubble();if(overlay&&p!=null&&p.visible&&!p.docked){AgentRuntime.express(id,emotion,reply,turnId);}else speech.start(reply);
             }
             public void error(String message){if(!dialog.isShowing())return;sending=false;send.setText("发送");input.setEnabled(true);input.setText(draft);sendState();idle();status.setText(message);loadLatest();PetService.Pet p=pet();if(p!=null)p.clearBubble();}

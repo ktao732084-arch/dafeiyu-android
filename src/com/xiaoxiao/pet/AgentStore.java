@@ -225,6 +225,12 @@ final class AgentStore {
     synchronized void clearDiary()throws Exception {JSONObject next=snapshot();next.put("diary",new JSONArray());save(next,false);purgeBackup();}
     /** Builds the recall index off the chat path (a background thread at store open), so the first reply does not wait. */
     synchronized void warm(){try{index();}catch(Exception unavailable){/* built on first use instead */}}
+    /** The chat page's search over the whole conversation, newest first; each row carries its page key so the page can open there. */
+    synchronized JSONArray searchChat(String text,int limit)throws Exception {
+        JSONArray out=new JSONArray();
+        for(EpisodeIndex.Episode e:index().find(text,limit)){JSONObject row=new JSONObject().put("id",e.id).put("at",e.at).put("user",e.user).put("reply",e.reply);out.put(row.put("pageKey",ChatArchive.key(row)));}
+        return out;
+    }
     /** Past exchanges relevant to this message from the whole conversation; see EpisodeIndex. */
     synchronized JSONArray episodes(String query,Set<String> exclude,long now)throws Exception {
         return EpisodeIndex.describe(index().search(query,exclude,now,EpisodeIndex.LIMIT));
