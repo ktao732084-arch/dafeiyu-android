@@ -35,6 +35,10 @@ final class ChatArchive {
     }
     JSONArray page(JSONArray recent,String before,int limit)throws Exception{return page(recent,before,limit,Long.MIN_VALUE,Long.MAX_VALUE);}
     synchronized JSONArray page(JSONArray recent,String before,int limit,long fromInclusive,long toExclusive)throws Exception{
+        return page(recent,before,limit,fromInclusive,toExclusive,false);
+    }
+    /** UI pages omit physical reactions before counting the page, without deleting their memory evidence. */
+    synchronized JSONArray page(JSONArray recent,String before,int limit,long fromInclusive,long toExclusive,boolean conversationOnly)throws Exception{
         TreeMap<String,Object> index=new TreeMap<>();for(String k:keys())index.put(k,file(k));
         for(int i=0;i<recent.length();i++){JSONObject t=recent.getJSONObject(i);index.put(key(t),t);}
         List<JSONObject> selected=new ArrayList<>();
@@ -44,7 +48,7 @@ final class ChatArchive {
             // A file removed behind our back is dropped from the listing rather than failing the page.
             if(entry.getValue() instanceof File&&!((File)entry.getValue()).exists()){keys.remove(entry.getKey());continue;}
             JSONObject t=entry.getValue() instanceof File?read((File)entry.getValue()):new JSONObject(entry.getValue().toString());
-            if(deleted(id(t)))continue;t.put("id",id(t)).put("pageKey",entry.getKey());selected.add(t);if(selected.size()>=limit)break;
+            if(deleted(id(t))||conversationOnly&&t.has("interaction"))continue;t.put("id",id(t)).put("pageKey",entry.getKey());selected.add(t);if(selected.size()>=limit)break;
         }
         Collections.reverse(selected);return new JSONArray(selected);
     }

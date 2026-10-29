@@ -72,7 +72,7 @@ public class MainActivity extends Activity {
   */
  void recent(LinearLayout hero){
   String preview=null,at="";
-  try{org.json.JSONArray last=AgentRuntime.store().historyRange(Long.MIN_VALUE,Long.MAX_VALUE,null,1);if(last.length()>0){org.json.JSONObject t=last.getJSONObject(0);String reply=ReplySegments.visible(t);preview=Chat.displayText(reply.isEmpty()?"你："+t.optString("user"):reply).replace('\n',' ');at=ChatPage.when(t,t.optLong("repliedAt",t.optLong("at")));}}catch(Exception ignored){}
+  try{org.json.JSONArray last=AgentRuntime.store().conversationRange(Long.MIN_VALUE,Long.MAX_VALUE,null,1);if(last.length()>0){org.json.JSONObject t=last.getJSONObject(0);String reply=ReplySegments.visible(t);preview=Chat.displayText(reply.isEmpty()?"你："+t.optString("user"):reply).replace('\n',' ');at=ChatPage.when(t,t.optLong("repliedAt",t.optLong("at")));}}catch(Exception ignored){}
   TextView line=text(preview!=null?preview:PersonaManager.isInitialized("main")?"我在呢，有话就慢慢说。":"先和她打个招呼，决定她的性格吧。",14);line.setTextColor(Apple.SECONDARY);line.setGravity(Gravity.CENTER);line.setPadding(dp(8),dp(8),dp(8),0);
   if(preview!=null){line.setMaxLines(2);line.setEllipsize(android.text.TextUtils.TruncateAt.END);line.setOnClickListener(v->openChat());line.setContentDescription("最近的聊天："+preview+"，点按继续");}
   hero.addView(line);

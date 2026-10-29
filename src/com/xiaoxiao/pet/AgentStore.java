@@ -240,6 +240,7 @@ final class AgentStore {
     }
     synchronized JSONArray historyPage(String before,int limit)throws Exception {return transcript.page(state.getJSONArray("turns"),before,Math.max(1,Math.min(limit,40)));}
     synchronized JSONArray historyRange(long fromInclusive,long toExclusive,String before,int limit)throws Exception {return transcript.page(state.getJSONArray("turns"),before,Math.max(1,Math.min(limit,40)),fromInclusive,toExclusive);}
+    synchronized JSONArray conversationRange(long fromInclusive,long toExclusive,String before,int limit)throws Exception {return transcript.page(state.getJSONArray("turns"),before,Math.max(1,Math.min(limit,40)),fromInclusive,toExclusive,true);}
     synchronized HistoryRecall.Result recallHistory(HistoryRecall.Plan plan,AgentTransport.Token token)throws Exception{
         if(plan==null)return null;token.check();
         if(!plan.valid())return HistoryRecall.build(plan,new HistoryRecall.Scan());
