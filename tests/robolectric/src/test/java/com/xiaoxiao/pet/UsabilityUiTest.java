@@ -22,7 +22,7 @@ public class UsabilityUiTest {
         java.time.LocalDate day=java.time.LocalDate.now().minusDays(1);assertTrue(AgentRuntime.store().addDiary(AgentRuntime.store().epoch(),Diary.entry(day,"今天陪他聊了晚饭。",new java.util.ArrayList<>(),System.currentTimeMillis())));
         MemoryPanel.diary(a);AlertDialog diary=(AlertDialog)UiTest.dialog();diary.getButton(AlertDialog.BUTTON_POSITIVE).performClick();ShadowLooper.idleMainLooper();
         assertEquals("one tap does not clear",1,Diary.entries(AgentRuntime.store().snapshot()).length());
-        AlertDialog confirm=(AlertDialog)UiTest.dialog();assertNotSame(diary,confirm);confirm.getButton(AlertDialog.BUTTON_POSITIVE).performClick();ShadowLooper.idleMainLooper();
+        AlertDialog confirm=(AlertDialog)UiTest.dialog();assertNotSame(diary,confirm);confirm.getButton(AlertDialog.BUTTON_POSITIVE).performClick();UiTest.storage();
         assertEquals(0,Diary.entries(AgentRuntime.store().snapshot()).length());
     }
     @Test public void proactiveSettingSaysWhatIsMissing()throws Exception{
@@ -31,6 +31,17 @@ public class UsabilityUiTest {
         ModelSettings.save("https://example.invalid/v1","mock","test-only-key",false);TextView quiet=UiTest.find(root,"安静陪伴 1 小时");quiet.performClick();ShadowLooper.idleMainLooper();
         assertTrue(quiet.getText().toString().startsWith("结束安静陪伴（到 "));assertTrue("pet not on screen comes first",UiTest.texts(root).contains("住到屏幕上"));
         quiet.performClick();ShadowLooper.idleMainLooper();assertEquals("安静陪伴 1 小时",quiet.getText().toString());assertEquals(0,Data.prefs().getLong("agent.focusUntil",-1));
+    }
+    @Test public void emptyNotebookStillOpensAndEditsRefreshItInPlace()throws Exception{
+        AgentPanel.memories(a);AlertDialog notebook=(AlertDialog)UiTest.dialog();assertTrue(notebook.isShowing());assertTrue(UiTest.texts(root()).contains("这里还空空的"));
+        AgentRuntime.store().remember("我喜欢蓝色",false);AgentRuntime.store().remember("我不吃香菜",false);AgentPanel.memories(a);notebook=(AlertDialog)UiTest.dialog();
+        UiTest.click(notebook,"我喜欢蓝色");AlertDialog editor=(AlertDialog)UiTest.dialog();assertTrue("the notebook stays open under the editor",notebook.isShowing());
+        UiTest.all(editor.getWindow().getDecorView(),EditText.class).get(0).setText("我最喜欢深蓝色");editor.getButton(AlertDialog.BUTTON_POSITIVE).performClick();UiTest.storage();
+        assertFalse(editor.isShowing());assertTrue(notebook.isShowing());assertNotNull(UiTest.find(notebook.getWindow().getDecorView(),"我最喜欢深蓝色"));
+    }
+    @Test public void firstStepsChecklistUntilDoneOrDismissed(){
+        a.render();assertNotNull(UiTest.find(a.content,"接通模型，让她能开口"));assertNotNull(UiTest.find(a.content,"开始之前还差 2 步"));
+        UiTest.click(a.content,"不再提示");assertNull(UiTest.find(a.content,"接通模型，让她能开口"));assertTrue(Data.prefs().getBoolean("onboarding.done",false));
     }
     @Test public void developerMemoryRowsAppearOnlyOnLongPress(){
         MemoryPanel.settings(a);View root=root();assertFalse(UiTest.find(root,"开发联调（可选）").isShown());
