@@ -36,6 +36,19 @@ public class SharedExperienceUiTest {
   Data.prefs().edit().putBoolean("agent.diary",true).putBoolean("agent.memory",false).commit();AgentRuntime.writeDiaryIfDue();awaitDiary();assertEquals(0,calls.get());
   Data.prefs().edit().putBoolean("agent.memory",true).commit();AgentRuntime.store().clearDiary();AgentRuntime.writeDiaryIfDue();awaitDiary();assertEquals(0,calls.get());
  }
+ @Test public void forgettingContextSourcePurgesItsCueButKeepsTheSelectedMoment()throws Exception{
+  AgentStore db=AgentRuntime.store();List<JSONObject> turns=new ArrayList<>();String[] words={"我在写论文，但卡住了","这次只完成两百字","给这个小行动起名叫星火吧"};
+  for(int i=0;i<words.length;i++){JSONObject t=new JSONObject().put("id","cue"+i).put("at",at+i*60000).put("user",words[i]).put("reply","好");turns.add(t);}
+  JSONObject plan=NativeMemoryEngine.evaluate(db.snapshot(),new JSONArray().put(MemoryLedger.record("essay",words[0],"cue0",false,at)),"",at,ZoneId.systemDefault(),null,new AgentTransport.Token()).state;
+  assertTrue(db.commit(db.epoch(),words[0],"好","calm",null,true,false,null,new MemoryBridge.Result(plan,null,false,"",new JSONArray()),"cue0",at,null));
+  SharedExperience.Material m=SharedExperience.collect(day,ZoneId.systemDefault(),turns,db.snapshot(),new JSONArray());SharedExperience.request(day,m,"大肥鱼",new JSONArray(),"");
+  JSONObject page=SharedExperience.entry("{\"moment\":{\"source_id\":\"chat:cue2\",\"reflection\":\"这样也挺好。\"}}",day,m,at+86400000);
+  assertTrue(db.addDiary(db.epoch(),page));assertTrue(db.snapshot().toString().contains("论文"));db.forget("essay");
+  JSONObject saved=new AgentStore(dir).snapshot();assertEquals(1,Diary.entries(saved).length());assertFalse(saved.toString().contains("论文"));
+  assertFalse(new File(dir,"companion-v1.json.bak").exists());
+  JSONObject stale=new JSONObject(page.toString()).put("date",day.minusDays(1).toString());
+  assertFalse(db.addDiary(db.epoch(),stale)); // Even with the current epoch, a deleted cue source cannot return.
+ }
  @Test public void notebookPagesSearchesShowsEvidenceAndDeletesOnlyThePage()throws Exception{
   AgentStore db=AgentRuntime.store();SharedExperience.Material material=SharedExperience.collect(day,ZoneId.systemDefault(),Collections.emptyList(),db.snapshot(),games.resultsOn(day,ZoneId.systemDefault()));
   JSONObject page=SharedExperience.entry(answer(),day,material,System.currentTimeMillis());assertTrue(db.addDiary(db.epoch(),page));

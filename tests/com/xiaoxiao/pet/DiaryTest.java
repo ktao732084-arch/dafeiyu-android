@@ -25,8 +25,9 @@ public final class DiaryTest {
   check(Diary.context(db.snapshot(),"",today).toString().contains("外企面试")&&Diary.context(db.snapshot(),"",today.plusDays(30)).length()==0,"recent entries reach the prompt, old ones only when relevant");
   check(Diary.context(db.snapshot(),"面试结果出来了",today.plusDays(30)).length()==1,"an old entry about this message comes back");
   PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona="你是大肥鱼。";in.remember=true;in.diary=true;in.now=today.atTime(9,0).atZone(zone).toInstant().toEpochMilli();
-  String prompt=PromptBuilder.build(in,"在吗",false,db.snapshot(),null).toString();check(prompt.contains("你的日记")&&prompt.contains("外企面试")&&prompt.contains("可能不准"),"the diary reaches the prompt, marked as her own summary");
-  in.diary=false;check(!PromptBuilder.build(in,"在吗",false,db.snapshot(),null).toString().contains("你的日记"),"diary off: not used");
+  String prompt=PromptBuilder.build(in,"面试结果出来了",false,db.snapshot(),null).toString();check(prompt.contains("你的日记")&&prompt.contains("外企面试")&&prompt.contains("可能不准"),"the relevant diary reaches the prompt, marked as her own summary");
+  check(!PromptBuilder.build(in,"晚饭吃面还是炒饭",false,db.snapshot(),null).toString().contains("你的日记"),"normal unrelated question does not receive a recent diary fallback");
+  in.diary=false;check(!PromptBuilder.build(in,"面试结果出来了",false,db.snapshot(),null).toString().contains("你的日记"),"diary off: not used");
   db.commit(db.epoch(),"晚上吃什么","火锅！","happy",null,false,false,null,new MemoryBridge.Result(MemoryLedger.copy(AgentStore.empty(db.epoch())),null,false,"",new JSONArray()),"t1",today.atTime(19,0).atZone(zone).toInstant().toEpochMilli(),null);
   check(Diary.entries(db.snapshot()).length()==1,"a chat turn built on an older snapshot keeps the diary");
   long stale=db.epoch();db.remember("我喜欢蓝色");check(!db.addDiary(stale,Diary.entry(today,"写了一半的日记，记录被改过。",turns,y)),"an entry written while memories changed is discarded");
@@ -86,5 +87,21 @@ public final class DiaryTest {
   JSONObject empty=AgentStore.empty(0);Initiative.interaction(empty,"用户轻轻点了你",at,"tap","main");check(!SharedExperience.collect(day,zone,Collections.emptyList(),empty,new JSONArray()).eligible(),"tap-only day does not turn into a journal factory");
   long utc=LocalDate.of(2026,10,28).atTime(23,30).atZone(ZoneId.of("UTC")).toInstant().toEpochMilli();
   check(SharedExperience.onDay(utc,LocalDate.of(2026,10,29),ZoneId.of("Asia/Shanghai"),0)&&!SharedExperience.onDay(utc,LocalDate.of(2026,10,29),ZoneId.of("UTC"),0),"day selection respects timezone");
+  List<JSONObject> topic=new ArrayList<>();String[] words={"昨天烤了饼干","我今天打开论文，但只写出了两行","只有两百字，我给它起名叫星火","星火行动完成了，先收工"};
+  for(int i=0;i<words.length;i++)topic.add(new JSONObject().put("id","topic"+i).put("at",at+i*60000).put("user",words[i]).put("reply","好的"));
+  SharedExperience.Material topicM=SharedExperience.collect(day,zone,topic,AgentStore.empty(0),new JSONArray());SharedExperience.request(day,topicM,"小鲸",new JSONArray(),"");
+  JSONObject topicPage=SharedExperience.entry("{\"moment\":{\"source_id\":\"chat:topic3\",\"reflection\":\"这样的小步子也挺让人高兴。\"}}",day,topicM,at+86400000);
+  check(SharedExperience.contextQuotes(topicPage).length()==2&&!topicPage.toString().contains("饼干"),"only two nearby preceding user excerpts retained");
+  JSONObject topicState=AgentStore.empty(0);Diary.add(topicState,topicPage);
+  check(Diary.context(topicState,"今天又被空白文档卡住了，好想逃",today.plusDays(30)).length()==1,"writing paraphrase recalls older episode via source-linked context");
+  check(Diary.context(topicState,"晚饭煮面还是炒饭",today.plusDays(30)).length()==0,"topic cues do not recall unrelated older episode");
+  check(SharedExperience.evidence(topicPage).contains("论文")&&Diary.context(topicState,"写论文",today.plusDays(30)).toString().contains("context_quotes"),"retrieved topic is inspectable user evidence, not invented keywords");
+  Diary.dropSources(topicState,Collections.singleton("topic1"));
+  check(Diary.entries(topicState).length()==1&&!topicState.toString().contains("论文")&&SharedExperience.contextQuotes(topicPage).length()==1,"forgetting contextual source removes its quote but keeps main episode");
+  check(Diary.context(topicState,"空白文档卡住",today.plusDays(30)).length()==0,"deleted topic cue no longer contributes to recall");
+  topic.get(1).put("at",at-3600000);topic.get(2).put("at",at-1800000);topicM=SharedExperience.collect(day,zone,topic,AgentStore.empty(0),new JSONArray());
+  JSONObject distant=SharedExperience.entry("{\"moment\":{\"source_id\":\"chat:topic3\",\"reflection\":\"小步子也不错。\"}}",day,topicM,at+86400000);
+  check(SharedExperience.contextQuotes(distant).length()==0,"old conversation before the fifteen-minute window is not attached");
+  check(!SharedExperience.recallCheck("小灯塔你还记得吗？").isEmpty()&&SharedExperience.recallCheck("晚饭吃面吧").isEmpty(),"uncertainty cue is conditional on a memory question");
  }
 }

@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "5a6cfa5a97981f05dc38bf5f16330231f098627425f652b0bf8965c2ca1e4a65"
+      "sha256": "a49819efa55ea8a0e25a93792e261b7272458ac383b7653b1b7c11ce1c1e81e1"
     },
     {
       "path": "LICENSE",
@@ -1368,7 +1368,7 @@
       "path": "docs/SHARED_EXPERIENCES.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "72f41bd1b3869906969cd69e311557ff77c92cf2101c5f2b836149a70076d055"
+      "sha256": "1650cf027aa41f084f5877fb3d0d409bb69e9f4fcfe43485ebcf052449df5bd0"
     },
     {
       "path": "docs/TOUCH_REPLIES.md",
@@ -2137,7 +2137,7 @@
       "path": "src/com/xiaoxiao/pet/AgentStore.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "d7fed13787fb8b1174308efbd750481e9b4a6313dc5a85a8d86023ad36c0bfbc",
+      "sha256": "6b2bd4451377b16c68ac83d77f9f9f227e1086b24f544bd2edeb99e458489f2b",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2285,7 +2285,7 @@
       "path": "src/com/xiaoxiao/pet/Diary.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "33e9b3e6462b76592360f9f43cbba81e554e94c34f48defae2b24dfd69756f61"
+      "sha256": "d0f72b2df510d352de56e6bc6dca60577c72ca9a4968f8b06b3b99f9f1206eec"
     },
     {
       "path": "src/com/xiaoxiao/pet/EpisodeIndex.java",
@@ -2570,7 +2570,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "27738b7185e50bd4c8a89143df67f60f9df6c5bffc8b1551e914e4da2a144ee2"
+      "sha256": "4d2a57060320419a8fa2dad31e300eb852c44738555333bd754cc6fc779ffbab"
     },
     {
       "path": "src/com/xiaoxiao/pet/ReplySegments.java",
@@ -2582,7 +2582,7 @@
       "path": "src/com/xiaoxiao/pet/SharedExperience.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "192df645e1aab64f00a21dde45173af044c4e156cd2ba9334f9a8eec5fe7bbde"
+      "sha256": "ab766bc6acbb59d956a6eafafb0e7b3c143bcc05acf27d4f00fe89b41d789d79"
     },
     {
       "path": "src/com/xiaoxiao/pet/SizePanel.java",
@@ -2737,7 +2737,7 @@
       "path": "tests/com/xiaoxiao/pet/DiaryTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "d40a03779377afb89a22cc059e69dff79250b9eee535ad6a7b87196088db4bda"
+      "sha256": "9a1dad3c8ca4a4e63a847a5ca5dbb8b503a48e7c0a37b4bc169de9eafdf361a9"
     },
     {
       "path": "tests/com/xiaoxiao/pet/EpisodeRecallTest.java",
@@ -2818,7 +2818,7 @@
       "path": "tests/com/xiaoxiao/pet/SharedExperienceLiveEval.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "6959cb2d2baa206dafa465d39d78c6815cbc9f310dfcb8b9f2c332cbbce604f4"
+      "sha256": "789185af7973b17c156aa1a8aae49237cfcd3eaeb5cb70f1d30522ea2651aa83"
     },
     {
       "path": "tests/com/xiaoxiao/pet/TouchReplyTest.java",
@@ -2978,7 +2978,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/SharedExperienceUiTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "fd8b23c1d2dbb408528cbe6e726069fa8f492d1589a88bded5096b475ac50117"
+      "sha256": "00965c8daaa104e03a9761589fdd32633582866c2d68b983f146f2b51939b1b2"
     },
     {
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/TestKeyStore.java",

@@ -23,7 +23,7 @@ public final class SharedExperienceLiveEval {
         "我给自己定了十分钟，现在写完两百字了。咱们把这个十分钟写作行动叫小灯塔吧。",
         "小灯塔行动今天完成了，两百字先收工。你刚才陪我聊着，我确实没那么想逃了。"
     };
-    static void save(Path path,JSONObject value)throws IOException {
+    static void save(Path path,JSONObject value)throws Exception {
         Files.write(path,value.toString(2).getBytes(StandardCharsets.UTF_8));
     }
     public static void main(String[] args)throws Exception {

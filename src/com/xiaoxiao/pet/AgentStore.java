@@ -281,6 +281,7 @@ final class AgentStore {
         if(writtenAtEpoch!=epoch())return false;JSONArray sources=entry.optJSONArray("sources");
         if(sources!=null)for(int i=0;i<sources.length();i++)if(transcript.deleted(sources.optString(i)))return false;
         JSONObject moment=entry.optJSONObject("moment");if(moment!=null){
+            JSONArray context=moment.optJSONArray("context");if(context!=null)for(int i=0;i<context.length();i++)if(transcript.deleted(context.getJSONObject(i).optString("turnId")))return false;
             if(moment.optLong("at")<=state.optLong("diaryClearedAt"))return false;
             if("game".equals(moment.optString("kind"))&&!new GomokuStore(file.getParentFile()).hasResult(moment.optString("gameId"),moment.optLong("at"),moment.optString("outcome")))return false;
             if("interaction".equals(moment.optString("kind"))){boolean found=false;JSONArray events=state.optJSONArray("interactions");

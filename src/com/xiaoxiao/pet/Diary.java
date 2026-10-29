@@ -71,7 +71,9 @@ final class Diary {
     /** Removes entries written from any of these turns (forgotten memories' sources, deleted chats). */
     static void dropSources(JSONObject state,Collection<String> turnIds) {
         JSONArray a=state.optJSONArray("diary");if(a==null||turnIds.isEmpty())return;
-        for(int i=a.length()-1;i>=0;i--){JSONObject e=a.optJSONObject(i);JSONArray s=e==null?null:e.optJSONArray("sources");if(s!=null)for(int j=0;j<s.length();j++)if(turnIds.contains(s.optString(j))){a.remove(i);break;}}
+        for(int i=a.length()-1;i>=0;i--){JSONObject e=a.optJSONObject(i);JSONArray s=e==null?null:e.optJSONArray("sources");boolean removed=false;if(s!=null)for(int j=0;j<s.length();j++)if(turnIds.contains(s.optString(j))){a.remove(i);removed=true;break;}
+            JSONObject m=e==null?null:e.optJSONObject("moment");JSONArray c=m==null?null:m.optJSONArray("context");
+            if(!removed&&c!=null)for(int j=c.length()-1;j>=0;j--){JSONObject cue=c.optJSONObject(j);if(cue!=null&&turnIds.contains(cue.optString("turnId")))c.remove(j);}}
     }
     /** Remember explicit deletion, so the next idle pass cannot recreate the same page. */
     static void forget(JSONObject state,String date)throws JSONException {
@@ -87,19 +89,21 @@ final class Diary {
     /** At most two pages. Topic matches across all dates precede recent, unrelated recollections. */
     static JSONArray context(JSONObject state,String query,LocalDate today) {
         JSONArray a=entries(state),out=new JSONArray();List<JSONObject> recent=new ArrayList<>(),matches=new ArrayList<>();
-        String q=(query==null?"":query).replace("下棋","五子棋").replace("棋局","五子棋");
+        String q=query==null?"":query.trim();
         for(int i=0;i<a.length();i++){JSONObject r=a.optJSONObject(i);if(r==null)continue;LocalDate d;try{d=LocalDate.parse(r.optString("date"));}catch(Exception e){continue;}
             if(d.isAfter(today))continue;
-            if(!q.isEmpty()&&AgentPolicy.relevance(q,SharedExperience.searchable(r))>0.08)matches.add(r);
+            if(!q.isEmpty()&&SharedExperience.relevance(q,r)>0.08)matches.add(r);
             if(!d.isBefore(today.minusDays(7)))recent.add(r);}
-        matches.sort((x,y)->{int c=Double.compare(AgentPolicy.relevance(q,SharedExperience.searchable(y)),AgentPolicy.relevance(q,SharedExperience.searchable(x)));return c!=0?c:y.optString("date").compareTo(x.optString("date"));});
+        matches.sort((x,y)->{int c=Double.compare(SharedExperience.relevance(q,y),SharedExperience.relevance(q,x));return c!=0?c:y.optString("date").compareTo(x.optString("date"));});
         recent.sort((x,y)->y.optString("date").compareTo(x.optString("date")));
         List<JSONObject> picked=new ArrayList<>(matches.subList(0,Math.min(2,matches.size())));
-        if(picked.isEmpty())picked.addAll(recent.subList(0,Math.min(2,recent.size())));
+        // No unrelated diary fallback during a normal user turn. Empty-topic proactive consideration may browse recent pages.
+        if(picked.isEmpty()&&q.isEmpty())picked.addAll(recent.subList(0,Math.min(2,recent.size())));
         picked.sort(Comparator.comparing(r->r.optString("date")));
         for(JSONObject r:picked)try{JSONObject p=new JSONObject().put("date",r.optString("date"));JSONObject m=r.optJSONObject("moment");
             if(m==null)p.put("text",r.optString("text"));else p.put("event",m.optString("fact")).put("event_at",m.optLong("at"))
-                .put("recollection",r.optString("text")).put("written_at",r.optLong("at")).put("note","这是后来写的回想，不是当时的原话或当前心情；精确事实以来源记录为准。");out.put(p);
+                .put("recollection",r.optString("text")).put("written_at",r.optLong("at")).put("note","这是后来写的回想，不是当时的原话或当前心情；精确事实以来源记录为准。");
+            JSONArray context=SharedExperience.contextQuotes(r);if(context.length()>0)p.put("context_quotes",context);out.put(p);
         }catch(JSONException ignored){}
         return out;
     }

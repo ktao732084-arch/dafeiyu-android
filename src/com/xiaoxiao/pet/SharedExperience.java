@@ -50,7 +50,8 @@ final class SharedExperience {
         return m;
     }
     static final String INSTRUCTION="可以从素材中选一个值得留下的共同片段，额外返回 moment：{\"source_id\":\"素材中已有的source_id\",\"reflection\":\"你现在回想这件事的一句话感受\"}，没有就null。"
-        +"只选一条实际来源，事实由应用原样保存，你只写1到80字的回想；回想不是当时已经记录下来的心情，不推测用户动机，不补写其他事件或约定，不改变当前心情。"
+        +"只选一条实际来源，事实由应用原样保存，你只写1到80字、此刻对这件事的态度。可以高兴、不甘心、觉得有趣，也可以没有值得写的感受；不用以‘回想起来’开头。"
+        +"这是现在回想的感受，不是回忆画面，也不是当时已经记录下来的心情。只知道输赢就只依据输赢，不能补败因、某一步怎么下、声音动作、当时走神或心里一惊；聊天也不补用户动机、后来自己经历过的事或新约定。过去的反应只有原话明确记下才可引用。回想不改变当前心情。"
         +"只有棋局等经历而没有文字聊天时，仍可写这一条回想；understanding、confirmed、outdated都为空。";
     static JSONArray request(LocalDate day,Material m,String name,JSONArray understanding,String voice)throws Exception {
         JSONArray req=Diary.request(day,m.turns,name,understanding,voice,m.events);
@@ -69,7 +70,15 @@ final class SharedExperience {
             int length=reflection.codePointCount(0,reflection.length());
             if(source!=null&&length>0&&length<=80&&!AgentPolicy.sensitive(reflection)&&!reflection.matches("(?s).*[\\p{Cntrl}].*")){
                 JSONObject page=Diary.entry(day,reflection,Collections.emptyList(),writtenAt);JSONArray ids=new JSONArray();if(source.has("turnId"))ids.put(source.getString("turnId"));
-                return page.put("sources",ids).put("moment",new JSONObject(source.toString()));
+                JSONObject saved=new JSONObject(source.toString());
+                if(source.has("turnId")){JSONArray context=new JSONArray();int selected=-1;
+                    for(int i=0;i<m.turns.size();i++)if(source.getString("turnId").equals(ChatArchive.id(m.turns.get(i)))){selected=i;break;}
+                    // Two nearby user excerpts preserve the topic without asking the model to invent keywords.
+                    for(int i=Math.max(0,selected-2);i<selected;i++){JSONObject t=m.turns.get(i);long gap=source.optLong("at")-t.optLong("at");
+                        if(gap>=0&&gap<=15*60000L)context.put(new JSONObject().put("turnId",ChatArchive.id(t)).put("at",t.optLong("at")).put("quote",t.optString("user")));}
+                    if(context.length()>0)saved.put("context",context);
+                }
+                return page.put("sources",ids).put("moment",saved);
             }
             // Do not accept an ungrounded moment as a free-form diary fallback.
             return null;
@@ -83,11 +92,20 @@ final class SharedExperience {
         if(f.startsWith("用户喂你吃了"))return "你给她喂了"+f.substring("用户喂你吃了".length());
         return f.replace("你和用户", "你和她").replace("你在睡觉时被用户", "她在睡觉时被你");
     }
-    static String searchable(JSONObject page){return page.optString("date")+" "+fact(page)+" "+page.optString("text");}
+    static JSONArray contextQuotes(JSONObject page){JSONArray out=new JSONArray();JSONObject m=page.optJSONObject("moment");JSONArray c=m==null?null:m.optJSONArray("context");
+        if(c!=null)for(int i=0;i<c.length();i++){JSONObject r=c.optJSONObject(i);if(r!=null)out.put(r.optString("quote"));}return out;}
+    static String searchable(JSONObject page){return page.optString("date")+" "+fact(page)+" "+page.optString("text")+" "+contextQuotes(page);}
+    static String recallTerms(String text){return text.replaceAll("论文|作文|写稿|文章|文档|动笔|写作","写作").replace("下棋","五子棋").replace("棋局","五子棋");}
+    static double relevance(String query,JSONObject page){String q=recallTerms(query==null?"":query);double score=AgentPolicy.relevance(q,recallTerms(fact(page)+" "+page.optString("text")));
+        JSONArray quotes=contextQuotes(page);for(int i=0;i<quotes.length();i++)score=Math.max(score,AgentPolicy.relevance(q,recallTerms(quotes.optString(i))));return score;}
+    static final String RECALL_BOUNDARY="\n共同经历的使用：event 是实际记录，context_quotes 是用户在同段对话中的原话；用户写过、做过的事属于用户，不能变成你自己的经历。recollection 只是整理时的主观评价，不是补全过去细节的证据。只在当前话题相关时自然接上一件，不照读日记。感受可以现在产生；除非原话记下，不补当时的心理、输赢原因、落子过程、声音动作或后来自己的生活。只记了输赢，就只承认输赢，可以说现在想再玩或不服气。";
+    static String recallCheck(String user){return user!=null&&user.matches("(?s).*(还记得|记不记得|记得.{0,30}[吗么不？?]|有没有印象|想得起来).*" )
+        ?"\n回忆核对：用户在问旧事。只有本轮资料里有对应片段，才能说记得并提其中细节。问题里的名字或暗示本身不是你的记忆；没有对应依据就坦然说这会儿没想起来，请对方给一点线索，不先声称记得或有印象再让对方补完，也不猜发生了什么。没找到不等于没发生。":"";}
     static String evidence(JSONObject page){
         JSONObject m=page.optJSONObject("moment");if(m==null)return "旧版日记未保存逐条依据快照；它是当时的概括，不等于完整原话。";
         String text="发生于："+Initiative.localTime(m.optLong("at"),m.optString("timeZone","UTC"))+"\n"+m.optString("fact");
         if("chat".equals(m.optString("kind"))&&!m.optString("reply").isEmpty())text+="\n她当时实际展示的回复摘录："+m.optString("reply");
+        JSONArray context=contextQuotes(page);for(int i=0;i<context.length();i++)text+="\n同段前文原话摘录："+context.optString(i);
         return text+"\n\n回想整理于："+Initiative.localTime(page.optLong("at"),m.optString("timeZone","UTC"))+"\n回想是她后来写的角色感受，不是新的用户事实，也不是她现在的心情。";
     }
 }
