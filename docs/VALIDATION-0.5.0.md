@@ -4,7 +4,7 @@
 
 ## 已运行
 
-`tests/run-core.sh`（OpenJDK 21，Android 14 框架类 `android-all-14-robolectric-10818077`，`org.json 20240303`）全部通过：
+已合入 main 的 #5（易用性整理）和 #6（流畅度与上手）之后重新运行。`tests/run-core.sh`（OpenJDK 21，Android 14 框架类 `android-all-14-robolectric-10818077`，`org.json 20240303`）全部通过：
 
 - 全部 App 源码按 Java 8 级别对 Android 14 框架类编译通过。
 - 原有套件结果和改动前一致：
@@ -21,6 +21,7 @@
   - Unicode 83 项
   - 称呼/展示 33 项
   - 主动节奏 33 项
+  - main 新增的聊天搜索、手账筛选与存储 21 项
 - 新增 GrowthTest 3617 项检查：
   - `story.json` 与动画目录一致：每个动作都有章节，引用的动作都存在，每个月至少 30 个旅行地点。
   - 每日上限：聊一百轮和聊三轮得到的一样多；时间往回拨不重复发奖；成长记录有上限，而且合计不变。
@@ -39,7 +40,7 @@
 
 - `build.ps1` 构建 0.5.0 APK（需要签名私钥），并核对最终 DEX 的 API 引用。
 - 用 `tests/run-core-device.ps1` 在实际 Android 上跑核心套件。这次已加入 `growth main line` 一组，并推送 `assets/story.json` 和 `catalog.json`。
-- Robolectric 框架场景和独立测试包（`instrumentation/build-isolated-tests.ps1`）：这次改动了 PetService 的轻点、收边和气泡路径，AgentRuntime 的聊天提交后接线，以及主线程上的成长文件写入调度。
+- Robolectric 框架场景（这里无法运行：需要 aapt 打出的 APK 和 Google Maven 依赖）和独立测试包（`instrumentation/build-isolated-tests.ps1`）：这次改动了 PetService 的轻点、收边和气泡路径，AgentRuntime 的聊天提交后接线，以及主线程上的成长文件写入调度。
 - 真机或模拟器界面：
   - 新菜单 5 项的布局、喂食和出门面板。
   - 剧情逐句播放、点击翻页、被聊天打断后重新播放。

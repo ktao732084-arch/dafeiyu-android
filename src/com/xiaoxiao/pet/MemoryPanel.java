@@ -1,5 +1,5 @@
 package com.xiaoxiao.pet;
-import android.app.*;import android.widget.*;import org.json.*;
+import android.app.*;import android.view.View;import android.widget.*;import org.json.*;
 
 final class MemoryPanel {
     static void interactions(MainActivity a){try{
@@ -13,13 +13,16 @@ final class MemoryPanel {
     static Switch toggle(MainActivity a,LinearLayout l,String label,boolean value){Switch s=new Switch(a);s.setText(label);s.setTextColor(Apple.INK);s.setChecked(value);l.addView(s);return s;}
     static void settings(MainActivity a){
         LinearLayout l=a.column();l.setPadding(a.dp(18),a.dp(8),a.dp(18),a.dp(18));
-        GroupedList.note(l,"记忆引擎就装在手机里。理解时间、去重、更正、归档和查找都在本机完成，不需要电脑，也不用另外部署服务。");
+        TextView intro=GroupedList.note(l,"记忆引擎就装在手机里。理解时间、去重、更正、归档和查找都在本机完成，不需要电脑，也不用另外部署服务。");
         GroupedList.toggle(GroupedList.group(l),"用当前模型辅助理解记忆",Data.prefs().getBoolean("memory.smart",true),(v,on)->{AgentRuntime.cancel();Data.prefs().edit().putBoolean("memory.smart",on).apply();});
         GroupedList.note(l,"默认开启。直接用「模型连接」里的模型和 Key，帮她听懂换种说法、喜好变化这些事，可能多用一点模型请求。没网或模型不可用时用本机规则，记忆照样存在手机里。");
         GroupedList.note(l,"上次整理："+MemoryBridge.lastStatus);
         LinearLayout rows=GroupedList.group(l);GroupedList.row(rows,"共同经历与记忆变化",v->history(a));
-        GroupedList.row(rows,"开发联调（可选）",v->serviceSettings(a));
-        GroupedList.row(rows,"使用手机内置引擎",v->{try{MemoryBridge.save(false,"","",false,false);MemoryBridge.lastStatus="手机内置记忆 · 默认运行";Toast.makeText(a,"已使用手机内置记忆",Toast.LENGTH_SHORT).show();}catch(Exception e){AgentPanel.fail(a,e);}});
+        // Python comparison is for developers: hidden unless already in use, and revealed by long-pressing the first paragraph.
+        LinearLayout dev=GroupedList.group(l);dev.setVisibility("python-debug".equals(Data.prefs().getString("memory.mode","native"))?View.VISIBLE:View.GONE);
+        intro.setOnLongClickListener(v->{dev.setVisibility(View.VISIBLE);return true;});
+        GroupedList.row(dev,"开发联调（可选）",v->serviceSettings(a));
+        GroupedList.row(dev,"使用手机内置引擎",v->{try{MemoryBridge.save(false,"","",false,false);MemoryBridge.lastStatus="手机内置记忆 · 默认运行";Toast.makeText(a,"已使用手机内置记忆",Toast.LENGTH_SHORT).show();}catch(Exception e){AgentPanel.fail(a,e);}});
         ScrollView scroll=new SpringScrollView(a);scroll.addView(l);new Apple.Builder(a).setTitle("手机记忆").setView(scroll).setPositiveButton("完成",null).show();
     }
     static void serviceSettings(MainActivity a){
@@ -56,7 +59,7 @@ final class MemoryPanel {
         if(rows==null||rows.length()==0){TextView empty=a.text("还没有哦。聊到她喜欢什么的时候，会慢慢记下来。",15);empty.setTextColor(Apple.SECONDARY);empty.setPadding(a.dp(6),a.dp(16),a.dp(6),a.dp(8));l.addView(empty);}
         else{LinearLayout said=GroupedList.group(l);for(int i=rows.length()-1;i>=0;i--){GroupedList.divider(said);TextView line=a.text(rows.getJSONObject(i).optString("text"),15);line.setLineSpacing(a.dp(3),1);line.setPadding(a.dp(16),a.dp(13),a.dp(16),a.dp(13));said.addView(line);}}
         ScrollView scroll=new SpringScrollView(a);scroll.addView(l);
-        new Apple.Builder(a).setTitle("她说过的自己").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->{try{AgentRuntime.cancel();AgentRuntime.store().clearSelf();}catch(Exception e){AgentPanel.fail(a,e);}}).show();
+        new Apple.Builder(a).setTitle("她说过的自己").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->confirm(a,"清空她说过的自己？","她之前说过的喜好和习惯会全部忘掉，之后可能说出和以前不一样的话。你的记忆和聊天记录不受影响。",()->{AgentRuntime.cancel();AgentRuntime.store().clearSelf();})).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}
     /** Her diary, newest first; her own summaries of past days, clearable as a whole. */
     static void diary(MainActivity a){try{
@@ -65,10 +68,12 @@ final class MemoryPanel {
         if(rows.length()==0){TextView empty=a.text(AgentRuntime.diaryEnabled()?"还没有日记哦。聊过一天之后，下次聊天时她会写下前一天的。":"陪伴日记关着呢，可以在陪伴设置里打开。",15);empty.setTextColor(Apple.SECONDARY);empty.setPadding(a.dp(6),a.dp(16),a.dp(6),a.dp(8));l.addView(empty);}
         else{LinearLayout pages=GroupedList.group(l);for(int i=rows.length()-1;i>=0;i--){JSONObject r=rows.getJSONObject(i);GroupedList.divider(pages);LinearLayout page=a.column();page.setPadding(a.dp(16),a.dp(12),a.dp(16),a.dp(13));TextView date=a.text(r.optString("date"),12);date.setTextColor(Apple.SECONDARY);page.addView(date);TextView text=a.text(r.optString("text"),15);text.setLineSpacing(a.dp(3),1);text.setPadding(0,a.dp(6),0,0);page.addView(text);pages.addView(page);}}
         ScrollView scroll=new SpringScrollView(a);scroll.addView(l);
-        new Apple.Builder(a).setTitle("她的日记").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->{try{AgentRuntime.store().clearDiary();}catch(Exception e){AgentPanel.fail(a,e);}}).show();
+        new Apple.Builder(a).setTitle("她的日记").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->confirm(a,"清空她的日记？","已经写下的日记会全部删除，聊天记录和记忆还在。之后她只会给最近几天补写日记。",()->AgentRuntime.store().clearDiary())).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}
+    /** Clearing a whole list cannot be undone, so it always asks once more. */
+    static void confirm(MainActivity a,String title,String message,Chat.Change action){new Apple.Builder(a).setTitle(title).setMessage(message).setNegativeButton("取消",null).setPositiveButton("确认清空",(d,w)->Chat.store(a,action,()->Toast.makeText(a,"已清空",Toast.LENGTH_SHORT).show(),e->AgentPanel.fail(a,e))).show();}
     static void historicalEntry(MainActivity a,JSONObject r){
         String at=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm",java.util.Locale.CHINA).format(new java.util.Date(r.optLong("at")));
-        new Apple.Builder(a).setTitle("历史记忆").setMessage(r.optString("text")+"\n\n记录于 "+at+"\n这条记录已过期或被更新，不作为当前事实。").setNegativeButton("关闭",null).setPositiveButton("忘记相关版本",(d,w)->new Apple.Builder(a).setMessage("忘记这件事的当前与历史版本，以及直接来源对话？").setNegativeButton("取消",null).setPositiveButton("忘记",(dd,ww)->{try{AgentRuntime.cancel();AgentRuntime.store().forget(r.optString("id"));history(a);}catch(Exception e){AgentPanel.fail(a,e);}}).show()).show();
+        new Apple.Builder(a).setTitle("历史记忆").setMessage(r.optString("text")+"\n\n记录于 "+at+"\n这条记录已过期或被更新，不作为当前事实。").setNegativeButton("关闭",null).setPositiveButton("忘记相关版本",(d,w)->new Apple.Builder(a).setMessage("忘记这件事的当前与历史版本，以及直接来源对话？").setNegativeButton("取消",null).setPositiveButton("忘记",(dd,ww)->{AgentRuntime.cancel();Chat.store(a,()->AgentRuntime.store().forget(r.optString("id")),()->history(a),e->AgentPanel.fail(a,e));}).show()).show();
     }
 }

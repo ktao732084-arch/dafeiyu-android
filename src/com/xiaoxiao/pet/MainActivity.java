@@ -31,8 +31,9 @@ public class MainActivity extends Activity {
   boolean visible=PetService.instance!=null&&PetService.instance.pets.get("main")!=null&&PetService.instance.pets.get("main").visible;
   LinearLayout pair=new LinearLayout(this);hero.addView(pair);Button history=button(pair,"她的小动作",v->manage());Button desk=button(pair,visible?"请她回来歇会":"让她住到屏幕上",v->{send(visible?"hideAll":"show","main");handler.postDelayed(this::render,300);});
   for(Button b:new Button[]{history,desk}){LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(46),1);p.topMargin=dp(10);if(b==desk)p.leftMargin=dp(10);b.setLayoutParams(p);b.setBackground(Apple.shape(this,Apple.PANEL,14));}
+  boolean steps=firstSteps(visible);
   recent();
-  if(!Settings.canDrawOverlays(this)){View hint=PermissionsPanel.hint(this);LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.topMargin=dp(16);content.addView(hint,p);}
+  if(!steps&&!Settings.canDrawOverlays(this)){View hint=PermissionsPanel.hint(this);LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.topMargin=dp(16);content.addView(hint,p);}
   GroupedList.section(content,"她的声音");LinearLayout voice=GroupedList.group(content);GroupedList.row(voice,"模型连接",GroupedList.BOLT,GroupedList.SKY,v->Chat.settings(this));
   GroupedList.note(content,AgentRuntime.configured()?"已接通。聊天内容会发往你设置的模型服务商。":"还没接通。推荐 DeepSeek：去官网拿一枚 API Key，粘贴进来就能聊。");
   GroupedList.section(content,"我们的日常");LinearLayout life=GroupedList.group(content);
@@ -51,6 +52,21 @@ public class MainActivity extends Activity {
   GrowthStore g=PersonaManager.isInitialized("main")?GrowthStore.quiet():null;if(g==null)return;org.json.JSONObject s=g.snapshot();
   TextView chip=text(GrowthPanel.summary(s)+"\n"+GrowthPanel.today(s),12);chip.setTextColor(Apple.BLUE);chip.setGravity(Gravity.CENTER);chip.setLineSpacing(dp(2),1);chip.setBackground(Apple.shape(this,Apple.TINT,14));chip.setPadding(dp(12),dp(8),dp(12),dp(8));chip.setContentDescription("我们的故事："+GrowthPanel.summary(s)+"，点按查看");chip.setOnClickListener(v->GrowthPanel.show(this));
   LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.topMargin=dp(4);hero.addView(chip,p);
+ }
+ /**
+  * After the first meeting, the two things still needed — a model so she can talk, and her place on the screen —
+  * as a short checklist, until both have been done once or it is dismissed. Returns whether it is shown.
+  */
+ boolean firstSteps(boolean onScreen){
+  android.content.SharedPreferences prefs=Data.prefs();boolean model=AgentRuntime.configured();
+  if(model&&onScreen&&!prefs.getBoolean("onboarding.done",false))prefs.edit().putBoolean("onboarding.done",true).apply();
+  if(!PersonaManager.isInitialized("main")||prefs.getBoolean("onboarding.done",false))return false;
+  GroupedList.section(content,"开始之前还差 "+((model?0:1)+(onScreen?0:1))+" 步");LinearLayout steps=GroupedList.group(content);
+  Button connect=GroupedList.row(steps,model?"✓ 已接通模型":"接通模型，让她能开口",GroupedList.BOLT,GroupedList.SKY,v->Chat.settings(this));
+  Button place=GroupedList.row(steps,onScreen?"✓ 她已经在桌面上":"把她放到桌面上",GroupedList.PHONE,GroupedList.MINT,v->{send("show","main");handler.postDelayed(this::render,300);});
+  if(model)connect.setTextColor(Apple.SECONDARY);if(onScreen)place.setTextColor(Apple.SECONDARY);
+  TextView later=GroupedList.note(content,"不再提示");later.setTextColor(Apple.BLUE);later.setOnClickListener(v->{prefs.edit().putBoolean("onboarding.done",true).apply();render();});
+  return true;
  }
  /** The latest exchange as one conversation-list row, like the first line of a messaging app. */
  void recent(){try{

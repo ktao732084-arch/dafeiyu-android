@@ -9,7 +9,7 @@ final class PetMenu {
   pet.frame.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
   Dialog d=CompactPanel.create(c);LinearLayout l=new LinearLayout(c);l.setOrientation(1);int pad=Apple.dp(c,8);l.setPadding(pad,pad,pad,pad);
   TextView title=Apple.label(c,Data.name(pet.role),13,true);title.setTextColor(Apple.SECONDARY);title.setSingleLine(true);title.setEllipsize(android.text.TextUtils.TruncateAt.END);title.setPadding(pad,pad,pad,pad);l.addView(title);
-  String[] names={"对话","喂食","动作","出门","更多"};
+  String[] names={"聊天","喂食","动作","出门","更多"};
   for(int i=0;i<names.length;i++){final int index=i;Button b=GroupedList.menuOption(l,names[i],v->{d.dismiss();if(index==0)Chat.show(c,pet.role,pet.id);if(index==1)GrowthSheets.feed(c,pet);if(index==2)new ActionSheet(c,pet,false,null).show();if(index==3)GrowthSheets.trip(c,pet);if(index==4)GrowthSheets.more(c,pet);});b.setCompoundDrawablePadding(Apple.dp(c,12));b.setCompoundDrawablesWithIntrinsicBounds(new MenuIcon(c,i),null,null,null);}
   d.setContentView(l);d.setCanceledOnTouchOutside(true);Window w=d.getWindow();w.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);w.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
   int sw=PetService.instance.sw(),sh=PetService.instance.sh();Rect safe=new Rect(0,0,sw,sh);
