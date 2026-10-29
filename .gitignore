@@ -13,6 +13,7 @@ fish-assets/
 .env
 .env.*
 local.properties
+deploy/updates/release.local.json
 .idea/
 .vscode/
 *.log

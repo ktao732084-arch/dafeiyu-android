@@ -1,0 +1,6 @@
+{
+  "build_tools": "D:/Android/Sdk/build-tools/36.0.0",
+  "jdk": "C:/Program Files/Java/jdk-17",
+  "ssh_target": "root@81.70.79.133",
+  "ssh_identity": "C:/Users/your-name/.ssh/update-server-key"
+}

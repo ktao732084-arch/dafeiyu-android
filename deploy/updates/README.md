@@ -1,5 +1,7 @@
 # 轻量国内更新站点
 
+**日常发布统一使用仓库根目录 `release.ps1`，一次同步 GitHub 与国内站点。** 具体命令及失败重跑见 [双端发布流程](RELEASING.md)。下文的手工步骤保留用于部署和排障。
+
 现有北京服务器已选定使用公网 IP + HTTPS，入口为 `https://81.70.79.133/dafeiyu-updates/stable.json`。部署与验证记录见 [北京更新入口](BEIJING.md)。无需先买域名。
 
 从 0.4.9.2 起，`assets/update-channel.json` 默认内置北京入口。普通构建和 `deploy/updates/build-beijing.ps1` 均可直接使用；显式 `-UpdateUrl` 可更换地址。用户不需要填写服务器地址。框架单测通过 OfflineTestApplication 隔离更新网络，真实网络验收显式执行。
