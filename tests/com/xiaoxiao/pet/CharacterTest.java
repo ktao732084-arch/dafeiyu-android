@@ -48,6 +48,14 @@ public final class CharacterTest {
   JSONObject now=db.mood(t+10*60000),later=db.mood(t+50*60000),gone=db.mood(t+130*60000);
   check("happy".equals(now.optString("emotion"))&&now.optInt("level")==3&&"被夸了有点得意".equals(now.optString("cause"))&&now.optLong("minutes")==10,"a fresh mood keeps its strength and cause");
   check(later.optInt("level")==2&&"happy".equals(later.optString("emotion")),"it fades a step after 40 minutes");
+  db.commit(db.epoch(),"嗯","嗯，我在。","happy",null,true,false,null,null,"m2",t+30*60000,null,false,null,null,3,"换个说法继续高兴",false);
+  check(db.snapshot().getLong("emotionAt")==t&&"m1".equals(db.snapshot().optString("moodSource")),"explicit carry preserves clock and original source even if cause is paraphrased");
+  db.commit(db.epoch(),"然后呢","继续聊。","happy",null,true,false,null,null,"m3",t+60*60000,null,false,null,3,"又换了个说法");
+  check(db.snapshot().getLong("emotionAt")==t&&db.mood(t+130*60000).getInt("level")==0,"legacy same-kind responses cannot repeatedly renew mood");
+  AgentStore restarted=new AgentStore(new File(root,"mood"));check(restarted.mood(t+130*60000).getInt("level")==0,"mood still fades after restart");
+  db.commit(db.epoch(),"你今天很厉害","谢谢，我有点得意。","happy",null,true,false,null,null,"m4",t+140*60000,null,false,null,null,2,"又被夸奖了",true);
+  check(db.snapshot().getLong("emotionAt")==t+140*60000&&"m4".equals(db.snapshot().optString("moodSource")),"a new event can start another mood of the same kind");
+  check(Boolean.FALSE.equals(AgentReply.parse("普通回复").moodChanged)&&Boolean.FALSE.equals(AgentReply.parse("{\"reply\":\"嗯\",\"mood_changed\":\"true\"}").moodChanged),"missing/plain or invalid change claims carry conservatively");
   check("calm".equals(gone.optString("emotion"))&&gone.optInt("level")==0,"and is gone after three steps");
   String line=AgentPolicy.moodLine(now,true);check(line.contains("开心")&&line.contains("很强烈")&&line.contains("被夸了有点得意")&&line.contains("10 分钟前"),"the mood line names feeling, strength, cause and time");
   check(!AgentPolicy.moodLine(now,false).contains("被夸"),"memory off: the cause stays out of the prompt");
@@ -57,6 +65,11 @@ public final class CharacterTest {
   String tail=last(PromptBuilder.build(in,"在吗",false,db.snapshot(),null));
   check(tail.contains("你此刻的心情：开心（很强烈）")&&!tail.contains("上次情绪"),"the carried-over mood reaches the next turn");
   String sys=PromptBuilder.build(in,"在吗",false,db.snapshot(),null).getJSONObject(0).getString("content");check(sys.contains("mood_level")&&sys.contains("mood_cause"),"the reply format asks for strength and cause");
+  db.commit(db.epoch(),"我考过了","哼，我早说你可以。","happy",null,true,false,null,null,"m5",t+200*60000,null,false,null,null,2,"替TA考过高兴",true);
+  db.commit(db.epoch(),"","晚上要不要庆祝一下？","happy",null,true,true,null,null,"p1",t+202*60000,null,false,null,null,2,"",false);
+  check("替TA考过高兴".equals(db.snapshot().optString("moodCause"))&&"m5".equals(db.snapshot().optString("moodSource")),"a proactive turn that carries the mood keeps its cause");
+  db.commit(db.epoch(),"","还在吗","happy",null,false,true,null,null,"p2",t+203*60000,null,false,null,null,2,"",false);
+  check(!db.snapshot().has("moodCause"),"memory off: the cause is not kept");
   db.clear(false);check(!db.snapshot().has("moodCause"),"clearing chats clears the mood's cause");
 
   // Understanding: formed in the diary call, every step backed by the user's own words that day.
@@ -74,8 +87,13 @@ public final class CharacterTest {
   check(up.added.size()==1&&up.added.get(0).getString("text").contains("先被听着")&&up.confirmed.isEmpty(),"only items quoting the day's words, without labels, about known ids, are kept");
   long epoch=u.epoch();check(u.addDiary(epoch,Diary.entry(day,Diary.parse(answer),turns,y+3600000L),up),"diary and understanding are saved together");
   JSONArray items=Understanding.entries(u.snapshot());String id=items.getJSONObject(0).getString("id");
+  check("venting".equals(items.getJSONObject(0).optString("scene"))&&"work".equals(items.getJSONObject(0).optString("topic")),"legacy understanding receives narrow inferred scope");
+  check(Understanding.context(u.snapshot(),"工作上被领导骂了，想吐槽").length()==1,"work venting uses work listening preference");
+  check(Understanding.context(u.snapshot(),"工作这次我需要建议，怎么办").length()==0,"asking for advice does not activate listening-only preference");
+  check(Understanding.context(u.snapshot(),"和朋友吵架了很难过").length()==0&&Understanding.context(u.snapshot()).length()==0,"unrelated and unknown situations do not activate scoped preferences");
+  check(Understanding.parse("{\"understanding\":[{\"text\":\"TA吐槽工作时似乎希望先被听着\",\"evidence\":\"吐完舒服多了\",\"scene\":\"invented\"}]}",turns,u.snapshot(),day.toString()).empty(),"invalid scene labels are rejected");
   check(items.length()==1&&"d1".equals(items.getJSONObject(0).getJSONArray("evidence").getJSONObject(0).getString("turn")),"each item keeps the turn it quotes");
-  in=new PromptBuilder.Inputs();in.persona="你是大肥鱼。";in.timeZone="Asia/Shanghai";in.now=y+86400000L;in.remember=true;in.diary=true;in.understanding=Understanding.context(u.snapshot());
+  in=new PromptBuilder.Inputs();in.persona="你是大肥鱼。";in.timeZone="Asia/Shanghai";in.now=y+86400000L;in.remember=true;in.diary=true;in.understanding=Understanding.context(u.snapshot(),"今天工作被领导骂了，想吐槽");
   tail=last(PromptBuilder.build(in,"在吗",false,u.snapshot(),null));
   check(tail.contains("相处理解")&&tail.contains("先被听着")&&tail.contains("不要把它当成事实"),"understanding reaches the prompt as tact, not fact");
   in.diary=false;check(!last(PromptBuilder.build(in,"在吗",false,u.snapshot(),null)).contains("先被听着"),"diary off: not used");
@@ -83,7 +101,7 @@ public final class CharacterTest {
   // A later day confirms it, then a third retires it.
   Understanding.Update again=Understanding.parse("{\"diary\":\"x\",\"understanding\":[{\"text\":\"TA 吐槽工作的时候似乎更想先被听着，不急着要建议\",\"evidence\":\"吐完舒服多了\"}]}",turns,u.snapshot(),"2026-10-29");
   check(again.added.isEmpty()&&again.confirmed.containsKey(id),"a restatement confirms instead of duplicating");
-  JSONObject s=u.snapshot();Understanding.apply(s,again,y+2*86400000L);check(Understanding.entries(s).getJSONObject(0).optInt("confirmed")==2&&Understanding.context(s).getJSONObject(0).optInt("seen_days")==2,"confirmation adds evidence and a day");
+  JSONObject s=u.snapshot();Understanding.apply(s,again,y+2*86400000L);check(Understanding.entries(s).getJSONObject(0).optInt("confirmed")==2&&Understanding.context(s,"工作被领导骂了，只想吐槽").getJSONObject(0).optInt("seen_days")==2,"confirmation adds evidence and a day");
   Understanding.Update retire=Understanding.parse("{\"diary\":\"x\",\"outdated\":[{\"id\":\""+id+"\",\"evidence\":\"明天还要早起\"}],\"confirmed\":[{\"id\":\""+id+"\",\"evidence\":\"吐完舒服多了\"}]}",turns,s,"2026-10-30");
   check(retire.outdated.containsKey(id)&&!retire.confirmed.containsKey(id),"retiring wins over confirming the same item");
   Understanding.apply(s,retire,y+3*86400000L);check(Understanding.entries(s).length()==0,"a retired item is removed");
@@ -99,6 +117,17 @@ public final class CharacterTest {
   u.commit(u.epoch(),"晚安","晚安。","sleepy",null,true,false,null,null,"n1",y+86400000L,null);check(Understanding.entries(u.snapshot()).length()==1,"a chat turn keeps the understanding written beside it");
   long beforeClear=u.epoch();u.clearUnderstanding();check(u.epoch()>beforeClear&&!u.addDiary(beforeClear,Diary.entry(day.minusDays(2),"迟到日记不可恢复已清空理解。",turns,y),up),"late diary cannot restore cleared understanding");
   u.clear(false);check(Understanding.entries(u.snapshot()).length()==0,"clearing chats clears the understanding");
+  for(PersonaManager.Persona style:styles){
+   for(String event:new String[]{"greeting_morning","greeting_noon","greeting_afternoon","greeting_evening","greeting_night","feed","trip_depart","trip_back","trip_early","trip_tooEarly","trip_away"})
+    check(!"missing".equals(PersonaManager.voice(style,event,"missing",new Random(1))),style.id+" supplies local event voice "+event);
+   check(PersonaManager.voice(style,"trip_depart","",new Random(1)).contains("{time}"),"departure retains actual return time placeholder");
+   check(PersonaManager.voice(style,"feed","",new Random(1)).contains("{food}"),"feeding retains actual food placeholder");
+   check(!PersonaManager.storyLine(style,"这个给你……是我写的信，不准笑。").isEmpty(),"chapter voice remains available");
+   String quoted="里面是你说过的「{memory}」。";check(quoted.equals(PersonaManager.storyLine(style,quoted)),"unmapped factual quote remains exact");
+   JSONArray diary=Diary.request(day,turns,"小鲸",Understanding.offered(u.snapshot()),style.character);
+   check(diary.getJSONObject(0).getString("content").contains(style.character)&&diary.getJSONObject(0).getString("content").contains("逐字"),"diary shares voice without losing evidence constraints");
+  }
+  check("neutral".equals(PersonaManager.voice(null,"feed","neutral",new Random(1)))&&"text".equals(PersonaManager.storyLine(null,"text")),"custom/no-style retains neutral text");
   System.out.println("PASS: "+checks+" character checks");
  }
  static String last(JSONArray messages)throws Exception{return messages.getJSONObject(messages.length()-1).getString("content");}

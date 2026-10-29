@@ -13,6 +13,20 @@ final class AgentPolicy {
      * of continuity, not an appraisal engine: the cause is her reading of this turn, never a memory.
      */
     static final int MOOD_FADE_MINUTES=40;
+    /** Carrying a mood never restarts its fade clock. Older models may change type, not refresh the same type. */
+    static void carryMood(JSONObject next,JSONObject previous,String proposed,int strength,String cause,Boolean changed,String turn,long now,boolean remember)throws Exception {
+        String emotion=emotion(proposed);boolean had=previous.optLong("emotionAt")>0;
+        boolean keep=had&&(Boolean.FALSE.equals(changed)||changed==null&&emotion.equals(emotion(previous.optString("emotion"))));
+        if(keep){for(String key:new String[]{"emotion","emotionAt","moodLevel","moodCause","moodSource"}){if(previous.has(key))next.put(key,previous.get(key));else next.remove(key);}}
+        else{
+            if(Boolean.FALSE.equals(changed))emotion="calm";
+            next.put("emotion",emotion).put("emotionAt",now).put("moodLevel",strength>=1&&strength<=3?strength:1);
+            String clean="calm".equals(emotion)?"":moodCause(cause);
+            if(clean.isEmpty())next.remove("moodCause");else next.put("moodCause",clean);
+            if("calm".equals(emotion))next.remove("moodSource");else next.put("moodSource",turn);
+        }
+        if(!remember){next.remove("moodCause");next.remove("moodSource");}
+    }
     static String moodName(String emotion){switch(emotion(emotion)){case "happy":return "开心";case "shy":return "害羞";case "curious":return "好奇";case "concerned":return "担心";case "playful":return "想闹一闹";case "sleepy":return "犯困";default:return "平静";}}
     static int moodLevel(Object value){int n=value instanceof Number?((Number)value).intValue():0;if(value instanceof String)try{n=Integer.parseInt(((String)value).trim());}catch(NumberFormatException e){n=0;}return n>=1&&n<=3?n:0;}
     static String moodCause(String value){

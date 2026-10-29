@@ -25,6 +25,12 @@ public class TouchReplyRuntimeTest {
   gestures();assertEquals(0,calls.get());settle();assertEquals(1,calls.get());assertEquals("我在呢，慢点戳。",spoken);JSONObject state=AgentRuntime.store().snapshot(),turn=state.getJSONArray("turns").getJSONObject(0);assertTrue(turn.has("interaction"));assertEquals(1,turn.getInt("displayed"));assertEquals(0,state.optInt("userTurns"));
   ShadowLooper.idleMainLooper(1,TimeUnit.MINUTES);assertEquals(1,calls.get());
  }
+ @Test public void touchContinuationPreservesMoodClockCauseAndInteractionEvidence()throws Exception{
+  Data.prefs().edit().putBoolean("agent.memory",true).commit();AgentStore db=AgentRuntime.store();long at=System.currentTimeMillis()-60000;
+  db.commit(db.epoch(),"分享好消息","替你开心","happy",null,true,false,null,null,"mood-origin",at,null,false,null,null,2,"听到你的好消息",true);
+  AgentRuntime.model=(m,t,p)->"{\"reply\":\"我在呢。\",\"emotion\":\"playful\",\"mood_changed\":false}";
+  gestures();settle();JSONObject state=db.snapshot();assertEquals("我在呢。",spoken);assertEquals(at,state.getLong("emotionAt"));assertEquals("happy",state.getString("emotion"));assertEquals("听到你的好消息",state.getString("moodCause"));assertEquals("mood-origin",state.getString("moodSource"));assertEquals(3,state.getJSONArray("turns").getJSONObject(1).getJSONObject("interaction").getInt("count"));assertEquals(0,state.getJSONArray("memories").length());
+ }
  @Test public void singleTapIsRecordedButDoesNotRequestAModel()throws Exception{pet.userInteraction("tap","用户轻轻点了你",true);AgentRuntime.worker.submit(()->{}).get(5,TimeUnit.SECONDS);settle();assertEquals(0,calls.get());assertEquals(1,AgentRuntime.store().snapshot().getJSONArray("interactions").length());}
  @Test public void disabledAndBusyStatesDoNotReplyOrClearWaiting()throws Exception{
   Data.prefs().edit().putBoolean("agent.touchReply",false).commit();gestures();settle();assertEquals(0,calls.get());
