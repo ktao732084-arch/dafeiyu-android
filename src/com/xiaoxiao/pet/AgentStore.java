@@ -17,6 +17,9 @@ final class AgentStore {
     private JSONObject state;
     // Whole-conversation recall index; built on first use from the archive and recent turns, then kept in step.
     private EpisodeIndex episodes;
+    /** Told after memories, chats or diary pages were deleted, while this store is still locked: listeners only queue work (GrowthStore re-syncs its bubbles on its own thread). */
+    static volatile Runnable deleted;
+    private static void notifyDeleted(){Runnable r=deleted;if(r!=null)r.run();}
     AgentStore(File dir) throws Exception {
         if(!dir.exists()&&!dir.mkdirs())throw new IOException("无法创建记忆目录");
         file=new File(dir,"companion-v1.json");transcript=new ChatArchive(dir);
@@ -173,21 +176,21 @@ final class AgentStore {
     synchronized void editMemory(String id,String text,boolean pinned)throws Exception {
         if(text.trim().isEmpty()||text.length()>240||AgentPolicy.sensitive(text))throw new IOException("请填写 1–240 字，不含密码或证件号码");
         JSONObject next=snapshot();Set<String> removed=MemoryLedger.forget(next,id);transcript.forget(removed);if(episodes!=null)episodes.remove(removed);Diary.dropSources(next,removed);MemoryLedger.addLocal(next,MemoryLedger.record(id,text.trim(),"你手动修改",pinned,System.currentTimeMillis()));
-        next.put("epoch",epoch()+1);save(next,false);purgeBackup();
+        next.put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();
     }
     private static void removeSourceTurn(JSONObject next,String source)throws Exception {
         JSONArray turns=next.getJSONArray("turns");for(int j=turns.length()-1;j>=0;j--)if(source.equals(turns.getJSONObject(j).optString("id")))turns.remove(j);
     }
     synchronized void forget(String id)throws Exception {
         JSONObject next=snapshot();Set<String> removed=MemoryLedger.forget(next,id);transcript.forget(removed);if(episodes!=null)episodes.remove(removed);Diary.dropSources(next,removed);
-        next.put("epoch",epoch()+1);save(next,false);purgeBackup();
+        next.put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();
     }
     synchronized void clear(boolean all)throws Exception {
         transcript.clear(state.getJSONArray("turns"));if(episodes!=null)episodes.clear();
         // The diary is made from chats, so clearing chats clears it too.
         JSONObject next=all?empty(epoch()+1):snapshot().put("turns",new JSONArray()).put("diary",new JSONArray()).put("epoch",epoch()+1);
         next.put("interactions",new JSONArray()).put("initiativeChecks",new JSONArray()).put("lastUser",0).put("proactiveFailures",0);next.remove("proactiveNextAt");next.remove("proactiveOutcome");next.remove("proactiveDecidedAt");
-        MemoryLedger.migrate(next);save(next,false);purgeBackup();
+        MemoryLedger.migrate(next);save(next,false);purgeBackup();notifyDeleted();
     }
     synchronized JSONArray historyPage(String before,int limit)throws Exception {return transcript.page(state.getJSONArray("turns"),before,Math.max(1,Math.min(limit,40)));}
     synchronized JSONArray historyRange(long fromInclusive,long toExclusive,String before,int limit)throws Exception {return transcript.page(state.getJSONArray("turns"),before,Math.max(1,Math.min(limit,40)),fromInclusive,toExclusive);}
@@ -222,7 +225,7 @@ final class AgentStore {
         if(sources!=null)for(int i=0;i<sources.length();i++)if(transcript.deleted(sources.optString(i)))return false;
         JSONObject next=snapshot();if(!Diary.add(next,entry))return false;save(next);return true;
     }
-    synchronized void clearDiary()throws Exception {JSONObject next=snapshot();next.put("diary",new JSONArray());save(next,false);purgeBackup();}
+    synchronized void clearDiary()throws Exception {JSONObject next=snapshot();next.put("diary",new JSONArray());save(next,false);purgeBackup();notifyDeleted();}
     /** Builds the recall index off the chat path (a background thread at store open), so the first reply does not wait. */
     synchronized void warm(){try{index();}catch(Exception unavailable){/* built on first use instead */}}
     /** Past exchanges relevant to this message from the whole conversation; see EpisodeIndex. */

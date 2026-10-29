@@ -13,10 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
+          # GrowthTest reads the two JSON assets; the animation videos are not needed.
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
-            src
-            tests
-            memory-service
+            /src/
+            /tests/
+            /memory-service/
+            /assets/catalog.json
+            /assets/story.json
       - uses: actions/setup-java@v5
         with:
           distribution: temurin

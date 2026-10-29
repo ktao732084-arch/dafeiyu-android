@@ -142,3 +142,8 @@ Nickname、ChatPolishRulesTest和ChatPolishTest由本项目新增，称呼识别
 ## 0.4.8 自主陪伴与互动记录
 
 `Initiative.java`、`InitiativeTest.java`、`InitiativeRuntimeTest.java`为本项目AI辅助新增：模型安排下次考虑、物理事件时间线、主动决定记录、防循环与错误退避。`AgentRuntime`、`AgentStore`、`AgentReply`、`PromptBuilder`、`MemoryPanel`、`AgentPanel`与测试接入这些能力，沿用各自既有来源；`PetService`在小小桌宠悬浮交互基础上增加事件接线。无新增第三方运行依赖或外部Agent框架；原有素材、人格参考和Claude协作提交归属不变。
+
+## 0.5.0 养成主线
+
+`Growth.java`、`GrowthStore.java`、`GrowthSheets.java`、`GrowthPanel.java`、`assets/story.json`和`GrowthTest.java`为本项目AI辅助新增：羁绊值与小鱼干、章节门槛与剧情、动作解锁、喂食、出门与明信片、泡泡瓶与图鉴、旧版回溯。世界观、剧情台词和40个旅行地点为本项目新写，不来自上游人格或素材；玩法思路参考了 VPet、Finch、旅行青蛙、女神异闻录协力者、星露谷好感事件等公开产品的设计理念，没有复制其代码、文案或素材。`PetService`、`PetMenu`、`ActionSheet`、`ActionPlan`、`AgentRuntime`、`AgentStore`、`AgentPolicy`、`PromptBuilder`、`MainActivity`与`AgentPanel`在既有实现上接线，沿用各自来源。动画全部使用原有角色素材，素材许可不变。
+
