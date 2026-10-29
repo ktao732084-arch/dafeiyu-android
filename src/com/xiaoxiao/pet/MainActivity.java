@@ -2,13 +2,13 @@ package com.xiaoxiao.pet;
 import android.app.*;import android.os.*;import android.content.*;import android.graphics.*;import android.graphics.drawable.GradientDrawable;import android.provider.Settings;import android.view.*;import android.widget.*;
 
 public class MainActivity extends Activity {
- static boolean active;boolean updateResumed;LinearLayout content;final Handler handler=new Handler(Looper.getMainLooper());
+ static boolean active;boolean updateResumed;LinearLayout content;HeroPet pet;final Handler handler=new Handler(Looper.getMainLooper());
  public void onCreate(Bundle b){Data.init(this);Apple.load();setTheme(Apple.dark?com.dafeiyu.companion.R.style.AppThemeDark:com.dafeiyu.companion.R.style.AppTheme);super.onCreate(b);try{boolean met=PersonaManager.ensureInitialized("main");GrowthStore.quiet();if(!met)handler.post(()->PersonaPanel.show(this,"main"));}catch(Exception e){AgentPanel.fail(this,e);}render();consumeChatIntent();}
  public void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);consumeChatIntent();}
  void consumeChatIntent(){if(getIntent()==null)return;if(getIntent().getBooleanExtra("openChat",false)){getIntent().removeExtra("openChat");handler.post(()->openChat());}if(getIntent().getBooleanExtra("openModel",false)){getIntent().removeExtra("openModel");handler.post(()->Chat.settings(this));}if(getIntent().getBooleanExtra("openStory",false)){getIntent().removeExtra("openStory");handler.post(()->GrowthPanel.show(this));}if(getIntent().getBooleanExtra("openUpdate",false)){getIntent().removeExtra("openUpdate");handler.post(()->UpdatePanel.show(this));}if(getIntent().getBooleanExtra("openGomoku",false)){getIntent().removeExtra("openGomoku");handler.post(()->GomokuPage.show(this));}}
- public void onResume(){super.onResume();active=true;updateResumed=true;AgentRuntime.interruptProactive();Apple.load();meet();render();PermissionsPanel.refresh();if(PetService.instance!=null)PetService.instance.control(true);handler.postDelayed(()->{if(updateResumed&&!isFinishing()&&!isDestroyed())UpdateRuntime.enter(this);},1500);}
- public void onPause(){updateResumed=false;UpdateRuntime.leave(this);Chat.interruptPresentation("main");active=false;if(PetService.instance!=null)PetService.instance.control(false);super.onPause();}
- public void onDestroy(){DialogLifecycle.close(this);handler.removeCallbacksAndMessages(null);super.onDestroy();}
+ public void onResume(){super.onResume();active=true;updateResumed=true;AgentRuntime.interruptProactive();Apple.load();meet();render();pet.resume();PermissionsPanel.refresh();if(PetService.instance!=null)PetService.instance.control(true);handler.postDelayed(()->{if(updateResumed&&!isFinishing()&&!isDestroyed())UpdateRuntime.enter(this);},1500);}
+ public void onPause(){updateResumed=false;if(pet!=null)pet.pause();UpdateRuntime.leave(this);Chat.interruptPresentation("main");active=false;if(PetService.instance!=null)PetService.instance.control(false);super.onPause();}
+ public void onDestroy(){DialogLifecycle.close(this);if(pet!=null)pet.release();handler.removeCallbacksAndMessages(null);super.onDestroy();}
  public void onConfigurationChanged(android.content.res.Configuration c){super.onConfigurationChanged(c);Apple.load();render();}
  int dp(int v){return Apple.dp(this,v);}TextView text(String s,int size){return Apple.label(this,s,size,false);}
  LinearLayout column(){LinearLayout l=new LinearLayout(this);l.setOrientation(1);return l;}
@@ -21,9 +21,9 @@ public class MainActivity extends Activity {
   // Title, with her current mood as a small chip.
   LinearLayout head=new LinearLayout(this);head.setGravity(Gravity.BOTTOM);LinearLayout titles=column();TextView eyebrow=text("一只鲸鱼，住进日常",13);eyebrow.setTextColor(Apple.BLUE);titles.addView(eyebrow);TextView title=Apple.label(this,"大肥鱼",30,true);title.setPadding(0,dp(6),0,0);titles.addView(title);head.addView(titles,new LinearLayout.LayoutParams(0,-2,1));
   TextView mood=text("● "+AgentRuntime.moodLabel(),12);mood.setTextColor(Apple.BLUE);mood.setBackground(Apple.shape(this,Apple.TINT,14));mood.setPadding(dp(10),dp(6),dp(10),dp(6));head.addView(mood);content.addView(head);
-  // Hero: her portrait on a soft sky gradient, one primary action and two quiet ones.
+  // Hero: her (animated) portrait on a soft sky gradient, one primary action and two quiet ones.
   LinearLayout hero=panel();GradientDrawable bg=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,Apple.dark?new int[]{0xff1a2c44,0xff1c1c20}:new int[]{0xffe6f0ff,0xfff7faff});bg.setCornerRadius(dp(24));hero.setBackground(bg);hero.setPadding(dp(18),dp(8),dp(18),dp(18));
-  ImageView portrait=new ImageView(this);portrait.setContentDescription("蓝色鲸鱼娘大肥鱼");portrait.setScaleType(ImageView.ScaleType.FIT_CENTER);try(java.io.InputStream in=getAssets().open(Data.role("main").optString("portrait"))){portrait.setImageBitmap(BitmapFactory.decodeStream(in));}catch(Exception ignored){}hero.addView(portrait,new LinearLayout.LayoutParams(-1,dp(190)));
+  if(pet==null)pet=new HeroPet(this);pet.attach(hero,dp(190));
   TextView name=Apple.label(this,Data.name("main"),20,true);name.setGravity(Gravity.CENTER);hero.addView(name);
   recent(hero);
   Button chat=button(hero,"和她聊聊",v->openChat());Apple.button(chat,true);chat.setTextSize(16);chat.getLayoutParams().height=dp(50);((LinearLayout.LayoutParams)chat.getLayoutParams()).topMargin=dp(12);
