@@ -18,6 +18,8 @@ final class GrowthStore {
     interface Host {
         long since();boolean initialized();boolean custom();String nickname();
         default PersonaManager.Persona style(){return null;}
+        /** Gomoku results (GomokuStore.context()), or null when unavailable: the source of the game goals. */
+        default JSONObject games(){return null;}
         /** The memory/chat state (AgentStore snapshot), or null when it cannot be read. */
         JSONObject agent();
     }
@@ -45,7 +47,11 @@ final class GrowthStore {
                     loaded=Growth.migrate(s,now,host.since(),a.optInt("chatDays"),memories,diary,touches==null?0:touches.length(),m,host.custom(),file.exists()?"recovered":VERSION_BEFORE);
                 }else loaded=Growth.fresh(now);
                 g=loaded;persist();
-            }else{g=loaded;if(Growth.simplify(g))persist();}
+            }else{
+                g=loaded;boolean changed=Growth.simplify(g);
+                if(!g.has("days")){JSONObject a=host.agent();changed|=Growth.quests(g,a==null?0:a.optInt("chatDays"));}
+                if(changed)persist();
+            }
         }catch(Exception e){throw new IllegalStateException("成长记录无法建立",e);}
     }
 
@@ -63,10 +69,14 @@ final class GrowthStore {
             public PersonaManager.Persona style(){return PersonaManager.activeStyle("main");}
             public String nickname(){try{return Nickname.current();}catch(Exception e){return "";}}
             public JSONObject agent(){try{return AgentRuntime.store().snapshot();}catch(Exception e){return null;}}
+            public JSONObject games(){try{return new GomokuStore(new File(Data.app.getFilesDir(),"agent")).context();}catch(Exception e){return null;}}
         };
         GrowthStore store=new GrowthStore(new File(Data.app.getFilesDir(),"growth-main.json"),story(),host);
         // Forgetting or clearing in the memory ledger pops bubbles and strips quotes from chapter cards.
         AgentStore.deleted=()->store.writer.execute(()->{try{store.sync();}catch(Exception e){Data.log("main","成长记录同步暂未完成");}});
+        // Read the memory and gomoku counts once at start, so a goal already reached (before an update, or while
+        // the app was closed) moves the chapter without waiting for the next chat.
+        store.writer.execute(()->{try{store.sync();}catch(Exception e){Data.log("main","成长记录同步暂未完成");}});
         return instance=store;
     }
     /** For callers that must not fail because of growth (chat, taps): null when the store cannot be opened. */
@@ -92,7 +102,7 @@ final class GrowthStore {
     private interface Change<T>{T apply(long now)throws Exception;}
     private <T> T change(Change<T> c)throws Exception{
         T out;boolean moved;
-        synchronized(this){long now=now();out=c.apply(now);moved=Growth.advance(g,s,host.since(),now);persist();}
+        synchronized(this){long now=now();out=c.apply(now);moved=Growth.advance(g,s,now);persist();}
         if(moved&&out instanceof Growth.Award)((Growth.Award)out).chapterUp=true;
         Runnable listener=changed;if(listener!=null&&moved)listener.run();
         return out;
@@ -102,10 +112,20 @@ final class GrowthStore {
     Growth.Award chatted()throws Exception{return change(now->Growth.chatted(g,now,zone()));}
     Growth.Award touched()throws Exception{return change(now->Growth.touched(g,now,zone()));}
     String feed(Growth.Food food,Growth.Award out)throws Exception{String r=change(now->Growth.feed(g,food,now,zone(),out));Runnable l=changed;if(r==null&&l!=null)l.run();return r;}
-    /** Re-reads memories and diary: bubbles, the memory reward and quote stripping (Growth.sync). */
+    /**
+     * Re-reads memories, diary and gomoku results: the memory reward, quote stripping (Growth.sync) and the counts
+     * behind the chapter goals. Called after chats, deletions and finished games; a goal reached may move a chapter.
+     */
     Growth.Award sync()throws Exception{
-        JSONObject a=host.agent();if(a==null)return new Growth.Award();
-        return change(now->Growth.sync(g,a.optJSONArray("memories"),a.optJSONArray("archive"),a.optJSONArray("diary"),now,zone()));
+        JSONObject a=host.agent(),games=host.games();if(a==null&&games==null)return new Growth.Award();
+        return change(now->{
+            Growth.Award out=a==null?new Growth.Award():Growth.sync(g,a.optJSONArray("memories"),a.optJSONArray("archive"),a.optJSONArray("diary"),now,zone());
+            JSONObject old=g.optJSONObject("counts");JSONArray memories=a==null?null:a.optJSONArray("memories");
+            int remembered=memories!=null?memories.length():old==null?0:old.optInt("memories");
+            int played=games!=null?games.optInt("user_wins")+games.optInt("pet_wins")+games.optInt("draws"):old==null?0:old.optInt("games");
+            int won=games!=null?games.optInt("user_wins"):old==null?0:old.optInt("wins");
+            Growth.counts(g,remembered,played,won);return out;
+        });
     }
     /** First time a clip is played: recorded for the action and seasonal collections. Saved only when new. */
     synchronized void seen(String action){try{if(Growth.seen(g,action,now()))persist();}catch(Exception ignored){}}
@@ -116,7 +136,9 @@ final class GrowthStore {
         if(pending()==0)return null;sync();JSONObject a=host.agent();
         synchronized(this){
             int chapter=Growth.pending(g);if(chapter==0)return null;
-            Growth.Material m=new Growth.Material(a==null?null:a.optJSONArray("memories"),host.nickname(),Growth.day(host.since(),now()),Growth.bubbles(g),g.optInt("feeds"));
+            // The jar shows bond, so the scene's bubble count is the bond too.
+            Growth.Material m=new Growth.Material(a==null?null:a.optJSONArray("memories"),host.nickname(),Growth.day(host.since(),now()),Growth.bond(g),g.optInt("feeds"));
+            String via=Growth.done(g,s,Math.max(1,chapter-1));m.met=Growth.progress(g,"metDays");m.viaGame="games".equals(via);m.viaWin="wins".equals(via);
             return Growth.scene(s,chapter,host.custom(),m,host.style());
         }
     }
