@@ -19,6 +19,11 @@ public class InitiativeRuntimeTest {
         due();int before=AgentRuntime.history().length();AtomicInteger calls=new AtomicInteger();AgentRuntime.model=(m,t,p)->{calls.incrementAndGet();assertTrue(m.toString().contains("用户点了你"));assertTrue(m.toString().contains("我刚考完试"));assertTrue(m.getJSONObject(0).getString("content").contains("鲸鱼娘"));return "{\"reply\":\"[安静陪伴]\",\"next_check_minutes\":17}";};
         assertTrue(AgentRuntime.canSpeakNow());long start=System.currentTimeMillis();AgentRuntime.heartbeat(service);UiTest.awaitIdle();assertEquals(1,calls.get());assertEquals(before,AgentRuntime.history().length());assertNull(spoken);JSONObject s=AgentRuntime.store().snapshot();assertEquals("quiet",s.getString("proactiveOutcome"));assertTrue(s.getLong("proactiveNextAt")>=start+17*60000);AgentRuntime.heartbeat(service);UiTest.awaitIdle();assertEquals(1,calls.get());
     }
+    @Test public void proactiveTurnKeepsTheCarriedMoodsCause()throws Exception{
+        due();AgentStore db=AgentRuntime.store();db.commit(db.epoch(),"我考过了","哼，我早说你可以。","happy",null,true,false,null,null,"passed",System.currentTimeMillis()-60000,null,false,null,null,2,"替TA考过高兴",Boolean.TRUE);
+        AgentRuntime.model=(m,t,p)->"{\"reply\":\"晚上要不要庆祝一下？\",\"emotion\":\"happy\",\"mood_level\":2,\"mood_cause\":\"\",\"mood_changed\":false,\"next_check_minutes\":30}";
+        AgentRuntime.heartbeat(service);UiTest.awaitIdle();assertNotNull(spoken);JSONObject s=AgentRuntime.store().snapshot();assertEquals("替TA考过高兴",s.getString("moodCause"));assertEquals("passed",s.getString("moodSource"));
+    }
     @Test public void speaksBeyondOldDailyCapAndStoresNextChoice()throws Exception{
         due();AgentRuntime.model=(m,t,p)->"{\"reply\":\"考试结束啦，想怎么放松？\",\"next_check_minutes\":3}";AgentRuntime.heartbeat(service);UiTest.awaitIdle();assertNotNull(spoken);JSONObject s=AgentRuntime.store().snapshot();JSONArray turns=s.getJSONArray("turns");JSONObject last=turns.getJSONObject(turns.length()-1);assertTrue(last.getBoolean("proactive"));assertEquals(1,last.getInt("displayed"));assertEquals("speak",s.getString("proactiveOutcome"));assertTrue(s.getLong("proactiveNextAt")>System.currentTimeMillis()+170000);
     }

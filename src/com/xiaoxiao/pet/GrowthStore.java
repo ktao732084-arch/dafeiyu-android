@@ -17,6 +17,7 @@ final class GrowthStore {
     /** What the store needs from the rest of the app; the JVM tests supply their own. */
     interface Host {
         long since();boolean initialized();boolean custom();String nickname();
+        default PersonaManager.Persona style(){return null;}
         /** The memory/chat state (AgentStore snapshot), or null when it cannot be read. */
         JSONObject agent();
     }
@@ -59,6 +60,7 @@ final class GrowthStore {
             public long since(){return PersonaManager.initializedAt("main");}
             public boolean initialized(){return PersonaManager.isInitialized("main");}
             public boolean custom(){return PersonaManager.CUSTOM.equals(PersonaManager.mode("main"));}
+            public PersonaManager.Persona style(){return PersonaManager.activeStyle("main");}
             public String nickname(){try{return Nickname.current();}catch(Exception e){return "";}}
             public JSONObject agent(){try{return AgentRuntime.store().snapshot();}catch(Exception e){return null;}}
         };
@@ -115,7 +117,7 @@ final class GrowthStore {
         synchronized(this){
             int chapter=Growth.pending(g);if(chapter==0)return null;
             Growth.Material m=new Growth.Material(a==null?null:a.optJSONArray("memories"),host.nickname(),Growth.day(host.since(),now()),Growth.bubbles(g),g.optInt("feeds"));
-            return Growth.scene(s,chapter,host.custom(),m);
+            return Growth.scene(s,chapter,host.custom(),m,host.style());
         }
     }
     Growth.Award shown(Growth.Scene scene)throws Exception{return change(now->Growth.shown(g,scene,now,false));}
