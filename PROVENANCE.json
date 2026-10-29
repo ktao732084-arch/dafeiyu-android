@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "85de6b663c59aa2b906854a717fc1044b07a8dcf7f526bb7a09a1b89bf0cc0ee"
+      "sha256": "bdeff2e63c20d48a58d76e23d31e8b12c0e6dd7ca52a00c132a5624d34c367df"
     },
     {
       "path": "LICENSE",
@@ -1302,7 +1302,7 @@
       "path": "docs/GOMOKU.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "0bb9fd9aa511883cd33ee3c0424d501d1d4aa33527c3a2bb794c1e051de21902"
+      "sha256": "bb22e4749d3e95ce1820f6336ca47e9b545b56aa421120ac8c93f7188309f64f"
     },
     {
       "path": "docs/GROWTH_DESIGN.md",
@@ -2231,19 +2231,25 @@
       "path": "src/com/xiaoxiao/pet/Gomoku.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "00cec6e44434c0d46d56906c28b31e9fc89ad83926708cae892cb057040a1445"
+      "sha256": "e623ef520ddff9556050c47c236d0f68932b7a906e6a0b866465f942514575ed"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/GomokuLevel.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "3d0b712645e59326e7a5c616ba32ac507ac547b22ee08e90eda89a78adeb02c5"
     },
     {
       "path": "src/com/xiaoxiao/pet/GomokuPage.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "6a910753b64c8b1a9096fc94a9e5c12e79de735532cb16ec8122d532100677d2"
+      "sha256": "65816dc3e8688e0eb600a00ed7d05d2f877a9925cfe9338ad6a53771f8b69c3a"
     },
     {
       "path": "src/com/xiaoxiao/pet/GomokuStore.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "d1e16cc270608784ec282168103f9f9d11ecf577cde16f3a9fadcb349a31d188"
+      "sha256": "e60227037df7e3c9b9018469a2888bd87073be52d68a019be85b145d55a64ead"
     },
     {
       "path": "src/com/xiaoxiao/pet/GroupedList.java",
@@ -2474,7 +2480,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "b16320958bce9a20f60678e69fbd55069322712629cc6ab74c5fb81e9e54bdbb"
+      "sha256": "92edb67c98023e5b4ae53f8b3e13bc3c384879a0a95e56d63e6c02fe6c2cbb6b"
     },
     {
       "path": "src/com/xiaoxiao/pet/ReplySegments.java",
@@ -2641,7 +2647,7 @@
       "path": "tests/com/xiaoxiao/pet/GomokuTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "a6b464c2941ec5a2abc38c57beff97d6bd3d7c785dd2e710451ca6d2a174c1bc"
+      "sha256": "265d0d0009a7941d3856e131f0d8a63b59e47bfcb7e1dda4dffafcfad11df693"
     },
     {
       "path": "tests/com/xiaoxiao/pet/GrowthTest.java",
@@ -2792,7 +2798,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/GomokuUiTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "61e88883307884c74365496ec10d6c2bc8543861e5e2a446a171adbfdf1c2a74"
+      "sha256": "bccad9267e3719f1a638b38c7f99178865370380d1659b99e6bb2e0bf404bc38"
     },
     {
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/GrowthUiTest.java",
