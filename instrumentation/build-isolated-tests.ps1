@@ -6,7 +6,7 @@ $out=Join-Path $PSScriptRoot 'build/isolated'
 New-Item -ItemType Directory -Force "$out/classes","$out/dex" | Out-Null
 function Run($Exe,$Arguments){& $Exe @Arguments;if($LASTEXITCODE -ne 0){throw "Failed: $Exe"}}
 $bt=Join-Path $Sdk 'build-tools/36.0.0';$jar=Join-Path $Sdk 'platforms/android-34/android.jar'
-Run "$Jdk/bin/javac.exe" @('-encoding','UTF-8','--release','8','-cp',"$jar;$root/build/classes",'-d',"$out/classes","$PSScriptRoot/AgentInstrumentation.java","$PSScriptRoot/UpdateInstrumentationChecks.java")
+Run "$Jdk/bin/javac.exe" @('-encoding','UTF-8','--release','8','-cp',"$jar;$root/build/classes",'-d',"$out/classes","$PSScriptRoot/AgentInstrumentation.java","$PSScriptRoot/UpdateInstrumentationChecks.java","$PSScriptRoot/UpdateNetworkInstrumentation.java")
 $classes=@(Get-ChildItem "$root/build/classes","$out/classes" -Recurse -Filter *.class | ForEach-Object FullName)
 $d8=@('-cp',"$bt/lib/d8.jar",'com.android.tools.r8.D8','--lib',$jar,'--min-api','26','--output',"$out/dex")+$classes
 [IO.File]::WriteAllLines("$out/d8.args",($d8 | ForEach-Object {'"'+$_.Replace('\','/')+'"'}),[Text.UTF8Encoding]::new($false))
@@ -16,10 +16,12 @@ $manifest=@'
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.dafeiyu.compatchecks">
  <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34"/>
  <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+ <uses-permission android:name="android.permission.INTERNET"/>
  <application android:label="Dafeiyu isolated checks" android:theme="@style/AppTheme" android:allowBackup="false">
   <provider android:name="com.xiaoxiao.pet.UpdateFileProvider" android:authorities="com.dafeiyu.compatchecks.updates" android:exported="false" android:grantUriPermissions="true"/>
  </application>
  <instrumentation android:name="com.xiaoxiao.pet.AgentInstrumentation" android:targetPackage="com.dafeiyu.compatchecks" android:functionalTest="true"/>
+ <instrumentation android:name="com.xiaoxiao.pet.UpdateNetworkInstrumentation" android:targetPackage="com.dafeiyu.compatchecks" android:functionalTest="true"/>
 </manifest>
 '@
 $manifest=$manifest.Replace('com.dafeiyu.compatchecks',$TestPackage)

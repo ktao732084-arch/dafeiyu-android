@@ -22,6 +22,9 @@ class PublishTests(unittest.TestCase):
     def test_https_origin_validation(self):
         for url in ['http://example.test','https://user:pass@example.test','https://example.test/#x','https://example.test/?key=x','https://example.test:0']:
             with self.assertRaises(ValueError):publisher.base_url(url)
+    def test_ip_https_site_retains_its_dedicated_path(self):
+        r=publisher.metadata(self.badging,self.verify,self.apk,'https://192.0.2.1/dafeiyu-updates/','','com.dafeiyu.companion',self.cert)
+        self.assertEqual('https://192.0.2.1/dafeiyu-updates/releases/11-'+publisher.digest(self.apk)+'.apk',r['apk_url'])
     def test_apk_is_present_before_manifest_and_older_release_cannot_replace_it(self):
         out=self.root/'site';release=self.release();path=publisher.publish(self.apk,release,out);saved=json.loads(path.read_text(encoding='utf8'));self.assertEqual(release,saved)
         self.assertEqual(1,len(list((out/'releases').glob('*.apk'))))

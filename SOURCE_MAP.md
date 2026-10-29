@@ -138,3 +138,5 @@ UnicodeRegex、NativeRegexTest和设备检查脚本为本项目新增实现。An
 ## 开发分支：轻量更新
 
 AppUpdate、UpdateTransport、UpdateApk、UpdateFileProvider、UpdateRuntime、UpdatePanel、prepare-update.py、部署模板及相应测试均为本项目新增实现。使用 Android 平台网络、包管理器、ContentProvider 和系统安装界面；没有引入第三方更新 SDK、动态服务端或外部 Agent 代码。版本仍为 0.4.6，仅作开发验证，尚未发布。
+
+公网 IP 接入的 Nginx 路径配置、北京构建入口与 UpdateNetworkInstrumentation 为本项目新增；复用用户已有北京服务器和 IP 证书续期配置。镜像安装包来自本仓库已发布的 v0.4.7，保持原字节、签名及上游素材归属；没有重新打包或另行发布开发 APK。

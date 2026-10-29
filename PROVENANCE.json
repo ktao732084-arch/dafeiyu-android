@@ -78,14 +78,14 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "c7c5976449718fc1f95b6aafdff2d6da15929e00f1ee0ea1eccd347fba0441fa",
+      "sha256": "b8060c27653f89426dde9e10e75ddd6ca7e4f32db9fb4c807756be5704b4608d",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
       "path": "SOURCE_MAP.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "e856514276554dec2ab026d15a2e8c19ab9e1c6bf2d6c26a297d7a13d80ab141"
+      "sha256": "e4db2c52efee0cf9561fe8db5bb0ed98a02bd350bef0954575bef04ea8afd8a9"
     },
     {
       "path": "THIRD-PARTY-LICENSE.txt",
@@ -1221,10 +1221,28 @@
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
+      "path": "deploy/updates/BEIJING.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "268bc5e8a7a74607fafda2a6a2929e27b8fcf705b0617a557f4a1b82ec99badb"
+    },
+    {
       "path": "deploy/updates/README.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "5f328751c1dbad720eddad03bda3ef740adce84ba3ed1bdba1a643094994e840"
+      "sha256": "c07266d9f490c29a39e87a0686d4472d4bb46f8729ad784290ab260f59f26184"
+    },
+    {
+      "path": "deploy/updates/beijing-locations.conf",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "7855ce0383b6c8ec578c61e34fb3081656cc457f829a0f14debf230ca5589a55"
+    },
+    {
+      "path": "deploy/updates/build-beijing.ps1",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "42420adc45ac1206b270e968763339de3ec32ff1ff0e28c22cff05513bff7562"
     },
     {
       "path": "deploy/updates/nginx.conf.example",
@@ -1248,7 +1266,7 @@
       "path": "docs/UPDATES.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "178a6b98ba22117dcea14de3f4034268737040df32f5310ab788d10e2897df1a"
+      "sha256": "1b1f9bf1302df5bc29e0689e436bc694a870a1046aea33fc800959efba4f4cf1"
     },
     {
       "path": "docs/VALIDATION-0.2.0.md",
@@ -1369,10 +1387,16 @@
       "sha256": "0eaceaad20c55dadca0b4ca29ca177f74dfc568a8e8ddd86a52ae3219aab8fdf"
     },
     {
+      "path": "instrumentation/UpdateNetworkInstrumentation.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "e6380a85f88150c664da7c5a330af95818f0fe42c25c4e1d13960c25e85e31e5"
+    },
+    {
       "path": "instrumentation/build-isolated-tests.ps1",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "58ca8ae5f6ed305e78475234fa6d82e74b5d4889cd284741f76d86210de3e0d3"
+      "sha256": "640ac05b790d0d51ffc89601890a820ae72b346282cdb75b0f5bbc830c46d4d1"
     },
     {
       "path": "instrumentation/build-tests.ps1",
@@ -2380,7 +2404,7 @@
       "path": "tests/com/xiaoxiao/pet/UpdateCoreTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "7e00ff42307bf80f6c2619d3589925b46211b7d20742dfa86f01566d08b1fb1d"
+      "sha256": "235a463d9a1e85c3af68657e9ab8383152e1c7419448b5da1dc759bf871af609"
     },
     {
       "path": "tests/compile-check.sh",
@@ -2534,7 +2558,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "d0100713ca9ea84cc12b37a4d124ff89e3939bd65112757044ef73a29e80f883"
+      "sha256": "7904ae8f88c931be8f33a454262ba2a2ab19dea187b67ddd5d5bcf6cac7d0cf4"
     },
     {
       "path": "tests/run-regex-device.ps1",
@@ -2546,7 +2570,7 @@
       "path": "tests/test_update_publish.py",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "57719ea20c354c67d1dbdeae28d72a9d6e491f9670903d8ace5b1ba476e479ae"
+      "sha256": "ca2fd92cfddf2e827de3a8b9289e0b09e726820ceb6a13ff609554790e106031"
     },
     {
       "path": "tools/generate-native-memory-rules.py",

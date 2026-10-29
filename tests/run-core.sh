@@ -26,4 +26,4 @@ java -cp "$product:$out:$json" com.xiaoxiao.pet.MemoryCaptureTest "$root/tests/m
 java -cp "$product:$out:$json" com.xiaoxiao.pet.DiaryTest "$out/diary-$(date +%s)-$$"
 
 java -cp "$product:$out:$json" com.xiaoxiao.pet.NativeRegexTest
-java -cp "$product:$out:$json" com.xiaoxiao.pet.UpdateCoreTest
+java -cp "$product:$out:$json" com.xiaoxiao.pet.UpdateCoreTest "$out/updates-$(date +%s)-$$"

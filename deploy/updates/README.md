@@ -1,6 +1,8 @@
 # 轻量国内更新站点
 
-当前域名尚未确定。默认 `assets/update-channel.json` 的地址为空，App不会自动访问占位域名；手动检查会提示更新服务未配置。此目录是部署模板，不是已经上线的服务。
+现有北京服务器已选定使用公网 IP + HTTPS，入口为 `https://81.70.79.133/dafeiyu-updates/stable.json`。部署与验证记录见 [北京更新入口](BEIJING.md)。无需先买域名。
+
+通用构建的 `assets/update-channel.json` 仍为空，避免开发测试自动访问线上。接入北京入口时使用 `deploy/updates/build-beijing.ps1`（参数同下方 SDK、JDK、KeyStore），或显式传入 `-UpdateUrl`。配置进入 APK，用户不需要自己填写服务器地址。
 
 服务器只需通过HTTPS提供两个路径：
 
@@ -13,10 +15,10 @@
 
 ## 配置客户端
 
-确定真实域名后，在正式签名构建时传入版本文件地址：
+正式签名构建时传入版本文件地址，支持域名或带受信任 IP 证书的公网 IP：
 
 ```powershell
-./build.ps1 -Sdk 'D:/Android/Sdk' -Jdk 'C:/Program Files/Java/jdk-17' -KeyStore 'D:/Keys/release.keystore' -UpdateUrl 'https://你的真实域名/stable.json'
+./deploy/updates/build-beijing.ps1 -Sdk 'D:/Android/Sdk' -Jdk 'C:/Program Files/Java/jdk-17' -KeyStore 'D:/Keys/release.keystore'
 ```
 
 地址只写入本次构建的 `fish-assets/update-channel.json`。不传 `-UpdateUrl` 会恢复为空，不沿用上一次构建地址。正式发布仍须遵循AGENTS.md的版本递增和签名连续性要求。
@@ -26,7 +28,7 @@
 使用实际正式APK的签名证书指纹。这里需要的是公开SHA-256指纹，不是私钥或密码：
 
 ```powershell
-python tools/prepare-update.py --apk build/dafeiyu-新版本.apk --build-tools 'D:/Android/Sdk/build-tools/36.0.0' --base-url 'https://你的真实域名' --expected-cert-sha256 '正式签名证书的64位SHA256指纹' --notes release-notes.txt --out build/update-site
+python tools/prepare-update.py --apk build/dafeiyu-新版本.apk --build-tools 'D:/Android/Sdk/build-tools/36.0.0' --base-url 'https://81.70.79.133/dafeiyu-updates' --expected-cert-sha256 '正式签名证书的64位SHA256指纹' --notes release-notes.txt --out build/update-site
 ```
 
 脚本先使用SDK的aapt读取包名、版本和最低系统版本，再使用apksigner验证签名；版本信息中的大小、SHA-256和文件名从实际APK生成。它拒绝错误证书、错误包名、超过512MiB的包，以及覆盖同目录内更高或相同的versionCode。发布操作用本地锁串行化。
@@ -51,7 +53,7 @@ python tools/prepare-update.py --apk build/dafeiyu-新版本.apk --build-tools '
 
 ## 部署顺序
 
-1. 在已有HTTPS站点中配置 `nginx.conf.example` 对应路径。
+1. 独立站点可使用 `nginx.conf.example`；北京共享站点使用 `beijing-locations.conf`，只提供 `/dafeiyu-updates/` 下列出的文件。
 2. 先上传新APK到 `releases/`。文件名不可变，不覆盖旧APK。
 3. 从公网下载一次新APK，核对大小与SHA-256。
 4. 上传新的版本文件为 `stable.json.tmp`，最后在服务器上原子重命名为 `stable.json`。
@@ -69,4 +71,4 @@ python tools/prepare-update.py --apk build/dafeiyu-新版本.apk --build-tools '
 - 没有安装权限时引导至系统设置，返回后点击安装；系统仍要求用户确认。不会卸载旧App或清空记忆。
 - 旧版没有检测逻辑，用户必须先手动覆盖安装一次带更新功能且配置了真实地址的正式版本。
 
-尚未配置域名、TLS、线上文件和正式新版本，因此不能宣称国内更新服务已上线。
+更新站点可先镜像已有发布包，但该包不因此自动获得更新功能。独立分支中的客户端功能仍需合入后续正式签名版本；不要将开发测试签名 APK 当作正式升级包分发。当前部署状态和实测边界以 BEIJING.md 为准。

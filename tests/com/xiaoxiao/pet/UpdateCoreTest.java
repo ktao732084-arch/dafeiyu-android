@@ -27,6 +27,12 @@ public final class UpdateCoreTest {
         JSONObject valid=manifest(body);AppUpdate release=new AppUpdate(valid.toString(),"com.dafeiyu.companion",channel);
         check(release.newer(10,26)&&!release.newer(11,26)&&!release.newer(12,26),"numeric version comparison");
         check(!release.newer(10,25),"minimum Android version");
+        URL ipChannel=AppUpdate.https("https://192.0.2.1/dafeiyu-updates/stable.json");
+        AppUpdate ipRelease=new AppUpdate(new JSONObject(valid.toString()).put("apk_url","https://192.0.2.1/dafeiyu-updates/releases/11.apk").toString(),"com.dafeiyu.companion",ipChannel);
+        check(ipRelease.newer(10,26)&&AppUpdate.sameOrigin(ipChannel,ipRelease.apk),"IP HTTPS with path prefix accepted");
+        check(AppUpdate.sameOrigin(ipChannel,AppUpdate.https("https://192.0.2.1:443/dafeiyu-updates/releases/11.apk")),"IP default HTTPS port matches explicit 443");
+        rejected(()->new AppUpdate(new JSONObject(valid.toString()).put("apk_url","https://192.0.2.1:9443/releases/11.apk").toString(),"com.dafeiyu.companion",ipChannel),"IP port change rejected");
+        rejected(()->new AppUpdate(new JSONObject(valid.toString()).put("apk_url","https://192.0.2.2/releases/11.apk").toString(),"com.dafeiyu.companion",ipChannel),"IP host change rejected");
         check(AppUpdate.due(0,1)&&!AppUpdate.due(1000,2000)&&AppUpdate.due(1000,1000+AppUpdate.DAY)&&AppUpdate.due(2000,1000),"daily throttle and clock rollback");
         for(String invalid:new String[]{"http://updates.example.test/stable.json","https://user:password@updates.example.test/x","https://updates.example.test/x#fragment","https://updates.example.test:0/x"})rejected(()->AppUpdate.https(invalid),"reject unsafe URL");
         rejected(()->new AppUpdate(new JSONObject(valid.toString()).put("apk_url","https://other.example.test/x.apk").toString(),"com.dafeiyu.companion",channel),"off-site package rejected");
