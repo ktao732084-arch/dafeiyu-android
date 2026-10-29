@@ -146,3 +146,5 @@ Nickname、ChatPolishRulesTest和ChatPolishTest由本项目新增，称呼识别
 ## 0.4.9.1 忙闲调度修复
 
 `InitiativePlan.java`为本项目AI辅助新增：验证模型调度字段、明确忙闲意图、安排来源与主动催问过滤。`Initiative`、runtime/store/prompt和设置界面在原项目模块上继续修改，未引入额外Agent框架或新第三方依赖。保留了[主分支合并的可用性优化](https://github.com/ktao732084-arch/dafeiyu-android/commit/e3a1da1)：聊天搜索、长按记住、手账搜索与设置精简；本轮另修复其中的空手账提前返回，并修正分页测试夹具。上述界面改动不署为本轮独立原创。
+
+发布前再合并[后台存储与上手优化](https://github.com/ktao732084-arch/dafeiyu-android/commit/59c04c7)：展示记录异步写盘、归档缓存、编辑手账后台执行、首次使用提示与隐藏桌宠等。`AgentStore.shown`的合并同时保留后台写盘和本轮已展示话题记录；新增对异步写盘后主题恢复的验证。

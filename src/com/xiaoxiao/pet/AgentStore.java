@@ -17,6 +17,12 @@ final class AgentStore {
     private JSONObject state;
     // Whole-conversation recall index; built on first use from the archive and recent turns, then kept in step.
     private EpisodeIndex episodes;
+    // Segment display progress changes the live state in place and is written by this thread soon after, so the
+    // main thread does not rewrite the whole file once per segment. version counts in-memory changes (under this
+    // object's lock); written is the newest version on disk (under fileLock). Full saves stay synchronous.
+    private static final java.util.concurrent.ExecutorService WRITER=java.util.concurrent.Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"store-writer");t.setDaemon(true);return t;});
+    private final Object fileLock=new Object();
+    private long version,written;private boolean flushQueued;
     AgentStore(File dir) throws Exception {
         if(!dir.exists()&&!dir.mkdirs())throw new IOException("无法创建记忆目录");
         file=new File(dir,"companion-v1.json");transcript=new ChatArchive(dir);
@@ -61,15 +67,34 @@ final class AgentStore {
         JSONArray previous=new JSONArray(state.getJSONArray("turns").toString());
         byte[] bytes=boundedBytes(next);
         if(preserveHistory)transcript.evicted(previous,next.getJSONArray("turns"));
-        File tmp=new File(file+".tmp");
-        try(FileOutputStream out=new FileOutputStream(tmp)){out.write(bytes);out.getFD().sync();}
-        // Backup only the last validated in-memory state, not a possibly corrupt source file.
-        File backup=new File(file+".bak");
-        try(FileOutputStream out=new FileOutputStream(backup)){out.write(state.toString().getBytes(StandardCharsets.UTF_8));out.getFD().sync();}
-        try{Files.move(tmp.toPath(),file.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.ATOMIC_MOVE);}
-        catch(AtomicMoveNotSupportedException e){Files.move(tmp.toPath(),file.toPath(),StandardCopyOption.REPLACE_EXISTING);}
+        long saved=++version;
+        synchronized(fileLock){
+            File tmp=new File(file+".tmp");
+            try(FileOutputStream out=new FileOutputStream(tmp)){out.write(bytes);out.getFD().sync();}
+            // Backup only the last validated in-memory state, not a possibly corrupt source file.
+            File backup=new File(file+".bak");
+            try(FileOutputStream out=new FileOutputStream(backup)){out.write(state.toString().getBytes(StandardCharsets.UTF_8));out.getFD().sync();}
+            try{Files.move(tmp.toPath(),file.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.ATOMIC_MOVE);}
+            catch(AtomicMoveNotSupportedException e){Files.move(tmp.toPath(),file.toPath(),StandardCopyOption.REPLACE_EXISTING);}
+            written=saved;
+        }
         state=next;
     }
+    /** Queues a write of the live state after an in-place change; several changes before it runs become one write. */
+    private void flushLater(){version++;if(flushQueued)return;flushQueued=true;WRITER.execute(this::flush);}
+    private void flush(){
+        try{
+            byte[] bytes;long current;
+            synchronized(this){
+                flushQueued=false;current=version;bytes=state.toString().getBytes(StandardCharsets.UTF_8);
+                // Over the bound, trimming must archive the dropped turns: take the ordinary path instead.
+                if(bytes.length>MAX_FILE_BYTES){save(new JSONObject(state.toString()));return;}
+            }
+            synchronized(fileLock){if(written>=current)return;ChatArchive.write(file,bytes);written=current;}
+        }catch(Exception e){/* The next full save writes the same live state. */}
+    }
+    /** For tests and orderly shutdown: returns once queued background writes are on disk. */
+    void awaitWrites()throws Exception{WRITER.submit(()->{}).get(10,java.util.concurrent.TimeUnit.SECONDS);}
     private static byte[] boundedBytes(JSONObject next)throws Exception {
         byte[] bytes=next.toString().getBytes(StandardCharsets.UTF_8);
         if(bytes.length<=MAX_FILE_BYTES)return bytes;
@@ -204,13 +229,15 @@ final class AgentStore {
         catch(IOException failure){token.check();return new HistoryRecall.Result(plan,new JSONObject().put("status","error").put("range",plan.label).put("records",new JSONArray()));}
     }
     synchronized void shown(String id,int count)throws Exception {
-        if(id==null||transcript.deleted(id))return;JSONObject next=snapshot();JSONArray turns=next.getJSONArray("turns");
-        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(id.equals(ChatArchive.id(t))){int n=Math.min(count,ReplySegments.count(t));if(t.has("displayed")&&n>t.optInt("displayed")){ChatArchive.markShown(t,n);Initiative.topicShown(next,t);if(episodes!=null)episodes.update(t);JSONArray self=next.optJSONArray("self");if(self!=null)for(int j=0;j<self.length();j++){JSONObject row=self.getJSONObject(j);if(id.equals(row.optString("source"))&&ReplySegments.visible(t).contains(row.optString("text")))row.put("shown",true);}save(next,false);}return;}}
+        // Called on the main thread for every segment: update the live turn in place (commit already merges these
+        // fields from the live state) and write later. A crash in between can only under-count what was shown.
+        if(id==null||transcript.deleted(id))return;JSONArray turns=state.getJSONArray("turns");
+        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(id.equals(ChatArchive.id(t))){int n=Math.min(count,ReplySegments.count(t));if(t.has("displayed")&&n>t.optInt("displayed")){ChatArchive.markShown(t,n);Initiative.topicShown(state,t);if(episodes!=null)episodes.update(t);JSONArray self=state.optJSONArray("self");if(self!=null)for(int j=0;j<self.length();j++){JSONObject row=self.getJSONObject(j);if(id.equals(row.optString("source"))&&ReplySegments.visible(t).contains(row.optString("text")))row.put("shown",true);}flushLater();}return;}}
         transcript.shown(id,count);
     }
     private EpisodeIndex index()throws Exception {
         if(episodes!=null)return episodes;EpisodeIndex built=new EpisodeIndex();
-        for(File f:transcript.files()){try{JSONObject t=transcript.read(f);if(!transcript.deleted(ChatArchive.id(t)))built.add(t);}catch(Exception unreadable){/* one damaged file must not hide the rest */}}
+        for(File f:transcript.archived()){try{JSONObject t=transcript.read(f);if(!transcript.deleted(ChatArchive.id(t)))built.add(t);}catch(Exception unreadable){/* one damaged file must not hide the rest */}}
         JSONArray turns=state.getJSONArray("turns");for(int i=0;i<turns.length();i++)built.add(turns.getJSONObject(i));
         return episodes=built;
     }

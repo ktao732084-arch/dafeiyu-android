@@ -1,4 +1,4 @@
-0.4.9.1 final product: 94 framework scenarios passed; 0 failures/errors/skipped.
+0.4.9.1 final product: 97 framework scenarios passed; 0 failures/errors/skipped.
 PASS com.xiaoxiao.pet.InitiativeRuntimeTest.busySurvivesRestartAndTouchThenFreeUsesModelChoice
 PASS com.xiaoxiao.pet.InitiativeRuntimeTest.touchIsPersistentAndFocusOrDisabledSwitchBlocksChecks
 PASS com.xiaoxiao.pet.InitiativeRuntimeTest.nightHoursAreAnOptionalUserChoice
@@ -66,6 +66,7 @@ PASS com.xiaoxiao.pet.ConversationTest.historyPageLoadsEarlierTurnsWithDateTimeA
 PASS com.xiaoxiao.pet.ConversationTest.oneModelCallCreatesProgressiveSegmentsAndDisplayedTimestamps
 PASS com.xiaoxiao.pet.ConversationTest.closingChatAlsoClearsItsPetBubble
 PASS com.xiaoxiao.pet.ConversationTest.closingPageStopsScheduledSegments
+PASS com.xiaoxiao.pet.ConversationTest.failedReplyOffersResendWithTheDraft
 PASS com.xiaoxiao.pet.ConversationTest.longPressOnYourOwnWordsRemembersThem
 PASS com.xiaoxiao.pet.CompanionBehaviorTest.transportKeepsNativeNonStreamingOverrideAndReasoningBudget
 PASS com.xiaoxiao.pet.CompanionBehaviorTest.scheduledChoicesExistInBundledCharacterCatalog
@@ -90,6 +91,8 @@ PASS com.xiaoxiao.pet.ModelSetupTest.closingDuringProbePreventsLateSave
 PASS com.xiaoxiao.pet.ModelSetupTest.insufficientFundsShowsActualZeroAndDoesNotSaveUnusableModel
 PASS com.xiaoxiao.pet.ModelSetupTest.flashDisablesThinkingWithoutChangingOtherProviders
 PASS com.xiaoxiao.pet.UsabilityUiTest.developerMemoryRowsAppearOnlyOnLongPress
+PASS com.xiaoxiao.pet.UsabilityUiTest.emptyNotebookStillOpensAndEditsRefreshItInPlace
 PASS com.xiaoxiao.pet.UsabilityUiTest.notebookSearchFiltersInPlaceAndPagesTheMatches
+PASS com.xiaoxiao.pet.UsabilityUiTest.firstStepsChecklistUntilDoneOrDismissed
 PASS com.xiaoxiao.pet.UsabilityUiTest.clearingTheDiaryAsksFirst
 PASS com.xiaoxiao.pet.UsabilityUiTest.proactiveSettingSaysWhatIsMissing

@@ -61,6 +61,7 @@ public final class InitiativeTest {
         db.commit(db.epoch(),"","午饭吃什么？","calm",null,false,true,null,null,"lunch",now+3000,null,true,null,lunch);
         check(!lunch.quiet("想好午饭了吗？",db.snapshot()),"unshown topic does not count as said");db.shown("lunch",1);
         check(lunch.quiet("想好午饭了吗？",db.snapshot()),"unanswered displayed topic is not repeated");
+        db.awaitWrites();check(lunch.quiet("想好午饭了吗？",new AgentStore(dir).snapshot()),"background display flush persists unanswered topics");
         long oldEpoch=db.epoch();db.clear(false);check(!db.initiativeDecision(oldEpoch,"quiet",freePlan,now),"new metadata still obeys deletion epoch");
         check(!db.snapshot().has("initiativePlan")&&!db.snapshot().has("proactiveWaiting"),"clear removes availability and plan metadata");
         System.out.println("PASS: "+checks+" model initiative checks");

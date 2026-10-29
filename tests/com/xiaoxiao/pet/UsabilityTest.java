@@ -32,7 +32,27 @@ public final class UsabilityTest {
   check(ids(MemoryLedger.browse(memories,"",MemoryLedger.MANUAL)).equals("ca"),"only hand-written");
   check(ids(MemoryLedger.browse(memories,"",MemoryLedger.CAPTURED)).equals("db"),"only captured from chat");
   check(ids(MemoryLedger.browse(memories," 蓝 ",MemoryLedger.ALL)).equals("da")&&ids(MemoryLedger.browse(memories,"蓝",MemoryLedger.CAPTURED)).equals("d"),"text filter combines with kind");
-  System.out.println("PASS: "+checks+" chat search and notebook filter checks");
+  // Display progress is applied in memory at once and written by the background writer; a later full save keeps it.
+  File dir=new File(root,"display");AgentStore shown=new AgentStore(dir);
+  shown.commit(shown.epoch(),"你好","嗯嗯我在呢。","calm",null,false,false,null,null,"p1",start,null,true);
+  check(turn(shown,"p1").getInt("displayed")==0,"waits for display");
+  long t0=System.nanoTime();shown.shown("p1",1);long shownMs=(System.nanoTime()-t0)/1_000_000;
+  check(turn(shown,"p1").getInt("displayed")==1,"visible to readers immediately");
+  shown.commit(shown.epoch(),"再见","拜拜。","calm",null,false,false,null,null,"p2",start+1000,null,true);shown.awaitWrites();
+  AgentStore reopened=new AgentStore(dir);check(turn(reopened,"p1").getInt("displayed")==1&&turn(reopened,"p2")!=null,"a full save after it keeps the display progress");
+  shown.shown("p2",1);shown.awaitWrites();check(turn(new AgentStore(dir),"p2").getInt("displayed")==1,"the background write reaches the disk");
+  System.out.println("  shown() on the calling thread: "+shownMs+" ms");
+  // The archive listing is read once and kept in step with writes and deletions.
+  AgentStore paged=new AgentStore(new File(root,"archive"));
+  for(int i=0;i<300;i++)paged.commit(paged.epoch(),"话"+i,"好"+i,"calm",null,false,false,null,null,"a"+i,start+i*60_000L,null,false);
+  check(count(paged)==300,"all turns page through the cached listing");
+  File[] files=new File(root,"archive/chat-history").listFiles((d,name)->name.endsWith(".json"));check(files.length==140&&files[0].delete(),"older turns are archived files");
+  check(count(paged)==299,"a file removed behind its back is skipped, not an error");
+  check(count(new AgentStore(new File(root,"archive")))==299,"a restart lists the folder again");
+  paged.clear(false);check(count(paged)==0&&count(new AgentStore(new File(root,"archive")))==0,"clearing empties the listing and the folder");
+  System.out.println("PASS: "+checks+" chat search, notebook filter and storage checks");
  }
+ static JSONObject turn(AgentStore db,String id)throws Exception{JSONArray t=db.snapshot().getJSONArray("turns");for(int i=0;i<t.length();i++)if(id.equals(t.getJSONObject(i).optString("id")))return t.getJSONObject(i);return null;}
+ static int count(AgentStore db)throws Exception{int total=0;String before=null;while(true){JSONArray page=db.historyRange(Long.MIN_VALUE,Long.MAX_VALUE,before,40);if(page.length()==0)return total;total+=page.length();before=page.getJSONObject(0).getString("pageKey");}}
  static String ids(List<JSONObject> rows){StringBuilder b=new StringBuilder();for(JSONObject r:rows)b.append(r.optString("id"));return b.toString();}
 }

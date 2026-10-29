@@ -1,6 +1,6 @@
 0.4.9.1 / MuMu Android API35 x86_64
-PASS: 14 final-product Android ART suites; 59 initiative checks, 12 search/notebook checks included.
+PASS: 14 final-product Android ART suites; 60 initiative checks, 21 search/notebook/storage checks included.
 PASS: 39 isolated Android runtime checks; actual Handler/Keystore, synthetic model, separate UID, no internet.
-PASS: 94 framework scenarios on final build, 0 failures/errors/skipped.
+PASS: 97 framework scenarios on final build, 0 failures/errors/skipped.
 Live app: busy -> persisted wait; restart preserved wait; free -> model-origin 13:10 plan; spontaneous new topic -> model-origin 13:19 plan.
 Real model quality is a finite smoke test, not universal accuracy. User screenshots stay local.

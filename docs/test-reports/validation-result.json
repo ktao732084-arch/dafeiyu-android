@@ -1,14 +1,14 @@
 {
   "version": "0.4.9.1",
   "version_code": 14,
-  "apk_sha256": "37d491e2d36c3bf55c7ee7f00767464998ce88306ba9df6bb9eefb849b79b0f3",
-  "framework_unique_passed": 94,
+  "apk_sha256": "c5290f1843afe9421bbb7cb5abe318a752d3deb12202a41b9f97f7a9af429c87",
+  "framework_unique_passed": 97,
   "framework_failed": 0,
   "framework_skipped": 0,
-  "final_build_framework_rechecked": 94,
+  "final_build_framework_rechecked": 97,
   "android_art_core_suites": 14,
   "android_runtime_instrumentation_checks": 39,
-  "initiative_checks": 59,
+  "initiative_checks": 60,
   "nickname_and_reply_checks": 33,
   "unicode_checks": 83,
   "core_checks": 141,
@@ -18,7 +18,7 @@
   "episodic_checks": 11,
   "diary_checks": 19,
   "endpoint_checks": 13,
-  "usability_checks": 12,
+  "usability_checks": 21,
   "native_memory": {
     "scenarios": 84,
     "passed": 145,
@@ -31,7 +31,8 @@
     "restart": "13:05 process restart and restoring desktop service preserved waiting; physical show event did not resume proactive checks",
     "available": "around 13:06 declaration cleared waiting; UI showed model-origin next consideration at 13:10, rather than fifteen minutes later",
     "natural_followup": "after scheduled consideration a new playful board-game topic was recorded and displayed; no lunch chase or announcing silence; next model-origin consideration was 13:19",
-    "timing": "No device clock, model response, stored schedule, or API key was directly changed to manufacture the result"
+    "timing": "No device clock, model response, stored schedule, or API key was directly changed to manufacture the result",
+    "post_merge_repeat": "Final merged APK: 13:24 busy -> persistent wait; about two minutes on desktop without new message; 13:31 free -> model-origin 13:35 consideration. First candidate additionally verified a spontaneous new topic followed by quiet with a repaired schedule to 14:06."
   },
   "not_verified": [
     "all Android versions",

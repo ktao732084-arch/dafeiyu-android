@@ -71,11 +71,10 @@ final class MemoryPanel {
         ScrollView scroll=new SpringScrollView(a);scroll.addView(l);
         new Apple.Builder(a).setTitle("她的日记").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->confirm(a,"清空她的日记？","已经写下的日记会全部删除，聊天记录和记忆还在。之后她只会给最近几天补写日记。",()->AgentRuntime.store().clearDiary())).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}
-    interface Action {void run()throws Exception;}
     /** Clearing a whole list cannot be undone, so it always asks once more. */
-    static void confirm(MainActivity a,String title,String message,Action action){new Apple.Builder(a).setTitle(title).setMessage(message).setNegativeButton("取消",null).setPositiveButton("确认清空",(d,w)->{try{action.run();Toast.makeText(a,"已清空",Toast.LENGTH_SHORT).show();}catch(Exception e){AgentPanel.fail(a,e);}}).show();}
+    static void confirm(MainActivity a,String title,String message,Chat.Change action){new Apple.Builder(a).setTitle(title).setMessage(message).setNegativeButton("取消",null).setPositiveButton("确认清空",(d,w)->Chat.store(a,action,()->Toast.makeText(a,"已清空",Toast.LENGTH_SHORT).show(),e->AgentPanel.fail(a,e))).show();}
     static void historicalEntry(MainActivity a,JSONObject r){
         String at=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm",java.util.Locale.CHINA).format(new java.util.Date(r.optLong("at")));
-        new Apple.Builder(a).setTitle("历史记忆").setMessage(r.optString("text")+"\n\n记录于 "+at+"\n这条记录已过期或被更新，不作为当前事实。").setNegativeButton("关闭",null).setPositiveButton("忘记相关版本",(d,w)->new Apple.Builder(a).setMessage("忘记这件事的当前与历史版本，以及直接来源对话？").setNegativeButton("取消",null).setPositiveButton("忘记",(dd,ww)->{try{AgentRuntime.cancel();AgentRuntime.store().forget(r.optString("id"));history(a);}catch(Exception e){AgentPanel.fail(a,e);}}).show()).show();
+        new Apple.Builder(a).setTitle("历史记忆").setMessage(r.optString("text")+"\n\n记录于 "+at+"\n这条记录已过期或被更新，不作为当前事实。").setNegativeButton("关闭",null).setPositiveButton("忘记相关版本",(d,w)->new Apple.Builder(a).setMessage("忘记这件事的当前与历史版本，以及直接来源对话？").setNegativeButton("取消",null).setPositiveButton("忘记",(dd,ww)->{AgentRuntime.cancel();Chat.store(a,()->AgentRuntime.store().forget(r.optString("id")),()->history(a),e->AgentPanel.fail(a,e));}).show()).show();
     }
 }
