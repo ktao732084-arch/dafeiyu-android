@@ -39,6 +39,52 @@ public final class DiaryTest {
   check(db.addDiary(db.epoch(),Diary.entry(today.minusDays(2),"前天聊了周末去爬山。",Collections.singletonList(new JSONObject().put("id","t1").put("user","x")),y))&&Diary.entries(db.snapshot()).length()==1,"another day");
   db.clear(false);check(Diary.entries(db.snapshot()).length()==0,"clearing chats clears the diary");
   db.clearDiary();check(Diary.entries(new AgentStore(new File(root,"diary")).snapshot()).length()==0,"and stays cleared after reopening");
+  sharedChecks(new File(root,"shared"),today,zone);
   System.out.println("PASS: "+checks+" diary checks");
+ }
+ static Gomoku fixture(GomokuStore store,long at)throws Exception{
+  Gomoku g=new Gomoku(UUID.randomUUID().toString(),at,ZoneId.systemDefault().getId());
+  for(int p:new int[]{0,15,1,16,2,17,3,18,4})g.play(p);g.finishedAt=at+1000;
+  ChatArchive.write(new File(store.results,g.id+".json"),g.json().toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));return g;
+ }
+ static void sharedChecks(File root,LocalDate today,ZoneId zone)throws Exception{
+  AgentStore db=new AgentStore(root);GomokuStore games=new GomokuStore(root);LocalDate day=today.minusDays(1);long at=day.atTime(12,0).atZone(zone).toInstant().toEpochMilli();
+  Gomoku first=fixture(games,at);for(int i=1;i<12;i++)fixture(games,at+i*2000);
+  check(games.context().getJSONArray("recent_results").length()==8&&db.dayGames(day,zone).length()==12,"day's durable games are not limited by last-eight chat context");
+  SharedExperience.Material m=SharedExperience.collect(day,zone,Collections.emptyList(),db.snapshot(),db.dayGames(day,zone));
+  check(m.eligible()&&m.turns.isEmpty(),"finished game alone can produce a page");
+  JSONArray req=SharedExperience.request(day,m,"小鲸",new JSONArray(),"她的固定性格");check(req.toString().contains("game:"+first.id)&&req.toString().contains("现在回想"),"model receives source ids and retrospective instruction");
+  String raw=new JSONObject().put("diary","这句不应冒充事实。").put("moment",new JSONObject().put("source_id","game:"+first.id).put("reflection","现在想起那盘棋，还是挺想再玩一局。").put("fact","模型伪造的胜负")).toString();
+  JSONObject page=SharedExperience.entry(raw,day,m,at+86400000L);check(page!=null&&SharedExperience.fact(page).contains("用户赢")&&!page.toString().contains("模型伪造"),"fact is copied from source, never model-written");
+  check(page.getJSONArray("sources").length()==0&&page.getJSONObject("moment").getLong("at")==first.finishedAt&&page.getLong("at")!=first.finishedAt,"event time and writing time are separate, game is not a fake chat source");
+  check(db.addDiary(db.epoch(),page),"grounded game page saved");JSONObject before=db.snapshot();
+  String context=Diary.context(before,"上次下棋",today.plusDays(30)).toString();check(context.contains("用户赢")&&context.contains("recollection")&&context.contains("不是当时的原话或当前心情"),"old shared game recalled with fact and reflection distinguished");
+  check(before.toString().equals(db.snapshot().toString()),"recall does not change mood or user facts");
+  check(Diary.browse(before,"五子棋").size()==1&&Diary.browse(before,day.toString()).size()==1,"search matches event text and date");
+  JSONObject roundTrip=new JSONObject(before.toString());check(Diary.entries(roundTrip).getJSONObject(0).getJSONObject("moment").getString("gameId").equals(first.id),"export roundtrip keeps evidence snapshot");
+  check(SharedExperience.entry("{\"moment\":{\"source_id\":\"game:invented\",\"reflection\":\"我很高兴\"},\"diary\":\"不允许回退这段文字\"}",day,m,at)==null,"invented source rejects whole new-format page");
+  check(SharedExperience.entry("{\"moment\":\"bad schema\",\"diary\":\"不允许用这段文字绕过校验\"}",day,m,at)==null,"malformed moment cannot bypass source validation");
+  check(SharedExperience.entry("{\"moment\":{\"source_id\":\"game:"+first.id+"\",\"reflection\":\"密码12345678901\"}}",day,m,at)==null,"sensitive reflection rejected");
+  check(SharedExperience.entry("{\"diary\":\"没有来源的游戏日记\"}",day,m,at)==null,"game-only generation requires a grounded moment");
+  long pending=db.epoch();db.forgetDiary(day.toString());check(!db.addDiary(pending,page),"delete during generation rejects late result");
+  AgentStore reopened=new AgentStore(root);check(Diary.suppressed(reopened.snapshot(),day)&&!reopened.addDiary(reopened.epoch(),page),"explicitly forgotten date stays suppressed after restart");
+  LocalDate older=day.minusDays(1);Gomoku old=fixture(games,at-86400000L);SharedExperience.Material oldM=SharedExperience.collect(older,zone,Collections.emptyList(),reopened.snapshot(),db.dayGames(older,zone));
+  JSONObject oldPage=SharedExperience.entry(raw.replace(first.id,old.id),older,oldM,at);check(reopened.addDiary(reopened.epoch(),oldPage),"another day is independent");
+  pending=reopened.epoch();reopened.clearDiary();check(reopened.epoch()>pending&&!reopened.addDiary(pending,oldPage),"clear invalidates in-flight diary");
+  check(!SharedExperience.collect(older,zone,Collections.emptyList(),reopened.snapshot(),games.resultsOn(older,zone)).eligible(),"pre-clear game evidence cannot regenerate a page");
+  JSONObject fresh=AgentStore.empty(0);List<JSONObject> turns=new ArrayList<>();
+  for(int i=0;i<4;i++)turns.add(new JSONObject().put("id","chat"+i).put("at",at+i).put("user","我想去海边散步"+i).put("reply","保存但未展示的秘密回复").put("displayed",0));
+  SharedExperience.Material chat=SharedExperience.collect(day,zone,turns,fresh,new JSONArray());JSONArray chatReq=SharedExperience.request(day,chat,"小鲸",new JSONArray(),"");
+  check(!chatReq.toString().contains("秘密回复"),"unshown reply cannot become an experienced memory");
+  JSONObject chatPage=SharedExperience.entry("{\"moment\":{\"source_id\":\"chat:chat2\",\"reflection\":\"回想起来，我也期待那片海。\"}}",day,chat,at+1000);
+  check(chatPage.getJSONArray("sources").length()==1&&chatPage.getJSONArray("sources").getString(0).equals("chat2"),"selected moment links only its actual chat source");
+  Diary.add(fresh,chatPage);Diary.dropSources(fresh,Collections.singleton("chat1"));check(Diary.entries(fresh).length()==1,"unrelated source does not remove selected moment");
+  Diary.dropSources(fresh,Collections.singleton("chat2"));check(Diary.entries(fresh).length()==0,"forgetting selected source removes reflection and source snapshot");
+  JSONObject oldSource=SharedExperience.entry(raw,day,m,at);JSONObject ranked=AgentStore.empty(0);Diary.add(ranked,oldSource);
+  for(int i=0;i<3;i++)Diary.add(ranked,Diary.entry(today.plusDays(10+i),"今天聊了火锅和饮料。",Collections.emptyList(),at+i));
+  JSONArray hits=Diary.context(ranked,"上次下棋",today.plusDays(14));check(hits.length()<=2&&hits.toString().contains(first.id)==false&&hits.toString().contains("用户赢"),"relevant older event beats unrelated recent pages, no internal source ids in prompt");
+  JSONObject empty=AgentStore.empty(0);Initiative.interaction(empty,"用户轻轻点了你",at,"tap","main");check(!SharedExperience.collect(day,zone,Collections.emptyList(),empty,new JSONArray()).eligible(),"tap-only day does not turn into a journal factory");
+  long utc=LocalDate.of(2026,10,28).atTime(23,30).atZone(ZoneId.of("UTC")).toInstant().toEpochMilli();
+  check(SharedExperience.onDay(utc,LocalDate.of(2026,10,29),ZoneId.of("Asia/Shanghai"),0)&&!SharedExperience.onDay(utc,LocalDate.of(2026,10,29),ZoneId.of("UTC"),0),"day selection respects timezone");
  }
 }

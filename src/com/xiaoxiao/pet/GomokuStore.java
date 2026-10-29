@@ -31,5 +31,16 @@ final class GomokuStore {
         JSONObject out=new JSONObject().put("game","gomoku").put("user_wins",win).put("pet_wins",loss).put("draws",draw).put("abandoned",ended).put("unreadable",unreadable).put("recent_results",recent);
         if(active!=null&&!active.over())out.put("current",new JSONObject().put("id",active.id).put("moves",active.moves.size()).put("startedAt",active.startedAt).put("turn",active.turn()==1?"user":"pet").put("level",active.level.isEmpty()?"undecided":active.level).put("level_reason",active.levelReason));return out;
     }}
+    /** Read one local day's durable results, independently of the chat context's last-eight limit. */
+    JSONArray resultsOn(java.time.LocalDate day,java.time.ZoneId zone)throws Exception{synchronized(GomokuStore.class){
+        load();File[] files=results.listFiles((d,n)->n.endsWith(".json"));if(files==null)throw new IOException("对局记录暂不可读");
+        List<JSONObject> rows=new ArrayList<>();for(File f:files)try{Gomoku g=Gomoku.read(read(f));if(g.over()&&Diary.day(g.finishedAt,zone).equals(day))
+            rows.add(new JSONObject().put("id",g.id).put("finishedAt",g.finishedAt).put("timeZone",g.zone).put("outcome",g.outcome()));}catch(Exception unreadable){/* no fabricated result */}
+        rows.sort(Comparator.comparingLong(r->r.optLong("finishedAt")));return new JSONArray(rows);
+    }}
+    boolean hasResult(String id,long at,String outcome)throws Exception{synchronized(GomokuStore.class){
+        if(!id.matches("[a-zA-Z0-9_-]{1,100}"))return false;File f=new File(results,id+".json");if(!f.exists())return false;
+        Gomoku g=Gomoku.read(read(f));return g.over()&&g.finishedAt==at&&g.outcome().equals(outcome);
+    }}
     void clear()throws Exception{synchronized(GomokuStore.class){File[] files=results.listFiles();if(files==null)throw new IOException("无法清除棋局记录");for(File f:files)if(f.isFile())Files.delete(f.toPath());Files.deleteIfExists(current.toPath());Files.deleteIfExists(new File(current+".tmp").toPath());}}
 }

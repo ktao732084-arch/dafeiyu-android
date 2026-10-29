@@ -103,19 +103,25 @@ final class AgentRuntime {
     static final ExecutorService diaryWorker=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"diary");t.setDaemon(true);t.setPriority(Thread.MIN_PRIORITY);return t;});
     static final java.util.concurrent.atomic.AtomicBoolean writingDiary=new java.util.concurrent.atomic.AtomicBoolean();
     static boolean diaryEnabled(){return Data.prefs().getBoolean("agent.diary",true);}
-    /** After a chat reply: if a recent day has enough turns and no entry, write one (one model call, one attempt per day). */
+    static Model diaryModel=(messages,token,progress)->AgentTransport.request(ModelSettings.read(),messages,token,progress,false,Diary.MAX_TOKENS);
+    /** On app entry or after chat: one idle request per local day, also for days with a finished game only. */
     static void writeDiaryIfDue(){
-        if(!diaryEnabled()||!rememberEnabled()||!configured()||!writingDiary.compareAndSet(false,true))return;
+        if(!diaryEnabled()||!rememberEnabled()||!configured()||!PersonaManager.isInitialized("main")||busy()||!writingDiary.compareAndSet(false,true))return;
         diaryWorker.execute(()->{try{
-            AgentStore db=store();java.time.ZoneId zone=java.time.ZoneId.systemDefault();java.time.LocalDate day=Diary.due(db.snapshot(),java.time.LocalDate.now(zone),zone);
-            if(day==null||day.toString().equals(Data.prefs().getString("diary.attempted","")))return;
-            Data.prefs().edit().putString("diary.attempted",day.toString()).apply();
-            long epoch=db.epoch();List<JSONObject> turns=db.dayTurns(day,zone);if(turns.isEmpty())return;JSONObject before=db.snapshot();
-            // The same call is her slow loop: besides the diary it may add, confirm or retire her understanding of the user.
-            JSONObject games=null;try{games=GomokuPage.store().context();}catch(Exception unavailable){}
-            String raw=AgentTransport.request(ModelSettings.read(),Diary.request(day,turns,Data.name("main"),Understanding.offered(before),PersonaManager.diaryGuidance("main"),CharacterNow.experiences(before,games,day,zone)),new AgentTransport.Token(),partial->{},false,Diary.MAX_TOKENS);
-            String text=Diary.parse(raw);Understanding.Update update=Understanding.parse(raw,turns,before,day.toString());
-            if(text!=null&&db.addDiary(epoch,Diary.entry(day,text,turns,System.currentTimeMillis()),update))Data.log("main","陪伴日记已写好："+day+(update.empty()?"":"，相处理解已更新"));
+            if(busy())return;AgentStore db=store();java.time.ZoneId zone=java.time.ZoneId.systemDefault();java.time.LocalDate today=java.time.LocalDate.now(zone);
+            if(today.toString().equals(Data.prefs().getString("diary.attemptedOn","")))return;
+            long epoch=db.epoch();JSONObject before=db.snapshot();java.time.LocalDate day=null;SharedExperience.Material material=null;
+            for(int back=1;back<=Diary.LOOKBACK_DAYS;back++){java.time.LocalDate candidate=today.minusDays(back);if(Diary.has(before,candidate)||Diary.suppressed(before,candidate))continue;
+                JSONArray results=new JSONArray();try{results=db.dayGames(candidate,zone);}catch(Exception unreadable){/* available chat evidence still works */}
+                SharedExperience.Material offered=SharedExperience.collect(candidate,zone,db.dayTurns(candidate,zone),before,results);
+                if(offered.eligible()){day=candidate;material=offered;break;}}
+            if(day==null||busy()||db.epoch()!=epoch||!diaryEnabled()||!rememberEnabled())return;
+            JSONArray request=SharedExperience.request(day,material,Data.name("main"),Understanding.offered(before),PersonaManager.diaryGuidance("main"));
+            if(!Data.prefs().edit().putString("diary.attempted",day.toString()).putString("diary.attemptedOn",today.toString()).commit())return;
+            String raw=diaryModel.generate(request,new AgentTransport.Token(),partial->{});
+            if(!diaryEnabled()||!rememberEnabled()||memory!=db)return;
+            JSONObject entry=SharedExperience.entry(raw,day,material,System.currentTimeMillis());Understanding.Update update=Understanding.parse(raw,material.turns,before,day.toString());
+            if(entry!=null&&db.addDiary(epoch,entry,update))Data.log("main","共同经历已写好："+day+(update.empty()?"":"，相处理解已更新"));
         }catch(Exception e){Data.log("main","陪伴日记暂未写成");}finally{writingDiary.set(false);}});
     }
     static boolean send(String user,boolean proactive,Listener listener) {

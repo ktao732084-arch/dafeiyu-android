@@ -26,7 +26,7 @@ public class UsabilityUiTest {
         a.render();java.util.Map<String,Integer> seen=new java.util.HashMap<>();for(TextView v:UiTest.all(a.content,TextView.class))seen.merge(v.getText().toString(),1,Integer::sum);
         for(String entry:new String[]{"和她聊聊","我们的故事","一起下五子棋","记忆手账","名字与称呼","模型连接","陪伴设置","桌宠设置","检查更新"})assertEquals(entry,Integer.valueOf(1),seen.get(entry));
         assertNull(UiTest.find(a.content,"最近聊天"));assertNull(UiTest.find(a.content,"她的小动作"));
-        AgentPanel.memories(a);View notebook=root();assertNull(UiTest.find(notebook,"我们的故事"));assertNotNull(UiTest.find(notebook,"她的日记"));assertNotNull(UiTest.find(notebook,"最近互动"));
+        AgentPanel.memories(a);View notebook=root();assertNull(UiTest.find(notebook,"我们的故事"));assertNotNull(UiTest.find(notebook,"我们的经历"));assertNotNull(UiTest.find(notebook,"最近互动"));
         GrowthPanel.show(a);View story=root();assertTrue(UiTest.texts(story).contains("泡泡瓶"));assertFalse(UiTest.texts(story).contains("记忆泡泡"));assertNull(UiTest.find(story,"她的日记"));
         AgentPanel.settings(a);View settings=root();assertNotNull(UiTest.find(settings,"记忆引擎"));assertNull(UiTest.find(settings,"手机悬浮权限"));
     }

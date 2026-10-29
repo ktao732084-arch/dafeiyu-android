@@ -69,7 +69,7 @@ public class CompanionBehaviorTest {
         PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona="初始化固定人格";in.now=System.currentTimeMillis();in.remember=true;
         JSONObject state=AgentRuntime.store().snapshot().put("self",new JSONArray().put(new JSONObject().put("text","我最爱吃小鱼干").put("at",in.now)));
         JSONArray request=PromptBuilder.build(in,"你好",false,state,null);
-        String system=request.getJSONObject(0).getString("content");assertTrue(system.startsWith(in.persona));assertTrue(system.contains("冲突时以初始化人格为准"));
+        String system=request.getJSONObject(0).getString("content");assertTrue(system.startsWith(in.persona));assertTrue(system.contains("和初始人格冲突时以初始人格为准"));
         assertTrue(request.toString().contains("我最爱吃小鱼干"));in.remember=false;
         assertFalse(PromptBuilder.build(in,"你好",false,state,null).toString().contains("我最爱吃小鱼干"));
     }

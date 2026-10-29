@@ -51,7 +51,7 @@ final class MemoryPanel {
         GroupedList.note(l,"这些是已经变了或过期的事，平时聊天不会当成现在的情况。点开能看来源，也能忘掉相关版本。");
         if(archive.length()>0){LinearLayout past=GroupedList.group(l);for(int i=archive.length()-1;i>=0;i--){JSONObject r=archive.getJSONObject(i),e=r.optJSONObject("engine");String reason=e==null?"历史":"expired".equals(e.optString("archived_reason"))?"已过期":"已更新";GroupedList.entry(past,"["+reason+"] "+r.optString("text"),v->historicalEntry(a,r));}}
         GroupedList.section(l,"最近的整理记录");for(int i=audit.length()-1;i>=Math.max(0,audit.length()-30);i--){JSONObject e=audit.getJSONObject(i);String op=e.optString("op");String label="ADD".equals(op)?"写下记忆":"MERGE".equals(op)?"合并重复":"ARCHIVE".equals(op)?"收入历史":"INVALIDATE".equals(op)||"DOWNGRADE".equals(op)?"更新旧说法":"重复表达";GroupedList.note(l,new java.text.SimpleDateFormat("MM-dd HH:mm",java.util.Locale.CHINA).format(new java.util.Date(e.optLong("at")))+" · "+label);}
-        ScrollView scroll=new SpringScrollView(a);scroll.addView(l);new Apple.Builder(a).setTitle("共同经历与记忆变化").setView(scroll).setPositiveButton("关闭",null).show();
+        ScrollView scroll=new SpringScrollView(a);scroll.addView(l);new Apple.Builder(a).setTitle("历史与整理记录").setView(scroll).setPositiveButton("关闭",null).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}
     /** What she has said about herself, kept so she stays consistent; read-only, clearable as a whole. */
     static void self(MainActivity a){try{
@@ -62,14 +62,31 @@ final class MemoryPanel {
         ScrollView scroll=new SpringScrollView(a);scroll.addView(l);
         new Apple.Builder(a).setTitle("她说过的自己").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->confirm(a,"清空她说过的自己？","她之前说过的喜好和习惯会全部忘掉，之后可能说出和以前不一样的话。你的记忆和聊天记录不受影响。",()->{AgentRuntime.cancel();AgentRuntime.store().clearSelf();})).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}
-    /** Her diary, newest first; her own summaries of past days, clearable as a whole. */
+    /** One notebook entry, with source details on the same page; legacy diary text remains readable. */
     static void diary(MainActivity a){try{
-        JSONArray rows=Diary.entries(AgentRuntime.store().snapshot());LinearLayout l=a.column();l.setPadding(a.dp(18),0,a.dp(18),a.dp(18));
-        GroupedList.note(l,"她每天最多写一篇，概括前一天你们聊过的事。这是她自己的概括，可能不准；聊天时以你的原话和记忆为准。忘记记忆或清空聊天时，相关的日记会一起删掉。");
-        if(rows.length()==0){TextView empty=a.text(AgentRuntime.diaryEnabled()?"还没有日记哦。聊过一天之后，下次聊天时她会写下前一天的。":"陪伴日记关着呢，可以在陪伴设置里打开。",15);empty.setTextColor(Apple.SECONDARY);empty.setPadding(a.dp(6),a.dp(16),a.dp(6),a.dp(8));l.addView(empty);}
-        else{LinearLayout pages=GroupedList.group(l);for(int i=rows.length()-1;i>=0;i--){JSONObject r=rows.getJSONObject(i);GroupedList.divider(pages);LinearLayout page=a.column();page.setPadding(a.dp(16),a.dp(12),a.dp(16),a.dp(13));TextView date=a.text(r.optString("date"),12);date.setTextColor(Apple.SECONDARY);page.addView(date);TextView text=a.text(r.optString("text"),15);text.setLineSpacing(a.dp(3),1);text.setPadding(0,a.dp(6),0,0);page.addView(text);pages.addView(page);}}
+        LinearLayout l=a.column();l.setPadding(a.dp(18),0,a.dp(18),a.dp(18));
+        GroupedList.note(l,"这里留下你们聊过、一起做过的事，以及她后来写下的回想。每天最多整理一次，也可能暂时没有值得写的片段。回想可能不准，以实际记录为准；它不会变成关于你的事实或她现在的心情。");
+        EditText search=Chat.field(a,l,"搜索经历或日期", "",false);search.setContentDescription("搜索经历或日期");
+        LinearLayout holder=a.column();l.addView(holder);int[] shown={20};Runnable[] fill=new Runnable[1];
+        fill[0]=()->{try{holder.removeAllViews();java.util.List<JSONObject> rows=Diary.browse(AgentRuntime.store().snapshot(),search.getText().toString());
+            if(rows.isEmpty()){GroupedList.note(holder,search.getText().length()>0?"没有找到相关经历。":AgentRuntime.diaryEnabled()?"还没有共同小记。聊过一天或完成棋局后，下次打开应用或聊天时，她会在空闲时回想。":"陪伴日记关着呢，可以在陪伴设置里打开。");return;}
+            LinearLayout pages=GroupedList.group(holder);for(int i=0;i<Math.min(shown[0],rows.size());i++){
+                JSONObject r=rows.get(i);String date=r.optString("date"),fact=SharedExperience.fact(r);GroupedList.divider(pages);
+                LinearLayout page=a.column();page.setPadding(a.dp(16),a.dp(12),a.dp(16),a.dp(13));pages.addView(page);
+                TextView when=a.text(date,12);when.setTextColor(Apple.SECONDARY);page.addView(when);
+                if(!fact.isEmpty())page.addView(a.text("发生的事："+SharedExperience.displayFact(r),15));
+                TextView words=a.text((fact.isEmpty()?"旧日记：":"她的回想：")+r.optString("text"),15);words.setLineSpacing(a.dp(3),1);words.setPadding(0,a.dp(6),0,0);page.addView(words);
+                a.button(page,"查看依据",v->new Apple.Builder(a).setTitle(date+" · 依据").setMessage(SharedExperience.evidence(r)).setPositiveButton("知道了",null).show());
+                a.button(page,"删除这篇",v->new Apple.Builder(a).setTitle("删除这篇小记？").setMessage("这篇经历和回想会删除，并停止自动补写。原聊天、棋局和关于你的事实记忆仍保留。").setNegativeButton("留着",null)
+                    .setPositiveButton("删除",(d,w)->Chat.store(a,()->AgentRuntime.store().forgetDiary(date),fill[0],e->AgentPanel.fail(a,e))).show());
+            }
+            if(rows.size()>shown[0])GroupedList.row(holder,"再显示 "+Math.min(20,rows.size()-shown[0])+" 篇（共 "+rows.size()+" 篇）",v->{shown[0]+=20;fill[0].run();});
+        }catch(Exception e){AgentPanel.fail(a,e);}};
+        search.addTextChangedListener(new ChatPage.Watcher(()->{shown[0]=20;fill[0].run();}));fill[0].run();
         ScrollView scroll=new SpringScrollView(a);scroll.addView(l);
-        new Apple.Builder(a).setTitle("她的日记").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->confirm(a,"清空她的日记？","已经写下的日记会全部删除，聊天记录和记忆还在。之后她只会给最近几天补写日记。",()->AgentRuntime.store().clearDiary())).show();
+        new Apple.Builder(a).setTitle("我们的经历").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->new Apple.Builder(a).setTitle("清空我们的经历？")
+            .setMessage("已写下的小记与回想会删除，清空前的材料不再自动补写。原聊天、棋局和关于你的事实记忆仍保留。").setNegativeButton("取消",null)
+            .setPositiveButton("确认清空",(dd,ww)->Chat.store(a,()->AgentRuntime.store().clearDiary(),fill[0],e->AgentPanel.fail(a,e))).show()).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}
     /** Her understanding of how to be with you, each with the words it came from; deletable one by one. */
     static void understanding(MainActivity a){try{

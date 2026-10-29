@@ -239,6 +239,7 @@ final class AgentStore {
         transcript.clear(state.getJSONArray("turns"));if(episodes!=null)episodes.clear();
         // The diary and her understanding of the user are made from chats, so clearing chats clears them too.
         JSONObject next=all?empty(epoch()+1):snapshot().put("turns",new JSONArray()).put("diary",new JSONArray()).put("understanding",new JSONArray()).put("epoch",epoch()+1);
+        next.put("diaryClearedAt",System.currentTimeMillis());
         next.put("interactions",new JSONArray()).put("initiativeChecks",new JSONArray()).put("lastUser",0).put("proactiveFailures",0);next.remove("moodCause");next.remove("moodSource");next.remove("proactiveNextAt");next.remove("proactiveOutcome");next.remove("proactiveDecidedAt");
         for(String key:Initiative.PLAN_FIELDS)next.remove(key);
         MemoryLedger.migrate(next);save(next,false);purgeBackup();notifyDeleted();
@@ -272,15 +273,23 @@ final class AgentStore {
             for(int i=page.length()-1;i>=0;i--)out.add(page.getJSONObject(i));before=page.getJSONObject(0).getString("pageKey");if(page.length()<40)break;}
         Collections.reverse(out);return out;
     }
+    synchronized JSONArray dayGames(java.time.LocalDate day,java.time.ZoneId zone)throws Exception {return new GomokuStore(file.getParentFile()).resultsOn(day,zone);}
     /** Stores a diary entry unless memories or chats changed while it was written (epoch) or a source was deleted. */
     synchronized boolean addDiary(long writtenAtEpoch,JSONObject entry)throws Exception {return addDiary(writtenAtEpoch,entry,null);}
     /** Also applies the same call's understanding update (Understanding.parse); both or neither are saved. */
     synchronized boolean addDiary(long writtenAtEpoch,JSONObject entry,Understanding.Update update)throws Exception {
         if(writtenAtEpoch!=epoch())return false;JSONArray sources=entry.optJSONArray("sources");
         if(sources!=null)for(int i=0;i<sources.length();i++)if(transcript.deleted(sources.optString(i)))return false;
+        JSONObject moment=entry.optJSONObject("moment");if(moment!=null){
+            if(moment.optLong("at")<=state.optLong("diaryClearedAt"))return false;
+            if("game".equals(moment.optString("kind"))&&!new GomokuStore(file.getParentFile()).hasResult(moment.optString("gameId"),moment.optLong("at"),moment.optString("outcome")))return false;
+            if("interaction".equals(moment.optString("kind"))){boolean found=false;JSONArray events=state.optJSONArray("interactions");
+                if(events!=null)for(int i=0;i<events.length();i++)if(moment.optString("id").equals(SharedExperience.interactionId(events.getJSONObject(i)))){found=true;break;}if(!found)return false;}
+        }
         JSONObject next=snapshot();if(!Diary.add(next,entry))return false;if(update!=null)Understanding.apply(next,update,entry.optLong("at",System.currentTimeMillis()));save(next);return true;
     }
-    synchronized void clearDiary()throws Exception {JSONObject next=snapshot();next.put("diary",new JSONArray());save(next,false);purgeBackup();notifyDeleted();}
+    synchronized void forgetDiary(String day)throws Exception {JSONObject next=snapshot();Diary.forget(next,day);next.put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();}
+    synchronized void clearDiary()throws Exception {JSONObject next=snapshot();next.put("diary",new JSONArray()).put("diaryClearedAt",System.currentTimeMillis()).put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();}
     synchronized void forgetUnderstanding(String id)throws Exception {JSONObject next=snapshot();if(Understanding.remove(next,id)){next.put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();}}
     synchronized void clearUnderstanding()throws Exception {JSONObject next=snapshot();next.put("understanding",new JSONArray()).put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();}
     /** Builds the recall index off the chat path (a background thread at store open), so the first reply does not wait. */
