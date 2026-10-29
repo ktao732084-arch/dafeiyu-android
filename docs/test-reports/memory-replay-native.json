@@ -1,0 +1,998 @@
+[
+  {
+    "case": "basic-01",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-01",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-01",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-01",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-02",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-02",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-03",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-03",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-04",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-04",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-05",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-05",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-06",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-06",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-06",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-07",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-07",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-08",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-08",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-09",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-09",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-10",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-10",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-10",
+    "day": 2,
+    "metric": "top1",
+    "passed": true
+  },
+  {
+    "case": "basic-10",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-11",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-11",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-11",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "basic-12",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "basic-12",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-01",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "correction-01",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-01",
+    "day": 2,
+    "metric": "stale",
+    "passed": true
+  },
+  {
+    "case": "correction-02",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "correction-02",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-02",
+    "day": 2,
+    "metric": "stale",
+    "passed": false
+  },
+  {
+    "case": "correction-03",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "correction-03",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-03",
+    "day": 2,
+    "metric": "stale",
+    "passed": false
+  },
+  {
+    "case": "correction-04",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "correction-04",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-04",
+    "day": 2,
+    "metric": "stale",
+    "passed": false
+  },
+  {
+    "case": "correction-05",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "correction-05",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-05",
+    "day": 2,
+    "metric": "stale",
+    "passed": true
+  },
+  {
+    "case": "correction-06",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "correction-06",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-06",
+    "day": 2,
+    "metric": "stale",
+    "passed": true
+  },
+  {
+    "case": "correction-07",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "correction-07",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-07",
+    "day": 2,
+    "metric": "stale",
+    "passed": true
+  },
+  {
+    "case": "correction-08",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "correction-08",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-08",
+    "day": 2,
+    "metric": "stale",
+    "passed": true
+  },
+  {
+    "case": "correction-09",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "correction-09",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-09",
+    "day": 1,
+    "metric": "stale",
+    "passed": true
+  },
+  {
+    "case": "correction-10",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "correction-10",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-10",
+    "day": 2,
+    "metric": "stale",
+    "passed": false
+  },
+  {
+    "case": "correction-11",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "correction-11",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-11",
+    "day": 2,
+    "metric": "stale",
+    "passed": true
+  },
+  {
+    "case": "correction-12",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "correction-12",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-12",
+    "day": 2,
+    "metric": "stale",
+    "passed": true
+  },
+  {
+    "case": "correction-13",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "correction-13",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "correction-13",
+    "day": 2,
+    "metric": "stale",
+    "passed": true
+  },
+  {
+    "case": "dedup-01",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "dedup-01",
+    "day": 1,
+    "metric": "unique",
+    "passed": true
+  },
+  {
+    "case": "dedup-02",
+    "day": 2,
+    "metric": "unique",
+    "passed": true
+  },
+  {
+    "case": "dedup-03",
+    "day": 2,
+    "metric": "unique",
+    "passed": false
+  },
+  {
+    "case": "dedup-04",
+    "day": 1,
+    "metric": "unique",
+    "passed": false
+  },
+  {
+    "case": "dedup-05",
+    "day": 3,
+    "metric": "unique",
+    "passed": true
+  },
+  {
+    "case": "dedup-06",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "dedup-06",
+    "day": 2,
+    "metric": "unique",
+    "passed": true
+  },
+  {
+    "case": "entity-01",
+    "day": 1,
+    "metric": "top1",
+    "passed": true
+  },
+  {
+    "case": "entity-01",
+    "day": 1,
+    "metric": "top1",
+    "passed": true
+  },
+  {
+    "case": "entity-02",
+    "day": 1,
+    "metric": "top1",
+    "passed": true
+  },
+  {
+    "case": "entity-02",
+    "day": 1,
+    "metric": "top1",
+    "passed": true
+  },
+  {
+    "case": "entity-03",
+    "day": 1,
+    "metric": "top1",
+    "passed": true
+  },
+  {
+    "case": "entity-03",
+    "day": 1,
+    "metric": "top1",
+    "passed": true
+  },
+  {
+    "case": "entity-04",
+    "day": 1,
+    "metric": "top1",
+    "passed": true
+  },
+  {
+    "case": "entity-04",
+    "day": 1,
+    "metric": "top1",
+    "passed": true
+  },
+  {
+    "case": "entity-05",
+    "day": 1,
+    "metric": "top1",
+    "passed": true
+  },
+  {
+    "case": "entity-05",
+    "day": 1,
+    "metric": "top1",
+    "passed": true
+  },
+  {
+    "case": "entity-06",
+    "day": 1,
+    "metric": "top1",
+    "passed": true
+  },
+  {
+    "case": "entity-06",
+    "day": 1,
+    "metric": "top1",
+    "passed": true
+  },
+  {
+    "case": "noconflict-01",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-01",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-01",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "noconflict-02",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-02",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-03",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-03",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-03",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "noconflict-04",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-04",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-05",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-05",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-06",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-06",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-07",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-07",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-08",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noconflict-08",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noise-01",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "noise-01",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "noise-01",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "noise-02",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noise-02",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "noise-03",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "noise-04",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "noise-05",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "noise-06",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "noise-07",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noise-07",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "noise-08",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "noise-09",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "noise-09",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "noise-10",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "noise-11",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "paraphrase-01",
+    "day": 1,
+    "metric": "hit",
+    "passed": false
+  },
+  {
+    "case": "paraphrase-02",
+    "day": 1,
+    "metric": "hit",
+    "passed": false
+  },
+  {
+    "case": "paraphrase-03",
+    "day": 1,
+    "metric": "hit",
+    "passed": false
+  },
+  {
+    "case": "paraphrase-04",
+    "day": 1,
+    "metric": "hit",
+    "passed": false
+  },
+  {
+    "case": "paraphrase-05",
+    "day": 1,
+    "metric": "hit",
+    "passed": false
+  },
+  {
+    "case": "paraphrase-06",
+    "day": 1,
+    "metric": "hit",
+    "passed": false
+  },
+  {
+    "case": "paraphrase-07",
+    "day": 1,
+    "metric": "hit",
+    "passed": false
+  },
+  {
+    "case": "paraphrase-08",
+    "day": 1,
+    "metric": "hit",
+    "passed": false
+  },
+  {
+    "case": "paraphrase-09",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "paraphrase-09",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "paraphrase-10",
+    "day": 1,
+    "metric": "hit",
+    "passed": false
+  },
+  {
+    "case": "shift-01",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "shift-01",
+    "day": 2,
+    "metric": "stale",
+    "passed": false
+  },
+  {
+    "case": "shift-02",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "shift-02",
+    "day": 2,
+    "metric": "stale",
+    "passed": false
+  },
+  {
+    "case": "shift-03",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "shift-03",
+    "day": 2,
+    "metric": "stale",
+    "passed": false
+  },
+  {
+    "case": "shift-04",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "shift-04",
+    "day": 2,
+    "metric": "stale",
+    "passed": false
+  },
+  {
+    "case": "shift-05",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "shift-05",
+    "day": 2,
+    "metric": "stale",
+    "passed": false
+  },
+  {
+    "case": "privacy-01",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "privacy-02",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "privacy-03",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "temporal-01",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "temporal-01",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "temporal-01",
+    "day": 2,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "temporal-02",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "temporal-02",
+    "day": 2,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "temporal-03",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "temporal-03",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "temporal-04",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "temporal-04",
+    "day": 1,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "temporal-05",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "temporal-05",
+    "day": 1,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "temporal-06",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "temporal-07",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "temporal-07",
+    "day": 2,
+    "metric": "forget",
+    "passed": true
+  },
+  {
+    "case": "temporal-08",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "temporal-09",
+    "day": 1,
+    "metric": "remember",
+    "passed": true
+  },
+  {
+    "case": "temporal-09",
+    "day": 2,
+    "metric": "hit",
+    "passed": true
+  },
+  {
+    "case": "temporal-09",
+    "day": 2,
+    "metric": "stale",
+    "passed": false
+  },
+  {
+    "case": "temporal-10",
+    "day": 2,
+    "metric": "remember",
+    "passed": true
+  }
+]

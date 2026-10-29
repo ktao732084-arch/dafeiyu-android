@@ -22,7 +22,7 @@ final class MemoryBridge {
         Config(boolean enabled,Address address,String secret,boolean semantic,boolean judge){this.enabled=enabled;this.address=address;this.secret=secret;this.semantic=semantic;this.judge=judge;}
     }
     static Config read()throws Exception {
-        Map<String,?> p=Data.prefs().getAll();boolean enabled=ModelSettings.flag(p,"memory.service.enabled",false);
+        Map<String,?> p=Data.prefs().getAll();boolean enabled="python-debug".equals(ModelSettings.value(p,"memory.mode"))&&ModelSettings.flag(p,"memory.service.enabled",false);
         if(!enabled)return new Config(false,null,"",false,false);
         Address address=new Address(ModelSettings.value(p,"memory.service.url"));
         if(!address.origin.equals(ModelSettings.value(p,"memory.service.origin")))throw new IOException("记忆服务地址与凭据不匹配，请重新保存");
@@ -30,7 +30,7 @@ final class MemoryBridge {
         return new Config(true,address,secret,ModelSettings.flag(p,"memory.service.semantic",true),ModelSettings.flag(p,"memory.service.judge",true));
     }
     static void save(boolean enabled,String url,String entered,boolean semantic,boolean judge)throws Exception {
-        if(!enabled){AgentRuntime.cancel();if(!Data.prefs().edit().putBoolean("memory.service.enabled",false).commit())throw new IOException("保存失败");return;}
+        if(!enabled){AgentRuntime.cancel();if(!Data.prefs().edit().putString("memory.mode","native").putBoolean("memory.service.enabled",false).commit())throw new IOException("保存失败");return;}
         Address address=new Address(url);String secret=entered.trim();
         if(secret.isEmpty()){
             if(!address.origin.equals(Data.prefs().getString("memory.service.origin","")))throw new IOException("更换记忆服务时请重新填写访问令牌");
@@ -38,11 +38,11 @@ final class MemoryBridge {
         }
         ApiEndpoint.validateSecret(secret);if(secret.length()<32||secret.matches("(?s).*\\s.*"))throw new IOException("访问令牌至少 32 位，不能含空白");
         String encrypted=Chat.encrypt(secret);AgentRuntime.cancel();
-        if(!Data.prefs().edit().putBoolean("memory.service.enabled",true).putString("memory.service.url",address.base).putString("memory.service.origin",address.origin).putString("memory.service.secret",encrypted).putBoolean("memory.service.semantic",semantic).putBoolean("memory.service.judge",judge).commit())throw new IOException("保存失败");
+        if(!Data.prefs().edit().putString("memory.mode","python-debug").putBoolean("memory.service.enabled",true).putString("memory.service.url",address.base).putString("memory.service.origin",address.origin).putString("memory.service.secret",encrypted).putBoolean("memory.service.semantic",semantic).putBoolean("memory.service.judge",judge).commit())throw new IOException("保存失败");
     }
     interface Client {JSONObject call(Config config,String path,JSONObject body,AgentTransport.Token token)throws Exception;}
     static Client client=MemoryBridge::http;
-    static volatile String lastStatus="手机本地记忆";
+    static volatile String lastStatus="手机内置记忆 · 默认运行";
     static JSONObject http(Config config,String path,JSONObject payload,AgentTransport.Token token)throws Exception {
         token.check();HttpURLConnection con=(HttpURLConnection)new URL(config.address.base+path).openConnection();token.connection=con;
         try {
@@ -68,7 +68,8 @@ final class MemoryBridge {
     }
     static Result evaluate(Config config,JSONObject original,JSONArray incoming,String query,long now,AgentTransport.Token token)throws Exception {
         JSONObject state=MemoryLedger.copy(original);MemoryLedger.expire(state,now);token.check();
-        if(config.enabled)try {
+        boolean fits=state.getJSONArray("memories").length()<=MemoryLedger.SERVICE_ACTIVE&&state.getJSONArray("archive").length()<=MemoryLedger.SERVICE_ARCHIVE;
+        if(config.enabled&&fits)try {
             JSONObject wireState=new JSONObject();for(String k:new String[]{"memories","archive","audit","vector_cache"})wireState.put(k,state.get(k));
             JSONObject body=new JSONObject().put("protocol",1).put("now",now).put("utc_offset_minutes",TimeZone.getDefault().getOffset(now)/60000).put("query",query).put("state",wireState).put("incoming",incoming).put("semantic",config.semantic).put("judge",config.judge);
             JSONObject response=client.call(config,"/v1/evaluate",body,token);token.check();validate(response,state,incoming);
@@ -78,18 +79,16 @@ final class MemoryBridge {
             if(response.optBoolean("degraded"))status+=" · 部分组件失败，已用规则补充";
             lastStatus=status;return new Result(state,response.getJSONArray("hits"),true,status,response.optJSONArray("rejected"));
         }catch(Exception failure){token.check();lastStatus="记忆服务暂不可用，本轮使用手机本地记忆";}
-        // No service: the same rule-mode write path in Java (corrections, merges, date grounding, noise).
-        // Unlike the service, a full phone makes room by dropping the oldest unpinned memory, as before.
-        MemoryLedger.makeRoom(state,incoming.length());
-        LocalEngine.Result local=LocalEngine.evaluate(state,incoming,now,TimeZone.getDefault().getOffset(now)/60000);
-        String status=config.enabled?lastStatus:"手机本地记忆";lastStatus=status;return new Result(local.state,null,false,status,local.rejected);
+        NativeMemoryEngine.Intelligence intelligence=null;try{intelligence=NativeMemoryIntelligence.configured();}catch(Exception unavailable){token.check();}
+        Result result=NativeMemoryEngine.evaluate(state,incoming,query,now,java.time.ZoneId.systemDefault(),intelligence,token);
+        String status=(config.enabled?(fits?"联调服务不可用 · ":"记忆超过电脑服务的"+MemoryLedger.SERVICE_ACTIVE+"条上限 · "):"")+result.status;lastStatus=status;return new Result(result.state,result.hits,false,status,result.rejected);
     }
     static void validate(JSONObject response,JSONObject previous,JSONArray incoming)throws Exception {
         if(response.optInt("protocol")!=1)throw new IOException("不兼容的记忆服务协议");
         JSONObject state=response.getJSONObject("state");Map<String,JSONObject> known=new HashMap<>();Set<String> knownSources=new HashSet<>();
         for(JSONArray rows:new JSONArray[]{previous.getJSONArray("memories"),previous.getJSONArray("archive"),incoming})for(int i=0;i<rows.length();i++){JSONObject r=rows.getJSONObject(i);known.put(r.getString("id"),r);JSONArray sources=MemoryLedger.sources(r);for(int j=0;j<sources.length();j++)knownSources.add(sources.optString(j));}
         Set<String> returned=new HashSet<>(),active=new HashSet<>();
-        for(String pool:new String[]{"memories","archive"}){JSONArray rows=state.getJSONArray(pool);if(rows.length()>(pool.equals("memories")?120:240))throw new IOException("服务返回过多记忆");for(int i=0;i<rows.length();i++){
+        for(String pool:new String[]{"memories","archive"}){JSONArray rows=state.getJSONArray(pool);if(rows.length()>(pool.equals("memories")?MemoryLedger.SERVICE_ACTIVE:MemoryLedger.SERVICE_ARCHIVE))throw new IOException("服务返回过多记忆");for(int i=0;i<rows.length();i++){
             JSONObject r=rows.getJSONObject(i);String id=r.getString("id");if(!known.containsKey(id)||!returned.add(id))throw new IOException("服务返回未知记忆");if(pool.equals("memories"))active.add(id);
             boolean evidence=false;for(JSONObject k:known.values())if(k.optString("text").equals(r.optString("text"))&&k.optString("source").equals(r.optString("source"))&&k.optLong("at")==r.optLong("at")){evidence=true;break;}
             if(!evidence)throw new IOException("服务返回的记忆没有用户原话依据");

@@ -1,5 +1,5 @@
 package com.xiaoxiao.pet;
-import org.json.*;import java.io.*;import java.nio.file.*;import java.util.List;
+import org.json.*;import java.time.ZoneOffset;import java.io.*;import java.nio.file.*;import java.util.List;
 
 /** Real filesystem persistence and policy regression tests; run with org.json on the JVM. */
 public final class AgentCoreTest {
@@ -9,12 +9,13 @@ public final class AgentCoreTest {
   File root=new File(args[0]);root.mkdirs();
   check(AgentPolicy.quiet(23)&&AgentPolicy.quiet(7)&&!AgentPolicy.quiet(8),"quiet hours boundaries");
   long now=100_000_000L;
-  check(AgentPolicy.mayInitiate(now,now-31*60000,now-91*60000,0,12,true,true,true,false,false),"eligible proactive");
-  check(!AgentPolicy.mayInitiate(now,0,0,0,12,true,true,true,false,false),"no unsolicited cold start");
-  check(!AgentPolicy.mayInitiate(now,now-31*60000,now-91*60000,3,12,true,true,true,false,false),"daily budget");
-  check(!AgentPolicy.mayInitiate(now,now-31*60000,now-91*60000,0,12,true,false,true,false,false),"screen off gate");
-  check(!AgentPolicy.mayInitiate(now,now-31*60000,now-91*60000,0,12,true,true,true,true,false),"focus gate");
-  check(!AgentPolicy.mayInitiate(now,now-31*60000,now-10*60000,0,12,true,true,true,false,false),"request cooldown");
+  JSONObject initiative=AgentStore.empty(0).put("lastUser",now-5*60000).put("lastAttempt",now-3*60000).put("proactiveNextAt",now-1);
+  check(Initiative.due(initiative,now,0),"model scheduled proactive is due");
+  check(!Initiative.due(AgentStore.empty(0),now,0),"no unsolicited cold start");
+  check(Initiative.due(initiative.put("attempts",99),now,0),"no fixed daily quota");
+  check(!Initiative.due(initiative,now,now-1000),"current interaction gets a short grace period");
+  check(!Initiative.due(initiative.put("proactiveNextAt",now+60000),now,0),"model chosen future time respected");
+  check(!Initiative.due(initiative.put("proactiveNextAt",now-1).put("lastAttempt",now-60000),now,0),"anti-loop floor");
   check("calm".equals(AgentPolicy.emotion("execute_shell")),"unknown action cannot execute");
   check(AgentPolicy.relevance("喜欢什么咖啡","我喜欢喝冰咖啡")>0,"Chinese bigram recall");
   check(AgentPolicy.validEvidence("我喜欢喝冰咖啡","喜欢喝冰咖啡"),"grounded quote");
@@ -139,7 +140,7 @@ public final class AgentCoreTest {
   boolean alternates=true;for(int i=1;i<req.length();i++)alternates&=req.getJSONObject(i).getString("role").equals(i%2==1?"user":"assistant");
   check(alternates&&req.length()%2==0,"one system message, then strict user/assistant alternation ending with the user");
   int pairs=(req.length()-2)/2;check(pairs>=8&&pairs<=11,"8-11 history turns: "+pairs);
-  check(req.getJSONObject(2).getString("content").equals("回复"+(14-pairs)+"的第一句。")&&req.getJSONObject(req.length()-2).getString("content").contains("第二句话"),"older replies compressed, the last three verbatim");
+  check(new JSONObject(req.getJSONObject(2).getString("content")).getString("reply").equals("回复"+(14-pairs)+"的第一句。")&&new JSONObject(req.getJSONObject(req.length()-2).getString("content")).getString("reply").contains("第二句话"),"older replies compressed inside structured history, the last three verbatim");
   hist.put(new JSONObject().put("id","t14").put("at",14000L).put("user","第14句话").put("reply","回复14。").put("proactive",false));chat.put("turnCount",15);
   JSONArray next=PromptBuilder.build(in,"再推荐一个",false,chat,null);int same=0;while(same<Math.min(req.length(),next.length())-1&&req.getJSONObject(same).toString().equals(next.getJSONObject(same).toString()))same++;
   check(same>=6,"consecutive requests share a cacheable prefix of "+same+" messages");
@@ -147,34 +148,47 @@ public final class AgentCoreTest {
   check(PromptBuilder.build(in,"",true,chat,null).toString().contains("主动陪伴事件")&&!PromptBuilder.build(in,"",true,chat,null).getJSONObject(1).getString("role").equals("system"),"proactive request uses a user-role event");
   for(int i=0;i<4;i++)hist.put(new JSONObject().put("id","d"+i).put("at",20000L+i).put("user","嗯").put("reply","才不是呢（扭头），我只是路过"+i+"。").put("proactive",false));chat.put("turnCount",19);
   check(PromptBuilder.build(in,"你好",false,chat,null).toString().contains("风格提醒"),"drift reminder reaches the prompt");
-  // Date grounding ported from temporal.py (its own self-test cases), due events and one-time follow-ups.
-  java.time.LocalDate obs=java.time.LocalDate.of(2026,10,28);
-  String[][] tg={{"我下周三有个重要考试","我下周三（2026-11-04）有个重要考试","2026-11-04"},{"明天下午开会","明天（2026-10-29）下午开会","2026-10-29"},{"大后天出发","大后天（2026-10-31）出发","2026-10-31"},
-   {"我昨天去了北京","我昨天（2026-10-27）去了北京","2026-10-27"},{"下个月15号交论文","下个月15号（2026-11-15）交论文","2026-11-15"},{"我每周三去健身","我每周三去健身",null},
-   {"下周要搬家","下周（2026-11-02 当周）要搬家",null},{"明年准备考研","明年（2027年）准备考研",null},{"我对花生过敏","我对花生过敏",null},{"明天（2026-10-29）开会","明天（2026-10-29）开会",null}};
-  for(String[] c:tg){TimeGround.Result g=TimeGround.ground(c[0],obs);check(g.text.equals(c[1])&&String.valueOf(g.event).equals(String.valueOf(c[2])),"temporal.py case: "+c[0]+" -> "+g.text);}
-  long spoke=java.time.LocalDateTime.of(2026,10,28,20,0).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
-  JSONObject plan=AgentStore.empty(0);MemoryLedger.migrate(plan);
-  MemoryLedger.addLocal(plan,MemoryLedger.record("exam","我明天有面试","t1",false,spoke));MemoryLedger.addLocal(plan,MemoryLedger.record("move","下个月15号搬家","t2",false,spoke));MemoryLedger.addLocal(plan,MemoryLedger.record("blue","我喜欢蓝色","t3",false,spoke));
-  JSONObject exam=plan.getJSONArray("memories").getJSONObject(0);
-  check("我明天（2026-10-29）有面试".equals(exam.getJSONObject("engine").getString("content"))&&"2026-10-29".equals(exam.getJSONObject("engine").getString("event_date"))&&"我明天有面试".equals(exam.getString("text")),"local memories keep the quote and gain the engine's resolved date");
-  check(!plan.getJSONArray("memories").getJSONObject(2).has("engine")&&MemoryLedger.current(exam,spoke+5*86_400_000L),"undated memories untouched; no local expiry");
-  check(MemoryLedger.dueEvents(plan,obs).getJSONObject(0).getString("when").equals("明天")&&MemoryLedger.dueEvents(plan,obs).length()==1,"the interview is tomorrow's plan");
+  // Follow-ups on dated plans, using the dates the native engine writes.
+  java.time.ZoneId zone=java.time.ZoneId.systemDefault();java.time.LocalDate obs=java.time.LocalDate.of(2026,10,28);
+  long spoke=obs.atTime(20,0).atZone(zone).toInstant().toEpochMilli();
+  JSONObject plan=NativeMemoryEngine.evaluate(MemoryLedger.copy(AgentStore.empty(0)),new JSONArray().put(MemoryLedger.record("exam","我明天有面试","t1",false,spoke)).put(MemoryLedger.record("blue","我喜欢蓝色","t2",false,spoke)),"",spoke,zone,null,new AgentTransport.Token()).state;
+  check("2026-10-29".equals(NativeMemoryEngine.find(plan,"exam").getJSONObject("engine").optString("event_date")),"native engine dates the interview");
+  check(MemoryLedger.dueEvents(plan,obs).length()==1&&"明天".equals(MemoryLedger.dueEvents(plan,obs).getJSONObject(0).getString("when")),"the interview is tomorrow's plan");
   check(MemoryLedger.followUps(plan,obs).length()==0&&MemoryLedger.followUps(plan,obs.plusDays(1)).length()==1&&MemoryLedger.followUps(plan,obs.plusDays(2)).length()==1&&MemoryLedger.followUps(plan,obs.plusDays(3)).length()==0,"follow up on the day and the day after only");
-  AgentStore follow=new AgentStore(new File(root,"follow"));follow.markFollowed(MemoryLedger.followUps(plan,obs.plusDays(1)));JSONObject fs=follow.snapshot();fs.put("memories",plan.getJSONArray("memories"));
-  check(MemoryLedger.followUps(fs,obs.plusDays(1)).length()==0,"asked once, not again");
-  in.remember=true;in.now=spoke+86_400_000L;JSONObject pc=AgentStore.empty(0);MemoryLedger.migrate(pc);pc.put("memories",plan.getJSONArray("memories"));
-  check(PromptBuilder.build(in,"",true,pc,null).toString().contains("今天：我明天（2026-10-29）有面试")&&PromptBuilder.build(in,"早",false,pc,null).toString().contains("近期安排"),"proactive turn may ask how the interview went; chat knows the schedule");
-  // Offline memory now runs the engine's rules in Java (LocalEngine; replayed against Python in tests/local-engine).
-  MemoryBridge.Config offline=new MemoryBridge.Config(false,null,"",false,false);long d1=1_772_618_400_000L;
-  JSONObject mem=MemoryLedger.copy(AgentStore.empty(0));
-  mem=MemoryBridge.evaluate(offline,mem,new JSONArray().put(MemoryLedger.record("b","我住在北京","turn-b",false,d1)),"",d1,new AgentTransport.Token()).state;
-  MemoryBridge.Result moved=MemoryBridge.evaluate(offline,mem,new JSONArray().put(MemoryLedger.record("s","我不再住在北京了，搬到上海了","turn-s",false,d1+3600_000L)),"",d1+3600_000L,new AgentTransport.Token());
-  check(moved.state.getJSONArray("memories").length()==1&&"我不再住在北京了，搬到上海了".equals(moved.state.getJSONArray("memories").getJSONObject(0).getString("text"))&&"superseded".equals(moved.state.getJSONArray("archive").getJSONObject(0).getJSONObject("engine").getString("archived_reason")),"offline correction archives the old fact (rule mode needs shared wording, like the service)");
-  check(MemoryBridge.evaluate(offline,mem,new JSONArray().put(MemoryLedger.record("n","提醒我明天开会","turn-n",true,d1)),"",d1,new AgentTransport.Token()).rejected.length()==1,"offline noise is rejected, so an explicit note can say it was not kept");
-  JSONObject full=MemoryLedger.copy(AgentStore.empty(0));for(int i=0;i<120;i++)full.getJSONArray("memories").put(MemoryLedger.record("f"+i,"第"+i+"件很特别的小事情",("t"+i),i>0,d1));
-  JSONArray kept=MemoryBridge.evaluate(offline,full,new JSONArray().put(MemoryLedger.record("x","我养了一只叫团子的橘猫","turn-x",false,d1)),"",d1,new AgentTransport.Token()).state.getJSONArray("memories");
-  check(kept.length()==120&&!kept.toString().contains("\"f0\"")&&kept.toString().contains("团子"),"a full notebook drops the oldest unpinned memory, as before");
+  long dayAfter=obs.plusDays(2).atTime(9,0).atZone(zone).toInstant().toEpochMilli();
+  JSONObject later=NativeMemoryEngine.evaluate(plan,new JSONArray(),"",dayAfter,zone,null,new AgentTransport.Token()).state;
+  check(MemoryLedger.followUps(later,obs.plusDays(2)).length()==1&&later.getJSONArray("archive").length()==1,"still asked about after the plan expired into the archive");
+  AgentStore follow=new AgentStore(new File(root,"follow"));follow.markFollowed(MemoryLedger.followUps(plan,obs.plusDays(1)),"p1");JSONObject fs=follow.snapshot();fs.put("memories",plan.getJSONArray("memories"));
+  fs.getJSONArray("turns").put(new JSONObject().put("id","p1").put("user","").put("reply","面试怎么样了？").put("proactive",true).put("displayed",0));
+  check(MemoryLedger.followUps(fs,obs.plusDays(1)).length()==1,"a follow-up that never reached the screen may be asked again");
+  fs.getJSONArray("turns").getJSONObject(0).put("displayed",1);check(MemoryLedger.followUps(fs,obs.plusDays(1)).length()==0,"once shown, asked once, not again");
+  PromptBuilder.Inputs fin=new PromptBuilder.Inputs();fin.persona="你是大肥鱼。";fin.timeZone="Asia/Shanghai";fin.remember=true;fin.now=spoke+86_400_000L;
+  check(PromptBuilder.build(fin,"",true,plan,null).toString().contains("今天：我明天（2026-10-29）有面试")&&PromptBuilder.build(fin,"早",false,plan,null).toString().contains("近期安排"),"proactive turn may ask how it went; chat knows the schedule");
+  fin.remember=false;check(!PromptBuilder.build(fin,"",true,plan,null).toString().contains("面试"),"memory off: no follow-up");
+  // Model recall only when it can change the prompt: more memories than it carries, and not for chatter.
+  check(NativeMemoryEngine.casual("哈哈哈")&&NativeMemoryEngine.casual("嗯")&&NativeMemoryEngine.casual("好的！")&&!NativeMemoryEngine.casual("我明天面试有点紧张"),"casual chatter is recognised");
+  int[] recalls={0};NativeMemoryEngine.Intelligence counting=(op,data,token)->{recalls[0]++;return new JSONObject().put("ids",new JSONArray());};
+  long r0=1_772_618_400_000L;JSONObject few=MemoryLedger.copy(AgentStore.empty(0));
+  String[] facts={"我在协和医学院读书","我养了一只橘猫","我每天跑步五公里","我最爱吃火锅","我的生日在三月","我住在杭州西湖边","我会弹吉他","我在学日语","我喜欢下雨天","我妈妈是老师","我每周去游泳","我收藏邮票","我讨厌香菜","我开电动车","我喜欢科幻小说","我早上喝咖啡"};
+  for(int i=0;i<3;i++)few=NativeMemoryEngine.evaluate(few,new JSONArray().put(MemoryLedger.record("f"+i,facts[i],"t"+i,false,r0)),"",r0,ZoneOffset.UTC,null,new AgentTransport.Token()).state;
+  MemoryBridge.Result small=NativeMemoryEngine.evaluate(few,new JSONArray(),"我的学校在哪里",r0,ZoneOffset.UTC,counting,new AgentTransport.Token());
+  check(recalls[0]==0&&MemoryLedger.context(small.state,"我的学校在哪里",small.hits).contains("协和"),"few memories: no recall call, and all of them reach the prompt");
+  JSONObject many=few;for(int i=3;i<facts.length;i++)many=NativeMemoryEngine.evaluate(many,new JSONArray().put(MemoryLedger.record("f"+i,facts[i],"t"+i,false,r0)),"",r0,ZoneOffset.UTC,null,new AgentTransport.Token()).state;
+  check(MemoryLedger.currentCount(many,r0)>MemoryLedger.CORE+10,"sixteen distinct facts are kept");
+  NativeMemoryEngine.evaluate(many,new JSONArray(),"哈哈",r0,ZoneOffset.UTC,counting,new AgentTransport.Token());check(recalls[0]==0,"chatter: no recall call");
+  NativeMemoryEngine.evaluate(many,new JSONArray(),"我的学校在哪里",r0,ZoneOffset.UTC,counting,new AgentTransport.Token());check(recalls[0]==1,"many memories and a real question: one recall call");
+  // Capacity: hundreds of memories fit, while the model only ever sees a bounded shortlist.
+  JSONObject big=MemoryLedger.copy(AgentStore.empty(0));String[] cities={"成都","西安","厦门","大理","青岛","桂林","苏州","哈尔滨","拉萨","重庆"};
+  for(int i=0;i<300;i++)MemoryLedger.addLocal(big,MemoryLedger.record("big"+i,"我第"+i+"次去"+cities[i%10]+"玩的时候住在"+(i*7%97)+"号民宿","tb"+i,false,r0+i));
+  MemoryLedger.addLocal(big,MemoryLedger.record("allergy","我对青霉素过敏","ta",true,r0));
+  check(big.getJSONArray("memories").length()==301&&big.toString().getBytes("UTF-8").length<AgentStore.MAX_FILE_BYTES,"three hundred memories fit in the state budget");
+  JSONArray judge=NativeMemoryEngine.judgeCandidates(big,"我第42次去厦门玩的时候住在3号民宿");
+  check(judge.length()==NativeMemoryEngine.JUDGE_SIMILAR+NativeMemoryEngine.JUDGE_RECENT&&judge.getJSONObject(0).getString("id").equals("big42"),"write judgement sees the most similar and recent memories, not all 301");
+  JSONArray recall=NativeMemoryEngine.recallCandidates(big,"西安",r0+400);boolean hasAllergy=false;int longest=0;for(int i=0;i<recall.length();i++){hasAllergy|=recall.getJSONObject(i).getString("id").equals("allergy");longest=Math.max(longest,recall.getJSONObject(i).getString("quote").length());}
+  check(recall.length()<=NativeMemoryEngine.RECALL_RELEVANT+NativeMemoryEngine.RECALL_RECENT+MemoryLedger.CORE*3&&hasAllergy&&longest<=81,"recall shortlist is bounded, keeps core facts, clips quotes");
+  MemoryBridge.Config service=new MemoryBridge.Config(true,new MemoryBridge.Address("http://127.0.0.1:8787"),"x".repeat(32),false,false);
+  MemoryBridge.Client saved=MemoryBridge.client;MemoryBridge.client=(c,p,b,t)->{throw new AssertionError("service has a 120-memory protocol limit");};
+  try{MemoryBridge.Result over=MemoryBridge.evaluate(service,big,new JSONArray(),"",r0,new AgentTransport.Token());check(!over.remote&&over.status.contains("120"),"over the service limit the phone engine answers without a doomed request");}finally{MemoryBridge.client=saved;}
   System.out.println("PASS: "+checks+" core checks");
  }
 }

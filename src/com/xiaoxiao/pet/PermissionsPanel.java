@@ -32,7 +32,7 @@ final class PermissionsPanel {
         content.setOrientation(LinearLayout.VERTICAL);
         int padding = Apple.dp(activity, 18);
         content.setPadding(padding, Apple.dp(activity, 8), padding, padding);
-        TextView help = Apple.label(activity, "开关显示当前状态，点按后前往系统设置。", 13, false);
+        TextView help = Apple.label(activity, "这里只显示当前状态，点一下会带你去系统设置里调整。", 13, false);
         help.setTextColor(Apple.SECONDARY);
         help.setPadding(0, 0, 0, Apple.dp(activity, 12));
         content.addView(help);
@@ -145,15 +145,15 @@ final class PermissionsPanel {
             toggle.setChecked(on);
             title.setTextColor(Apple.INK);
             detail.setTextColor(Apple.SECONDARY);
-            setBackground(Apple.shape(context, Apple.BACK, 12));
+            setBackground(Apple.shape(context, Apple.FILL, 16));
             String status;
             if (kind == OVERLAY) {
-                status = on ? "已允许 · 可在其他应用上显示角色" : "未允许 · 开启后角色才能出现在桌面";
+                status = on ? "已允许 · 她可以待在其他应用上面" : "还没允许 · 打开后她才能住到屏幕上";
             } else if (kind == NOTIFICATIONS) {
                 status = !appNotificationsAllowed(context) ? "应用通知未开启" : !channelAllowed(context)
-                        ? "桌宠运行通知未开启" : "已开启 · 可从通知进入角色管理";
+                        ? "桌宠运行通知未开启" : "已开启 · 可以从通知栏回来找她";
             } else {
-                status = on ? "已豁免 · 不受系统电池优化限制" : "未豁免 · 在系统列表中找到大肥鱼进行调整";
+                status = on ? "已豁免 · 系统不会随手把她请走" : "未豁免 · 在系统列表里找到大肥鱼调整";
             }
             detail.setText(status);
             toggle.setContentDescription(title.getText() + "，" + (on ? "已开启" : "未开启") + "，点按打开系统设置");

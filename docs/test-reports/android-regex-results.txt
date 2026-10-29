@@ -1,0 +1,7 @@
+0.4.6 product DEX, MuMu Android API 35 x86_64, app_process
+Runtime: Dalvik / 2.1.0
+Platform accepts Unicode flag: false
+PASS: 83 native Unicode regex checks
+Exit code: 0
+Before fix: 0.4.5 reproduces IllegalArgumentException: UNICODE_CHARACTER_CLASS flag not supported at NativeMemoryEngine.pattern -> patterns -> noise for the reported name message.
+Desktop JVM: accepts flag = true, same 83 checks pass.

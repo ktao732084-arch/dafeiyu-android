@@ -1,32 +1,32 @@
 {
-  "version": "0.3.0",
-  "apk_sha256": "b9552608d863204c8785c8f60c7ac5db9c7d60a413cda1a2a04f93a450a2244c",
-  "memory_source": "b6718dfedcfb17a31f5c3d8d32d71ffc2665101a",
-  "reviewed_engine": "9862c930b367bbb0b5fa4b2c751914604cd0b548",
-  "android_framework_tests": {
-    "passed": 26,
-    "failed": 0,
-    "persona_subchecks": 33,
-    "environment": "Robolectric Android 14/API34; not an installed APK"
-  },
-  "core_checks": 48,
-  "endpoint_checks": 13,
-  "physics": "passed",
-  "python_service_checks": 16,
-  "python_llm_regressions": 9,
-  "shared_scenarios": 84,
-  "expectation_results": {
+  "version": "0.4.9.2",
+  "version_code": 15,
+  "apk_sha256": "97dca0a731bab47c1e81bf513f918f05a0b2d04277406676f458440bf7b4d25c",
+  "apk_size": 91505033,
+  "framework_unique_passed": 119,
+  "framework_failed_final_reports": 0,
+  "framework_skipped": 0,
+  "framework_note": "Final full run: 118/119; after draining Python subprocess output, HTTP suite 12/12 passed on the same final product build. Aggregate unique scenarios:119.",
+  "android_api": 35,
+  "android_art_core_suites": 15,
+  "android_runtime_instrumentation_checks": 47,
+  "initiative_checks": 62,
+  "update_checks": 30,
+  "publisher_checks": 7,
+  "upgrade_from": "0.4.9.1",
+  "upgrade_preserved": [
+    "persona",
+    "nickname",
+    "memory",
+    "history",
+    "keystore"
+  ],
+  "native_memory": {
+    "scenarios": 84,
     "passed": 145,
     "total": 166,
-    "known_unmet": 21,
-    "mode": "rules, no external models",
-    "cross_runtime_parity": true
+    "known_unmet": 21
   },
-  "unverified": [
-    "physical-device installation and overlay",
-    "device Android Keystore",
-    "real cloud model calls in this integration run",
-    "real ONNX weights",
-    "OEM battery/background behavior"
-  ]
+  "physical_device_tested": false,
+  "live_model_tested_this_release": false
 }

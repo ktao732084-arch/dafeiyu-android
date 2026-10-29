@@ -16,15 +16,11 @@ jobs:
           sparse-checkout: |
             src
             tests
-            tools
             memory-service
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.12'
       - uses: actions/cache@v5
         with:
           path: ~/test-libs
@@ -34,14 +30,8 @@ jobs:
           mkdir -p ~/test-libs
           [ -f ~/test-libs/json.jar ] || curl -fsSL --retry 3 -o ~/test-libs/json.jar https://repo1.maven.org/maven2/org/json/json/20240303/json-20240303.jar
           [ -f ~/test-libs/android-all.jar ] || curl -fsSL --retry 3 -o ~/test-libs/android-all.jar https://repo1.maven.org/maven2/org/robolectric/android-all/14-robolectric-10818077/android-all-14-robolectric-10818077.jar
-      - name: Java rules match the vendored memory engine
-        run: |
-          python -X utf8 tools/export-memory-rules.py
-          git diff --exit-code -- src/com/xiaoxiao/pet/MemoryRules.java
       - name: Compile app sources and run core checks
         run: tests/run-core.sh ~/test-libs/json.jar ~/test-libs/android-all.jar
-      - name: Offline LocalEngine matches the Python service on the shared scenarios
-        run: tests/local-engine/run.sh ~/test-libs/json.jar
 
   memory-service:
     runs-on: ubuntu-latest

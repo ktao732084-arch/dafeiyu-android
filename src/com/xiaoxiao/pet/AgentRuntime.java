@@ -12,7 +12,7 @@ import java.io.IOException;
 
 /** An independent on-device orchestrator: events -> recall -> model -> validate -> commit -> act. */
 final class AgentRuntime {
-    interface Listener {void partial(String text);void done(String text,String emotion);void error(String message);}
+    interface Listener {default void saved(String turnId){} void partial(String text);void done(String text,String emotion);void error(String message);}
     interface Model {String generate(JSONArray messages,AgentTransport.Token token,AgentTransport.Progress progress)throws Exception;}
     static Model model=AgentTransport::request;
     static AgentStore memory;
@@ -24,7 +24,7 @@ final class AgentRuntime {
     static long lastTouch,lastEventAt;
     static boolean touched;
     static String lastEvent="第一次见面";
-    static synchronized AgentStore store()throws Exception{if(memory==null)memory=new AgentStore(new java.io.File(Data.app.getFilesDir(),"agent"));return memory;}
+    static synchronized AgentStore store()throws Exception{if(memory==null){memory=new AgentStore(new java.io.File(Data.app.getFilesDir(),"agent"));final AgentStore opened=memory;Thread warm=new Thread(opened::warm,"recall-index");warm.setDaemon(true);warm.setPriority(Thread.MIN_PRIORITY);warm.start();}return memory;}
     static synchronized boolean busy(){return active!=null;}
     static synchronized void cancel(){if(active!=null){AgentTransport.Token token=active;Listener l=activeListener;active=null;activeListener=null;activeProactive=false;if(token.completed!=null){main.post(token.completed);}else{token.cancel();if(l!=null)main.post(()->l.error("已停止回复"));}}}
     static synchronized void interruptProactive(){if(activeProactive)cancel();}
@@ -35,7 +35,10 @@ final class AgentRuntime {
     static JSONArray history(){try{return store().history();}catch(Exception e){return new JSONArray();}}
     static String mood(){try{return store().emotion(System.currentTimeMillis(),20*60_000);}catch(Exception e){return "calm";}}
     static String moodLabel(){switch(mood()){case "happy":return "心情明亮";case "shy":return "有点害羞";case "curious":return "好奇中";case "concerned":return "认真听你说";case "playful":return "想和你玩";case "sleepy":return "安静陪着你";default:return "自在待着";}}
-    static void touch(String type){note(type);lastTouch=lastEventAt;}
+    static void touch(String type){
+        note(type);lastTouch=lastEventAt;interruptProactive();final long at=lastTouch;
+        try{final AgentStore db=store();final long epoch=db.epoch();worker.execute(()->{try{if(memory==db)db.interaction(epoch,type,at);}catch(Exception e){Data.log("main","互动记录暂未保存");}});}catch(Exception e){Data.log("main","互动记录暂不可用");}
+    }
     /** Context for the next prompt only; unlike touch() it does not postpone proactive chat. */
     static void note(String type){lastEventAt=System.currentTimeMillis();lastEvent=type;touched=true;}
     static String action(String emotion){switch(AgentPolicy.emotion(emotion)){
@@ -43,88 +46,139 @@ final class AgentRuntime {
         case "curious":return "东张西望";case "concerned":return "碎碎念-对屏碎碎念";
         case "playful":return "鲸鱼吐泡泡特效";case "sleepy":return "原地小憩沉眠";default:return "碎碎念-发呆碎碎念";
     }}
-    static void express(String instance,String emotion,String reply){PetService s=PetService.instance;if(s==null)return;PetService.Pet p=s.pets.get(instance);if(p!=null&&p.visible&&!p.docked){if(!p.dragging&&!p.moving)p.play(p.plan.emotion(AgentPolicy.emotion(emotion),action(emotion),Data.random));p.reply(reply);}}
+    static void express(String instance,String emotion,String reply){express(instance,emotion,reply,null);}
+    static void express(String instance,String emotion,String reply,String turnId){PetService s=PetService.instance;if(s==null)return;PetService.Pet p=s.pets.get(instance);if(p!=null&&p.visible&&!p.docked){if(!p.dragging&&!p.moving)p.play(p.plan.emotion(AgentPolicy.emotion(emotion),action(emotion),Data.random));p.speak(reply,turnId);}}
     static JSONArray context(String user,boolean proactive)throws Exception {
         return context(user,proactive,store().snapshot(),null);
     }
     static JSONArray context(String user,boolean proactive,JSONObject s,JSONArray hits)throws Exception {
-        PromptBuilder.Inputs in=new PromptBuilder.Inputs();
-        in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.nickname=Data.prefs().getString("agent.nickname","");
+        HistoryRecall.Plan plan=proactive?null:HistoryRecall.plan(user,System.currentTimeMillis(),java.time.ZoneId.systemDefault());
+        return context(user,proactive,s,hits,store().recallHistory(plan,new AgentTransport.Token()));
+    }
+    static JSONArray context(String user,boolean proactive,JSONObject s,JSONArray hits,HistoryRecall.Result history)throws Exception {
+        PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.historyRecall=history==null?null:history.evidence;
+        in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.nickname=Nickname.current();
+        String requested=!proactive&&history==null?Nickname.requested(user):null;if(requested!=null)in.nickname=requested;
         in.mood=mood();in.timeZone=TimeZone.getDefault().getID();in.now=System.currentTimeMillis();in.initializedAt=PersonaManager.initializedAt("main");
-        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}in.remember=rememberEnabled();
+        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}in.remember=rememberEnabled();in.diary=diaryEnabled();
+        if(in.remember&&history==null){
+            // Whole-conversation recall, minus what the history window already carries and corrected sources.
+            Set<String> exclude=MemoryLedger.staleSources(s,in.now);JSONArray turns=s.getJSONArray("turns");for(int i=Math.max(0,turns.length()-12);i<turns.length();i++)exclude.add(ChatArchive.id(turns.getJSONObject(i)));
+            in.episodes=store().episodes(proactive?Initiative.query(s):user,exclude,in.now);
+        }
         return PromptBuilder.build(in,user,proactive,s,hits);
     }
+    // The diary has its own low-priority thread, so writing it never delays the next chat message.
+    static final ExecutorService diaryWorker=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"diary");t.setDaemon(true);t.setPriority(Thread.MIN_PRIORITY);return t;});
+    static final java.util.concurrent.atomic.AtomicBoolean writingDiary=new java.util.concurrent.atomic.AtomicBoolean();
+    static boolean diaryEnabled(){return Data.prefs().getBoolean("agent.diary",true);}
+    /** After a chat reply: if a recent day has enough turns and no entry, write one (one model call, one attempt per day). */
+    static void writeDiaryIfDue(){
+        if(!diaryEnabled()||!rememberEnabled()||!configured()||!writingDiary.compareAndSet(false,true))return;
+        diaryWorker.execute(()->{try{
+            AgentStore db=store();java.time.ZoneId zone=java.time.ZoneId.systemDefault();java.time.LocalDate day=Diary.due(db.snapshot(),java.time.LocalDate.now(zone),zone);
+            if(day==null||day.toString().equals(Data.prefs().getString("diary.attempted","")))return;
+            Data.prefs().edit().putString("diary.attempted",day.toString()).apply();
+            long epoch=db.epoch();List<JSONObject> turns=db.dayTurns(day,zone);if(turns.isEmpty())return;
+            String text=Diary.parse(AgentTransport.request(ModelSettings.read(),Diary.request(day,turns,Data.name("main")),new AgentTransport.Token(),raw->{},false,Diary.MAX_TOKENS));
+            if(text!=null&&db.addDiary(epoch,Diary.entry(day,text,turns,System.currentTimeMillis())))Data.log("main","陪伴日记已写好："+day);
+        }catch(Exception e){Data.log("main","陪伴日记暂未写成");}finally{writingDiary.set(false);}});
+    }
     static boolean send(String user,boolean proactive,Listener listener) {
-        final AgentTransport.Token token; synchronized(AgentRuntime.class){if(active!=null)return false;token=new AgentTransport.Token();active=token;activeListener=listener;activeProactive=proactive;}
+        final long receivedAt=System.currentTimeMillis();final AgentTransport.Token token; synchronized(AgentRuntime.class){if(active!=null)return false;token=new AgentTransport.Token();active=token;activeListener=listener;activeProactive=proactive;}
+        if(!proactive){if(Looper.myLooper()==Looper.getMainLooper())Chat.interruptPresentation("main");else main.post(()->Chat.interruptPresentation("main"));}
         // Wake a dozing pet before the prompt is built, so the reply can sound freshly woken.
         if(!proactive&&PetService.instance!=null){if(Looper.myLooper()==Looper.getMainLooper())PetService.instance.heard("main");else main.post(()->{if(PetService.instance!=null)PetService.instance.heard("main");});}
         worker.execute(()->{
+            AgentStore attemptStore=null;long attemptEpoch=-1;
             try {
                 token.check();if(!PersonaManager.ensureInitialized("main"))throw new IOException("请先在首页完成初次相遇，确定她的性格");
-                AgentStore db=store();long epoch=db.epoch(),observed=System.currentTimeMillis();String turnId=UUID.randomUUID().toString();token.check();
-                MemoryBridge.Config memoryConfig=rememberEnabled()?MemoryBridge.read():new MemoryBridge.Config(false,null,"",false,false);
+                AgentStore db=store();long epoch=db.epoch(),observed=receivedAt;attemptStore=db;attemptEpoch=epoch;String turnId=UUID.randomUUID().toString();token.check();
                 MemoryBridge.Result memoryPlan=null;JSONObject contextState=db.snapshot();JSONArray recallHits=null;
                 final JSONArray offered=proactive&&rememberEnabled()?MemoryLedger.followUps(contextState,java.time.LocalDate.now()):null;
                 String explicit=null;if(!proactive&&(user.startsWith("记住：")||user.startsWith("记住:")))explicit=user.substring(3).trim();
+                HistoryRecall.Plan historyQuery=!proactive&&explicit==null?HistoryRecall.plan(user,observed,java.time.ZoneId.systemDefault()):null;
+                final HistoryRecall.Result history=db.recallHistory(historyQuery,token);
+                token.check();if(db.epoch()!=epoch)throw new IOException("聊天记录已修改，请重新查询");
+                MemoryBridge.Config memoryConfig=rememberEnabled()&&history==null?MemoryBridge.read():new MemoryBridge.Config(false,null,"",false,false);
                 AgentReply result;
-                if(explicit!=null){
+                if(history!=null&&(history.fallback()!=null||!configured())){
+                    result=new AgentReply();result.reply=history.fallback()!=null?history.fallback():history.offline();
+                }else if(explicit!=null){
                     if(!rememberEnabled())throw new IOException("记忆已关闭，可在陪伴设置开启后再保存");
                     result=new AgentReply();result.reply="记下啦。以后聊到这件事，我会记得；想改的时候，到「记忆手账」里告诉我就好。";result.emotion="happy";
                 }else{
                     if(!configured())throw new IOException("我已经住进手机啦。去「模型连接」填好接口和 Key，我们就能真正聊天了。也可以先试试：记住：我喜欢蓝色。");
-                    if(rememberEnabled()){memoryPlan=MemoryBridge.evaluate(memoryConfig,contextState,new JSONArray(),user,observed,token);contextState=memoryPlan.state;recallHits=memoryPlan.hits;}
-                    String raw=model.generate(context(user,proactive,contextState,recallHits),token,partial->{String text=AgentPolicy.streamPreview(partial);if(!text.isEmpty())main.post(()->{if(current(token))listener.partial(text);});});
+                    if(rememberEnabled()&&history==null){memoryPlan=MemoryBridge.evaluate(memoryConfig,contextState,new JSONArray(),user,observed,token);contextState=memoryPlan.state;recallHits=memoryPlan.hits;}
+                    JSONArray request=context(user,proactive,contextState,recallHits,history);
+                    String raw=model.generate(request,token,partial->{String text=AgentPolicy.streamPreview(partial);if(!text.isEmpty())main.post(()->{if(current(token))listener.partial(text);});});
                     result=AgentReply.parse(raw);
+                    result.plan.ground(user,proactive);
+                    if(history==null&&!result.plan.valid()&&!"busy".equals(result.plan.availability)&&(proactive||Data.prefs().getBoolean("agent.proactive",false))){
+                        // One bounded repair, never an endless retry or an invented fifteen-minute choice.
+                        result.plan.repaired=true;
+                        try{
+                            request.put(new JSONObject().put("role","assistant").put("content",new JSONObject().put("reply",result.reply).toString()));
+                            request.put(new JSONObject().put("role","user").put("content","应用格式补齐请求（不是新用户消息）：上条正文已收到，不改正文。请按系统要求返回完整JSON，必须有next_check_minutes整数、availability及其本轮用户原话依据、initiative、topic。当前缺少有效主动时间，请依据原用户消息和背景重新安排，不要填固定默认值。"));
+                            AgentReply repaired=AgentReply.parse(model.generate(request,token,ignored->{}));
+                            repaired.plan.ground(user,proactive);repaired.plan.repaired=true;
+                            if(repaired.plan.valid()){repaired.plan.source="model_repair";result.plan=repaired.plan;}
+                        }catch(Exception repairFailed){token.check();result.plan.repaired=true;}
+                    }
+                    if(history!=null){result.plan.availability="unchanged";result.plan.evidence="";}
                 }
                 token.check();
-                if(proactive&&"[安静陪伴]".equals(result.reply)){release(token);return;}
+                if(proactive&&(!result.plan.valid()||result.plan.quiet(result.reply,db.snapshot())||db.snapshot().optBoolean("proactiveWaiting"))){
+                    synchronized(AgentRuntime.class){if(current(token))db.initiativeDecision(epoch,"quiet",result.plan,System.currentTimeMillis());release(token);}return;
+                }
                 if(proactive){
                     final AgentReply output=result;final long commitEpoch=epoch;
                     main.post(()->{
                         if(!current(token))return;
                         // Recheck after the network wait, before saving a message the user won't see.
-                        if(!canSpeakNow()){release(token);return;}
+                        if(!canSpeakNow()){try{db.initiativeDecision(commitEpoch,"not-visible",output.plan,System.currentTimeMillis());}catch(Exception ignored){}release(token);return;}
                         try{
-                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,false,true)){release(token);return;}db.markFollowed(offered);}
-                            release(token);listener.done(output.reply,output.emotion);
+                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,false,true,null,null,turnId,observed,null,true,null,output.plan)){release(token);return;}db.markFollowed(offered,turnId);}
+                            release(token);listener.saved(turnId);listener.done(output.reply,output.emotion);
                         }catch(Exception e){release(token);listener.error("主动消息未能保存");}
                     });return;
                 }
-                if(rememberEnabled()){
+                if(rememberEnabled()&&history==null){
                     JSONArray incoming=MemoryLedger.candidates(user,result.memories,explicit,turnId,observed);
                     if(incoming.length()>0)memoryPlan=MemoryBridge.evaluate(memoryConfig,contextState,incoming,user,observed,token);
                     if(explicit!=null&&memoryPlan!=null&&memoryPlan.rejected!=null&&memoryPlan.rejected.length()>0){result.reply="这句话没有作为长期记忆保存。可以在记忆手账里手动写下你希望我记得的事。";result.emotion="calm";}
                 }
                 token.check();
-                final AgentReply output=result;final long completedEpoch=epoch;
+                if(history!=null){result.memories=new JSONArray();result.self=new JSONArray();}
+                final AgentReply output=result;final long completedEpoch=epoch;final String explicitWas=explicit;
                 final java.util.concurrent.atomic.AtomicBoolean delivered=new java.util.concurrent.atomic.AtomicBoolean();
-                Runnable completion=()->{if(!delivered.compareAndSet(false,true))return;release(token);if(db.epoch()!=completedEpoch){listener.error("记录已修改，本次已完成的回复不再显示");return;}listener.done(output.reply,output.emotion);};
-                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");token.completed=completion;}
+                Runnable completion=()->{if(!delivered.compareAndSet(false,true))return;release(token);if(db.epoch()!=completedEpoch){listener.error("记录已修改，本次已完成的回复不再显示");return;}listener.saved(turnId);listener.done(output.reply,output.emotion);if(explicitWas==null&&history==null)writeDiaryIfDue();};
+                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true,null,history==null&&explicit==null?result.plan:null))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");if(history==null)Nickname.committed(user);token.completed=completion;}
                 main.post(completion);
-            }catch(Exception e){String msg=e instanceof java.net.SocketTimeoutException?"等模型回复超时了，消息还在，可以重试。":e.getMessage();main.post(()->{if(current(token)){release(token);listener.error(msg==null?"连接失败，请检查网络和模型配置":msg);}});}
+            }catch(Exception e){if(proactive&&attemptStore!=null)try{synchronized(AgentRuntime.class){if(current(token))attemptStore.initiativeDecision(attemptEpoch,"error",Initiative.DEFAULT_MINUTES,System.currentTimeMillis());}}catch(Exception ignored){}String msg=e instanceof java.net.SocketTimeoutException?"等模型回复超时了，消息还在，可以重试。":e.getMessage();main.post(()->{if(current(token)){release(token);listener.error(msg==null?"连接失败，请检查网络和模型配置":msg);}});}
         });return true;
     }
+    static boolean nightQuiet(){return nightQuiet(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));}
+    static boolean nightQuiet(int hour){return Data.prefs().getBoolean("agent.quietNight",false)&&AgentPolicy.quiet(hour);}
     static boolean canSpeakNow(){
         PetService service=PetService.instance;if(service==null)return false;PetService.Pet pet=service.pets.get("main");
         if(pet==null||!pet.visible||pet.docked||!service.screenOn||MainActivity.active||Chat.isPetChatOpen("main"))return false;
-        if(!Data.prefs().getBoolean("agent.proactive",false)||Data.prefs().getLong("agent.focusUntil",0)>System.currentTimeMillis()||AgentPolicy.quiet(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)))return false;
+        if(!Data.prefs().getBoolean("agent.proactive",false)||Data.prefs().getLong("agent.focusUntil",0)>System.currentTimeMillis()||nightQuiet())return false;
         KeyguardManager lock=service.getSystemService(KeyguardManager.class);NotificationManager nm=service.getSystemService(NotificationManager.class);
         return (lock==null||!lock.isKeyguardLocked())&&(nm==null||nm.getCurrentInterruptionFilter()==NotificationManager.INTERRUPTION_FILTER_ALL);
     }
     static void heartbeat(PetService service) {
         // Runs every 30 s while the screen is on; proactive chat is off by default, so check that first.
-        if(!Data.prefs().getBoolean("agent.proactive",false)||busy()||!PersonaManager.isInitialized("main")||!configured())return;
+        if(!canSpeakNow()||busy()||!PersonaManager.isInitialized("main")||!configured())return;
         try {
             KeyguardManager lock=service.getSystemService(KeyguardManager.class);if(lock!=null&&lock.isKeyguardLocked())return;
             NotificationManager nm=service.getSystemService(NotificationManager.class);if(nm!=null&&nm.getCurrentInterruptionFilter()!=NotificationManager.INTERRUPTION_FILTER_ALL)return;
             PetService.Pet pet=service.pets.get("main");AgentStore db=store();long now=System.currentTimeMillis();
-            String day=new SimpleDateFormat("yyyy-MM-dd",Locale.ROOT).format(new Date());int n=db.attempts(day);
-            boolean visible=pet!=null&&pet.visible&&!pet.docked&&!MainActivity.active&&!Chat.isPetChatOpen("main");
-            boolean focus=Data.prefs().getLong("agent.focusUntil",0)>now;
-            if(!AgentPolicy.mayInitiate(now,Math.max(db.lastUser(),lastTouch),db.lastAttempt(),n,Calendar.getInstance().get(Calendar.HOUR_OF_DAY),true,service.screenOn,visible,focus,busy()))return;
+            String day=new SimpleDateFormat("yyyy-MM-dd",Locale.ROOT).format(new Date());
+            if(!db.initiativeDue(now,lastTouch))return;
             db.reserveAttempt(day,now);
-            send("",true,new Listener(){public void partial(String t){}public void done(String t,String e){
-                if(PetService.instance==service&&service.screenOn&&pet.visible&&!pet.docked&&!MainActivity.active&&(lock==null||!lock.isKeyguardLocked())&&!AgentPolicy.quiet(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))&&(nm==null||nm.getCurrentInterruptionFilter()==NotificationManager.INTERRUPTION_FILTER_ALL)&&Data.prefs().getBoolean("agent.proactive",false)&&Data.prefs().getLong("agent.focusUntil",0)<=System.currentTimeMillis())express("main",e,t);
+            send("",true,new Listener(){String turn;public void saved(String id){turn=id;}public void partial(String t){}public void done(String t,String e){
+                if(PetService.instance==service&&canSpeakNow())express("main",e,t,turn);
             }public void error(String error){Data.log("main","主动陪伴请求未完成");}});
         }catch(Exception e){Data.log("main","主动陪伴暂不可用");}
     }

@@ -1,0 +1,7 @@
+0.4.8 final product / MuMu Android API35 x86_64
+13 Android ART core suites passed, 0 failed; includes 33 initiative checks.
+32 isolated Android runtime checks passed: real Handler/Keystore, synthetic model, separate UID, no internet.
+80 framework scenarios passed on final build, including 8 initiative runtime scenarios.
+Live smoke: timestamped physical touch persisted; proactive message appeared in chat; next consideration persisted and displayed.
+No user data cleared, no API key extracted; temporary UI driver and isolated test package removed.
+Screenshots stay local. A two-minute user request was not verified as an exact scheduled reminder; see VALIDATION.md.

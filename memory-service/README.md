@@ -1,4 +1,6 @@
-# 大肥鱼 × Agent 拟人记忆：双项目联调
+# 大肥鱼 × Agent 拟人记忆：可选开发联调
+
+**0.4.0 起，记忆引擎已内置在手机，普通使用不需要本服务。** 本页保留Python对照方式；高级入口为「陪伴设置 → 记忆引擎」，长按第一段说明后出现「开发联调」。下文0.3.0启动方法适用于开发对照，不能再当作当前版本的前置安装要求。
 
 0.3.0 将 `agent-anthropomorphic-memory` 的真实 Python 引擎接入 Android runtime。不是另一套仿写规则，也不是在 APK 中安装 Python。完整引擎运行在你自己的电脑或 HTTPS 服务上；Android 保持独立，不依赖 DSH / OpenClaw。
 
@@ -49,7 +51,7 @@ $env:MEMORY_EMBEDDING_MODEL_DIR='D:/Models/your-onnx-model'
 
 ## 数据与连接
 
-- 手机是主存储：用户原话、来源、活跃记忆、历史归档、整理记录和向量缓存随对话原子保存。保留 120 条活跃记忆、最多 240 条归档、512 条整理记录，整个状态最多 4 MiB。
+- 手机是主存储：用户原话、来源、活跃记忆、历史归档、整理记录和向量缓存随对话保存。手机内置引擎上限为500条活跃记忆、1000条归档、512条整理记录，工作状态最多4MiB；本页Python对照协议仍限120条活跃记忆、240条归档。超过协议容量时手机使用内置引擎，不发送无法接受的请求。
 - 请求只携带记忆快照、本轮查询和待记原话，不携带人格、聊天模型 Key、完整聊天记录或动画资源。模型调用由自己的服务配置决定。
 - 服务每次在独立子进程和临时目录处理，正常完成与工作进程超时均由父进程清理，不维护另一个持久用户记忆库。它不会自动同步你其他 CLI/OpenClaw 用户档案。
 - 向量缓存回到手机，下次请求复用。删除记忆会清除关联版本、直接来源对话、相应整理记录、整个向量缓存和恢复备份；已经自行导出的文件、外部模型服务商的数据不由 App 删除。
@@ -75,6 +77,6 @@ Android 测试：构建 APK 后运行仓库 `tests/robolectric/run-tests.ps1`。
 python tools/sync-memory-service.py --source '../agent-anthropomorphic-memory'
 ```
 
-然后运行 `python tools/export-memory-rules.py` 重新生成手机离线引擎的规则表（`MemoryRules.java`），并用 `tests/local-engine/run.sh` 确认 Java 离线引擎与 Python 在共享场景上仍逐字段一致。随后重跑 Python、Android 的共享场景和生命周期回归，再更新基线与来源清单。不要为了让测试通过修改原始场景的预期。
+随后重跑 Python、Android 的共享场景和生命周期回归，再更新基线与来源清单。不要为了让测试通过修改原始场景的预期。
 
 上游 `9862c93` 报告语义检索 + DeepSeek 实测达到164/166，并将 `MEMORY_LLM_JUDGE_MAX_TOKENS` 默认值调整为2048；本包已纳入该修复。164/166 是上游报告，本次未用真实云模型独立复测，详见随包 `upstream/eval/README.md`。

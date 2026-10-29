@@ -31,7 +31,7 @@ final class ModelSettings {
         ApiEndpoint address=new ApiEndpoint(base);ApiEndpoint.validateModel(model);String secret=selectedSecret(address.base,entered);
         String encrypted=Chat.encrypt(secret);AgentRuntime.cancel();
         if(!Data.prefs().edit().putString("api.url",address.base).putString("api.model",model.trim()).putBoolean("api.header",header)
-            .putString("api.secret",encrypted).putString("api.secret.origin",address.origin).commit())throw new IOException("模型设置保存失败，请重试");
+            .putString("api.secret",encrypted).putString("api.secret.origin",address.origin).remove("api.balance.summary").remove("api.balance.at").commit())throw new IOException("模型设置保存失败，请重试");
     }
-    static synchronized void clear()throws IOException {AgentRuntime.cancel();if(!Data.prefs().edit().remove("api.secret").remove("api.secret.origin").commit())throw new IOException("清除失败，请重试");}
+    static synchronized void clear()throws IOException {AgentRuntime.cancel();if(!Data.prefs().edit().remove("api.secret").remove("api.secret.origin").remove("api.balance.summary").remove("api.balance.at").commit())throw new IOException("清除失败，请重试");}
 }

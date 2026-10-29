@@ -8,12 +8,6 @@ final class AgentPolicy {
     static final Set<String> EMOTIONS = new HashSet<>(Arrays.asList("calm","happy","shy","curious","concerned","playful","sleepy"));
     static String emotion(String value) { return EMOTIONS.contains(value) ? value : "calm"; }
     static boolean quiet(int hour) { return hour >= 23 || hour < 8; }
-    static boolean mayInitiate(long now, long lastUser, long lastAttempt, int attempts, int hour,
-                               boolean enabled, boolean screen, boolean visible, boolean focused, boolean busy) {
-        return enabled && screen && visible && !focused && !busy && !quiet(hour) && attempts < 3
-            && lastUser > 0 && now >= lastUser && now-lastUser >= 30*60_000L
-            && now >= lastAttempt && now-lastAttempt >= 90*60_000L;
-    }
     static Set<String> tokens(String s) {
         Set<String> out=new HashSet<>(); String clean=s.toLowerCase(Locale.ROOT).replaceAll("[^\\p{L}\\p{N}]", " ");
         for(String part:clean.split("\\s+")) {
@@ -49,11 +43,13 @@ final class AgentPolicy {
         return open>=0&&close>open&&text.indexOf("\"reply\"",open)>open?text.substring(open,close+1):null;
     }
     /** What the bubble may show while streaming: the reply field, or plain text when the model ignored JSON. */
+    static String replyText(String text){return text.replaceFirst("(?i)^(?:\\s*\\[(?:tool|assistant)\\]\\s*)+","");}
     static String streamPreview(String raw) {
         String text=raw.replaceAll("(?s)<think>.*?</think>","").trim();
         if(text.startsWith("<think>"))return "";
-        if(text.indexOf('{')>=0||text.startsWith("`"))return partialReply(text);
-        return text;
+        String visible=replyText(text.indexOf('{')>=0||text.startsWith("`")?partialReply(text):text);
+        String lower=visible.toLowerCase(Locale.ROOT);if("[tool]".startsWith(lower)||"[assistant]".startsWith(lower))return "";
+        return visible;
     }
     static boolean reasoningModel(String model) { return model.toLowerCase(Locale.ROOT).matches("(?s).*(reason|-r1|thinking|qwq).*"); }
     /** "：<message>" from an error body in OpenAI, Azure or plain-text form; never HTML pages or the caller's key. */

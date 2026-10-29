@@ -1,5 +1,7 @@
 # 来源与许可
 
+- 0.4.0 将拟人记忆的规则、时间解析与操作流程移植为Android原生实现；生成规则及源文件哈希见 `docs/native-rules-source.json`。手机模型辅助适配为本项目新增，源项目MIT许可继续保留。
+
 - 0.3.0 完整记忆引擎：[agent-anthropomorphic-memory](https://github.com/ktao732084-arch/agent-anthropomorphic-memory)，MIT。固定提交和逐文件来源见 `memory-service/UPSTREAM.json`，许可原文为 `memory-service/upstream/LICENSE`。服务适配器及部分校验增强为本次集成新增，已回提 PR #4。
 
 - Android 底座：[yshuang722-spec/xiaoxiao-zhuochong](https://github.com/yshuang722-spec/xiaoxiao-zhuochong)，保留原 MIT 声明，见 `THIRD-PARTY-LICENSE.txt`。本次修改包括独立应用身份、主界面、人格、记忆、网络流式和运行时。
