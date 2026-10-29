@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-29",
+  "branch": "codex/shared-experiences-lite",
+  "source_commit": "77994d93da0c303d81fe7da763ff622b2de50e45",
+  "baseline_commit": "245b934",
+  "status": "implemented_and_regression_checked_with_remaining_model_quality_issues",
+  "release": {"merged_to_main": false, "published": false, "version": "0.4.9.4", "version_code": 18},
+  "changes": [
+    "New selected chat moments retain at most two preceding user excerpts within fifteen minutes, with source IDs and timestamps. Only already-offered material is eligible.",
+    "Recall scores the primary event and each contextual quote independently; a small writing-topic alias group supplements existing chess aliases.",
+    "Deleting a contextual source removes its cue without removing an independently sourced main moment. Store commit checks deleted cue sources as well as the epoch.",
+    "Ordinary user turns no longer receive unrelated recent-diary fallback; empty-topic proactive consideration retains that option.",
+    "Diary generation and recall slots distinguish present retrospective attitudes from historical details and user experiences from the character's own history.",
+    "Explicit memory questions conditionally ask the model to verify matching evidence and admit uncertainty if no matching material is available."
+  ],
+  "scope_limits": [
+    "No extra model calls, memory service, vector database or classifier added.",
+    "Frozen personas, persona assets and current mood behavior were not changed.",
+    "Existing pages remain readable and are not automatically backfilled with context.",
+    "Prompt constraints do not prove semantic grounding of generated prose."
+  ],
+  "build": {
+    "passed": true,
+    "jdk": 17,
+    "platform": 34,
+    "signatures": ["v2", "v3"],
+    "dex_sha256": "015c0ce7b5faa403d3caf50481e1065abb55c6d2d333a90c5d086cc8bc146d03",
+    "apk": "test-signed; not for distribution"
+  },
+  "regression": {
+    "host_core_before_last_prompt_and_gate_changes": "passed, including 53 diary assertions and the unchanged 84-scenario native memory replay",
+    "framework_broad": {"tests": 118, "failures": 0, "errors": 0, "note": "Affected suites before final wording and unrelated-diary gate; excludes unrelated model setup/update suites and the already-validated Python HTTP replay."},
+    "framework_final_affected": {"tests": 29, "failures": 0, "errors": 0, "suites": ["SharedExperienceUiTest", "CompanionBehaviorTest", "PersonaContinuityTest", "InitiativeRuntimeTest"]},
+    "android_art_final": {"device": "MuMu emulator", "android": "15", "api": 35, "uses_final_product_dex": true, "suites_passed": 20, "suites_failed": 0, "diary_assertions": 54},
+    "native_memory_replay": {"scenarios": 84, "expectations_passed": 145, "expectations_total": 166, "baseline_passed": 145, "regressions": 0},
+    "android_instrumentation_final": {"package": "com.dafeiyu.experiencechecks", "runtime_assertions": 63, "notebook_assertions": 19, "passed": true, "model": "controlled", "formal_app_data_touched": false},
+    "intermediate_infrastructure_issues": [
+      "The opt-in live harness needed a checked JSONException-compatible throws declaration to compile against Android JSON; test harness only.",
+      "A build overlapped Robolectric's open APK resource handle; serialization of builds resolved the file lock and overlapping instrumentation compilation. Final checks used the completed final build.",
+      "One earlier notebook instrumentation run failed while UiAutomation was connecting/disconnecting. An unchanged rerun and the final-build run passed; product UI did not change."
+    ]
+  },
+  "live_model": {
+    "model_alias": "deepseek-flash",
+    "chat_temperature": 1.3,
+    "diary_temperature": "provider default",
+    "thinking": "disabled",
+    "styles": ["classic", "gentle"],
+    "repetitions_each": 2,
+    "method": "Same synthetic scenarios and product transport/prompt/parser/storage harness as baseline. Independent probes isolate the diary channel; no real user's history sent.",
+    "final_primary": {"requests": 56, "valid_results": 55, "format_errors": 1, "network_errors": 0, "error_case": "classic-1/game-feeling"},
+    "final_diagnostics_initial": {"requests": 24, "valid_results": 6, "dns_errors": 16, "connection_resets": 2},
+    "final_diagnostics_recheck": {"requests": 24, "valid_results": 24, "errors": 0, "note": "Reran the complete diagnostic conversations after DNS recovered, with the same product and model settings. Initial failures are retained separately."},
+    "comparison": {
+      "old_named_event": {"baseline_selected": 4, "final_selected": 4, "final_core_recalled": 4, "total": 4},
+      "old_paraphrase": {"baseline_selected": 1, "final_selected": 4, "baseline_explicit_event_reference": 0, "final_explicit_event_reference": 4, "total": 4},
+      "old_topic_without_name": {"baseline_selected": 0, "final_selected": 4, "final_explicit_event_reference": 3, "total": 4},
+      "missing_memory": {"baseline_confident_false_memory": 3, "final_confident_false_memory": 0, "final_acknowledged_missing_evidence": 4, "total": 4},
+      "unrelated_recent_diary_injection": {"baseline_injected": 8, "final_injected": 0, "total": 8, "note": "Independent dinner probes plus diagnostic conversation topic switches."},
+      "game_diary_historical_detail": {"baseline_unsupported": 4, "final_unsupported": 1, "total": 4, "note": "Strict review: one final diary still described an unrecorded feeling at the past event rather than only a present attitude."},
+      "final_game_chat_grounding": {"valid_answers": 3, "format_errors": 1, "unsupported_historical_claims": 3, "note": "Still fails strict grounding: e.g. invented intentional loss, past internal state or later private review. No claim that hallucination was solved."}
+    },
+    "remaining_issues": [
+      "Game replies still invent past mental states, causes or later review even though structured event facts remain correct; withholding recollection does not fully prevent this.",
+      "A diagnostic paraphrase answer drifted on numbers. Diary topic selection is not equivalent to faithful generation.",
+      "Some replies use meta-memory wording, arbitrary statements or reminders not explicitly requested; conversational naturalness remains variable.",
+      "Some topic-switch replies answer dinner but still mention the writing task from recent conversation history. Removing unrelated diary fallback does not erase recent chat context.",
+      "One final primary request returned malformed/incomplete output and was rejected by the existing parser."
+    ],
+    "development_runs_retained": {"run-2": {"requests": 56, "format_errors": 2}, "run-3": {"requests": 56, "format_errors": 1}, "diagnostic-3": {"requests": 24, "errors": 0}},
+    "requests_this_development_turn": {"scenario_attempts": 240, "connection_checks": 6},
+    "interpretation": "Source-backed recall and no-memory honesty improved in this small sample. Stored reflections improved but conversational factual grounding is still unresolved. These are assistant-reviewed qualitative observations, not independent human ratings or population success rates."
+  },
+  "local_evidence": {
+    "final_primary": "build/live-experience-checks/run-4/results.json",
+    "final_primary_sha256": "ade2a50d8a72211809ea5b5fa7a8ea8dc3e06aab52469cf077f0031a920e4375",
+    "diagnostics_initial": "build/live-experience-checks/diagnostic-4/results.json",
+    "diagnostics_initial_sha256": "9c0f36ca79abffc1136f5957df755e8a878c0f838aebb9230b87696d6740ab16",
+    "diagnostics_recheck": "build/live-experience-checks/diagnostic-4-recheck/results.json",
+    "diagnostics_recheck_sha256": "911a2d23393fc8e4c83091b35b6b30796ed9f00e522c726d89e577bb5476b6a4",
+    "review": "build/live-experience-checks/REFINEMENT_REVIEW.md",
+    "raw_responses_committed": false,
+    "credential_persisted": false
+  }
+}

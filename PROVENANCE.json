@@ -1563,6 +1563,12 @@
       "sha256": "1d87f3c873dff2938499d84249401007dddc8c617bd5bd8f015cc55a466651cb"
     },
     {
+      "path": "docs/test-reports/shared-experiences-refinement.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "96ab0bdb686d7257dc0649317f9c49864e795c00a0a8d3a743c557131e8aba76"
+    },
+    {
       "path": "docs/test-reports/shared-experiences.json",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
