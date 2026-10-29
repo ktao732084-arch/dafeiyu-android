@@ -2,15 +2,15 @@ package com.xiaoxiao.pet;
 
 import android.app.Dialog;import android.content.Context;import android.graphics.*;import android.graphics.drawable.Drawable;import android.os.Build;import android.view.*;import android.widget.*;
 
-/** Four nearby commands. The detailed action catalog is a separate scrollable surface. */
+/** Five nearby commands: chat, feed, actions, going out and more. The detailed action catalog is a separate scrollable surface. */
 final class PetMenu {
  static void show(Context c,PetService.Pet pet){
   if(pet.frame==null||PetService.instance==null)return;
   pet.frame.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
   Dialog d=CompactPanel.create(c);LinearLayout l=new LinearLayout(c);l.setOrientation(1);int pad=Apple.dp(c,8);l.setPadding(pad,pad,pad,pad);
   TextView title=Apple.label(c,Data.name(pet.role),13,true);title.setTextColor(Apple.SECONDARY);title.setSingleLine(true);title.setEllipsize(android.text.TextUtils.TruncateAt.END);title.setPadding(pad,pad,pad,pad);l.addView(title);
-  String[] names={"聊天","动作","大小","隐藏"};
-  for(int i=0;i<names.length;i++){final int index=i;Button b=GroupedList.menuOption(l,names[i],v->{d.dismiss();if(index==0)Chat.show(c,pet.role,pet.id);if(index==1)new ActionSheet(c,pet,false,null).show();if(index==2)SizePanel.show(c,pet);if(index==3&&PetService.instance!=null){pet.hide();PetService.instance.save();Toast.makeText(c,Data.name(pet.role)+"先回小窝了。想她的时候，在首页点「让她住到屏幕上」",Toast.LENGTH_LONG).show();PetService.instance.stopIfEmpty();}});b.setCompoundDrawablePadding(Apple.dp(c,12));b.setCompoundDrawablesWithIntrinsicBounds(new MenuIcon(c,i),null,null,null);}
+  String[] names={"聊天","喂食","动作","出门","更多"};
+  for(int i=0;i<names.length;i++){final int index=i;Button b=GroupedList.menuOption(l,names[i],v->{d.dismiss();if(index==0)Chat.show(c,pet.role,pet.id);if(index==1)GrowthSheets.feed(c,pet);if(index==2)new ActionSheet(c,pet,false,null).show();if(index==3)GrowthSheets.trip(c,pet);if(index==4)GrowthSheets.more(c,pet);});b.setCompoundDrawablePadding(Apple.dp(c,12));b.setCompoundDrawablesWithIntrinsicBounds(new MenuIcon(c,i),null,null,null);}
   d.setContentView(l);d.setCanceledOnTouchOutside(true);Window w=d.getWindow();w.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);w.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
   int sw=PetService.instance.sw(),sh=PetService.instance.sh();Rect safe=new Rect(0,0,sw,sh);
   if(Build.VERSION.SDK_INT>=30){android.view.WindowMetrics m=c.getSystemService(WindowManager.class).getMaximumWindowMetrics();android.graphics.Insets in=m.getWindowInsets().getInsetsIgnoringVisibility(WindowInsets.Type.systemBars()|WindowInsets.Type.displayCutout());safe.set(in.left,in.top,sw-in.right,sh-in.bottom);}
@@ -27,9 +27,10 @@ final class PetMenu {
   public int getIntrinsicWidth(){return size;}public int getIntrinsicHeight(){return size;}
   public void draw(Canvas c){c.save();c.translate(getBounds().left,getBounds().top);c.scale(size/24f,size/24f);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1.6f);p.setStrokeCap(Paint.Cap.ROUND);p.setStrokeJoin(Paint.Join.ROUND);p.setColor(Apple.INK);Path path=new Path();
    if(kind==0){c.drawRoundRect(3,4,21,17,4,4,p);path.moveTo(6,17);path.lineTo(6,21);path.lineTo(11,17);}
-   if(kind==1){path.moveTo(8,5);path.lineTo(19,12);path.lineTo(8,19);path.close();}
-   if(kind==2){path.moveTo(3,9);path.lineTo(3,3);path.lineTo(9,3);path.moveTo(15,21);path.lineTo(21,21);path.lineTo(21,15);path.moveTo(7,17);path.lineTo(17,7);}
-   if(kind==3){c.drawOval(3,7,21,17,p);c.drawCircle(12,12,3,p);path.moveTo(3,3);path.lineTo(21,21);}c.drawPath(path,p);c.restore();}
+   if(kind==1){path.moveTo(3,11);path.lineTo(21,11);path.moveTo(4,11);path.cubicTo(4,17,8,20,12,20);path.cubicTo(16,20,20,17,20,11);path.moveTo(9,7);path.quadTo(10,5,9,3);path.moveTo(14,7);path.quadTo(15,5,14,3);}
+   if(kind==2){path.moveTo(8,5);path.lineTo(19,12);path.lineTo(8,19);path.close();}
+   if(kind==3){path.moveTo(3,11);path.lineTo(21,4);path.lineTo(15,20);path.lineTo(11,13);path.close();path.moveTo(11,13);path.lineTo(21,4);}
+   if(kind==4){p.setStyle(Paint.Style.FILL);c.drawCircle(5,12,1.8f,p);c.drawCircle(12,12,1.8f,p);c.drawCircle(19,12,1.8f,p);}c.drawPath(path,p);c.restore();}
   public void setAlpha(int a){p.setAlpha(a);}public void setColorFilter(ColorFilter f){p.setColorFilter(f);}public int getOpacity(){return PixelFormat.TRANSLUCENT;}
  }
 }

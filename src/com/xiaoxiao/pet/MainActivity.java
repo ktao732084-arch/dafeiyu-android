@@ -3,10 +3,10 @@ import android.app.*;import android.os.*;import android.content.*;import android
 
 public class MainActivity extends Activity {
  static boolean active;boolean updateResumed;LinearLayout content;final Handler handler=new Handler(Looper.getMainLooper());
- public void onCreate(Bundle b){Data.init(this);Apple.load();setTheme(Apple.dark?com.dafeiyu.companion.R.style.AppThemeDark:com.dafeiyu.companion.R.style.AppTheme);super.onCreate(b);try{if(!PersonaManager.ensureInitialized("main"))handler.post(()->PersonaPanel.show(this,"main"));}catch(Exception e){AgentPanel.fail(this,e);}render();consumeChatIntent();}
+ public void onCreate(Bundle b){Data.init(this);Apple.load();setTheme(Apple.dark?com.dafeiyu.companion.R.style.AppThemeDark:com.dafeiyu.companion.R.style.AppTheme);super.onCreate(b);try{boolean met=PersonaManager.ensureInitialized("main");GrowthStore.quiet();if(!met)handler.post(()->PersonaPanel.show(this,"main"));}catch(Exception e){AgentPanel.fail(this,e);}render();consumeChatIntent();}
  public void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);consumeChatIntent();}
- void consumeChatIntent(){if(getIntent()==null)return;if(getIntent().getBooleanExtra("openChat",false)){getIntent().removeExtra("openChat");handler.post(()->openChat());}if(getIntent().getBooleanExtra("openModel",false)){getIntent().removeExtra("openModel");handler.post(()->Chat.settings(this));}if(getIntent().getBooleanExtra("openUpdate",false)){getIntent().removeExtra("openUpdate");handler.post(()->UpdatePanel.show(this));}}
- public void onResume(){super.onResume();active=true;updateResumed=true;AgentRuntime.interruptProactive();Apple.load();render();PermissionsPanel.refresh();if(PetService.instance!=null)PetService.instance.control(true);handler.postDelayed(()->{if(updateResumed&&!isFinishing()&&!isDestroyed())UpdateRuntime.enter(this);},1500);}
+ void consumeChatIntent(){if(getIntent()==null)return;if(getIntent().getBooleanExtra("openChat",false)){getIntent().removeExtra("openChat");handler.post(()->openChat());}if(getIntent().getBooleanExtra("openModel",false)){getIntent().removeExtra("openModel");handler.post(()->Chat.settings(this));}if(getIntent().getBooleanExtra("openStory",false)){getIntent().removeExtra("openStory");handler.post(()->GrowthPanel.show(this));}if(getIntent().getBooleanExtra("openUpdate",false)){getIntent().removeExtra("openUpdate");handler.post(()->UpdatePanel.show(this));}}
+ public void onResume(){super.onResume();active=true;updateResumed=true;AgentRuntime.interruptProactive();Apple.load();meet();render();PermissionsPanel.refresh();if(PetService.instance!=null)PetService.instance.control(true);handler.postDelayed(()->{if(updateResumed&&!isFinishing()&&!isDestroyed())UpdateRuntime.enter(this);},1500);}
  public void onPause(){updateResumed=false;UpdateRuntime.leave(this);Chat.interruptPresentation("main");active=false;if(PetService.instance!=null)PetService.instance.control(false);super.onPause();}
  public void onDestroy(){DialogLifecycle.close(this);handler.removeCallbacksAndMessages(null);super.onDestroy();}
  public void onConfigurationChanged(android.content.res.Configuration c){super.onConfigurationChanged(c);Apple.load();render();}
@@ -26,6 +26,7 @@ public class MainActivity extends Activity {
   ImageView portrait=new ImageView(this);portrait.setContentDescription("蓝色鲸鱼娘大肥鱼");portrait.setScaleType(ImageView.ScaleType.FIT_CENTER);try(java.io.InputStream in=getAssets().open(Data.role("main").optString("portrait"))){portrait.setImageBitmap(BitmapFactory.decodeStream(in));}catch(Exception ignored){}hero.addView(portrait,new LinearLayout.LayoutParams(-1,dp(190)));
   TextView name=Apple.label(this,Data.name("main"),20,true);name.setGravity(Gravity.CENTER);hero.addView(name);
   TextView line=text(PersonaManager.isInitialized("main")?"我在呢，有话就慢慢说。":"先和她打个招呼，决定她的性格吧。",14);line.setTextColor(Apple.SECONDARY);line.setGravity(Gravity.CENTER);line.setPadding(0,dp(8),0,dp(6));hero.addView(line);
+  growth(hero);
   Button chat=button(hero,"和她聊聊",v->openChat());Apple.button(chat,true);chat.setTextSize(16);chat.getLayoutParams().height=dp(50);((LinearLayout.LayoutParams)chat.getLayoutParams()).topMargin=dp(12);
   boolean visible=PetService.instance!=null&&PetService.instance.pets.get("main")!=null&&PetService.instance.pets.get("main").visible;
   LinearLayout pair=new LinearLayout(this);hero.addView(pair);Button history=button(pair,"她的小动作",v->manage());Button desk=button(pair,visible?"请她回来歇会":"让她住到屏幕上",v->{send(visible?"hideAll":"show","main");handler.postDelayed(this::render,300);});
@@ -36,6 +37,7 @@ public class MainActivity extends Activity {
   GroupedList.section(content,"她的声音");LinearLayout voice=GroupedList.group(content);GroupedList.row(voice,"模型连接",GroupedList.BOLT,GroupedList.SKY,v->Chat.settings(this));
   GroupedList.note(content,AgentRuntime.configured()?"已接通。聊天内容会发往你设置的模型服务商。":"还没接通。推荐 DeepSeek：去官网拿一枚 API Key，粘贴进来就能聊。");
   GroupedList.section(content,"我们的日常");LinearLayout life=GroupedList.group(content);
+  GrowthStore growth=PersonaManager.isInitialized("main")?GrowthStore.quiet():null;if(growth!=null)GroupedList.row(life,"我们的故事 · "+GrowthStore.story().chapter(growth.chapter()).title(),GroupedList.WAVE,GroupedList.TEAL,v->GrowthPanel.show(this));
   GroupedList.row(life,"记忆手账",GroupedList.BOOK,GroupedList.ORANGE,v->AgentPanel.memories(this));
   GroupedList.row(life,PersonaManager.isInitialized("main")?"她的性格 · "+PersonaManager.label("main"):"初次相遇 · 确定性格",GroupedList.HEART,GroupedList.PINK,v->PersonaPanel.show(this,"main"));
   GroupedList.row(life,"名字与称呼",GroupedList.TAG,GroupedList.VIOLET,v->ProfilePage.show(this,"main"));
@@ -43,6 +45,14 @@ public class MainActivity extends Activity {
   GroupedList.section(content,"关于");LinearLayout more=GroupedList.group(content);GroupedList.row(more,"关于与开源来源",GroupedList.INFO,GroupedList.GREY,v->about());
   GroupedList.row(more,"检查更新",GroupedList.INFO,GroupedList.SKY,v->UpdatePanel.show(this));
   TextView footer=text("大肥鱼 "+version()+" · 非官方社区二创\n记忆只存在这台手机里",12);footer.setTextColor(Apple.SECONDARY);footer.setGravity(Gravity.CENTER);footer.setLineSpacing(dp(3),1);footer.setPadding(0,dp(28),0,0);content.addView(footer);
+ }
+ /** Opening the app counts as meeting her today. */
+ void meet(){GrowthStore g=PersonaManager.isInitialized("main")?GrowthStore.quiet():null;if(g!=null)try{g.met();}catch(Exception ignored){}}
+ /** The chapter and today's summary under her name; tapping opens 我们的故事. */
+ void growth(LinearLayout hero){
+  GrowthStore g=PersonaManager.isInitialized("main")?GrowthStore.quiet():null;if(g==null)return;org.json.JSONObject s=g.snapshot();
+  TextView chip=text(GrowthPanel.summary(s)+"\n"+GrowthPanel.today(s),12);chip.setTextColor(Apple.BLUE);chip.setGravity(Gravity.CENTER);chip.setLineSpacing(dp(2),1);chip.setBackground(Apple.shape(this,Apple.TINT,14));chip.setPadding(dp(12),dp(8),dp(12),dp(8));chip.setContentDescription("我们的故事："+GrowthPanel.summary(s)+"，点按查看");chip.setOnClickListener(v->GrowthPanel.show(this));
+  LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.topMargin=dp(4);hero.addView(chip,p);
  }
  /**
   * After the first meeting, the two things still needed — a model so she can talk, and her place on the screen —
@@ -74,5 +84,5 @@ public class MainActivity extends Activity {
  void size(PetService.Pet p){SizePanel.show(this,p);}
  void manage(){if(!Settings.canDrawOverlays(this)){PermissionsPanel.show(this);return;}send("ensure","main");handler.postDelayed(()->{if(isFinishing()||PetService.instance==null)return;PetService.Pet p=PetService.instance.pets.get("main");if(p==null)return;LinearLayout l=column();l.setPadding(dp(16),0,dp(16),dp(16));LinearLayout actions=GroupedList.group(l);GroupedList.row(actions,"播放一个动作",GroupedList.PLAY,GroupedList.TEAL,v->{if(!p.visible)PetService.instance.show("main");new ActionSheet(this,p,false,null).show();});GroupedList.row(actions,"调整大小",GroupedList.SLIDERS,GroupedList.SKY,v->size(p));LinearLayout switches=GroupedList.group(l);GroupedList.toggle(switches,"自己随意做小动作",p.rotation,(v,on)->{p.rotation=on;if(PetService.instance!=null)PetService.instance.save();});GroupedList.toggle(switches,"可以拖动、会弹跳",Data.prefs().getBoolean("physics",true),(v,on)->Data.prefs().edit().putBoolean("physics",on).apply());new Apple.Builder(this).setTitle("她的小动作").setView(l).setPositiveButton("好的",null).show();},250);}
  void about(){new Apple.Builder(this).setTitle("大肥鱼 · 独立陪伴版").setMessage("版本 "+version()+"\n\n基于 yshuang722-spec/xiaoxiao-zhuochong 安卓版改造。桌宠上游：PC2005-cloud/dsh-pet；透明视频路线参考 OTFiles/dsh-pet-inAndroid。人格改编自 ERUIHNIYHBKBNF/dafeiyu-persona。\n\n新增独立对话运行时、可追溯记忆、流式回复、情绪动作与可选主动陪伴。无需 DSH 或电脑常开。\n\n代码按 MIT 条款；动画和角色素材另受上游非商业与署名条款约束。此体验包供非商业体验。\n\n模型提供 AI 回复，动画表达为角色演绎。应用不读取其他 App、屏幕或通知。完整来源和许可随源码包提供。").setPositiveButton("知道了",null).show();}
- protected void onActivityResult(int request,int result,Intent data){super.onActivityResult(request,result,data);if(request==42&&result==RESULT_OK&&data!=null)try(java.io.OutputStream out=getContentResolver().openOutputStream(data.getData())){out.write(AgentRuntime.store().snapshot().toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));Toast.makeText(this,"手账已导出（不含 API Key）",0).show();}catch(Exception e){Toast.makeText(this,"导出失败",0).show();}}
+ protected void onActivityResult(int request,int result,Intent data){super.onActivityResult(request,result,data);if(request==42&&result==RESULT_OK&&data!=null)try(java.io.OutputStream out=getContentResolver().openOutputStream(data.getData())){org.json.JSONObject export=AgentRuntime.store().snapshot();GrowthStore growth=GrowthStore.quiet();if(growth!=null){growth.sync();export.put("growth",growth.snapshot());}out.write(export.toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));Toast.makeText(this,"手账已导出（不含 API Key）",0).show();}catch(Exception e){Toast.makeText(this,"导出失败",0).show();}}
 }
