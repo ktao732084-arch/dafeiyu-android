@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "08867889c7dd0f87ba67aa60e60fc7524b91d8c01d6089e6685ddadcc929671c"
+      "sha256": "99259165180614861304224bd10cab25851e16b4685780cfa8f75b1c6694cd35"
     },
     {
       "path": "LICENSE",
@@ -1308,7 +1308,7 @@
       "path": "docs/GROWTH_DESIGN.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "fb0916efff72f1af237b5e8ea7e9bf6b69ce4a8c6ddc0623fff60b5165e9552f"
+      "sha256": "65dfac09ade2c6aaa25ceb59b90e549d578993e56cd6fc2de90f4d56393e946f"
     },
     {
       "path": "docs/GROWTH_INTEGRATION.md",
@@ -2270,13 +2270,13 @@
       "path": "src/com/xiaoxiao/pet/GrowthPanel.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "06ded85355c0b5726573c2deb4f0699ded38852673b8c6731c50d45eddbddbd4"
+      "sha256": "53ee6c5ad261711e6d3b0dae299d9616f29c7e49d7a373ca95fcfc4a32c7667a"
     },
     {
       "path": "src/com/xiaoxiao/pet/GrowthSheets.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "7a209660ae484bf8ad62837acbc775c64905a67096b29c85c6c84639a2bcfe66"
+      "sha256": "761861aa0623a8b2c3a739b069432e16e2c3f8aa0c24d12070a4f109244fa736"
     },
     {
       "path": "src/com/xiaoxiao/pet/GrowthStore.java",
@@ -2804,7 +2804,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/GrowthUiTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "f8dacdb4f2c98bc352923f637a04737a36f68686db206874d7bfdc3c367d5845"
+      "sha256": "510ab039d3e8bae3fd49debfb7e99e5d7eac12f4429b3125adce3ce209c83dfd"
     },
     {
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/HistoryRecallIntegrationTest.java",
@@ -2886,7 +2886,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/UsabilityUiTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "e87032ebd48686adb91a8cb76db5e85e30ccd76e457b4dd13e1ca51dba8f443e"
+      "sha256": "6fe8ef44ccf989467b0bcec32dfa1ce351d47774cf8d6413f1259f52223ae230"
     },
     {
       "path": "tests/robolectric/src/test/resources/robolectric.properties",
