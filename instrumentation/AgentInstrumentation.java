@@ -69,7 +69,7 @@ public class AgentInstrumentation extends Instrumentation {
     check("model".equals(AgentRuntime.store().snapshot().getJSONObject("initiativePlan").getString("source")),"schedule provenance persisted on Android");
     int beforeNag=AgentRuntime.history().length();AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"我不催，你还没回复\",\"next_check_minutes\":41}";
     AgentRuntime.send("",true,new Reply());AgentRuntime.worker.submit(()->{}).get(10,TimeUnit.SECONDS);check(AgentRuntime.history().length()==beforeNag,"announcing silence does not send another message");
-    AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"好，等你忙完。\",\"emotion\":\"concerned\",\"mood_level\":2,\"mood_cause\":\"想让你安心忙完\",\"next_check_minutes\":45,\"availability\":\"busy\",\"availability_evidence\":\"我在忙，等忙完再聊\",\"initiative\":\"speak\",\"topic\":\"等你回来\"}";
+    AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"好，等你忙完。\",\"emotion\":\"concerned\",\"mood_level\":2,\"mood_cause\":\"想让你安心忙完\",\"mood_changed\":true,\"next_check_minutes\":45,\"availability\":\"busy\",\"availability_evidence\":\"我在忙，等忙完再聊\",\"initiative\":\"speak\",\"topic\":\"等你回来\"}";
     Reply combined=new Reply();AgentRuntime.send("我在忙，等忙完再聊",false,combined);combined.await();
     check(combined.error==null,"character reply keeps initiative protocol on Android");
     JSONObject mergedState=AgentRuntime.store().snapshot();check(mergedState.optInt("moodLevel")==2&&"想让你安心忙完".equals(mergedState.optString("moodCause")),"mood strength and cause saved beside schedule");
@@ -82,6 +82,11 @@ public class AgentInstrumentation extends Instrumentation {
     check(!growth.hungry(),"feeding state is visible to pet actions");
     check(new org.json.JSONObject(new String(java.nio.file.Files.readAllBytes(growth.file.toPath()),"UTF-8")).optInt("feeds")==priorFeeds+1,"growth writer persists on Android filesystem");
     check(growth.unlocked(Data.actions("main")).contains(Data.idle("main")),"idle animation remains available");
+    long originalMoodAt=AgentRuntime.store().snapshot().getLong("emotionAt");String moodSource=AgentRuntime.store().snapshot().optString("moodSource");
+    AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"嗯，听你说。\",\"emotion\":\"playful\",\"mood_level\":3,\"mood_cause\":\"只是在改写\",\"mood_changed\":false,\"next_check_minutes\":30}";
+    Reply carried=new Reply();AgentRuntime.send("嗯",false,carried);carried.await();
+    JSONObject carriedMood=AgentRuntime.store().snapshot();check(carried.error==null&&carriedMood.getLong("emotionAt")==originalMoodAt,"unchanged mood does not renew its clock on Android");
+    check("concerned".equals(carried.emotion)&&"concerned".equals(carriedMood.optString("emotion"))&&moodSource.equals(carriedMood.optString("moodSource")),"unchanged mood retains kind and causal source on Android");
     result.putString("stream","PASS: "+checks+" Android runtime checks\n");
    }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;MemoryBridge.client=MemoryBridge::http;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}
   }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e.toString());result.putString("stack",android.util.Log.getStackTraceString(e));}

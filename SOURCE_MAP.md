@@ -151,6 +151,8 @@ Nickname、ChatPolishRulesTest和ChatPolishTest由本项目新增，称呼识别
 
 ## 0.4.9.2 轻量更新
 
+后续独立人格连续性分支对预设台词、日记指导、条件化相处理解及心情续期的改动由本项目独立编写；只借鉴此前 Alice 1.3.45 静态调研中的分层、条件使用及连续性思路，没有导入其源码、提示词或角色文案。既有桌宠、素材、记忆引擎与其他合并分支的归属保持不变。
+
 后续 `release.ps1`、`release-sync.py`、`release-remote.py` 与同步测试为本项目新增发布编排，复用已有 prepare-update.py、GitHub CLI、OpenSSH 和 curl；不引入第三方 Python 库或服务器常驻程序。本次自动化不改变 App 版本或 APK。
 
 AppUpdate、UpdateTransport、UpdateApk、UpdateFileProvider、UpdateRuntime、UpdatePanel、prepare-update.py、部署模板及相应测试均为本项目新增实现。使用 Android 平台网络、包管理器、ContentProvider 和系统安装界面；没有引入第三方更新 SDK、动态服务端或外部 Agent 代码。合入当前主分支后以 0.4.9.2 发布，保留原产品与素材归属。

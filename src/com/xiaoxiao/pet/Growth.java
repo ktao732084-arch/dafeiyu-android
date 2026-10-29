@@ -227,11 +227,15 @@ final class Growth {
         return out;
     }
     static Scene scene(Story s,int chapter,boolean custom,Material m){
+        return scene(s,chapter,custom,m,null);
+    }
+    static Scene scene(Story s,int chapter,boolean custom,Material m,PersonaManager.Persona style){
         Chapter c=s.chapter(chapter);Scene out=new Scene(c.id,c.title());List<JSONObject> used=picks(c.id,m);
         Map<String,String> real=values(m,used),plain=values(m,Collections.emptyList());
         for(String[] step:custom?c.neutral:c.scene){
-            String line=fill(step[1],real);if(line==null)line=fill(step[2],real);
-            String safe=fill(step[1],plain);if(safe==null)safe=fill(step[2],plain);
+            String main=PersonaManager.storyLine(custom?null:style,step[1]),fallback=PersonaManager.storyLine(custom?null:style,step[2]);
+            String line=fill(main,real);if(line==null)line=fill(fallback,real);
+            String safe=fill(main,plain);if(safe==null)safe=fill(fallback,plain);
             if(line!=null){out.steps.add(new String[]{step[0],line});if(safe!=null)out.fallback.add(safe);}
         }
         out.steps.add(new String[]{"","（"+c.title()+" · 解锁："+c.unlocks+"）"});out.fallback.add("（"+c.title()+" · 解锁："+c.unlocks+"）");

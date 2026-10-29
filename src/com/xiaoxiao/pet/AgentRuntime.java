@@ -60,7 +60,7 @@ final class AgentRuntime {
         in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.signature=PersonaManager.signature("main");in.nickname=Nickname.current();
         String requested=!proactive&&history==null?Nickname.requested(user):null;if(requested!=null)in.nickname=requested;
         in.feeling=store().mood(System.currentTimeMillis());in.mood=in.feeling.optString("emotion","calm");in.timeZone=TimeZone.getDefault().getID();in.now=System.currentTimeMillis();in.initializedAt=PersonaManager.initializedAt("main");
-        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}in.remember=rememberEnabled();in.diary=diaryEnabled();if(in.remember&&in.diary&&history==null)in.understanding=Understanding.context(s);
+        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}in.remember=rememberEnabled();in.diary=diaryEnabled();if(in.remember&&in.diary&&history==null)in.understanding=Understanding.context(s,proactive?"":user);
         GrowthStore growth=GrowthStore.quiet();if(growth!=null){in.chapter=growth.chapter();in.lore=growth.lore();}
         if(in.remember&&history==null){
             // Whole-conversation recall, minus what the history window already carries and corrected sources.
@@ -82,7 +82,7 @@ final class AgentRuntime {
             Data.prefs().edit().putString("diary.attempted",day.toString()).apply();
             long epoch=db.epoch();List<JSONObject> turns=db.dayTurns(day,zone);if(turns.isEmpty())return;JSONObject before=db.snapshot();
             // The same call is her slow loop: besides the diary it may add, confirm or retire her understanding of the user.
-            String raw=AgentTransport.request(ModelSettings.read(),Diary.request(day,turns,Data.name("main"),Understanding.offered(before)),new AgentTransport.Token(),partial->{},false,Diary.MAX_TOKENS);
+            String raw=AgentTransport.request(ModelSettings.read(),Diary.request(day,turns,Data.name("main"),Understanding.offered(before),PersonaManager.diaryGuidance("main")),new AgentTransport.Token(),partial->{},false,Diary.MAX_TOKENS);
             String text=Diary.parse(raw);Understanding.Update update=Understanding.parse(raw,turns,before,day.toString());
             if(text!=null&&db.addDiary(epoch,Diary.entry(day,text,turns,System.currentTimeMillis()),update))Data.log("main","陪伴日记已写好："+day+(update.empty()?"":"，相处理解已更新"));
         }catch(Exception e){Data.log("main","陪伴日记暂未写成");}finally{writingDiary.set(false);}});
@@ -143,7 +143,7 @@ final class AgentRuntime {
                         // Recheck after the network wait, before saving a message the user won't see.
                         if(!canSpeakNow()){try{db.initiativeDecision(commitEpoch,"not-visible",output.plan,System.currentTimeMillis());}catch(Exception ignored){}release(token);return;}
                         try{
-                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,false,true,null,null,turnId,observed,null,true,null,output.plan,output.moodLevel,rememberEnabled()?output.moodCause:"")){release(token);return;}db.markFollowed(offered,turnId);}
+                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,false,true,null,null,turnId,observed,null,true,null,output.plan,output.moodLevel,rememberEnabled()?output.moodCause:"",output.moodChanged)){release(token);return;}db.markFollowed(offered,turnId);output.emotion=db.mood(System.currentTimeMillis()).optString("emotion","calm");}
                             release(token);listener.saved(turnId);listener.done(output.reply,output.emotion);
                         }catch(Exception e){release(token);listener.error("主动消息未能保存");}
                     });return;
@@ -158,7 +158,7 @@ final class AgentRuntime {
                 final AgentReply output=result;final long completedEpoch=epoch;final String explicitWas=explicit;
                 final java.util.concurrent.atomic.AtomicBoolean delivered=new java.util.concurrent.atomic.AtomicBoolean();
                 Runnable completion=()->{if(!delivered.compareAndSet(false,true))return;release(token);if(db.epoch()!=completedEpoch){listener.error("记录已修改，本次已完成的回复不再显示");return;}listener.saved(turnId);listener.done(output.reply,output.emotion);if(explicitWas==null&&history==null)writeDiaryIfDue();};
-                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true,null,history==null&&explicit==null?result.plan:null,result.moodLevel,rememberEnabled()?result.moodCause:""))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");if(history==null)Nickname.committed(user);token.completed=completion;}
+                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true,null,history==null&&explicit==null?result.plan:null,result.moodLevel,rememberEnabled()?result.moodCause:"",result.moodChanged))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");result.emotion=db.mood(System.currentTimeMillis()).optString("emotion","calm");if(history==null)Nickname.committed(user);token.completed=completion;}
                 main.post(completion);
                 // Growth counts only a committed turn of yours; proactive turns and history questions earn nothing.
                 if(history==null)grow();

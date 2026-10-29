@@ -19,6 +19,7 @@ final class PersonaManager {
 
     static final class Persona {
         final String id, name, description, prompt, character;
+        final JSONObject voice,storyLines;
         final List<String[]> examples = new ArrayList<>();
         /** Her recognisable expressions: drift reminders let these recur instead of flagging them as a tic. */
         final List<String> signature = new ArrayList<>();
@@ -26,6 +27,7 @@ final class PersonaManager {
             id = value.getString("id");name = value.getString("name");
             description = value.getString("description");prompt = value.getString("prompt");
             character = value.optString("character", "");
+            voice=value.optJSONObject("voice");storyLines=value.optJSONObject("storyLines");
             JSONArray marks = value.optJSONArray("signature");
             if (marks != null) for (int i = 0; i < marks.length(); i++) signature.add(marks.getString(i));
             JSONArray pairs = value.optJSONArray("examples");
@@ -70,6 +72,21 @@ final class PersonaManager {
         for (Persona item : presets()) if (item.id.equals(id)) return item;
         return null;
     }
+
+    static Persona activeStyle(String role){return !isInitialized(role)||CUSTOM.equals(mode(role))?null:find(activeId(role));}
+    /** Local event wording shares the selected style; custom personalities retain neutral fallbacks. */
+    static String voice(String role,String event,String fallback){return voice(activeStyle(role),event,fallback,Data.random);}
+    static String voice(Persona style,String event,String fallback,java.util.Random random){
+        if(style==null||style.voice==null)return fallback;Object value=style.voice.opt(event);
+        if(value instanceof JSONArray){JSONArray a=(JSONArray)value;return a.length()==0?fallback:a.optString(random.nextInt(a.length()),fallback);}
+        return value instanceof String?(String)value:fallback;
+    }
+    static String storyLine(Persona style,String line){
+        if(line==null||style==null||style.storyLines==null)return line;String changed=style.storyLines.optString(line,line);
+        return slots(line).equals(slots(changed))?changed:line;
+    }
+    private static java.util.Set<String> slots(String line){java.util.Set<String> found=new java.util.HashSet<>();java.util.regex.Matcher m=java.util.regex.Pattern.compile("\\{[a-z]+\\}").matcher(line);while(m.find())found.add(m.group());return found;}
+    static String diaryGuidance(String role){Persona style=activeStyle(role);return prompt(role)+(style==null?"":"\n写日记也沿用这个表达方式，但不照搬示例或补写经历：\n"+style.character);}
 
     /**
      * Her fixed traits, the active style's character sheet and its example dialogues. Unlike the frozen prompt

@@ -132,7 +132,7 @@ public class PetService extends Service {
   void grow(String reaction){
    GrowthStore g=GrowthStore.quiet();if(g==null||!id.equals("main"))return;
    try{Growth.Award met=g.met();if(!ActionPlan.ANNOYED.equals(reaction))g.touched();
-    if(met.first&&PersonaManager.isInitialized("main")&&scene==null)showBubble(Growth.greeting(GrowthStore.story(),java.time.LocalTime.now().getHour(),Data.random,you())+(met.fish>0?"（小鱼干 +"+met.fish+"）":""),true);}
+    if(met.first&&PersonaManager.isInitialized("main")&&scene==null)showBubble(PersonaManager.voice("main","greeting_"+Growth.slot(java.time.LocalTime.now().getHour()),Growth.greeting(GrowthStore.story(),java.time.LocalTime.now().getHour(),Data.random,you())).replace("{you}",you())+(met.fish>0?"（小鱼干 +"+met.fish+"）":""),true);}
    catch(Exception e){Data.log(role,"成长记录暂未保存");}
   }
   /** Plays a chapter scene line by line; a tap or a tap on the bubble moves on. Marked as seen at its last line. */
@@ -150,7 +150,7 @@ public class PetService extends Service {
   void showPostcard(JSONObject card,String lead){
    showBubble(lead+"\n\n"+Growth.postcardText(card),false);if(bubble!=null)bubble.setOnClickListener(v->clearBubble());
    bubbleEnd=()->clearBubble();handler.postDelayed(bubbleEnd,15000);
-   GrowthStore g=GrowthStore.quiet();if(g!=null)try{g.read(card.optString("id"));AgentRuntime.touch("你"+("away".equals(card.optString("kind"))?"在用户不在时":"")+"去了「"+card.optString("place")+"」，带回了一张明信片和"+card.optString("item"));}catch(Exception e){Data.log(role,"明信片记录暂未保存");}
+   GrowthStore g=GrowthStore.quiet();if(g!=null)try{g.read(card.optString("id"));AgentRuntime.touch("在应用内的虚拟旅行中，你"+("away".equals(card.optString("kind"))?"在用户不在时":"")+"去了「"+card.optString("place")+"」，带回了一张明信片和"+card.optString("item"));}catch(Exception e){Data.log(role,"明信片记录暂未保存");}
   }
  }
 
@@ -165,7 +165,7 @@ public class PetService extends Service {
    if(g.tripDue()){if(p!=null&&p.docked&&p.visible&&!p.docking)p.restoreDock();else if(p==null||!p.docking)finishTrip(p);return;}
    if(p==null||!quietMoment(p))return;
    Growth.Scene scene=g.nextScene();if(scene!=null){p.playScene(scene);return;}
-   JSONObject card=g.unread();if(card!=null&&g.trip()==null)p.showPostcard(card,Growth.pick(GrowthStore.story().trip.optJSONArray("away".equals(card.optString("kind"))?"away":"back"),Data.random,you()));
+   JSONObject card=g.unread();if(card!=null&&g.trip()==null)p.showPostcard(card,tripLine("away".equals(card.optString("kind"))?"away":"back"));
   }catch(Exception e){Data.log("main","成长剧情暂不可用");}
  }
  /** Nothing else is going on: visible, awake, no chat, no speech, no drag, Do Not Disturb off, daytime. */
@@ -175,10 +175,11 @@ public class PetService extends Service {
   NotificationManager nm=getSystemService(NotificationManager.class);return nm==null||nm.getCurrentInterruptionFilter()==NotificationManager.INTERRUPTION_FILTER_ALL;
  }
  /** Feeding from the menu: pays in fish, plays the eating clip, and she hears about it. */
+ String tripLine(String event){return PersonaManager.voice("main","trip_"+event,Growth.pick(GrowthStore.story().trip.optJSONArray(event),Data.random,you())).replace("{you}",you());}
  void feed(Pet p,Growth.Food food){
   GrowthStore g=GrowthStore.quiet();if(g==null)return;
   try{Growth.Award a=new Growth.Award();String error=g.feed(food,a);if(error!=null){Toast.makeText(this,error,Toast.LENGTH_SHORT).show();return;}g.met();
-   if(!Data.file(p.role,food.clip).isEmpty())p.play(food.clip);p.plan.hungry=false;p.plan.fedAt=System.currentTimeMillis();AgentRuntime.touch("用户喂你吃了"+food.name);
+   if(!Data.file(p.role,food.clip).isEmpty())p.play(food.clip);p.plan.hungry=false;p.plan.fedAt=System.currentTimeMillis();AgentRuntime.touch("用户喂你吃了"+food.name);if(p.visible&&!AgentRuntime.busy()&&!Chat.isPetChatOpen(p.id))p.showBubble(PersonaManager.voice("main","feed","谢谢这份{food}。").replace("{food}",food.name),true);
   }catch(Exception e){Toast.makeText(this,"喂食暂未保存，请重试",Toast.LENGTH_SHORT).show();}
  }
  /** Sets off on a trip: a departure line, then she tucks herself into the nearer screen edge until she is back. */
@@ -186,8 +187,8 @@ public class PetService extends Service {
   GrowthStore g=GrowthStore.quiet();if(g==null)return;
   try{String error=g.startTrip(snack);if(error!=null){Toast.makeText(this,"locked".equals(error)?GrowthStore.story().trip.optString("locked"):error,Toast.LENGTH_SHORT).show();return;}
    JSONObject t=g.trip();String back=new java.text.SimpleDateFormat("HH:mm",Locale.ROOT).format(new Date(t.optLong("end")));
-   AgentRuntime.touch("用户送你出门旅行，约"+back+"回来");if(!Data.file(p.role,"原地左转奔跑").isEmpty())p.play("原地左转奔跑");
-   p.showBubble(Growth.pick(GrowthStore.story().trip.optJSONArray("depart"),Data.random,you()).replace("{time}",back),false);
+   AgentRuntime.touch("用户送你参加应用内的虚拟旅行，约"+back+"回来");if(!Data.file(p.role,"原地左转奔跑").isEmpty())p.play("原地左转奔跑");
+   p.showBubble(tripLine("depart").replace("{time}",back),false);
    handler.postDelayed(()->{if(p.visible&&!p.docked&&p.frame!=null&&p.away()){p.clearBubble();p.dockAtEdge(p.x+p.width/2f>sw()/2f,(p.y+p.width*.375f)/sh(),p.x,p.y);}},2800);
   }catch(Exception e){Toast.makeText(this,"出门暂未成功，请重试",Toast.LENGTH_SHORT).show();}
  }
@@ -198,7 +199,7 @@ public class PetService extends Service {
    // Hidden, still tucked away, or a chat is starting: the postcard waits, unread, for the next quiet moment.
    if(p==null||!p.visible||p.frame==null||p.docked||AgentRuntime.busy()||Chat.isPetChatOpen(p.id))return;
    if(!Data.file(p.role,"原地漂浮踏步").isEmpty())p.play("原地漂浮踏步");
-   String lead=Growth.pick(GrowthStore.story().trip.optJSONArray(result),Data.random,you());
+   String lead=tripLine(result);
    if(a.postcard!=null)p.showPostcard(a.postcard,lead);else p.showBubble(lead,true);
   }catch(Exception e){Data.log("main","旅行记录暂未保存");}
  }

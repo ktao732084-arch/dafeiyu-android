@@ -138,6 +138,9 @@ final class AgentStore {
         return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,null,moodLevel,moodCause);
     }
     synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause)throws Exception {
+        return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,initiative,moodLevel,moodCause,null);
+    }
+    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause,Boolean moodChanged)throws Exception {
         if(epoch!=epoch())return false;
         JSONObject next=plan==null?snapshot():MemoryLedger.copy(plan.state);long now=observed>0?observed:System.currentTimeMillis();String tid=turnId==null?UUID.randomUUID().toString():turnId;
         MemoryLedger.migrate(next);if(plan!=null)next.put("memoryStatus",plan.status);
@@ -163,8 +166,7 @@ final class AgentStore {
         JSONObject turn=new JSONObject().put("id",tid).put("at",now).put("receivedAt",now).put("repliedAt",System.currentTimeMillis()).put("timeZone",zone.getId()).put("utcOffsetMinutes",zone.getRules().getOffset(java.time.Instant.ofEpochMilli(now)).getTotalSeconds()/60).put("user",user).put("reply",reply).put("proactive",proactive);
         if(awaitingDisplay)turn.put("displayed",0);turns.put(turn);final JSONObject added=turn;
         while(turns.length()>160)turns.remove(0);
-        next.put("emotion",AgentPolicy.emotion(emotion)).put("emotionAt",now).put("moodLevel",moodLevel>=1&&moodLevel<=3?moodLevel:1);
-        String cause=AgentPolicy.moodCause(moodCause);if(cause.isEmpty())next.remove("moodCause");else next.put("moodCause",cause);
+        AgentPolicy.carryMood(next,state,emotion,moodLevel,moodCause,moodChanged,tid,now,remember);
         if(!proactive){
             next.put("lastUser",now).put("userTurns",next.optInt("userTurns")+1);
             String day=java.time.Instant.ofEpochMilli(now).atZone(java.time.ZoneId.systemDefault()).toLocalDate().toString();
@@ -221,14 +223,14 @@ final class AgentStore {
         JSONArray turns=next.getJSONArray("turns");for(int j=turns.length()-1;j>=0;j--)if(source.equals(turns.getJSONObject(j).optString("id")))turns.remove(j);
     }
     synchronized void forget(String id)throws Exception {
-        JSONObject next=snapshot();Set<String> removed=MemoryLedger.forget(next,id);transcript.forget(removed);if(episodes!=null)episodes.remove(removed);Diary.dropSources(next,removed);Understanding.dropSources(next,removed);next.remove("moodCause");
+        JSONObject next=snapshot();Set<String> removed=MemoryLedger.forget(next,id);transcript.forget(removed);if(episodes!=null)episodes.remove(removed);Diary.dropSources(next,removed);Understanding.dropSources(next,removed);next.remove("moodCause");next.remove("moodSource");
         next.put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();
     }
     synchronized void clear(boolean all)throws Exception {
         transcript.clear(state.getJSONArray("turns"));if(episodes!=null)episodes.clear();
         // The diary and her understanding of the user are made from chats, so clearing chats clears them too.
         JSONObject next=all?empty(epoch()+1):snapshot().put("turns",new JSONArray()).put("diary",new JSONArray()).put("understanding",new JSONArray()).put("epoch",epoch()+1);
-        next.put("interactions",new JSONArray()).put("initiativeChecks",new JSONArray()).put("lastUser",0).put("proactiveFailures",0);next.remove("moodCause");next.remove("proactiveNextAt");next.remove("proactiveOutcome");next.remove("proactiveDecidedAt");
+        next.put("interactions",new JSONArray()).put("initiativeChecks",new JSONArray()).put("lastUser",0).put("proactiveFailures",0);next.remove("moodCause");next.remove("moodSource");next.remove("proactiveNextAt");next.remove("proactiveOutcome");next.remove("proactiveDecidedAt");
         for(String key:Initiative.PLAN_FIELDS)next.remove(key);
         MemoryLedger.migrate(next);save(next,false);purgeBackup();notifyDeleted();
     }
