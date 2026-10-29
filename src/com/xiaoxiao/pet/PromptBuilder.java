@@ -47,7 +47,7 @@ final class PromptBuilder {
         for(int i=AgentPolicy.windowStart(turns.length(),s.optInt("turnCount",turns.length()));i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(in.historyRecall==null&&!stale.contains(t.optString("id")))window.add(t);}
         List<String[]> lines=new ArrayList<>();int chars=0;
         for(int i=0;i<window.size();i++){JSONObject t=window.get(i);boolean full=!AgentPolicy.compressed(i,window.size());String said=t.optString("user"),reply=ReplySegments.visible(t);if(reply.isEmpty())reply="（上轮回复未展示，不能假设用户已听到）";
-            String[] line={said.isEmpty()?PROACTIVE_EVENT:full?said:AgentPolicy.clip(said,300),full?reply:AgentPolicy.compressReply(reply)};lines.add(line);chars+=line[0].length()+line[1].length();}
+            String[] line={said.isEmpty()?(t.has("interaction")?TouchReply.HISTORY_EVENT+"\n"+t.optJSONObject("interaction"):PROACTIVE_EVENT):full?said:AgentPolicy.clip(said,300),full?reply:AgentPolicy.compressReply(reply)};lines.add(line);chars+=line[0].length()+line[1].length();}
         while(lines.size()>1&&chars>10000){String[] dropped=lines.remove(0);chars-=dropped[0].length()+dropped[1].length();}
         // Strict user/assistant alternation and a single leading system message: several
         // OpenAI-compatible servers reject a later system message or two assistant turns in a row.

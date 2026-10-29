@@ -11,7 +11,7 @@ product="$root/build/compile-check/classes"
 out="$root/build/core-tests"
 tests="$root/tests/com/xiaoxiao/pet"
 mkdir -p "$out"
-javac -encoding UTF-8 -cp "$product:$json" -d "$out" "$tests/ApiEndpointTest.java" "$tests/AgentCoreTest.java" "$tests/MotionEngineTest.java" "$tests/ActionPlanTest.java" "$tests/ReplyHistoryTest.java" "$tests/NativeReplayTest.java" "$tests/EpisodeRecallTest.java" "$tests/MemoryCaptureTest.java" "$tests/DiaryTest.java" "$tests/HistoryRecallTest.java" "$tests/NativeRegexTest.java" "$tests/ChatPolishRulesTest.java" "$tests/InitiativeTest.java" "$tests/UsabilityTest.java" "$tests/UpdateCoreTest.java" "$tests/CharacterTest.java" "$tests/PersonaEvalDump.java" "$tests/GrowthTest.java"
+javac -encoding UTF-8 -cp "$product:$json" -d "$out" "$tests/ApiEndpointTest.java" "$tests/AgentCoreTest.java" "$tests/MotionEngineTest.java" "$tests/ActionPlanTest.java" "$tests/ReplyHistoryTest.java" "$tests/NativeReplayTest.java" "$tests/EpisodeRecallTest.java" "$tests/MemoryCaptureTest.java" "$tests/DiaryTest.java" "$tests/HistoryRecallTest.java" "$tests/NativeRegexTest.java" "$tests/ChatPolishRulesTest.java" "$tests/InitiativeTest.java" "$tests/UsabilityTest.java" "$tests/UpdateCoreTest.java" "$tests/CharacterTest.java" "$tests/PersonaEvalDump.java" "$tests/GrowthTest.java" "$tests/TouchReplyTest.java"
 java -cp "$product:$out:$json" com.xiaoxiao.pet.AgentCoreTest "$out/state-$(date +%s)-$$"
 java -cp "$product:$out" com.xiaoxiao.pet.MotionEngineTest
 java -cp "$product:$out" com.xiaoxiao.pet.ApiEndpointTest
@@ -38,3 +38,5 @@ java -cp "$product:$out:$json" com.xiaoxiao.pet.UpdateCoreTest "$out/updates-$(d
 java -cp "$product:$out:$json" com.xiaoxiao.pet.CharacterTest "$root/assets/personas.json" "$out/character-$(date +%s)-$$"
 
 java -cp "$product:$out:$json" com.xiaoxiao.pet.GrowthTest "$root" "$out/growth-$(date +%s)-$$"
+
+java -cp "$product:$out:$json" com.xiaoxiao.pet.TouchReplyTest

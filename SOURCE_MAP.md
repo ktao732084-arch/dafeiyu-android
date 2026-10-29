@@ -157,6 +157,10 @@ AppUpdate、UpdateTransport、UpdateApk、UpdateFileProvider、UpdateRuntime、U
 
 公网 IP 接入的 Nginx 路径配置、北京构建入口与 UpdateNetworkInstrumentation 为本项目新增；复用用户已有北京服务器和 IP 证书续期配置。站点最初镜像 v0.4.7；本次以原签名发布 0.4.9.2，保留上游素材归属。UpgradeAcceptance 与 OfflineTestApplication 为本项目新增验证代码：前者仅在新建模拟器使用合成数据验证真实 APK 覆盖安装，后者阻止框架单测意外访问线上更新站点。
 
+## 互动短气泡（源码集成，未独立发布）
+
+`TouchReply.java`、`TouchReplyTest`、`TouchReplyRuntimeTest`、`TouchReplyActivity`与`TouchReplyInstrumentation`为本项目AI辅助新增：汇总真实手势、一次模型回应、门禁与取消，以及Android浮窗验收。`PetService`在小小桌宠交互底座上补齐动作记录，runtime/store/prompt/设置/聊天页沿用本项目既有实现与来源。没有引入额外Agent框架、第三方台词或动画素材；原有角色素材许可不变。
+
 ## 养成主线（源码集成，未独立发布）
 
 `Growth.java`、`GrowthStore.java`、`GrowthSheets.java`、`GrowthPanel.java`、`assets/story.json`和`GrowthTest.java`为本项目AI辅助新增：羁绊值与小鱼干、章节门槛与剧情、动作解锁、喂食、出门与明信片、泡泡瓶与图鉴、旧版回溯。世界观、剧情台词和40个旅行地点为本项目新写，不来自上游人格或素材；玩法思路参考了 VPet、Finch、旅行青蛙、女神异闻录协力者、星露谷好感事件等公开产品的设计理念，没有复制其代码、文案或素材。`PetService`、`PetMenu`、`ActionSheet`、`ActionPlan`、`AgentRuntime`、`AgentStore`、`AgentPolicy`、`PromptBuilder`、`MainActivity`与`AgentPanel`在既有实现上接线，沿用各自来源。动画全部使用原有角色素材，素材许可不变。

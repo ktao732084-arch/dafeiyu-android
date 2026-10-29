@@ -138,6 +138,9 @@ final class AgentStore {
         return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,null,moodLevel,moodCause);
     }
     synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause)throws Exception {
+        return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,initiative,moodLevel,moodCause,null);
+    }
+    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause,JSONObject interaction)throws Exception {
         if(epoch!=epoch())return false;
         JSONObject next=plan==null?snapshot():MemoryLedger.copy(plan.state);long now=observed>0?observed:System.currentTimeMillis();String tid=turnId==null?UUID.randomUUID().toString():turnId;
         MemoryLedger.migrate(next);if(plan!=null)next.put("memoryStatus",plan.status);
@@ -162,6 +165,7 @@ final class AgentStore {
         java.time.ZoneId zone=java.time.ZoneId.systemDefault();
         JSONObject turn=new JSONObject().put("id",tid).put("at",now).put("receivedAt",now).put("repliedAt",System.currentTimeMillis()).put("timeZone",zone.getId()).put("utcOffsetMinutes",zone.getRules().getOffset(java.time.Instant.ofEpochMilli(now)).getTotalSeconds()/60).put("user",user).put("reply",reply).put("proactive",proactive);
         turn.put("segmentVersion",ReplySegments.VERSION);
+        if(interaction!=null)turn.put("interaction",new JSONObject(interaction.toString()));
         if(awaitingDisplay)turn.put("displayed",0);turns.put(turn);final JSONObject added=turn;
         while(turns.length()>160)turns.remove(0);
         next.put("emotion",AgentPolicy.emotion(emotion)).put("emotionAt",now).put("moodLevel",moodLevel>=1&&moodLevel<=3?moodLevel:1);
@@ -292,6 +296,7 @@ final class AgentStore {
     }
     synchronized void interaction(String note,long at)throws Exception {JSONObject next=snapshot();Initiative.interaction(next,note,at);save(next);}
     synchronized boolean interaction(long expectedEpoch,String note,long at)throws Exception {if(epoch()!=expectedEpoch)return false;interaction(note,at);return true;}
+    synchronized boolean interaction(long expectedEpoch,String note,long at,String kind,String pet)throws Exception {if(epoch()!=expectedEpoch)return false;JSONObject next=snapshot();Initiative.interaction(next,note,at,kind,pet);save(next);return true;}
     synchronized boolean initiativeDecision(long expectedEpoch,String outcome,int minutes,long at)throws Exception {if(epoch()!=expectedEpoch)return false;JSONObject next=snapshot();Initiative.decision(next,outcome,minutes,at);save(next);return true;}
     synchronized boolean initiativeDecision(long expectedEpoch,String outcome,InitiativePlan plan,long at)throws Exception {if(epoch()!=expectedEpoch)return false;JSONObject next=snapshot();Initiative.apply(next,plan,outcome,true,null,at);save(next);return true;}
     synchronized boolean initiativeDue(long now,long touch){return Initiative.due(state,now,touch);}

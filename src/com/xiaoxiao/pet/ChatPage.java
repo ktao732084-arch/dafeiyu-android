@@ -133,12 +133,12 @@ final class ChatPage {
     /** Each shown segment is its own bubble, like several short messages in a row; the rest waits behind the full-text pill. */
     void segments(JSONObject t){
         List<String> parts=ReplySegments.parts(t);int shown=t.has("displayed")?Math.min(parts.size(),t.optInt("displayed")):parts.size();
-        JSONObject pending=ReplySegments.label(t).isEmpty()?null:t;boolean proactive=t.optBoolean("proactive");
-        if(shown==0){message("回复已经保存好了，点开看看全文吧。",false,pending,proactive);return;}
+        JSONObject pending=ReplySegments.label(t).isEmpty()?null:t;String reason=t.has("interaction")?"回应了你的互动":t.optBoolean("proactive")?"她主动来找你":null;
+        if(shown==0){message("回复已经保存好了，点开看看全文吧。",false,pending,reason);return;}
         for(int i=0;i<shown;i++){
             String text=i==0?AgentPolicy.replyText(parts.get(i)):parts.get(i);
             List<String> bubbles=t.optInt("segmentVersion",1)>=ReplySegments.VERSION?Collections.singletonList(text):ReplySegments.split(text);
-            for(int j=0;j<bubbles.size();j++){boolean last=i==shown-1&&j==bubbles.size()-1;message(bubbles.get(j).trim(),false,last?pending:null,last&&proactive);}
+            for(int j=0;j<bubbles.size();j++){boolean last=i==shown-1&&j==bubbles.size()-1;message(bubbles.get(j).trim(),false,last?pending:null,last?reason:null);}
         }
     }
     void empty(){
@@ -164,7 +164,8 @@ final class ChatPage {
         now.add(Calendar.DAY_OF_YEAR,-1);if(now.get(Calendar.YEAR)==then.get(Calendar.YEAR)&&now.get(Calendar.DAY_OF_YEAR)==then.get(Calendar.DAY_OF_YEAR))return "昨天 "+clock;
         return time(turn,now.get(Calendar.YEAR)==then.get(Calendar.YEAR)?"M月d日 ":"yyyy年M月d日 ",at)+clock;
     }
-    View message(String text,boolean user,JSONObject pending,boolean proactive){
+    View message(String text,boolean user,JSONObject pending,boolean proactive){return message(text,user,pending,proactive?"她主动来找你":null);}
+    View message(String text,boolean user,JSONObject pending,String reason){
         LinearLayout line=new LinearLayout(c);line.setGravity(user?Gravity.END:Gravity.START);line.setPadding(0,dp(5),0,dp(5));
         LinearLayout body=column();body.setGravity(user?Gravity.END:Gravity.START);
         TextView content;
@@ -178,7 +179,7 @@ final class ChatPage {
         if(pending!=null)content.setOnClickListener(v->expand(pending));
         // Let the text measure its own width and height; MATCH_PARENT can inherit the short footer width.
         body.addView(content,new LinearLayout.LayoutParams(-2,-2));
-        if(proactive){TextView note=Apple.label(c,"她主动来找你",11,false);note.setTextColor(Apple.SECONDARY);note.setPadding(dp(4),dp(5),0,0);body.addView(note);}
+        if(reason!=null){TextView note=Apple.label(c,reason,11,false);note.setTextColor(Apple.SECONDARY);note.setPadding(dp(4),dp(5),0,0);body.addView(note);}
         if(pending!=null){Button expand=new Button(c);expand.setText(ReplySegments.label(pending));Apple.button(expand,false);expand.setTextSize(12);expand.setMinHeight(dp(30));expand.setPadding(dp(12),0,dp(12),0);expand.setOnClickListener(v->expand(pending));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-2,dp(30));p.topMargin=dp(6);body.addView(expand,p);}
         // Only her side carries an avatar; your messages are bubbles alone on the right.
         if(user)line.addView(body);

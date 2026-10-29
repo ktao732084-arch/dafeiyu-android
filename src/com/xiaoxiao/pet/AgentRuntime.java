@@ -21,23 +21,50 @@ final class AgentRuntime {
     static AgentTransport.Token active;
     static Listener activeListener;
     static boolean activeProactive;
+    static PetService.Pet activeTouch;
     static long lastTouch,lastEventAt;
     static boolean touched;
     static String lastEvent="第一次见面";
     static synchronized AgentStore store()throws Exception{if(memory==null){memory=new AgentStore(new java.io.File(Data.app.getFilesDir(),"agent"));final AgentStore opened=memory;Thread warm=new Thread(opened::warm,"recall-index");warm.setDaemon(true);warm.setPriority(Thread.MIN_PRIORITY);warm.start();}return memory;}
     static synchronized boolean busy(){return active!=null;}
-    static synchronized void cancel(){if(active!=null){AgentTransport.Token token=active;Listener l=activeListener;active=null;activeListener=null;activeProactive=false;if(token.completed!=null){main.post(token.completed);}else{token.cancel();if(l!=null)main.post(()->l.error("已停止回复"));}}}
+    static synchronized void cancel(){if(active!=null){AgentTransport.Token token=active;Listener l=activeListener;active=null;activeListener=null;activeProactive=false;activeTouch=null;if(token.completed!=null){main.post(token.completed);}else{token.cancel();if(l!=null)main.post(()->l.error("已停止回复"));}}}
     static synchronized void interruptProactive(){if(activeProactive)cancel();}
+    static synchronized void interruptTouch(PetService.Pet pet){if(activeTouch==pet)cancel();}
     static synchronized boolean current(AgentTransport.Token t){return active==t&&!t.cancelled;}
-    static synchronized void release(AgentTransport.Token t){if(active==t){active=null;activeListener=null;activeProactive=false;}}
+    static synchronized void release(AgentTransport.Token t){if(active==t){active=null;activeListener=null;activeProactive=false;activeTouch=null;}}
     static boolean configured(){return ModelSettings.complete();}
     static boolean rememberEnabled(){return Data.prefs().getBoolean("agent.memory",true);}
     static JSONArray history(){try{return store().history();}catch(Exception e){return new JSONArray();}}
     static String mood(){try{return store().mood(System.currentTimeMillis()).optString("emotion","calm");}catch(Exception e){return "calm";}}
     static String moodLabel(){switch(mood()){case "happy":return "心情明亮";case "shy":return "有点害羞";case "curious":return "好奇中";case "concerned":return "认真听你说";case "playful":return "想和你玩";case "sleepy":return "安静陪着你";default:return "自在待着";}}
     static void touch(String type){
-        note(type);lastTouch=lastEventAt;interruptProactive();final long at=lastTouch;
-        try{final AgentStore db=store();final long epoch=db.epoch();worker.execute(()->{try{if(memory==db)db.interaction(epoch,type,at);}catch(Exception e){Data.log("main","互动记录暂未保存");}});}catch(Exception e){Data.log("main","互动记录暂不可用");}
+        touch(type,"touch","main",System.currentTimeMillis());
+    }
+    static long touch(String note,String kind,String pet,long at){
+        lastEventAt=at;lastEvent=note;touched=true;lastTouch=at;interruptProactive();
+        try{final AgentStore db=store();final long epoch=db.epoch();worker.execute(()->{try{if(memory==db)db.interaction(epoch,note,at,kind,pet);}catch(Exception e){Data.log("main","互动记录暂未保存");}});return epoch;}catch(Exception e){Data.log("main","互动记录暂不可用");return -1;}
+    }
+    /** One model call for a user gesture burst. Shares cancellation with chat, but never changes idle plans. */
+    static boolean respondToTouch(PetService service,PetService.Pet pet,TouchReply.Request request){
+        if(!TouchReply.allowed(service,pet)||!TouchReply.free(pet)||!configured()||!pet.touchReplies.current(request))return false;
+        final AgentTransport.Token token;
+        synchronized(AgentRuntime.class){if(active!=null)return false;token=new AgentTransport.Token();active=token;activeListener=null;activeProactive=true;activeTouch=pet;}
+        worker.execute(()->{
+            try{
+                AgentStore db=store();if(db.epoch()!=request.epoch){release(token);return;}token.check();
+                JSONArray messages=TouchReply.prompt(context("",true,db.snapshot(),null),request);
+                AgentReply reply=AgentReply.parse(model.generate(messages,token,ignored->{}));token.check();String text=TouchReply.text(reply.reply);
+                main.post(()->{
+                    if(!current(token))return;
+                    try{
+                        if(text==null||SystemClock.uptimeMillis()-request.lastAt>TouchReply.EXPIRE_MS||memory!=db||db.epoch()!=request.epoch||!pet.touchReplies.current(request)||!TouchReply.allowed(service,pet)||!TouchReply.free(pet)){release(token);return;}
+                        String id=UUID.randomUUID().toString();
+                        synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(request.epoch,"",text,reply.emotion,null,false,true,null,null,id,System.currentTimeMillis(),null,true,null,null,reply.moodLevel,rememberEnabled()?reply.moodCause:"",request.evidence)){release(token);return;}}
+                        release(token);pet.speak(text,id);
+                    }catch(Exception failed){release(token);Data.log(pet.role,"互动回应暂未保存");}
+                });
+            }catch(Exception failed){release(token);Data.log(pet.role,"互动回应连接未完成，不自动重试");}
+        });return true;
     }
     /** Context for the next prompt only; unlike touch() it does not postpone proactive chat. */
     static void note(String type){lastEventAt=System.currentTimeMillis();lastEvent=type;touched=true;}
@@ -88,7 +115,7 @@ final class AgentRuntime {
         }catch(Exception e){Data.log("main","陪伴日记暂未写成");}finally{writingDiary.set(false);}});
     }
     static boolean send(String user,boolean proactive,Listener listener) {
-        final long receivedAt=System.currentTimeMillis();final AgentTransport.Token token; synchronized(AgentRuntime.class){if(active!=null)return false;token=new AgentTransport.Token();active=token;activeListener=listener;activeProactive=proactive;}
+        final long receivedAt=System.currentTimeMillis();final AgentTransport.Token token; synchronized(AgentRuntime.class){if(!proactive&&activeTouch!=null)cancel();if(active!=null)return false;token=new AgentTransport.Token();active=token;activeListener=listener;activeProactive=proactive;activeTouch=null;}
         if(!proactive){if(Looper.myLooper()==Looper.getMainLooper())Chat.interruptPresentation("main");else main.post(()->Chat.interruptPresentation("main"));}
         // Wake a dozing pet before the prompt is built, so the reply can sound freshly woken.
         if(!proactive&&PetService.instance!=null){if(Looper.myLooper()==Looper.getMainLooper())PetService.instance.heard("main");else main.post(()->{if(PetService.instance!=null)PetService.instance.heard("main");});}
