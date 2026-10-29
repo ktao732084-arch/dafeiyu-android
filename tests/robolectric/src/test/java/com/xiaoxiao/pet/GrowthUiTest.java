@@ -7,7 +7,7 @@ public class GrowthUiTest {
     @Before public void init(){fixture.init();activity=UiTest.ready();service=Robolectric.buildService(PetService.class).get();service.screenWidth=1080;service.screenHeight=1920;service.safeBottom=1920;pet=service.new Pet("main","main");PetService.instance=service;}
     @After public void cleanup()throws Exception{if(activity!=null)activity.finish();GrowthStore.get().flush();PetService.instance=null;fixture.cleanup();}
     @Test public void storyHomeAndListsRenderWithoutChangingTheFrozenPersona()throws Exception{
-        String persona=PersonaManager.prompt("main");GrowthPanel.show(activity);String text=UiTest.texts(UiTest.dialog().getWindow().getDecorView());assertTrue(text.contains("泡泡瓶"));assertTrue(text.contains("记忆泡泡"));assertTrue(text.contains("成长记录"));assertEquals(persona,PersonaManager.prompt("main"));
+        String persona=PersonaManager.prompt("main");GrowthPanel.show(activity);String text=UiTest.texts(UiTest.dialog().getWindow().getDecorView());assertTrue(text.contains("泡泡瓶"));assertTrue(text.contains("章节回忆"));assertFalse(text.contains("记忆泡泡"));assertTrue(text.contains("成长记录"));assertEquals(persona,PersonaManager.prompt("main"));
         UiTest.click(UiTest.dialog(),"章节回忆 · 0");assertTrue(UiTest.dialog().isShowing());
     }
     @Test public void freeFoodButtonUsesRealServiceFeedingAndPersists()throws Exception{

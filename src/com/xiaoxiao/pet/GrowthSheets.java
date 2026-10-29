@@ -28,7 +28,7 @@ final class GrowthSheets {
 
  /** Size, our story (opens the app) and hide, moved here from the four-item menu. */
  static void more(Context c,PetService.Pet pet){
-  Sheet sheet=new Sheet(c,"更多","「我们的故事」会打开 App，看章节、泡泡瓶和图鉴。");
+  Sheet sheet=new Sheet(c,"更多","「我们的故事」会打开 App，看章节、章节回忆和图鉴。");
   sheet.row("大小",true,v->{sheet.dialog.dismiss();SizePanel.show(c,pet);});
   sheet.row("我们的故事",true,v->{sheet.dialog.dismiss();c.startActivity(new Intent(c,MainActivity.class).putExtra("openStory",true).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP));});
   sheet.row("隐藏",true,v->{sheet.dialog.dismiss();if(PetService.instance!=null){pet.hide();PetService.instance.save();Toast.makeText(c,Data.name(pet.role)+"先回小窝了。想她的时候，在首页点「让她住到屏幕上」",Toast.LENGTH_LONG).show();PetService.instance.stopIfEmpty();}});

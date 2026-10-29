@@ -25,15 +25,12 @@ final class GrowthPanel {
   else{pct=100;progress="羁绊 "+Growth.bond(s)+" · 相识第 "+Math.max(1,day)+" 天\n主线已经走完。泡泡瓶变成了「我们的海」，可以一直攒下去。";}
   ProgressBar bar=new ProgressBar(a,null,android.R.attr.progressBarStyleHorizontal);bar.setMax(100);bar.setProgress(pct);bar.setProgressTintList(ColorStateList.valueOf(Apple.BLUE));LinearLayout.LayoutParams bp=new LinearLayout.LayoutParams(-1,a.dp(10));bp.topMargin=a.dp(10);l.addView(bar,bp);
   GroupedList.note(l,progress);GroupedList.note(l,today(s)+"\n一共喂过 "+s.optInt("feeds")+" 次");
-  JSONObject known=s.optJSONObject("known");int memories=known==null?0:known.optJSONArray("memories").length(),diary=known==null?0:known.optJSONArray("diary").length();
+  // Bubbles only point at real records, so the jar is a count, not a second list of the notebook.
   JSONArray cards=s.optJSONArray("cards");
-  GroupedList.section(l,(ch>=Growth.MAX_CHAPTER?"我们的海":"泡泡瓶")+" · "+Growth.bubbles(s)+" 个泡泡");
-  LinearLayout jar=GroupedList.group(l);
-  GroupedList.row(jar,"记忆泡泡 · "+memories,GroupedList.BOOK,GroupedList.ORANGE,v->AgentPanel.memories(a));
-  GroupedList.row(jar,"日记泡泡 · "+diary,GroupedList.BOOK,GroupedList.VIOLET,v->MemoryPanel.diary(a));
-  GroupedList.row(jar,"章节回忆 · "+cards.length(),GroupedList.HEART,GroupedList.PINK,v->cards(a));
-  if(s.optInt("popped")>0)GroupedList.note(l,"有 "+s.optInt("popped")+" 个泡泡破了：对应的记忆或日记已经删除，内容不会留在这里。羁绊和章节不受影响。");
-  GroupedList.section(l,"收集");LinearLayout collect=GroupedList.group(l);
+  GroupedList.note(l,(ch>=Growth.MAX_CHAPTER?"我们的海":"泡泡瓶")+"里有 "+Growth.bubbles(s)+" 个泡泡：每条记忆、每篇日记和每段章节回忆都是一个。记忆和日记在「记忆手账」里看。"
+   +(s.optInt("popped")>0?"\n有 "+s.optInt("popped")+" 个泡泡破了：对应的记忆或日记已经删除，内容不会留在这里，羁绊和章节不受影响。":""));
+  GroupedList.section(l,"收藏");LinearLayout collect=GroupedList.group(l);
+  GroupedList.row(collect,"章节回忆 · "+cards.length(),GroupedList.HEART,GroupedList.PINK,v->cards(a));
   Set<String> all=Data.actions("main"),open=g.unlocked(all);
   GroupedList.row(collect,"动作图鉴 · 已解锁 "+open.size()+"/"+all.size(),GroupedList.PLAY,GroupedList.TEAL,v->collection(a));
   int seasonal=0;for(String x:seasonal())if(s.optJSONObject("seen").has(x))seasonal++;
