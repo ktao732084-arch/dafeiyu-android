@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "9b2440dfa5cf0e2d528f2c4eae5589a3952eec63257a2877cc1087dd9f2798cf"
+      "sha256": "80a53c5d10981b1a85bdafb15d69d154e99f27a0b3ccd179f904fc884c237894"
     },
     {
       "path": "LICENSE",
@@ -2093,7 +2093,7 @@
       "path": "src/com/xiaoxiao/pet/AgentReply.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "10068222cf0304e9bf671e3b1cd89a2f16ed8985a3384c9530e776b465306a1b",
+      "sha256": "38e86f09ce3d226a8732e2075a9a4db5ea16bd6dfd5e4912be641c8d1a709fa6",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2546,7 +2546,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "254eb74e95e06401912c762cc5273f068451d9e7543c2ddb03d3228d3d3fe4ab"
+      "sha256": "8ccb62209635d8e717eef3ad9b0187db8c2fb8149f864b6cacbe15d50822b8cd"
     },
     {
       "path": "src/com/xiaoxiao/pet/ReplySegments.java",
@@ -2667,7 +2667,7 @@
       "path": "tests/com/xiaoxiao/pet/AgentCoreTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "5f785579904c4cae0f3eebb2278d1feb191ca5fdec9349903e7f8a4db75c19ad",
+      "sha256": "6aa19180e76699dae72398a49ed7dd6347a82bead364bedea8e2f307943eb256",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],

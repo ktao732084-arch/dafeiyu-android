@@ -4,7 +4,7 @@ import org.json.*;import java.io.IOException;
 /** The only model-produced fields accepted by the runtime. No executable tools. */
 final class AgentReply {
  String reply,emotion="calm",moodCause="";int moodLevel;Boolean moodChanged;int nextCheckMinutes=Initiative.DEFAULT_MINUTES;InitiativePlan plan=new InitiativePlan();JSONArray memories=new JSONArray(),self=new JSONArray();
- /** The reply string of a broken envelope, only when it comes first and its closing quote and the next comma arrived. */
+ /** The reply string of a broken envelope, only when it comes first and is closed by a quote and then a comma or the brace. */
  static String complete(String json){
   int p=json.indexOf('{')+1;while(p<json.length()&&Character.isWhitespace(json.charAt(p)))p++;
   if(!json.startsWith("\"reply\"",p))return null;p+=7;while(p<json.length()&&Character.isWhitespace(json.charAt(p)))p++;
@@ -12,8 +12,10 @@ final class AgentReply {
   if(p>=json.length()||json.charAt(p)!='"')return null;int start=p++;
   for(;p<json.length();p++){char c=json.charAt(p);if(c=='\\'){p++;continue;}if(c=='"')break;}
   if(p>=json.length())return null;int end=p++;while(p<json.length()&&Character.isWhitespace(json.charAt(p)))p++;
-  if(p>=json.length()||json.charAt(p)!=',')return null;
-  try{return new JSONObject("{\"r\":"+json.substring(start,end+1).replace("\n","\\n").replace("\r","\\r")+"}").getString("r");}catch(JSONException e){return null;}
+  if(p>=json.length()||json.charAt(p)!=','&&json.charAt(p)!='}')return null;
+  // Raw line breaks and stray escapes such as \[ are what break an otherwise finished reply string.
+  String body=json.substring(start,end+1).replace("\n","\\n").replace("\r","\\r").replaceAll("\\\\([^\"\\\\/bfnrtu])","$1");
+  try{return new JSONObject("{\"r\":"+body+"}").getString("r");}catch(JSONException e){return null;}
  }
  static AgentReply parse(String raw)throws Exception{
   AgentReply result=new AgentReply();String text=AgentPolicy.replyText(raw.replaceAll("(?s)<think>.*?</think>","").trim());

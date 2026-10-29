@@ -34,6 +34,7 @@ public final class AgentCoreTest {
   AgentReply slipped=AgentReply.parse("{\"reply\":\"再来一局！\\n刚才不算。\",\"emotion\":\"playful\",\"self\":[\"爱下棋\"},\"next_check_minutes\":3}");
   check("再来一局！\n刚才不算。".equals(slipped.reply)&&Boolean.FALSE.equals(slipped.moodChanged)&&!slipped.plan.valid()&&slipped.memories.length()==0,"a slip after a complete reply keeps the reply, like a plain answer");
   check("嗯".equals(AgentReply.parse("{\"reply\":\"嗯\",\"mood_cause\":\"\"\"\"}").reply),"stray quotes in a later field keep the reply");
+  check("能看到[按钮]。".equals(AgentReply.parse("{\"reply\":\"能看到\\[按钮]。\"}").reply),"a stray escape in a lone reply keeps the reply");
   malformed=false;try{AgentReply.parse("{\"reply\":[1,2]}");}catch(IOException e){malformed=true;}check(malformed,"typed reply required");
   check("你好".equals(AgentReply.parse("<think>internal</think>{\"reply\":\"你好\"}").reply),"reasoning not displayed");
   check("你好呀".equals(AgentReply.parse("好的～\n{\"reply\":\"你好呀\",\"emotion\":\"happy\",\"memories\":[]}").reply),"JSON after a preface is not shown raw");
