@@ -92,11 +92,12 @@ public final class CharacterTest {
   JSONObject full=AgentStore.empty(0);Understanding.Update many=new Understanding.Update();for(int i=0;i<14;i++)many.added.add(new JSONObject().put("text","第"+i+"条相处方式似乎是这样的").put("evidence",new JSONArray().put(new JSONObject().put("quote","q").put("turn","x"+i))));
   Understanding.apply(full,many,1);check(Understanding.entries(full).length()==Understanding.KEEP,"at most twelve items");
   // Deletion paths: one by one, forgetting the quoted turn, clearing chats.
-  u.forgetUnderstanding(id);check(Understanding.entries(u.snapshot()).length()==0,"the user can delete an item");
+  long beforeDelete=u.epoch();u.forgetUnderstanding(id);check(u.epoch()>beforeDelete&&!u.addDiary(beforeDelete,Diary.entry(day.minusDays(2),"迟到日记不可恢复已删除理解。",turns,y),up),"late diary cannot restore a deleted understanding");check(Understanding.entries(u.snapshot()).length()==0,"the user can delete an item");
   JSONObject drop=AgentStore.empty(0);Understanding.apply(drop,up,1);Understanding.dropSources(drop,Collections.singleton("d1"));check(Understanding.entries(drop).length()==0,"forgetting the quoted turn removes the item");
   JSONObject keep=u.snapshot();Understanding.apply(keep,up,1);check(Understanding.entries(keep).length()==1,"(fixture)");
   u.addDiary(u.epoch(),Diary.entry(day.minusDays(1),"前一天的日记。",turns,y),up);check(Understanding.entries(u.snapshot()).length()==1,"(fixture saved)");
   u.commit(u.epoch(),"晚安","晚安。","sleepy",null,true,false,null,null,"n1",y+86400000L,null);check(Understanding.entries(u.snapshot()).length()==1,"a chat turn keeps the understanding written beside it");
+  long beforeClear=u.epoch();u.clearUnderstanding();check(u.epoch()>beforeClear&&!u.addDiary(beforeClear,Diary.entry(day.minusDays(2),"迟到日记不可恢复已清空理解。",turns,y),up),"late diary cannot restore cleared understanding");
   u.clear(false);check(Understanding.entries(u.snapshot()).length()==0,"clearing chats clears the understanding");
   System.out.println("PASS: "+checks+" character checks");
  }

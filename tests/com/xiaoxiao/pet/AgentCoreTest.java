@@ -140,7 +140,7 @@ public final class AgentCoreTest {
   boolean alternates=true;for(int i=1;i<req.length();i++)alternates&=req.getJSONObject(i).getString("role").equals(i%2==1?"user":"assistant");
   check(alternates&&req.length()%2==0,"one system message, then strict user/assistant alternation ending with the user");
   int pairs=(req.length()-2)/2;check(pairs>=8&&pairs<=11,"8-11 history turns: "+pairs);
-  check(req.getJSONObject(2).getString("content").equals("回复"+(14-pairs)+"的第一句。第二句。")&&req.getJSONObject(2+2*3).getString("content").equals("回复"+(17-pairs)+"的第一句。第二句。")&&req.getJSONObject(2+2*4).getString("content").contains("第三句话")&&req.getJSONObject(req.length()-2).getString("content").contains("第三句话"),"the window's first four replies compressed, the rest verbatim");
+  check(new JSONObject(req.getJSONObject(2).getString("content")).getString("reply").equals("回复"+(14-pairs)+"的第一句。第二句。")&&new JSONObject(req.getJSONObject(2+2*3).getString("content")).getString("reply").equals("回复"+(17-pairs)+"的第一句。第二句。")&&new JSONObject(req.getJSONObject(2+2*4).getString("content")).getString("reply").contains("第三句话")&&new JSONObject(req.getJSONObject(req.length()-2).getString("content")).getString("reply").contains("第三句话"),"the window's first four replies compressed, the rest verbatim");
   hist.put(new JSONObject().put("id","t14").put("at",14000L).put("user","第14句话").put("reply","回复14。").put("proactive",false));chat.put("turnCount",15);
   JSONArray next=PromptBuilder.build(in,"再推荐一个",false,chat,null);int same=0;while(same<Math.min(req.length(),next.length())-1&&req.getJSONObject(same).toString().equals(next.getJSONObject(same).toString()))same++;
   check(same>=6,"consecutive requests share a cacheable prefix of "+same+" messages");

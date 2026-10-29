@@ -26,6 +26,10 @@ public final class DeviceCoreChecks {
         run("Unicode regex",NativeRegexTest::run);
         run("nickname and reply polish",()->ChatPolishRulesTest.main(new String[0]));
         run("model initiative",()->InitiativeTest.main(new String[0]));
+        run("chat search and notebook filter",()->UsabilityTest.main(new String[]{root+"/usability"}));
+
+        run("updates",()->UpdateCoreTest.main(new String[]{root+"/updates"}));
+        run("character and mood",()->CharacterTest.main(new String[]{root+"/personas.json",root+"/character"}));
         System.out.println("DEVICE SUITES: "+passed+" passed, "+failures+" failed");
         System.exit(failures==0?0:1);
     }

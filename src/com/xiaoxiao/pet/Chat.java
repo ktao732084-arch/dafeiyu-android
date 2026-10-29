@@ -6,6 +6,15 @@ import org.json.*;import java.util.*;import java.util.concurrent.*;import java.n
 final class Chat {
  static final ExecutorService executor=Executors.newFixedThreadPool(2);
  static final Map<String,Dialog> petChats=new HashMap<>();
+ // User-initiated storage changes (remember, edit, forget, clear) rewrite the whole state file: one at a time, off the main thread.
+ static final ExecutorService storage=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"storage-actions");t.setDaemon(true);return t;});
+ interface Change{void run()throws Exception;}
+ /** Runs the change in the background, then done or failed on the main thread, unless the screen it belongs to has closed. */
+ static void store(Context c,Change change,Runnable done,java.util.function.Consumer<Exception> failed){
+  Handler main=new Handler(Looper.getMainLooper());
+  storage.execute(()->{Exception error=null;try{change.run();}catch(Exception e){error=e;}final Exception result=error;
+   main.post(()->{if(c instanceof Activity&&(((Activity)c).isFinishing()||((Activity)c).isDestroyed()))return;if(result==null)done.run();else failed.accept(result);});});
+ }
  static boolean isPetChatOpen(String id){Dialog d=petChats.get(id);return d!=null&&d.isShowing();}
  static void closePet(String id){Dialog d=petChats.get(id);if(d!=null)d.dismiss();}
  static final Set<String> busy=Collections.synchronizedSet(new HashSet<>());

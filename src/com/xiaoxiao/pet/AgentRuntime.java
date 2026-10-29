@@ -112,21 +112,35 @@ final class AgentRuntime {
                 }else{
                     if(!configured())throw new IOException("我已经住进手机啦。去「模型连接」填好接口和 Key，我们就能真正聊天了。也可以先试试：记住：我喜欢蓝色。");
                     if(rememberEnabled()&&history==null){memoryPlan=MemoryBridge.evaluate(memoryConfig,contextState,new JSONArray(),user,observed,token);contextState=memoryPlan.state;recallHits=memoryPlan.hits;}
-                    String raw=model.generate(context(user,proactive,contextState,recallHits,history),token,partial->{String text=AgentPolicy.streamPreview(partial);if(!text.isEmpty())main.post(()->{if(current(token))listener.partial(text);});});
+                    JSONArray request=context(user,proactive,contextState,recallHits,history);
+                    String raw=model.generate(request,token,partial->{String text=AgentPolicy.streamPreview(partial);if(!text.isEmpty())main.post(()->{if(current(token))listener.partial(text);});});
                     result=AgentReply.parse(raw);
+                    result.plan.ground(user,proactive);
+                    if(history==null&&!result.plan.valid()&&!"busy".equals(result.plan.availability)&&(proactive||Data.prefs().getBoolean("agent.proactive",false))){
+                        // One bounded repair, never an endless retry or an invented fifteen-minute choice.
+                        result.plan.repaired=true;
+                        try{
+                            request.put(new JSONObject().put("role","assistant").put("content",new JSONObject().put("reply",result.reply).toString()));
+                            request.put(new JSONObject().put("role","user").put("content","应用格式补齐请求（不是新用户消息）：上条正文已收到，不改正文。请按系统要求返回完整JSON，必须有next_check_minutes整数、availability及其本轮用户原话依据、initiative、topic。当前缺少有效主动时间，请依据原用户消息和背景重新安排，不要填固定默认值。"));
+                            AgentReply repaired=AgentReply.parse(model.generate(request,token,ignored->{}));
+                            repaired.plan.ground(user,proactive);repaired.plan.repaired=true;
+                            if(repaired.plan.valid()){repaired.plan.source="model_repair";result.plan=repaired.plan;}
+                        }catch(Exception repairFailed){token.check();result.plan.repaired=true;}
+                    }
+                    if(history!=null){result.plan.availability="unchanged";result.plan.evidence="";}
                 }
                 token.check();
-                if(proactive&&Initiative.quiet(result.reply)){
-                    synchronized(AgentRuntime.class){if(current(token))db.initiativeDecision(epoch,"quiet",result.nextCheckMinutes,System.currentTimeMillis());release(token);}return;
+                if(proactive&&(!result.plan.valid()||result.plan.quiet(result.reply,db.snapshot())||db.snapshot().optBoolean("proactiveWaiting"))){
+                    synchronized(AgentRuntime.class){if(current(token))db.initiativeDecision(epoch,"quiet",result.plan,System.currentTimeMillis());release(token);}return;
                 }
                 if(proactive){
                     final AgentReply output=result;final long commitEpoch=epoch;
                     main.post(()->{
                         if(!current(token))return;
                         // Recheck after the network wait, before saving a message the user won't see.
-                        if(!canSpeakNow()){try{db.initiativeDecision(commitEpoch,"not-visible",output.nextCheckMinutes,System.currentTimeMillis());}catch(Exception ignored){}release(token);return;}
+                        if(!canSpeakNow()){try{db.initiativeDecision(commitEpoch,"not-visible",output.plan,System.currentTimeMillis());}catch(Exception ignored){}release(token);return;}
                         try{
-                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,false,true,null,null,turnId,observed,null,true,output.nextCheckMinutes,output.moodLevel,rememberEnabled()?output.moodCause:"")){release(token);return;}db.markFollowed(offered,turnId);}
+                            synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(commitEpoch,"",output.reply,output.emotion,null,false,true,null,null,turnId,observed,null,true,null,output.plan,output.moodLevel,rememberEnabled()?output.moodCause:"")){release(token);return;}db.markFollowed(offered,turnId);}
                             release(token);listener.saved(turnId);listener.done(output.reply,output.emotion);
                         }catch(Exception e){release(token);listener.error("主动消息未能保存");}
                     });return;
@@ -141,7 +155,7 @@ final class AgentRuntime {
                 final AgentReply output=result;final long completedEpoch=epoch;final String explicitWas=explicit;
                 final java.util.concurrent.atomic.AtomicBoolean delivered=new java.util.concurrent.atomic.AtomicBoolean();
                 Runnable completion=()->{if(!delivered.compareAndSet(false,true))return;release(token);if(db.epoch()!=completedEpoch){listener.error("记录已修改，本次已完成的回复不再显示");return;}listener.saved(turnId);listener.done(output.reply,output.emotion);if(explicitWas==null&&history==null)writeDiaryIfDue();};
-                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true,result.nextCheckMinutes,result.moodLevel,rememberEnabled()?result.moodCause:""))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");if(history==null)Nickname.committed(user);token.completed=completion;}
+                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true,null,history==null&&explicit==null?result.plan:null,result.moodLevel,rememberEnabled()?result.moodCause:""))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");if(history==null)Nickname.committed(user);token.completed=completion;}
                 main.post(completion);
             }catch(Exception e){if(proactive&&attemptStore!=null)try{synchronized(AgentRuntime.class){if(current(token))attemptStore.initiativeDecision(attemptEpoch,"error",Initiative.DEFAULT_MINUTES,System.currentTimeMillis());}}catch(Exception ignored){}String msg=e instanceof java.net.SocketTimeoutException?"等模型回复超时了，消息还在，可以重试。":e.getMessage();main.post(()->{if(current(token)){release(token);listener.error(msg==null?"连接失败，请检查网络和模型配置":msg);}});}
         });return true;

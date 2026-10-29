@@ -17,6 +17,7 @@ jobs:
             src
             tests
             memory-service
+            assets/personas.json
       - uses: actions/setup-java@v5
         with:
           distribution: temurin

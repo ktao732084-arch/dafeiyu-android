@@ -17,6 +17,12 @@ final class AgentStore {
     private JSONObject state;
     // Whole-conversation recall index; built on first use from the archive and recent turns, then kept in step.
     private EpisodeIndex episodes;
+    // Segment display progress changes the live state in place and is written by this thread soon after, so the
+    // main thread does not rewrite the whole file once per segment. version counts in-memory changes (under this
+    // object's lock); written is the newest version on disk (under fileLock). Full saves stay synchronous.
+    private static final java.util.concurrent.ExecutorService WRITER=java.util.concurrent.Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"store-writer");t.setDaemon(true);return t;});
+    private final Object fileLock=new Object();
+    private long version,written;private boolean flushQueued;
     AgentStore(File dir) throws Exception {
         if(!dir.exists()&&!dir.mkdirs())throw new IOException("无法创建记忆目录");
         file=new File(dir,"companion-v1.json");transcript=new ChatArchive(dir);
@@ -62,15 +68,34 @@ final class AgentStore {
         JSONArray previous=new JSONArray(state.getJSONArray("turns").toString());
         byte[] bytes=boundedBytes(next);
         if(preserveHistory)transcript.evicted(previous,next.getJSONArray("turns"));
-        File tmp=new File(file+".tmp");
-        try(FileOutputStream out=new FileOutputStream(tmp)){out.write(bytes);out.getFD().sync();}
-        // Backup only the last validated in-memory state, not a possibly corrupt source file.
-        File backup=new File(file+".bak");
-        try(FileOutputStream out=new FileOutputStream(backup)){out.write(state.toString().getBytes(StandardCharsets.UTF_8));out.getFD().sync();}
-        try{Files.move(tmp.toPath(),file.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.ATOMIC_MOVE);}
-        catch(AtomicMoveNotSupportedException e){Files.move(tmp.toPath(),file.toPath(),StandardCopyOption.REPLACE_EXISTING);}
+        long saved=++version;
+        synchronized(fileLock){
+            File tmp=new File(file+".tmp");
+            try(FileOutputStream out=new FileOutputStream(tmp)){out.write(bytes);out.getFD().sync();}
+            // Backup only the last validated in-memory state, not a possibly corrupt source file.
+            File backup=new File(file+".bak");
+            try(FileOutputStream out=new FileOutputStream(backup)){out.write(state.toString().getBytes(StandardCharsets.UTF_8));out.getFD().sync();}
+            try{Files.move(tmp.toPath(),file.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.ATOMIC_MOVE);}
+            catch(AtomicMoveNotSupportedException e){Files.move(tmp.toPath(),file.toPath(),StandardCopyOption.REPLACE_EXISTING);}
+            written=saved;
+        }
         state=next;
     }
+    /** Queues a write of the live state after an in-place change; several changes before it runs become one write. */
+    private void flushLater(){version++;if(flushQueued)return;flushQueued=true;WRITER.execute(this::flush);}
+    private void flush(){
+        try{
+            byte[] bytes;long current;
+            synchronized(this){
+                flushQueued=false;current=version;bytes=state.toString().getBytes(StandardCharsets.UTF_8);
+                // Over the bound, trimming must archive the dropped turns: take the ordinary path instead.
+                if(bytes.length>MAX_FILE_BYTES){save(new JSONObject(state.toString()));return;}
+            }
+            synchronized(fileLock){if(written>=current)return;ChatArchive.write(file,bytes);written=current;}
+        }catch(Exception e){/* The next full save writes the same live state. */}
+    }
+    /** For tests and orderly shutdown: returns once queued background writes are on disk. */
+    void awaitWrites()throws Exception{WRITER.submit(()->{}).get(10,java.util.concurrent.TimeUnit.SECONDS);}
     private static byte[] boundedBytes(JSONObject next)throws Exception {
         byte[] bytes=next.toString().getBytes(StandardCharsets.UTF_8);
         if(bytes.length<=MAX_FILE_BYTES)return bytes;
@@ -101,10 +126,15 @@ final class AgentStore {
         return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,null);
     }
     synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes)throws Exception {
-        return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,0,"");
+        return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,null);
     }
-    /** moodLevel 1–3 and moodCause are how strongly she feels emotion and why (0 / "" when the model gave none). */
+    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative)throws Exception {
+        return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,initiative,0,"");
+    }
     synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,int moodLevel,String moodCause)throws Exception {
+        return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,null,moodLevel,moodCause);
+    }
+    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause)throws Exception {
         if(epoch!=epoch())return false;
         JSONObject next=plan==null?snapshot():MemoryLedger.copy(plan.state);long now=observed>0?observed:System.currentTimeMillis();String tid=turnId==null?UUID.randomUUID().toString():turnId;
         MemoryLedger.migrate(next);if(plan!=null)next.put("memoryStatus",plan.status);
@@ -123,6 +153,7 @@ final class AgentStore {
         if(state.has("diary"))next.put("diary",state.getJSONArray("diary"));else next.remove("diary");
         if(state.has("understanding"))next.put("understanding",state.getJSONArray("understanding"));else next.remove("understanding");
         for(String key:new String[]{"interactions","initiativeChecks","proactiveNextAt","proactiveFailures","proactiveOutcome","proactiveDecidedAt"})if(state.has(key))next.put(key,state.get(key));
+        for(String key:Initiative.PLAN_FIELDS)if(state.has(key))next.put(key,state.get(key));else next.remove(key);
         // Lifetime counters: turnCount anchors the prompt's history window, the others the relationship stage.
         next.put("turnCount",next.optInt("turnCount",turns.length())+1);
         java.time.ZoneId zone=java.time.ZoneId.systemDefault();
@@ -141,6 +172,7 @@ final class AgentStore {
             String quote=quotes.optString(i,"");if(AgentPolicy.validEvidence(user,quote))addMemory(next,quote,tid,false,now);
         }
         if(nextCheckMinutes!=null){if(proactive)Initiative.decision(next,"speak",nextCheckMinutes,System.currentTimeMillis());else Initiative.afterUser(next,nextCheckMinutes,System.currentTimeMillis());}
+        if(initiative!=null){Initiative.apply(next,initiative,"speak",proactive,tid,System.currentTimeMillis());turn.put("initiativePlan",initiative.json());}
         save(next);if(episodes!=null)episodes.add(added);return true;
     }
     static final int MAX_SELF=40;
@@ -194,6 +226,7 @@ final class AgentStore {
         // The diary and her understanding of the user are made from chats, so clearing chats clears them too.
         JSONObject next=all?empty(epoch()+1):snapshot().put("turns",new JSONArray()).put("diary",new JSONArray()).put("understanding",new JSONArray()).put("epoch",epoch()+1);
         next.put("interactions",new JSONArray()).put("initiativeChecks",new JSONArray()).put("lastUser",0).put("proactiveFailures",0);next.remove("moodCause");next.remove("proactiveNextAt");next.remove("proactiveOutcome");next.remove("proactiveDecidedAt");
+        for(String key:Initiative.PLAN_FIELDS)next.remove(key);
         MemoryLedger.migrate(next);save(next,false);purgeBackup();
     }
     synchronized JSONArray historyPage(String before,int limit)throws Exception {return transcript.page(state.getJSONArray("turns"),before,Math.max(1,Math.min(limit,40)));}
@@ -205,13 +238,15 @@ final class AgentStore {
         catch(IOException failure){token.check();return new HistoryRecall.Result(plan,new JSONObject().put("status","error").put("range",plan.label).put("records",new JSONArray()));}
     }
     synchronized void shown(String id,int count)throws Exception {
-        if(id==null||transcript.deleted(id))return;JSONObject next=snapshot();JSONArray turns=next.getJSONArray("turns");
-        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(id.equals(ChatArchive.id(t))){int n=Math.min(count,ReplySegments.count(t));if(t.has("displayed")&&n>t.optInt("displayed")){ChatArchive.markShown(t,n);if(episodes!=null)episodes.update(t);JSONArray self=next.optJSONArray("self");if(self!=null)for(int j=0;j<self.length();j++){JSONObject row=self.getJSONObject(j);if(id.equals(row.optString("source"))&&ReplySegments.visible(t).contains(row.optString("text")))row.put("shown",true);}save(next,false);}return;}}
+        // Called on the main thread for every segment: update the live turn in place (commit already merges these
+        // fields from the live state) and write later. A crash in between can only under-count what was shown.
+        if(id==null||transcript.deleted(id))return;JSONArray turns=state.getJSONArray("turns");
+        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(id.equals(ChatArchive.id(t))){int n=Math.min(count,ReplySegments.count(t));if(t.has("displayed")&&n>t.optInt("displayed")){ChatArchive.markShown(t,n);Initiative.topicShown(state,t);if(episodes!=null)episodes.update(t);JSONArray self=state.optJSONArray("self");if(self!=null)for(int j=0;j<self.length();j++){JSONObject row=self.getJSONObject(j);if(id.equals(row.optString("source"))&&ReplySegments.visible(t).contains(row.optString("text")))row.put("shown",true);}flushLater();}return;}}
         transcript.shown(id,count);
     }
     private EpisodeIndex index()throws Exception {
         if(episodes!=null)return episodes;EpisodeIndex built=new EpisodeIndex();
-        for(File f:transcript.files()){try{JSONObject t=transcript.read(f);if(!transcript.deleted(ChatArchive.id(t)))built.add(t);}catch(Exception unreadable){/* one damaged file must not hide the rest */}}
+        for(File f:transcript.archived()){try{JSONObject t=transcript.read(f);if(!transcript.deleted(ChatArchive.id(t)))built.add(t);}catch(Exception unreadable){/* one damaged file must not hide the rest */}}
         JSONArray turns=state.getJSONArray("turns");for(int i=0;i<turns.length();i++)built.add(turns.getJSONObject(i));
         return episodes=built;
     }
@@ -232,10 +267,16 @@ final class AgentStore {
         JSONObject next=snapshot();if(!Diary.add(next,entry))return false;if(update!=null)Understanding.apply(next,update,entry.optLong("at",System.currentTimeMillis()));save(next);return true;
     }
     synchronized void clearDiary()throws Exception {JSONObject next=snapshot();next.put("diary",new JSONArray());save(next,false);purgeBackup();}
-    synchronized void forgetUnderstanding(String id)throws Exception {JSONObject next=snapshot();if(Understanding.remove(next,id)){save(next,false);purgeBackup();}}
-    synchronized void clearUnderstanding()throws Exception {JSONObject next=snapshot();next.put("understanding",new JSONArray());save(next,false);purgeBackup();}
+    synchronized void forgetUnderstanding(String id)throws Exception {JSONObject next=snapshot();if(Understanding.remove(next,id)){next.put("epoch",epoch()+1);save(next,false);purgeBackup();}}
+    synchronized void clearUnderstanding()throws Exception {JSONObject next=snapshot();next.put("understanding",new JSONArray()).put("epoch",epoch()+1);save(next,false);purgeBackup();}
     /** Builds the recall index off the chat path (a background thread at store open), so the first reply does not wait. */
     synchronized void warm(){try{index();}catch(Exception unavailable){/* built on first use instead */}}
+    /** The chat page's search over the whole conversation, newest first; each row carries its page key so the page can open there. */
+    synchronized JSONArray searchChat(String text,int limit)throws Exception {
+        JSONArray out=new JSONArray();
+        for(EpisodeIndex.Episode e:index().find(text,limit)){JSONObject row=new JSONObject().put("id",e.id).put("at",e.at).put("user",e.user).put("reply",e.reply);out.put(row.put("pageKey",ChatArchive.key(row)));}
+        return out;
+    }
     /** Past exchanges relevant to this message from the whole conversation; see EpisodeIndex. */
     synchronized JSONArray episodes(String query,Set<String> exclude,long now)throws Exception {
         return EpisodeIndex.describe(index().search(query,exclude,now,EpisodeIndex.LIMIT));
@@ -248,6 +289,7 @@ final class AgentStore {
     synchronized void interaction(String note,long at)throws Exception {JSONObject next=snapshot();Initiative.interaction(next,note,at);save(next);}
     synchronized boolean interaction(long expectedEpoch,String note,long at)throws Exception {if(epoch()!=expectedEpoch)return false;interaction(note,at);return true;}
     synchronized boolean initiativeDecision(long expectedEpoch,String outcome,int minutes,long at)throws Exception {if(epoch()!=expectedEpoch)return false;JSONObject next=snapshot();Initiative.decision(next,outcome,minutes,at);save(next);return true;}
+    synchronized boolean initiativeDecision(long expectedEpoch,String outcome,InitiativePlan plan,long at)throws Exception {if(epoch()!=expectedEpoch)return false;JSONObject next=snapshot();Initiative.apply(next,plan,outcome,true,null,at);save(next);return true;}
     synchronized boolean initiativeDue(long now,long touch){return Initiative.due(state,now,touch);}
     synchronized String memoryContext(String query)throws Exception {
         return MemoryLedger.context(state,query,null);
