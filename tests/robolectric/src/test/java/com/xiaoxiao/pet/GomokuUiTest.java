@@ -12,6 +12,18 @@ public class GomokuUiTest {
         p.play(112);idle();assertEquals(1,p.game.moves.size());p.dialog.dismiss();GomokuPage.show(a);idle();p=GomokuPage.current.get();assertEquals(1,p.game.moves.size());
         ShadowLooper.idleMainLooper(1,TimeUnit.SECONDS);idle();assertEquals(2,p.game.moves.size());assertEquals(1,p.game.turn());
     }
+    @Test public void firstTapPreviewsAndSecondTapOnTheSamePointPlays()throws Exception{
+        GomokuPage.show(a);idle();GomokuPage p=GomokuPage.current.get();
+        p.board.cells[112].performClick();idle();assertEquals(0,p.game.moves.size());assertEquals(112,p.pending);assertTrue(p.remark.getText().toString().contains("再点一次"));
+        p.board.cells[113].performClick();idle();assertEquals(0,p.game.moves.size());assertEquals(113,p.pending);
+        p.board.cells[113].performClick();idle();assertEquals(1,p.game.board[113]);assertEquals(-1,p.pending);
+    }
+    @Test public void herLevelIsChosenButNeverShown()throws Exception{
+        GomokuPage.show(a);idle();GomokuPage p=GomokuPage.current.get();p.play(112);idle();ShadowLooper.idleMainLooper(1,TimeUnit.SECONDS);idle();
+        GomokuLevel.ASK.submit(()->{}).get(10,TimeUnit.SECONDS);idle();
+        Gomoku saved=GomokuPage.store().load();assertTrue(Gomoku.LEVELS.contains(saved.level));
+        String shown=UiTest.texts(p.dialog.getWindow().getDecorView());for(String level:Gomoku.LEVELS)assertFalse(shown.contains(Gomoku.levelLabel(level)));
+    }
     @Test public void invitationButtonRoutesToSameRealBoard()throws Exception{
         ChatPage chat=new ChatPage(a,"main","main");chat.open();chat.message("陪我下盘五子棋吧",false,null,true);UiTest.click(chat.rows,"开始对局 · 五子棋");idle();assertFalse(chat.dialog.isShowing());assertTrue(GomokuPage.current.get().dialog.isShowing());
     }
