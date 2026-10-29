@@ -1,0 +1,8 @@
+{
+  "repository": "ktao732084-arch/dafeiyu-android",
+  "base_url": "https://81.70.79.133/dafeiyu-updates",
+  "remote_dir": "/srv/dafeiyu-updates",
+  "package": "com.dafeiyu.companion",
+  "signer_sha256": "e3074b90e07ff4fced5e0e2e5834c928619721716c507853a7247b455c65d405",
+  "prerelease": true
+}

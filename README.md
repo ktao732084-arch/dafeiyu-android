@@ -114,6 +114,8 @@ App在手机本地解析时间范围，查询近期和归档对话，筛选有�
 
 ## 构建与复现
 
+后续发布统一通过 `release.ps1` 同步 GitHub Release 与国内更新服务器；它复用已构建、已验证并已合入主分支的同一份签名 APK，支持失败重跑与只读核验。见 [双端发布流程](deploy/updates/RELEASING.md)。
+
 本版已加入轻量版本检查：“关于 → 检查更新”可手动检查；配置更新站点后，启动或桌宠亮屏运行时每天最多自动检查一次，确认后下载并交给系统安装。默认构建已经内置北京公网 IP 的 HTTPS 地址；`-UpdateUrl` 可覆盖为其他受信任 HTTPS 入口。国内服务器仅需托管版本 JSON 和 APK；构建配置、发布脚本和部署步骤见 [更新站点部署](deploy/updates/README.md)，验证范围见 [更新功能验证](docs/UPDATES.md)。
 
 JDK17、Android SDK Platform34、Build Tools36.0.0、PowerShell7；无需 Gradle。签名私钥不随源码分发：

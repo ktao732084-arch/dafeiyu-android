@@ -8,6 +8,21 @@ permissions:
   contents: read
 
 jobs:
+  release-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            tools
+            tests
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Release preparation and interrupted synchronization checks
+        run: |
+          python -m unittest discover -s tests -p test_update_publish.py
+          python -m unittest discover -s tests -p test_release_sync.py
   android:
     runs-on: ubuntu-latest
     steps:

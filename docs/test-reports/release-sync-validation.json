@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-29",
+  "scope": "release tooling only; no new APK or release",
+  "sync_unit_tests_passed": 18,
+  "prepare_unit_tests_passed": 7,
+  "linux_temporary_directory_checks": [
+    "first SFTP upload",
+    "resume partial SFTP upload",
+    "SHA-256 verification",
+    "OS lock excludes concurrent writer",
+    "atomic manifest commit",
+    "idempotent repeated commit",
+    "previous manifest backup"
+  ],
+  "existing_release": "v0.4.9.2",
+  "source_commit": "0063fdf0e07c84cadc6f9c7b759a4afd464d10a9",
+  "apk_sha256": "97dca0a731bab47c1e81bf513f918f05a0b2d04277406676f458440bf7b4d25c",
+  "full_public_https_download_verified": true,
+  "github_asset_digests_verified": true,
+  "public_manifest_matches": true,
+  "repeat_publish_wrote_remote_state": false,
+  "production_failure_injection": false
+}

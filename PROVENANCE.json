@@ -18,19 +18,19 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "866cad7e83c984bb6d21bfd48072299297c8affd3b83dbe21ef8e3b965e88554"
+      "sha256": "7910286deeb3e61c8a8c3d5a24dc4066f4127e33773d364b4814d993ea31c7ae"
     },
     {
       "path": ".gitignore",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "f2da222401c2c8515b06120c4d0215ea2ed62de1fa0ec710988fb54f8ec28412"
+      "sha256": "780351157436d09b69e1177f91ea0a2b285b10c0ec32511682e0c3868e8497ba"
     },
     {
       "path": "AGENTS.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "fa2d860e1405ef3e6eac596c552ada141adac4c97f00e1f99505348b87837e0f"
+      "sha256": "707a9d2218c653040a1a14bdb321827e7c1f3ec3859d9c458dcea81199ab4910"
     },
     {
       "path": "ASSET_LICENSE.md",
@@ -78,14 +78,14 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "6f8dab730c0613c1a384b8e3a95760a59758f7747ee25c2c087e94caf5c88bcd",
+      "sha256": "e443fa9f01ad9ba8541f7591bfffac6989857726553a3340220ee6b335151bd6",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
       "path": "SOURCE_MAP.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "3fd5323b0dcb8988db3864faf9ba199832e7a8e7dcd137f61bd883efa695cb84"
+      "sha256": "3aa5f55c7c940fc27df4e588b8e8e57bf889ee8cfe14c092b7b55089ae5ed5f6"
     },
     {
       "path": "THIRD-PARTY-LICENSE.txt",
@@ -1236,7 +1236,13 @@
       "path": "deploy/updates/README.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "dd3c8c1b20725e33ea4942ad72455aac2776dd04fd95ab576092616385b4d928"
+      "sha256": "6bb532c936e508403d832d98bb2f94a1135261e30db13615cd0b6eead6d6afe8"
+    },
+    {
+      "path": "deploy/updates/RELEASING.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "3572d65b98e041122db0704ba23ab7dab491a534e91070207dc4bdc9bf308998"
     },
     {
       "path": "deploy/updates/beijing-locations.conf",
@@ -1255,6 +1261,18 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "cac252c4b79d9adad443cadbfe0839dcc2240806d6f061b64ae5929c241d4a9e"
+    },
+    {
+      "path": "deploy/updates/release.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "363116a46778f43f6bc4b6e80bb21a4ddd2868c6d5960a1d0bd85000cd09fda8"
+    },
+    {
+      "path": "deploy/updates/release.local.example.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "4163da56f3393a082aacdf1cb77fc58543aceb2ee68983a53599ee2d73f1c1a5"
     },
     {
       "path": "docs/ANDROID_COMPATIBILITY_AUDIT.md",
@@ -1435,6 +1453,12 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "973991a3729441c12f0c7151206e91ee8460fcb870de4e211adbfcbd7b2da9a7"
+    },
+    {
+      "path": "docs/test-reports/release-sync-validation.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "9122749c9fe665b6f5336b80667abc3da58499ec7085ef8190eb82618db8c366"
     },
     {
       "path": "docs/test-reports/robolectric-results.txt",
@@ -1791,6 +1815,12 @@
       "direct_source": "https://github.com/ktao732084-arch/agent-anthropomorphic-memory/blob/b6718dfedcfb17a31f5c3d8d32d71ffc2665101a/tests/test_llm_judge.py",
       "license_scope": "MIT; preserved in memory-service/upstream/LICENSE",
       "sha256": "49dcc59dfed0ef9788e6fd82ca252916759145a62a5f5106d2bbb85507dfc394"
+    },
+    {
+      "path": "release.ps1",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "12d7950b1445d64b7dec6b22f8a51548a83875fe18a30ca63b95a1924a035991"
     },
     {
       "path": "res/anim/panel_enter.xml",
@@ -2795,6 +2825,12 @@
       "sha256": "7b9bd6944c28432ead36c4eac571d0437f36440f88d10bc70e9ff4f612ed3905"
     },
     {
+      "path": "tests/test_release_sync.py",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "d7c5a8da011ccc5c546a34384e73bb318dbd7d2f52bd4f4ab4dd8493f7bda42d"
+    },
+    {
       "path": "tests/test_update_publish.py",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -2817,6 +2853,18 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "236a0a8556f479cbc9f225e829316ff440d37e82e84202c586f17ba7e34dd417"
+    },
+    {
+      "path": "tools/release-remote.py",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "01c3c62c73df44d6587f975a043dd8ba7d7363971e58143dc705d31863462f2a"
+    },
+    {
+      "path": "tools/release-sync.py",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "650d974f770155b2011e5bfc26c7f9129fdd51382b8c16de7c03cd1788fcab4e"
     },
     {
       "path": "tools/sync-memory-service.py",
