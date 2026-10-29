@@ -115,7 +115,7 @@ public final class AgentCoreTest {
   List<String> notes=AgentPolicy.styleNotes(drift);
   check(notes.toString().contains("「才不」")&&notes.toString().contains("才不是")&&notes.toString().contains("括号"),"repeated opener, catchphrase and stage directions are flagged: "+notes);
   check(AgentPolicy.styleNotes(java.util.Arrays.asList("今天下雨了。","那就在家看书吧。","好呀，晚安。","明天见！")).isEmpty(),"varied replies get no reminder");
-  check("先说结论。".equals(AgentPolicy.compressReply("先说结论。后面还有很长的解释和例子。"))&&AgentPolicy.compressReply("没有标点的一段很长很长的话".repeat(10)).length()==60,"older replies keep their first sentence");
+  check("先说结论。再补一句。".equals(AgentPolicy.compressReply("先说结论。再补一句。后面还有很长的解释和例子。"))&&AgentPolicy.compressReply("没有标点的一段很长很长的话".repeat(10)).length()==90,"older replies keep their first two sentences");
   int prev=-1,moves=0;for(int total=9;total<=40;total++){int start=AgentPolicy.windowStart(total,total);int size=total-start;check(size>=8&&size<=11,"window holds 8-11 turns: "+size);if(prev>=0&&start!=prev)moves++;prev=start;}
   check(moves==8,"window advances four turns at a time, not every turn: "+moves);
   check(AgentPolicy.windowStart(160,500)+340==AgentPolicy.windowStart(160,501)+341&&AgentPolicy.windowStart(5,5)==0,"anchored to the lifetime count once old turns are trimmed");
@@ -128,7 +128,7 @@ public final class AgentCoreTest {
   persona.clearSelf();check(persona.snapshot().getJSONArray("self").length()==0,"her self statements can be cleared");
   // The assembled request: a stable cacheable prefix, compressed history, per-turn details last.
   JSONObject chat=AgentStore.empty(0);MemoryLedger.migrate(chat);JSONArray hist=chat.getJSONArray("turns");
-  for(int i=0;i<14;i++)hist.put(new JSONObject().put("id","t"+i).put("at",1000L*i).put("user","第"+i+"句话").put("reply","回复"+i+"的第一句。后面是更长的第二句话。").put("proactive",false));
+  for(int i=0;i<14;i++)hist.put(new JSONObject().put("id","t"+i).put("at",1000L*i).put("user","第"+i+"句话").put("reply","回复"+i+"的第一句。第二句。后面是更长的第三句话。").put("proactive",false));
   chat.put("turnCount",14).put("userTurns",14).put("chatDays",4).put("lastUser",13000L);
   MemoryLedger.addLocal(chat,MemoryLedger.record("m1","我对花生过敏","t0",true,1000L));
   PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona="你是大肥鱼。";in.guidance="你自己的固定设定：爱吃小鱼干。";in.nickname="小船长";in.mood="happy";in.timeZone="Asia/Shanghai";in.now=1_700_000_000_000L;in.initializedAt=in.now-10*86_400_000L;in.remember=true;in.lastEvent="用户轻轻碰了碰你";in.lastEventAt=in.now-1000;
@@ -140,7 +140,7 @@ public final class AgentCoreTest {
   boolean alternates=true;for(int i=1;i<req.length();i++)alternates&=req.getJSONObject(i).getString("role").equals(i%2==1?"user":"assistant");
   check(alternates&&req.length()%2==0,"one system message, then strict user/assistant alternation ending with the user");
   int pairs=(req.length()-2)/2;check(pairs>=8&&pairs<=11,"8-11 history turns: "+pairs);
-  check(req.getJSONObject(2).getString("content").equals("回复"+(14-pairs)+"的第一句。")&&req.getJSONObject(req.length()-2).getString("content").contains("第二句话"),"older replies compressed, the last three verbatim");
+  check(req.getJSONObject(2).getString("content").equals("回复"+(14-pairs)+"的第一句。第二句。")&&req.getJSONObject(2+2*3).getString("content").equals("回复"+(17-pairs)+"的第一句。第二句。")&&req.getJSONObject(2+2*4).getString("content").contains("第三句话")&&req.getJSONObject(req.length()-2).getString("content").contains("第三句话"),"the window's first four replies compressed, the rest verbatim");
   hist.put(new JSONObject().put("id","t14").put("at",14000L).put("user","第14句话").put("reply","回复14。").put("proactive",false));chat.put("turnCount",15);
   JSONArray next=PromptBuilder.build(in,"再推荐一个",false,chat,null);int same=0;while(same<Math.min(req.length(),next.length())-1&&req.getJSONObject(same).toString().equals(next.getJSONObject(same).toString()))same++;
   check(same>=6,"consecutive requests share a cacheable prefix of "+same+" messages");

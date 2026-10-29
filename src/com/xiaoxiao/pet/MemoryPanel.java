@@ -67,6 +67,17 @@ final class MemoryPanel {
         ScrollView scroll=new SpringScrollView(a);scroll.addView(l);
         new Apple.Builder(a).setTitle("她的日记").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->{try{AgentRuntime.store().clearDiary();}catch(Exception e){AgentPanel.fail(a,e);}}).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}
+    /** Her understanding of how to be with you, each with the words it came from; deletable one by one. */
+    static void understanding(MainActivity a){try{
+        JSONArray rows=Understanding.entries(AgentRuntime.store().snapshot());LinearLayout l=a.column();l.setPadding(a.dp(18),0,a.dp(18),a.dp(18));final AlertDialog[] dialog=new AlertDialog[1];
+        GroupedList.note(l,"这是她从你们的聊天里慢慢摸索出来的相处方式，只用来拿捏说话的分寸和时机，不会当成关于你的事实。每一条都附着你当时的原话；说得不对就点开删掉，之后的聊天也能改变它。忘记相关记忆或清空聊天时会一起删掉。");
+        if(rows.length()==0){TextView empty=a.text(AgentRuntime.diaryEnabled()?"还没有哦。她写陪伴日记的时候，会顺便想想怎样和你相处更舒服。":"陪伴日记关着呢。打开后，她会在写日记时慢慢形成对你的了解。",15);empty.setTextColor(Apple.SECONDARY);empty.setPadding(a.dp(6),a.dp(16),a.dp(6),a.dp(8));l.addView(empty);}
+        else{LinearLayout list=GroupedList.group(l);for(int i=rows.length()-1;i>=0;i--){JSONObject u=rows.getJSONObject(i);JSONArray ev=u.optJSONArray("evidence");JSONObject last=ev==null||ev.length()==0?null:ev.optJSONObject(ev.length()-1);
+            String basis=last==null?"":"\n依据："+"「"+last.optString("quote")+"」 · "+last.optString("date")+(u.optInt("confirmed",1)>1?" · 印证 "+u.optInt("confirmed",1)+" 天":"");
+            Button row=GroupedList.entry(list,u.optString("text")+basis,v->new Apple.Builder(a).setMessage("删掉这条了解？她之后不会再按它来拿捏分寸。").setNegativeButton("留着",null).setPositiveButton("删掉",(d,w)->{try{AgentRuntime.store().forgetUnderstanding(u.optString("id"));dialog[0].dismiss();understanding(a);}catch(Exception e){AgentPanel.fail(a,e);}}).show());row.setMaxLines(6);}}
+        ScrollView scroll=new SpringScrollView(a);scroll.addView(l);
+        dialog[0]=new Apple.Builder(a).setTitle("她对你的了解").setView(scroll).setNegativeButton("关闭",null).setPositiveButton("全部清空",(d,w)->{try{AgentRuntime.store().clearUnderstanding();}catch(Exception e){AgentPanel.fail(a,e);}}).show();
+    }catch(Exception e){AgentPanel.fail(a,e);}}
     static void historicalEntry(MainActivity a,JSONObject r){
         String at=new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm",java.util.Locale.CHINA).format(new java.util.Date(r.optLong("at")));
         new Apple.Builder(a).setTitle("历史记忆").setMessage(r.optString("text")+"\n\n记录于 "+at+"\n这条记录已过期或被更新，不作为当前事实。").setNegativeButton("关闭",null).setPositiveButton("忘记相关版本",(d,w)->new Apple.Builder(a).setMessage("忘记这件事的当前与历史版本，以及直接来源对话？").setNegativeButton("取消",null).setPositiveButton("忘记",(dd,ww)->{try{AgentRuntime.cancel();AgentRuntime.store().forget(r.optString("id"));history(a);}catch(Exception e){AgentPanel.fail(a,e);}}).show()).show();
