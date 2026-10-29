@@ -7,6 +7,7 @@ final class MemoryPanel {
         if(events==null||events.length()==0)text.append("还没有记录到桌宠互动。");
         else for(int i=events.length()-1;i>=0;i--){JSONObject e=events.getJSONObject(i);java.text.SimpleDateFormat f=new java.text.SimpleDateFormat("MM-dd HH:mm:ss",java.util.Locale.ROOT);f.setTimeZone(java.util.TimeZone.getTimeZone(e.optString("timeZone",java.util.TimeZone.getDefault().getID())));text.append(f.format(new java.util.Date(e.optLong("at")))).append("  ").append(e.optString("note")).append('\n');}
         String outcome=state.optString("proactiveOutcome");if(!outcome.isEmpty())text.append("\n上次考虑：").append("quiet".equals(outcome)?"选择先安静陪着你":"speak".equals(outcome)?"决定和你说句话":"error".equals(outcome)?"模型连接未完成，稍后再试":"窗口暂不可见，没有展示").append('\n');
+        text.append("\n主动安排：").append(Initiative.status(state)).append("\n");
         if(state.has("proactiveNextAt"))text.append("\n下次考虑开口：").append(new java.text.SimpleDateFormat("MM-dd HH:mm",java.util.Locale.ROOT).format(new java.util.Date(state.optLong("proactiveNextAt")))).append("（开启主动陪伴并满足可见和勿扰设置后才会考虑，不保证届时发消息）");
         new Apple.Builder(a).setTitle("最近互动").setMessage(text).setPositiveButton("知道了",null).show();
     }catch(Exception e){AgentPanel.fail(a,e);}}

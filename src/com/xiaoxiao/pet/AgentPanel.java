@@ -12,7 +12,7 @@ final class AgentPanel {
   hint[0]=GroupedList.note(l,"");hint[0].setTextColor(Apple.BLUE);proactiveHint(hint[0]);
   // The cost stays in plain sight; the full rules sit one tap away.
   TextView how=GroupedList.note(l,"她自己决定要不要开口、说什么、隔多久再想想，没有每日次数。每次考虑都会用模型额度，即使最后没说话。了解更多 ›");
-  how.setOnClickListener(v->new Apple.Builder(a).setTitle("主动陪伴怎么运作").setMessage("她会结合你们的聊天、点击拖动、记忆和自己的性格，决定要不要开口、说什么、多久再考虑。\n\n没有固定每日次数；两次考虑至少隔2分钟，避免刷屏。\n\n只有亮屏解锁、她展开在屏幕上、你们没正在聊天时才会考虑；系统勿扰和安静陪伴优先。\n\n每次考虑都会使用模型额度，即使她决定先不说话。下一次考虑时间不是保证发消息的时间。").setPositiveButton("知道了",null).show());
+  how.setOnClickListener(v->new Apple.Builder(a).setTitle("主动陪伴怎么运作").setMessage("她会结合你们的聊天、点击拖动、记忆和自己的性格，决定要不要开口、说什么、多久再考虑。\n\n你说在忙、等你回来时，她会真正暂停主动消息；你说忙完了再重新安排。模型遗漏时间时最多补问一次，仍失败则暂停并在最近互动说明，不暗中默认15分钟。\n\n没有固定每日次数；两次考虑至少隔2分钟，避免刷屏。\n\n只有亮屏解锁、她展开在屏幕上、你们没正在聊天时才会考虑；系统勿扰和安静陪伴优先。\n\n每次考虑都会使用模型额度，即使她决定先不说话。下一次考虑时间不是保证发消息的时间。").setPositiveButton("知道了",null).show());
   GroupedList.toggle(GroupedList.group(l),"夜间安静（23:00–08:00）",Data.prefs().getBoolean("agent.quietNight",false),(v,on)->{Data.prefs().edit().putBoolean("agent.quietNight",on).apply();if(on)AgentRuntime.interruptProactive();proactiveHint(hint[0]);});
   GroupedList.note(l,"不开时，她会参考时间和自己的性格决定。");
   GroupedList.toggle(GroupedList.group(l),"写陪伴日记",AgentRuntime.diaryEnabled(),(v,on)->Data.prefs().edit().putBoolean("agent.diary",on).apply());
@@ -45,7 +45,7 @@ final class AgentPanel {
    else if(until>0)text="安静陪伴中，"+clock(until)+" 以后才会考虑开口。";
    else if(AgentRuntime.nightQuiet())text="夜间安静中，08:00 以后才会考虑开口。";
    else{text="已开启。回到桌面后，她会自己决定什么时候开口。";
-    try{org.json.JSONObject state=AgentRuntime.store().snapshot();if(state.has("proactiveNextAt")){long next=state.optLong("proactiveNextAt");if(next>System.currentTimeMillis())text+="下次考虑约在 "+clock(next)+"。";}}catch(Exception ignored){}}
+    try{org.json.JSONObject state=AgentRuntime.store().snapshot();String status=Initiative.status(state);if(!status.isEmpty())text+="\n"+status+"。";if(state.has("proactiveNextAt")){long next=state.optLong("proactiveNextAt");if(next>System.currentTimeMillis())text+="下次考虑约在 "+clock(next)+"。";}}catch(Exception ignored){}}
   }
   hint.setText(text);hint.setVisibility(text.isEmpty()?View.GONE:View.VISIBLE);
  }
@@ -74,7 +74,7 @@ final class AgentPanel {
    search.addTextChangedListener(new ChatPage.Watcher(()->{view.query=search.getText().toString();view.shown=PAGE;fill[0].run();}));
    fill[0].run();
   }else{
-   if(entries.length()==0){TextView empty=a.text(AgentRuntime.rememberEnabled()?"这里还空空的。\n聊天时她会从你的原话里记下喜好和约定，\n也可以直接说「记住：我喜欢下雨天」。":"这里还空空的。\n「记住重要的事」关着，可以在陪伴设置里打开。",15);empty.setTextColor(Apple.SECONDARY);empty.setGravity(android.view.Gravity.CENTER);empty.setLineSpacing(a.dp(4),1);empty.setPadding(0,a.dp(22),0,a.dp(22));empty.setBackground(Apple.shape(a,Apple.FILL,16));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.topMargin=a.dp(10);holder.addView(empty,p);return;}
+   if(entries.length()==0){TextView empty=a.text(AgentRuntime.rememberEnabled()?"这里还空空的。\n聊天时她会从你的原话里记下喜好和约定，\n也可以直接说「记住：我喜欢下雨天」。":"这里还空空的。\n「记住重要的事」关着，可以在陪伴设置里打开。",15);empty.setTextColor(Apple.SECONDARY);empty.setGravity(android.view.Gravity.CENTER);empty.setLineSpacing(a.dp(4),1);empty.setPadding(0,a.dp(22),0,a.dp(22));empty.setBackground(Apple.shape(a,Apple.FILL,16));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.topMargin=a.dp(10);holder.addView(empty,p);}
   }
   l.addView(holder);
   LinearLayout actions=GroupedList.group(l);

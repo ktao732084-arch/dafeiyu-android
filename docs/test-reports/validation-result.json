@@ -1,16 +1,16 @@
 {
-  "version": "0.4.8",
-  "version_code": 12,
-  "apk_sha256": "4d29632ceb06bac3894854fbf300728865cf5f5b26085b5b672ffbc95ccada58",
-  "framework_unique_passed": 80,
+  "version": "0.4.9.1",
+  "version_code": 14,
+  "apk_sha256": "37d491e2d36c3bf55c7ee7f00767464998ce88306ba9df6bb9eefb849b79b0f3",
+  "framework_unique_passed": 94,
   "framework_failed": 0,
   "framework_skipped": 0,
-  "final_build_framework_rechecked": 80,
-  "android_art_core_suites": 13,
-  "android_runtime_instrumentation_checks": 32,
-  "initiative_checks": 33,
-  "unicode_checks": 83,
+  "final_build_framework_rechecked": 94,
+  "android_art_core_suites": 14,
+  "android_runtime_instrumentation_checks": 39,
+  "initiative_checks": 59,
   "nickname_and_reply_checks": 33,
+  "unicode_checks": 83,
   "core_checks": 141,
   "history_checks": 556,
   "temporal_history_checks": 38,
@@ -18,6 +18,7 @@
   "episodic_checks": 11,
   "diary_checks": 19,
   "endpoint_checks": 13,
+  "usability_checks": 12,
   "native_memory": {
     "scenarios": 84,
     "passed": 145,
@@ -25,19 +26,20 @@
     "known_unmet": 21
   },
   "live_model_smoke": {
-    "environment": "MuMu Android API35 x86_64; existing configured model through app UI",
-    "manual_chat": "completed; an interrupted segmented reply remained marked partially displayed",
-    "physical_interaction": "11:24:02 touch persisted with timestamp",
-    "proactive": "11:26 message related to the preceding conversation appeared in chat with proactive label",
-    "next_consideration": "11:46 shown in recent-interactions panel",
-    "timing_boundary": "Initial request for a two-minute follow-up produced a roughly 15-minute schedule, without inspecting whether this was model output or fallback. A real touch advanced eligibility; proactive speech followed about two minutes after that touch. This is not an exact reminder guarantee."
+    "environment": "MuMu Android API35 x86_64; existing configured model via normal app UI",
+    "busy": "13:02 declaration produced persistent waiting with no next-check countdown; no extra chat during roughly three-minute busy observation",
+    "restart": "13:05 process restart and restoring desktop service preserved waiting; physical show event did not resume proactive checks",
+    "available": "around 13:06 declaration cleared waiting; UI showed model-origin next consideration at 13:10, rather than fifteen minutes later",
+    "natural_followup": "after scheduled consideration a new playful board-game topic was recorded and displayed; no lunch chase or announcing silence; next model-origin consideration was 13:19",
+    "timing": "No device clock, model response, stored schedule, or API key was directly changed to manufacture the result"
   },
   "not_verified": [
     "all Android versions",
     "physical phones",
-    "broad real-model quality or battery benchmarks"
+    "every language or phrasing of availability",
+    "long-term real-model repetition or battery benchmarks"
   ],
   "known_issues": [
-    "Existing handbook export produced a zero-byte file during earlier inspection; not repaired or used as evidence in this release."
+    "Earlier zero-byte handbook-export issue is unchanged; do not treat that export as a reliable full backup."
   ]
 }

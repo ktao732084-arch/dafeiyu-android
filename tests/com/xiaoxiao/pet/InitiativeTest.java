@@ -39,6 +39,30 @@ public final class InitiativeTest {
         long epoch=db.epoch();db.clear(false);check(!db.interaction(epoch,"迟到的点击",now),"old interaction cannot return after clear");
         check(!db.initiativeDecision(epoch,"quiet",2,now),"old decision cannot return after clear");
         check(!db.initiativeDue(now+900000,now-60000)&&db.snapshot().getJSONArray("interactions").length()==0,"clearing history removes events and eligibility");
+        check(!AgentReply.parse("普通回复").plan.valid(),"missing timing is explicitly unknown, never a model fifteen");
+        for(Object value:new Object[]{"15",2.5,1,181,JSONObject.NULL})check(!InitiativePlan.parse(new JSONObject().put("next_check_minutes",value)).valid(),"invalid metadata is observable");
+        check("busy".equals(InitiativePlan.explicitAvailability("我现在有点忙，等忙完了再陪你聊天。")),"direct wait request");
+        check("available".equals(InitiativePlan.explicitAvailability("我忙完了，能聊天了。")),"direct return request");
+        for(String text:new String[]{"如果我忙完了该怎么办", "昨天我现在有点忙", "她说我忙完了", "我忙完了吗？", "翻译：我先忙", "我喜欢忙完后的轻松"})check("unchanged".equals(InitiativePlan.explicitAvailability(text)),"no availability inferred from historical/quoted/question text");
+        InitiativePlan busyPlan=AgentReply.parse("{\"reply\":\"好，你先忙\",\"next_check_minutes\":70}").plan;busyPlan.ground("我现在有点忙",false);
+        db.commit(db.epoch(),"我现在有点忙","好，你先忙","calm",null,false,false,null,null,"busy",now,null,false,null,busyPlan);
+        check(db.snapshot().optBoolean("proactiveWaiting")&&!db.snapshot().has("proactiveNextAt"),"busy becomes persistent wait, not a timed nudge");
+        db=new AgentStore(dir);db.interaction("用户点了你",now+1000);check(!db.initiativeDue(now+36000000,0),"restart and touches cannot undo wait");
+        InitiativePlan freePlan=AgentReply.parse("{\"reply\":\"欢迎回来\",\"next_check_minutes\":3}").plan;freePlan.ground("我忙完了",false);
+        db.commit(db.epoch(),"我忙完了","欢迎回来","calm",null,false,false,null,null,"free",now+2000,null,false,null,freePlan);
+        check(!db.snapshot().optBoolean("proactiveWaiting")&&db.snapshot().getJSONObject("initiativePlan").getInt("minutes")==3,"return resumes at actual model delay");
+        check("model".equals(db.snapshot().getJSONObject("initiativePlan").getString("source")),"source persisted");
+        InitiativePlan missing=new InitiativePlan();db.initiativeDecision(db.epoch(),"quiet",missing,now);
+        check(db.snapshot().optBoolean("proactiveAwaitingPlan")&&!db.snapshot().has("proactiveNextAt"),"invalid plan pauses rather than repeatedly guessing fifteen");
+        db.interaction("用户点了你",now+100);check(!db.initiativeDue(now+36000000,0),"touch cannot bypass a missing decision");
+        check(freePlan.quiet("你还没接吃什么那茬，我也不催。",db.snapshot()),"reassurance nags become actual silence");
+        check(!freePlan.quiet("刚想到一个脑筋急转弯。",db.snapshot()),"new spontaneous topic is allowed");
+        InitiativePlan lunch=AgentReply.parse("{\"reply\":\"午饭吃什么？\",\"next_check_minutes\":4,\"topic\":\"午饭\"}").plan;
+        db.commit(db.epoch(),"","午饭吃什么？","calm",null,false,true,null,null,"lunch",now+3000,null,true,null,lunch);
+        check(!lunch.quiet("想好午饭了吗？",db.snapshot()),"unshown topic does not count as said");db.shown("lunch",1);
+        check(lunch.quiet("想好午饭了吗？",db.snapshot()),"unanswered displayed topic is not repeated");
+        long oldEpoch=db.epoch();db.clear(false);check(!db.initiativeDecision(oldEpoch,"quiet",freePlan,now),"new metadata still obeys deletion epoch");
+        check(!db.snapshot().has("initiativePlan")&&!db.snapshot().has("proactiveWaiting"),"clear removes availability and plan metadata");
         System.out.println("PASS: "+checks+" model initiative checks");
     }
 }

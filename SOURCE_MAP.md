@@ -142,3 +142,7 @@ Nickname、ChatPolishRulesTest和ChatPolishTest由本项目新增，称呼识别
 ## 0.4.8 自主陪伴与互动记录
 
 `Initiative.java`、`InitiativeTest.java`、`InitiativeRuntimeTest.java`为本项目AI辅助新增：模型安排下次考虑、物理事件时间线、主动决定记录、防循环与错误退避。`AgentRuntime`、`AgentStore`、`AgentReply`、`PromptBuilder`、`MemoryPanel`、`AgentPanel`与测试接入这些能力，沿用各自既有来源；`PetService`在小小桌宠悬浮交互基础上增加事件接线。无新增第三方运行依赖或外部Agent框架；原有素材、人格参考和Claude协作提交归属不变。
+
+## 0.4.9.1 忙闲调度修复
+
+`InitiativePlan.java`为本项目AI辅助新增：验证模型调度字段、明确忙闲意图、安排来源与主动催问过滤。`Initiative`、runtime/store/prompt和设置界面在原项目模块上继续修改，未引入额外Agent框架或新第三方依赖。保留了[主分支合并的可用性优化](https://github.com/ktao732084-arch/dafeiyu-android/commit/e3a1da1)：聊天搜索、长按记住、手账搜索与设置精简；本轮另修复其中的空手账提前返回，并修正分页测试夹具。上述界面改动不署为本轮独立原创。

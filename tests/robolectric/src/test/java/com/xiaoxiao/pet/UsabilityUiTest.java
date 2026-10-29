@@ -11,7 +11,10 @@ public class UsabilityUiTest {
     @After public void cleanup()throws Exception{AgentRuntime.cancel();ShadowLooper.idleMainLooper();Data.logWriter.submit(()->{}).get(5,TimeUnit.SECONDS);}
     View root(){return UiTest.dialog().getWindow().getDecorView();}
     @Test public void notebookSearchFiltersInPlaceAndPagesTheMatches()throws Exception{
-        AgentRuntime.store().remember("我喜欢蓝色",true);for(int i=0;i<70;i++)AgentRuntime.store().remember("第"+i+"件小事",false);
+        // This is a paging fixture, not a semantic-dedup test: near-identical numbered text is otherwise merged.
+        JSONObject fixture=AgentStore.empty(0);long at=System.currentTimeMillis();MemoryLedger.addLocal(fixture,MemoryLedger.record("blue","我喜欢蓝色","你手动保存",true,at));
+        for(int i=0;i<70;i++)MemoryLedger.addLocal(fixture,MemoryLedger.record("row"+i,"第"+i+"件小事","你手动保存",false,at+i+1));
+        java.nio.file.Path dir=java.nio.file.Files.createTempDirectory("notebook-paging");java.nio.file.Files.write(dir.resolve("companion-v1.json"),fixture.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));AgentRuntime.memory=new AgentStore(dir.toFile());
         AgentPanel.memories(a);View root=root();assertNotNull(UiTest.find(root,"再显示 11 条（共 71 条）"));
         ((EditText)UiTest.description(root,"搜索记忆")).setText("蓝色");ShadowLooper.idleMainLooper();
         assertNotNull(UiTest.find(root,"★ 我喜欢蓝色"));assertNull(UiTest.find(root,"第3件小事"));

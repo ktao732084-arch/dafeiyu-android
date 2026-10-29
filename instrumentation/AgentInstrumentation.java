@@ -56,6 +56,18 @@ public class AgentInstrumentation extends Instrumentation {
     check(AgentRuntime.send("",true,new Reply()),"start proactive consideration");AgentRuntime.worker.submit(()->{}).get(15,TimeUnit.SECONDS);
     JSONObject initiative=AgentRuntime.store().snapshot();check("quiet".equals(initiative.optString("proactiveOutcome")),"quiet decision is recorded");check(AgentRuntime.history().length()==previousTurns,"quiet does not create a fake chat");check(initiative.optLong("proactiveNextAt")>=initiativeAt+7*60000,"model chooses next check time on Android");
     check(new AgentStore(new java.io.File(isolatedFiles,"agent")).snapshot().optLong("proactiveNextAt")==initiative.optLong("proactiveNextAt"),"schedule survives store restart");
+    AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"好，等你回来\",\"next_check_minutes\":60}";
+    Reply busyReply=new Reply();AgentRuntime.send("我现在有点忙，等忙完了再聊",false,busyReply);busyReply.await();
+    check(AgentRuntime.store().snapshot().optBoolean("proactiveWaiting"),"busy becomes a real wait on Android");
+    check(!new AgentStore(new java.io.File(isolatedFiles,"agent")).initiativeDue(System.currentTimeMillis()+86400000,0),"busy wait survives restart without a reminder");
+    AgentRuntime.touch("用户点了你");AgentRuntime.worker.submit(()->{}).get(10,TimeUnit.SECONDS);check(!AgentRuntime.store().initiativeDue(System.currentTimeMillis()+86400000,0),"touch does not cancel busy wait");
+    AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"忙完啦，聊点轻松的\",\"next_check_minutes\":3}";
+    Reply freeReply=new Reply();AgentRuntime.send("我忙完了，现在可以聊天了",false,freeReply);freeReply.await();
+    check(!AgentRuntime.store().snapshot().optBoolean("proactiveWaiting"),"return clears busy wait on Android");
+    check(AgentRuntime.store().snapshot().getJSONObject("initiativePlan").getInt("minutes")==3,"real model delay persisted instead of default fifteen");
+    check("model".equals(AgentRuntime.store().snapshot().getJSONObject("initiativePlan").getString("source")),"schedule provenance persisted on Android");
+    int beforeNag=AgentRuntime.history().length();AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"我不催，你还没回复\",\"next_check_minutes\":41}";
+    AgentRuntime.send("",true,new Reply());AgentRuntime.worker.submit(()->{}).get(10,TimeUnit.SECONDS);check(AgentRuntime.history().length()==beforeNag,"announcing silence does not send another message");
     result.putString("stream","PASS: "+checks+" Android runtime checks\n");
    }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;MemoryBridge.client=MemoryBridge::http;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}
   }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e.toString());result.putString("stack",android.util.Log.getStackTraceString(e));}
