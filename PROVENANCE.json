@@ -78,14 +78,14 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "17b0b2af05c0934b227bbd1901c2a12dcd97d124045ac160fe72ae126c6a62c3",
+      "sha256": "53dd2f3429d22dbe4d1a1f3b9139e51e60c3f3fffc18fa7ca5e6d21b35e441c1",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
       "path": "SOURCE_MAP.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "634a1ac25fb8d18dcade7bff3c1cc258106e0bf448cf52a414ba196670c2156f"
+      "sha256": "5b2a22781b64f0502e17ea364728ce92ca08a1a37a779ba1fa00f483f64f59ea"
     },
     {
       "path": "THIRD-PARTY-LICENSE.txt",
@@ -1365,6 +1365,12 @@
       "sha256": "96d366a07dd932b0786fe8a7d649fab665aacc074f25f21aa8b94ec2ba1556c4"
     },
     {
+      "path": "docs/QUEST_LINE_ACCEPTANCE.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "ca11fb65ea0847ec011008b4354f1ecb27082af49975abd1f7b4e84b9ed27da5"
+    },
+    {
       "path": "docs/RELEASE-0.4.9.4.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1609,6 +1615,12 @@
       "sha256": "fef24c197679915926182fab2e4ea1c0e7315236b45732f9985b65138ef74a50"
     },
     {
+      "path": "instrumentation/QuestLineInstrumentation.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "c8e5905925fe0139b68e45074a2966cb0bda4ea67b6d62a171e0b937f80640f9"
+    },
+    {
       "path": "instrumentation/TouchReplyActivity.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1642,7 +1654,7 @@
       "path": "instrumentation/build-isolated-tests.ps1",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "cea41d80671f024c817a2b74c0236dfdfbf70c115091db1e3789b584ea05f26d"
+      "sha256": "b43bc32c0274b1b906d298e6b9aa5071583cae0fe0cb3c8908c7bd0f6db3fb01"
     },
     {
       "path": "instrumentation/build-tests.ps1",
