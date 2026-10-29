@@ -85,7 +85,7 @@
       "path": "SOURCE_MAP.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "6505d7a49c0efa4c0af342e1e15adb3d64dd6ecf4b6ac38a53d49a650bb4967d"
+      "sha256": "634a1ac25fb8d18dcade7bff3c1cc258106e0bf448cf52a414ba196670c2156f"
     },
     {
       "path": "THIRD-PARTY-LICENSE.txt",
@@ -1281,6 +1281,12 @@
       "sha256": "c7bf34169bb2b45d3f08c2a5afece59bb5253bb2138a4b13c5b3e78d97299e59"
     },
     {
+      "path": "docs/ANIMATED_HOME_ACCEPTANCE.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "d6b9d22cc0c475bea1cea8a9e7bfe9363d43b4260bfa992f4372117d224e70a7"
+    },
+    {
       "path": "docs/CHARACTER.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1591,6 +1597,12 @@
       "sha256": "6b7e1372dfcffa826b54c279b4a22e1c9e8abf9994ada878d801a831804cf70d"
     },
     {
+      "path": "instrumentation/HeroPetInstrumentation.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "be5d3bee791052a5612e014a6ec61a9000b760ef2b77494528d8727881125de8"
+    },
+    {
       "path": "instrumentation/PersonaChecks.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1630,7 +1642,7 @@
       "path": "instrumentation/build-isolated-tests.ps1",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "bbb40280f46f774409c50b883292181eacc8abc1c206b03eb61a43cdd4f9b259"
+      "sha256": "cea41d80671f024c817a2b74c0236dfdfbf70c115091db1e3789b584ea05f26d"
     },
     {
       "path": "instrumentation/build-tests.ps1",
@@ -2354,7 +2366,7 @@
       "path": "src/com/xiaoxiao/pet/HeroPet.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "eeffeb7e9cd3e97a16e8e201ffbfbff0de018543a6d0b78f1922b4f7efc3950d"
+      "sha256": "c641ea5b5c15f8582f8c63c22cae7247a0f1583ca6e02d18838457b39da2f6bb"
     },
     {
       "path": "src/com/xiaoxiao/pet/HistoryRecall.java",
@@ -2870,7 +2882,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/CompanionBehaviorTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "e5a9c10a5a88f1b2d18908bd5e02bd3656da73ec845a82e331d1641183708cf2"
+      "sha256": "f3e69ff839f479c28647630e07a0958f3e9dfd538aadb42acf0ab899df0a8824"
     },
     {
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/ConversationTest.java",
@@ -2976,7 +2988,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/UsabilityUiTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "1b2c60769c1bfdaf50a982d47619064c5082909b8e20758cb621c11b63d92bf6"
+      "sha256": "7e78656549ce0b62ec5b9c44ee3989eb8bbf3512d72a2d4cfa6180f8a8e9383d"
     },
     {
       "path": "tests/robolectric/src/test/resources/robolectric.properties",

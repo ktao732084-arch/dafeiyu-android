@@ -24,6 +24,7 @@ final class HeroPet {
  }
  /** Puts her in the hero card (render() rebuilds the page); the portrait covers the gap until the clip is drawn again. */
  void attach(LinearLayout hero,int height){
+  plan.available(GrowthStore.unlockedOrAll(Data.actions(ROLE)));
   if(stage.getParent()!=null)((ViewGroup)stage.getParent()).removeView(stage);
   int room=activity.getResources().getDisplayMetrics().widthPixels-Apple.dp(activity,76),w=Math.min(height*4/3,room),h=w*3/4;
   for(View v:new View[]{poster,video})if(v!=null)v.setLayoutParams(new FrameLayout.LayoutParams(w,h,Gravity.CENTER));
