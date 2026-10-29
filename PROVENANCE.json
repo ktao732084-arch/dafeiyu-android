@@ -1557,6 +1557,12 @@
       "sha256": "a6d9a30b0d301e1455be5a5c8c29a1e47ed4c65237066342c1c6bd09e038c2f5"
     },
     {
+      "path": "docs/test-reports/shared-experiences.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "aa303623344af188fa0a4cc3b6d2c9fcc473bcf958e94d31769ece848b66d806"
+    },
+    {
       "path": "docs/test-reports/touch-reply-results.txt",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
