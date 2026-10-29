@@ -61,7 +61,7 @@
 | `build.ps1`、`AndroidManifest.xml`、既有主题资源 | 修改小小桌宠安卓基线：独立包名/版本、单角色打包、参数文件构建、签名验证 |
 | `tests/com/xiaoxiao/pet/MotionEngineTest.java`、`tests/check_action_return.py` | 沿用小小桌宠测试；后者为录屏分析脚本，本次未执行其设备录屏验收 |
 | `tests/com/xiaoxiao/pet/AgentCoreTest.java`、`ApiEndpointTest.java`、`tests/run-core.ps1` | 本版新增的核心逻辑与地址校验回归 |
-| `instrumentation/*` | 本版新增 Android 设备测试代码；本次仅编译，未在设备执行 |
+| `instrumentation/*` | 本版新增 Android 设备测试代码；当前实际Android执行范围见 VALIDATION.md（受控模型，独立测试包） |
 | `tests/robolectric/*` 中自写测试、bootstrap与runner | 本版新增。使用 [Robolectric 4.13](https://github.com/robolectric/robolectric)、[JUnit 4.13.2](https://github.com/junit-team/junit4)、[AndroidX Test](https://github.com/android/android-test)；这些依赖只用于测试，不打入应用 APK |
 | JVM核心检查的 JSON 库 | 测试依赖 [JSON-java 20240303](https://github.com/stleary/JSON-java)，不打入 APK；App 中使用系统 `org.json` |
 | 构建平台 | JDK17、[Android SDK](https://developer.android.com/tools) 与系统 Android APIs；不是本项目原创平台实现 |
@@ -134,6 +134,20 @@ AgentRuntime、PromptBuilder和AgentStore的改动将检索证据接入正常回
 追加审查中的DeviceCoreChecks、run-core-device.ps1、build-isolated-tests.ps1和测试扩展由本项目编写，复用既有产品代码、语料、测试断言与资源；没有引入第三方运行框架。既有素材与记忆项目的来源、许可保持原标注。
 
 UnicodeRegex、NativeRegexTest和设备检查脚本为本项目新增实现。Android默认Unicode字符类但不支持显式UNICODE_CHARACTER_CLASS的行为依据[Android官方文档](https://developer.android.com/reference/java/util/regex/Pattern#UNICODE_CHARACTER_CLASS)。对NativeMemoryEngine与NativeMemoryTime的兼容修正保持原记忆项目MIT归属；没有复制外部实现。
+
+## 0.4.7 称呼同步与聊天展示
+
+Nickname、ChatPolishRulesTest和ChatPolishTest由本项目新增，称呼识别采用本机保守规则，不引入额外模型或外部库。AgentRuntime、ProfilePage、AgentPanel、AgentPolicy、AgentReply、ReplySegments、ChatPage和PromptBuilder在既有实现上修改；保留原上游与优化分支归属。修复来自2026-10-29真实Android聊天实测反馈；用户对话截图仅保存在本地，不随源码公开。
+
+## 0.4.8 自主陪伴与互动记录
+
+`Initiative.java`、`InitiativeTest.java`、`InitiativeRuntimeTest.java`为本项目AI辅助新增：模型安排下次考虑、物理事件时间线、主动决定记录、防循环与错误退避。`AgentRuntime`、`AgentStore`、`AgentReply`、`PromptBuilder`、`MemoryPanel`、`AgentPanel`与测试接入这些能力，沿用各自既有来源；`PetService`在小小桌宠悬浮交互基础上增加事件接线。无新增第三方运行依赖或外部Agent框架；原有素材、人格参考和Claude协作提交归属不变。
+
+## 0.4.9.1 忙闲调度修复
+
+`InitiativePlan.java`为本项目AI辅助新增：验证模型调度字段、明确忙闲意图、安排来源与主动催问过滤。`Initiative`、runtime/store/prompt和设置界面在原项目模块上继续修改，未引入额外Agent框架或新第三方依赖。保留了[主分支合并的可用性优化](https://github.com/ktao732084-arch/dafeiyu-android/commit/e3a1da1)：聊天搜索、长按记住、手账搜索与设置精简；本轮另修复其中的空手账提前返回，并修正分页测试夹具。上述界面改动不署为本轮独立原创。
+
+发布前再合并[后台存储与上手优化](https://github.com/ktao732084-arch/dafeiyu-android/commit/59c04c7)：展示记录异步写盘、归档缓存、编辑手账后台执行、首次使用提示与隐藏桌宠等。`AgentStore.shown`的合并同时保留后台写盘和本轮已展示话题记录；新增对异步写盘后主题恢复的验证。
 
 ## 开发分支：轻量更新
 

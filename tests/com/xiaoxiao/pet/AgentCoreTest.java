@@ -9,12 +9,13 @@ public final class AgentCoreTest {
   File root=new File(args[0]);root.mkdirs();
   check(AgentPolicy.quiet(23)&&AgentPolicy.quiet(7)&&!AgentPolicy.quiet(8),"quiet hours boundaries");
   long now=100_000_000L;
-  check(AgentPolicy.mayInitiate(now,now-31*60000,now-91*60000,0,12,true,true,true,false,false),"eligible proactive");
-  check(!AgentPolicy.mayInitiate(now,0,0,0,12,true,true,true,false,false),"no unsolicited cold start");
-  check(!AgentPolicy.mayInitiate(now,now-31*60000,now-91*60000,3,12,true,true,true,false,false),"daily budget");
-  check(!AgentPolicy.mayInitiate(now,now-31*60000,now-91*60000,0,12,true,false,true,false,false),"screen off gate");
-  check(!AgentPolicy.mayInitiate(now,now-31*60000,now-91*60000,0,12,true,true,true,true,false),"focus gate");
-  check(!AgentPolicy.mayInitiate(now,now-31*60000,now-10*60000,0,12,true,true,true,false,false),"request cooldown");
+  JSONObject initiative=AgentStore.empty(0).put("lastUser",now-5*60000).put("lastAttempt",now-3*60000).put("proactiveNextAt",now-1);
+  check(Initiative.due(initiative,now,0),"model scheduled proactive is due");
+  check(!Initiative.due(AgentStore.empty(0),now,0),"no unsolicited cold start");
+  check(Initiative.due(initiative.put("attempts",99),now,0),"no fixed daily quota");
+  check(!Initiative.due(initiative,now,now-1000),"current interaction gets a short grace period");
+  check(!Initiative.due(initiative.put("proactiveNextAt",now+60000),now,0),"model chosen future time respected");
+  check(!Initiative.due(initiative.put("proactiveNextAt",now-1).put("lastAttempt",now-60000),now,0),"anti-loop floor");
   check("calm".equals(AgentPolicy.emotion("execute_shell")),"unknown action cannot execute");
   check(AgentPolicy.relevance("喜欢什么咖啡","我喜欢喝冰咖啡")>0,"Chinese bigram recall");
   check(AgentPolicy.validEvidence("我喜欢喝冰咖啡","喜欢喝冰咖啡"),"grounded quote");
@@ -139,7 +140,7 @@ public final class AgentCoreTest {
   boolean alternates=true;for(int i=1;i<req.length();i++)alternates&=req.getJSONObject(i).getString("role").equals(i%2==1?"user":"assistant");
   check(alternates&&req.length()%2==0,"one system message, then strict user/assistant alternation ending with the user");
   int pairs=(req.length()-2)/2;check(pairs>=8&&pairs<=11,"8-11 history turns: "+pairs);
-  check(req.getJSONObject(2).getString("content").equals("回复"+(14-pairs)+"的第一句。")&&req.getJSONObject(req.length()-2).getString("content").contains("第二句话"),"older replies compressed, the last three verbatim");
+  check(new JSONObject(req.getJSONObject(2).getString("content")).getString("reply").equals("回复"+(14-pairs)+"的第一句。")&&new JSONObject(req.getJSONObject(req.length()-2).getString("content")).getString("reply").contains("第二句话"),"older replies compressed inside structured history, the last three verbatim");
   hist.put(new JSONObject().put("id","t14").put("at",14000L).put("user","第14句话").put("reply","回复14。").put("proactive",false));chat.put("turnCount",15);
   JSONArray next=PromptBuilder.build(in,"再推荐一个",false,chat,null);int same=0;while(same<Math.min(req.length(),next.length())-1&&req.getJSONObject(same).toString().equals(next.getJSONObject(same).toString()))same++;
   check(same>=6,"consecutive requests share a cacheable prefix of "+same+" messages");

@@ -16,9 +16,9 @@ final class ReplySegments {
     static long holdMillis(String part){return Math.max(3500,Math.min(10000,1500+part.codePointCount(0,part.length())*100L));}
     static int count(JSONObject turn){return split(turn.optString("reply")).size();}
     static String visible(JSONObject turn){
-        String reply=turn.optString("reply");if(!turn.has("displayed"))return reply;
+        String reply=turn.optString("reply");if(!turn.has("displayed"))return AgentPolicy.replyText(reply);
         List<String> parts=split(reply);int n=Math.min(parts.size(),turn.optInt("displayed"));StringBuilder out=new StringBuilder();
-        for(int i=0;i<n;i++)out.append(parts.get(i));return out.toString();
+        for(int i=0;i<n;i++)out.append(parts.get(i));return AgentPolicy.replyText(out.toString());
     }
     static String label(JSONObject turn){if(!turn.has("displayed")||turn.optInt("displayed")>=count(turn))return "";return turn.optInt("displayed")==0?"未展示 · 点开全文":"部分已展示 · 剩余未展示";}
 }
