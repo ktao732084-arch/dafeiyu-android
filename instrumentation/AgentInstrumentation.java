@@ -81,9 +81,9 @@ public class AgentInstrumentation extends Instrumentation {
     check(mergedState.optBoolean("proactiveWaiting"),"busy wait survives character integration");
     check(AgentRuntime.context("你好",false).toString().contains("相处理解")||AgentRuntime.context("你好",false).toString().contains("想让你安心忙完"),"carried mood reaches next request");
     GrowthStore growth=GrowthStore.get();check(GrowthStore.story().chapter(1)!=null,"growth assets load on actual Android");
-    int priorFeeds=growth.snapshot().optInt("feeds"),priorFish=Growth.fish(growth.snapshot());
+    int priorFeeds=growth.snapshot().optInt("feeds");
     check(growth.feed(GrowthStore.story().food("白饭"),new Growth.Award())==null,"free feeding succeeds on Android");growth.flush();
-    check(growth.snapshot().optInt("feeds")==priorFeeds+1&&Growth.fish(growth.snapshot())==priorFish,"feeding changes only expected growth values");
+    check(growth.snapshot().optInt("feeds")==priorFeeds+1&&!growth.snapshot().has("fish"),"feeding changes only expected growth values");
     check(!growth.hungry(),"feeding state is visible to pet actions");
     check(new org.json.JSONObject(new String(java.nio.file.Files.readAllBytes(growth.file.toPath()),"UTF-8")).optInt("feeds")==priorFeeds+1,"growth writer persists on Android filesystem");
     check(growth.unlocked(Data.actions("main")).contains(Data.idle("main")),"idle animation remains available");

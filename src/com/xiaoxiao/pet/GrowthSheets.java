@@ -2,7 +2,7 @@ package com.xiaoxiao.pet;
 
 import android.app.*;import android.content.*;import android.view.*;import android.widget.*;import org.json.*;
 
-/** The pet menu's growth panels: feeding, going out, and "more" (size, our story, hide). Same look as ActionSheet. */
+/** The pet menu's growth panels: feeding and "more" (size, our story, hide). Same look as ActionSheet. */
 final class GrowthSheets {
  static final class Sheet {
   final Context c;final Dialog dialog;final LinearLayout rows;final TextView hint;
@@ -16,28 +16,14 @@ final class GrowthSheets {
   void show(PetService.Pet pet,String title){CompactPanel.show(dialog,c,pet,title);}
  }
 
- static String jar(int fish){return fish<=0?"余额-分文不剩":fish<5?"余额-袋空如洗":fish<15?"余额-数金皱眉":fish<40?"余额-钱袋如常":fish<100?"余额-金袋叮当":"余额-钱袋满溢";}
-
- /** Foods unlocked so far; plain rice is free, so feeding never runs dry. Tapping the jar shows how full it is. */
+ /** Foods unlocked so far. Feeding is free; the first three feeds a day bring you closer. */
  static void feed(Context c,PetService.Pet pet){
   GrowthStore g=GrowthStore.quiet();if(g==null){Toast.makeText(c,"成长记录暂不可用",Toast.LENGTH_SHORT).show();return;}
-  JSONObject s=g.snapshot();int fish=Growth.fish(s),fed=s.optJSONObject("daily")!=null&&s.optJSONObject("daily").optString("date").equals(Growth.date(System.currentTimeMillis(),java.time.ZoneId.systemDefault()))?s.optJSONObject("daily").optInt("feed"):0;
-  Sheet sheet=new Sheet(c,"喂食 · 小鱼干 "+fish,"每天前3次喂食会让你们更亲近；白饭永远免费。小鱼干靠每天见面、聊天和她旅行带回来，不能用钱买。"+(fed>0?"\n今天已经喂过 "+fed+" 次。":""));
-  sheet.row("看看小鱼干罐",true,v->{if(!Data.file(pet.role,jar(fish)).isEmpty())pet.play(jar(fish));});
+  JSONObject s=g.snapshot();JSONObject d=s.optJSONObject("daily");int fed=d!=null&&d.optString("date").equals(Growth.date(System.currentTimeMillis(),java.time.ZoneId.systemDefault()))?d.optInt("feed"):0;
+  Sheet sheet=new Sheet(c,"喂食","每天前3次喂食会让你们更亲近。新的食物随章节解锁。"+(fed>0?"\n今天已经喂过 "+fed+" 次。":""));
   for(Growth.Food f:GrowthStore.story().foods){boolean open=Growth.available(s,f);
-   sheet.row(f.name+" · "+(f.price==0?"免费":f.price+" 小鱼干")+(open?"":" · 第"+f.chapter+"章解锁"),open&&fish>=f.price,v->{sheet.dialog.dismiss();if(PetService.instance!=null)PetService.instance.feed(pet,f);});}
+   sheet.row(f.name+(open?"":" · 第"+f.chapter+"章解锁"),open,v->{sheet.dialog.dismiss();if(PetService.instance!=null)PetService.instance.feed(pet,f);});}
   sheet.show(pet,"大肥鱼-喂食");
- }
-
- /** Going out (chapter 2): a free plain-rice bento, or a snack bento that costs three fish and brings two more back. */
- static void trip(Context c,PetService.Pet pet){
-  GrowthStore g=GrowthStore.quiet();if(g==null){Toast.makeText(c,"成长记录暂不可用",Toast.LENGTH_SHORT).show();return;}
-  JSONObject s=g.snapshot();
-  if(!Growth.canTravel(s)){Toast.makeText(c,GrowthStore.story().trip.optString("locked"),Toast.LENGTH_LONG).show();return;}
-  Sheet sheet=new Sheet(c,"出门 · 带个便当","她会出门1–4小时，缩在屏幕边上。点一下边上的小标签，或者和她聊天，她就会提前回来，不会有惩罚。回来时带一张明信片。");
-  sheet.row("白饭便当 · 免费",true,v->{sheet.dialog.dismiss();if(PetService.instance!=null)PetService.instance.goOut(pet,false);});
-  sheet.row("零食便当 · "+Growth.SNACK_BENTO+" 小鱼干（多带回2条）",Growth.fish(s)>=Growth.SNACK_BENTO,v->{sheet.dialog.dismiss();if(PetService.instance!=null)PetService.instance.goOut(pet,true);});
-  sheet.show(pet,"大肥鱼-出门");
  }
 
  /** Size, our story (opens the app) and hide, moved here from the four-item menu. */
