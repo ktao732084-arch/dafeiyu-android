@@ -8,12 +8,6 @@ final class AgentPolicy {
     static final Set<String> EMOTIONS = new HashSet<>(Arrays.asList("calm","happy","shy","curious","concerned","playful","sleepy"));
     static String emotion(String value) { return EMOTIONS.contains(value) ? value : "calm"; }
     static boolean quiet(int hour) { return hour >= 23 || hour < 8; }
-    static boolean mayInitiate(long now, long lastUser, long lastAttempt, int attempts, int hour,
-                               boolean enabled, boolean screen, boolean visible, boolean focused, boolean busy) {
-        return enabled && screen && visible && !focused && !busy && !quiet(hour) && attempts < 3
-            && lastUser > 0 && now >= lastUser && now-lastUser >= 30*60_000L
-            && now >= lastAttempt && now-lastAttempt >= 90*60_000L;
-    }
     static Set<String> tokens(String s) {
         Set<String> out=new HashSet<>(); String clean=s.toLowerCase(Locale.ROOT).replaceAll("[^\\p{L}\\p{N}]", " ");
         for(String part:clean.split("\\s+")) {

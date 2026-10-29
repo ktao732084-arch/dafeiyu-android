@@ -8,7 +8,9 @@ final class AgentPanel {
   GroupedList.toggle(GroupedList.group(l),"记住重要的事",AgentRuntime.rememberEnabled(),(v,on)->{AgentRuntime.cancel();Data.prefs().edit().putBoolean("agent.memory",on).apply();});
   GroupedList.note(l,"开着时，她会从你的原话里记下喜好和约定。关掉后不再自动记下或主动翻找旧事，已有记忆仍可在手账里删。你明确问某段时间聊过什么时，仍会按请求查本机聊天记录。最近的对话照样用来接话。");
   GroupedList.toggle(GroupedList.group(l),"偶尔主动和我说话",Data.prefs().getBoolean("agent.proactive",false),(v,on)->{if(!on)AgentRuntime.cancel();Data.prefs().edit().putBoolean("agent.proactive",on).apply();});
-  GroupedList.note(l,"只在亮屏、她在屏幕上、你们没在聊天时才会开口；聊完至少等30分钟，两次至少隔90分钟，每天最多3次。23:00–08:00和勿扰时她会安安静静的，也不会在后台偷偷上网。");
+  GroupedList.note(l,"她会结合你们的聊天、点击拖动、记忆和自己的性格，决定要不要开口、说什么、多久再考虑。没有固定每日次数；两次考虑至少隔2分钟，避免刷屏。只有亮屏解锁、她展开在屏幕上、你们没正在聊天时才会考虑；系统勿扰和安静陪伴优先。每次考虑都会使用模型额度，即使她决定先不说话。");
+  GroupedList.toggle(GroupedList.group(l),"夜间安静（23:00–08:00）",Data.prefs().getBoolean("agent.quietNight",false),(v,on)->{Data.prefs().edit().putBoolean("agent.quietNight",on).apply();if(on)AgentRuntime.interruptProactive();});
+  GroupedList.note(l,"夜间是否固定安静由你选择；不开启时，她仍会参考当前时间和人格自行决定。下一次考虑时间不是保证发消息的时间。");
   GroupedList.toggle(GroupedList.group(l),"写陪伴日记",AgentRuntime.diaryEnabled(),(v,on)->Data.prefs().edit().putBoolean("agent.diary",on).apply());
   GroupedList.note(l,"每天最多一次模型请求，把前一天的聊天写成她的一两句日记，好记得「我们上周聊过什么」。这是她自己的概括，可能不准；在记忆手账里可以查看和清空。");
   GroupedList.toggle(GroupedList.group(l),"流式接收（不支持时关闭）",Data.prefs().getBoolean("agent.stream",true),(v,on)->Data.prefs().edit().putBoolean("agent.stream",on).apply());
@@ -30,7 +32,7 @@ final class AgentPanel {
   if(snapshot.optBoolean("recovered")){TextView warn=GroupedList.note(l,"上次数据出了点状况，已经从本机备份恢复。建议导出一份手账。");warn.setTextColor(Apple.DANGER);}
   GroupedList.note(l,snapshot.optString("memoryStatus",MemoryBridge.lastStatus));
   final AlertDialog[] dialog=new AlertDialog[1];
-  LinearLayout story=GroupedList.group(l);GroupedList.row(story,"共同经历与记忆变化",GroupedList.CLOCK,GroupedList.TEAL,v->MemoryPanel.history(a));GroupedList.row(story,"她说过的自己",GroupedList.HEART,GroupedList.PINK,v->MemoryPanel.self(a));GroupedList.row(story,"她的日记",GroupedList.BOOK,GroupedList.VIOLET,v->MemoryPanel.diary(a));
+  LinearLayout story=GroupedList.group(l);GroupedList.row(story,"共同经历与记忆变化",GroupedList.CLOCK,GroupedList.TEAL,v->MemoryPanel.history(a));GroupedList.row(story,"最近互动",GroupedList.CHAT,GroupedList.SKY,v->MemoryPanel.interactions(a));GroupedList.row(story,"她说过的自己",GroupedList.HEART,GroupedList.PINK,v->MemoryPanel.self(a));GroupedList.row(story,"她的日记",GroupedList.BOOK,GroupedList.VIOLET,v->MemoryPanel.diary(a));
   GroupedList.section(l,"她记得的事 · "+entries.length()+" 条");
   if(entries.length()==0){TextView empty=a.text("这里还空空的。\n聊天时说一句「记住：我喜欢下雨天」试试。",15);empty.setTextColor(Apple.SECONDARY);empty.setGravity(android.view.Gravity.CENTER);empty.setLineSpacing(a.dp(4),1);empty.setPadding(0,a.dp(22),0,a.dp(22));empty.setBackground(Apple.shape(a,Apple.FILL,16));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.topMargin=a.dp(10);l.addView(empty,p);}
   else{LinearLayout list=GroupedList.group(l);for(int i=entries.length()-1;i>=Math.max(0,entries.length()-shown);i--){JSONObject m=entries.getJSONObject(i);String id=m.getString("id");GroupedList.entry(list,(m.optBoolean("pinned")?"★ ":"")+m.getString("text"),v->{dialog[0].dismiss();edit(a,m,id);});}

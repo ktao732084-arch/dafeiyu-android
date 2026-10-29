@@ -51,6 +51,11 @@ public class AgentInstrumentation extends Instrumentation {
     Nickname.manual("小K");check("小K".equals(Nickname.current()),"manual nickname takes precedence");
     Nickname.manual("");check(Nickname.current().isEmpty(),"cleared nickname is not restored from old memory");
     runOnMainSync(()->{AlphaVideo video=new AlphaVideo(getTargetContext(),"main");try{video.vertices.position(2);check(video.vertices.position()==2,"video buffer links on Android");check(Avatar.of(getTargetContext(),"main",36)!=null,"avatar resource loads on Android");}finally{video.release();}});
+    long initiativeAt=System.currentTimeMillis();AgentRuntime.store().interaction("用户轻轻点了你",initiativeAt);int previousTurns=AgentRuntime.history().length();
+    AgentRuntime.model=(messages,token,progress)->{check(messages.toString().contains("用户轻轻点了你")&&messages.toString().contains("initiative_context"),"physical chronology reaches actual Android model request");return "{\"reply\":\"[安静陪伴]\",\"next_check_minutes\":7}";};
+    check(AgentRuntime.send("",true,new Reply()),"start proactive consideration");AgentRuntime.worker.submit(()->{}).get(15,TimeUnit.SECONDS);
+    JSONObject initiative=AgentRuntime.store().snapshot();check("quiet".equals(initiative.optString("proactiveOutcome")),"quiet decision is recorded");check(AgentRuntime.history().length()==previousTurns,"quiet does not create a fake chat");check(initiative.optLong("proactiveNextAt")>=initiativeAt+7*60000,"model chooses next check time on Android");
+    check(new AgentStore(new java.io.File(isolatedFiles,"agent")).snapshot().optLong("proactiveNextAt")==initiative.optLong("proactiveNextAt"),"schedule survives store restart");
     result.putString("stream","PASS: "+checks+" Android runtime checks\n");
    }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;MemoryBridge.client=MemoryBridge::http;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}
   }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e.toString());result.putString("stack",android.util.Log.getStackTraceString(e));}

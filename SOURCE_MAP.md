@@ -61,7 +61,7 @@
 | `build.ps1`、`AndroidManifest.xml`、既有主题资源 | 修改小小桌宠安卓基线：独立包名/版本、单角色打包、参数文件构建、签名验证 |
 | `tests/com/xiaoxiao/pet/MotionEngineTest.java`、`tests/check_action_return.py` | 沿用小小桌宠测试；后者为录屏分析脚本，本次未执行其设备录屏验收 |
 | `tests/com/xiaoxiao/pet/AgentCoreTest.java`、`ApiEndpointTest.java`、`tests/run-core.ps1` | 本版新增的核心逻辑与地址校验回归 |
-| `instrumentation/*` | 本版新增 Android 设备测试代码；本次仅编译，未在设备执行 |
+| `instrumentation/*` | 本版新增 Android 设备测试代码；当前实际Android执行范围见 VALIDATION.md（受控模型，独立测试包） |
 | `tests/robolectric/*` 中自写测试、bootstrap与runner | 本版新增。使用 [Robolectric 4.13](https://github.com/robolectric/robolectric)、[JUnit 4.13.2](https://github.com/junit-team/junit4)、[AndroidX Test](https://github.com/android/android-test)；这些依赖只用于测试，不打入应用 APK |
 | JVM核心检查的 JSON 库 | 测试依赖 [JSON-java 20240303](https://github.com/stleary/JSON-java)，不打入 APK；App 中使用系统 `org.json` |
 | 构建平台 | JDK17、[Android SDK](https://developer.android.com/tools) 与系统 Android APIs；不是本项目原创平台实现 |
@@ -138,3 +138,7 @@ UnicodeRegex、NativeRegexTest和设备检查脚本为本项目新增实现。An
 ## 0.4.7 称呼同步与聊天展示
 
 Nickname、ChatPolishRulesTest和ChatPolishTest由本项目新增，称呼识别采用本机保守规则，不引入额外模型或外部库。AgentRuntime、ProfilePage、AgentPanel、AgentPolicy、AgentReply、ReplySegments、ChatPage和PromptBuilder在既有实现上修改；保留原上游与优化分支归属。修复来自2026-10-29真实Android聊天实测反馈；用户对话截图仅保存在本地，不随源码公开。
+
+## 0.4.8 自主陪伴与互动记录
+
+`Initiative.java`、`InitiativeTest.java`、`InitiativeRuntimeTest.java`为本项目AI辅助新增：模型安排下次考虑、物理事件时间线、主动决定记录、防循环与错误退避。`AgentRuntime`、`AgentStore`、`AgentReply`、`PromptBuilder`、`MemoryPanel`、`AgentPanel`与测试接入这些能力，沿用各自既有来源；`PetService`在小小桌宠悬浮交互基础上增加事件接线。无新增第三方运行依赖或外部Agent框架；原有素材、人格参考和Claude协作提交归属不变。

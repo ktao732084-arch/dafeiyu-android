@@ -97,6 +97,9 @@ final class AgentStore {
         return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,false);
     }
     synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay)throws Exception {
+        return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,null);
+    }
+    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes)throws Exception {
         if(epoch!=epoch())return false;
         JSONObject next=plan==null?snapshot():MemoryLedger.copy(plan.state);long now=observed>0?observed:System.currentTimeMillis();String tid=turnId==null?UUID.randomUUID().toString():turnId;
         MemoryLedger.migrate(next);if(plan!=null)next.put("memoryStatus",plan.status);
@@ -113,6 +116,7 @@ final class AgentStore {
         JSONArray pendingSelf=next.optJSONArray("self"),liveSelf=state.optJSONArray("self");if(pendingSelf!=null&&liveSelf!=null)for(int i=0;i<pendingSelf.length();i++)for(int j=0;j<liveSelf.length();j++){JSONObject pending=pendingSelf.getJSONObject(i),current=liveSelf.getJSONObject(j);if(pending.optString("source").equals(current.optString("source"))&&pending.optString("text").equals(current.optString("text"))&&current.optBoolean("shown",true))pending.put("shown",true);}
         // The diary is written beside chat by its own thread; the live state's copy is the current one.
         if(state.has("diary"))next.put("diary",state.getJSONArray("diary"));else next.remove("diary");
+        for(String key:new String[]{"interactions","initiativeChecks","proactiveNextAt","proactiveFailures","proactiveOutcome","proactiveDecidedAt"})if(state.has(key))next.put(key,state.get(key));
         // Lifetime counters: turnCount anchors the prompt's history window, the others the relationship stage.
         next.put("turnCount",next.optInt("turnCount",turns.length())+1);
         java.time.ZoneId zone=java.time.ZoneId.systemDefault();
@@ -129,6 +133,7 @@ final class AgentStore {
         if(plan==null&&remember&&!proactive&&quotes!=null)for(int i=0;i<Math.min(3,quotes.length());i++) {
             String quote=quotes.optString(i,"");if(AgentPolicy.validEvidence(user,quote))addMemory(next,quote,tid,false,now);
         }
+        if(nextCheckMinutes!=null){if(proactive)Initiative.decision(next,"speak",nextCheckMinutes,System.currentTimeMillis());else Initiative.afterUser(next,nextCheckMinutes,System.currentTimeMillis());}
         save(next);if(episodes!=null)episodes.add(added);return true;
     }
     static final int MAX_SELF=40;
@@ -181,6 +186,7 @@ final class AgentStore {
         transcript.clear(state.getJSONArray("turns"));if(episodes!=null)episodes.clear();
         // The diary is made from chats, so clearing chats clears it too.
         JSONObject next=all?empty(epoch()+1):snapshot().put("turns",new JSONArray()).put("diary",new JSONArray()).put("epoch",epoch()+1);
+        next.put("interactions",new JSONArray()).put("initiativeChecks",new JSONArray()).put("lastUser",0).put("proactiveFailures",0);next.remove("proactiveNextAt");next.remove("proactiveOutcome");next.remove("proactiveDecidedAt");
         MemoryLedger.migrate(next);save(next,false);purgeBackup();
     }
     synchronized JSONArray historyPage(String before,int limit)throws Exception {return transcript.page(state.getJSONArray("turns"),before,Math.max(1,Math.min(limit,40)));}
@@ -226,8 +232,12 @@ final class AgentStore {
     private void purgeBackup()throws Exception {Files.deleteIfExists(new File(file+".bak").toPath());}
     synchronized void reserveAttempt(String day,long now)throws Exception {
         JSONObject next=snapshot();int n=day.equals(next.optString("attemptDay"))?next.optInt("attempts"):0;
-        next.put("attemptDay",day).put("attempts",n+1).put("lastAttempt",now);save(next);
+        next.put("attemptDay",day).put("attempts",n+1).put("lastAttempt",now);Initiative.reserve(next,now);save(next);
     }
+    synchronized void interaction(String note,long at)throws Exception {JSONObject next=snapshot();Initiative.interaction(next,note,at);save(next);}
+    synchronized boolean interaction(long expectedEpoch,String note,long at)throws Exception {if(epoch()!=expectedEpoch)return false;interaction(note,at);return true;}
+    synchronized boolean initiativeDecision(long expectedEpoch,String outcome,int minutes,long at)throws Exception {if(epoch()!=expectedEpoch)return false;JSONObject next=snapshot();Initiative.decision(next,outcome,minutes,at);save(next);return true;}
+    synchronized boolean initiativeDue(long now,long touch){return Initiative.due(state,now,touch);}
     synchronized String memoryContext(String query)throws Exception {
         return MemoryLedger.context(state,query,null);
     }

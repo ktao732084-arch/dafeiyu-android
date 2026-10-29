@@ -1,19 +1,16 @@
 {
-  "version": "0.4.7",
-  "version_code": 11,
-  "apk_sha256": "b7c636bb54efc1b5842089c6149779d94990ef2bdf415246ba43bca55aab9f85",
-  "framework_unique_passed": 72,
+  "version": "0.4.8",
+  "version_code": 12,
+  "apk_sha256": "4d29632ceb06bac3894854fbf300728865cf5f5b26085b5b672ffbc95ccada58",
+  "framework_unique_passed": 80,
   "framework_failed": 0,
   "framework_skipped": 0,
-  "final_build_framework_rechecked": 22,
-  "final_rechecked_suites": [
-    "ChatPolishTest",
-    "UiTest"
-  ],
-  "android_art_core_suites": 12,
-  "android_runtime_instrumentation_checks": 26,
-  "nickname_and_reply_checks": 33,
+  "final_build_framework_rechecked": 80,
+  "android_art_core_suites": 13,
+  "android_runtime_instrumentation_checks": 32,
+  "initiative_checks": 33,
   "unicode_checks": 83,
+  "nickname_and_reply_checks": 33,
   "core_checks": 141,
   "history_checks": 556,
   "temporal_history_checks": 38,
@@ -28,16 +25,19 @@
     "known_unmet": 21
   },
   "live_model_smoke": {
-    "environment": "MuMu Android API35 x86_64; existing user model via app UI",
-    "nickname_migration": "kk appeared without manual filling",
-    "unique_setting": "no nickname EditText in companion settings",
-    "reply": "name and today-history replies complete, no leading tool marker",
-    "interrupted_bubble": "complete first segment visually verified beside unshown footer",
-    "home_preview": "updated to latest completed reply after chat dismissal"
+    "environment": "MuMu Android API35 x86_64; existing configured model through app UI",
+    "manual_chat": "completed; an interrupted segmented reply remained marked partially displayed",
+    "physical_interaction": "11:24:02 touch persisted with timestamp",
+    "proactive": "11:26 message related to the preceding conversation appeared in chat with proactive label",
+    "next_consideration": "11:46 shown in recent-interactions panel",
+    "timing_boundary": "Initial request for a two-minute follow-up produced a roughly 15-minute schedule, without inspecting whether this was model output or fallback. A real touch advanced eligibility; proactive speech followed about two minutes after that touch. This is not an exact reminder guarantee."
   },
   "not_verified": [
     "all Android versions",
     "physical phones",
-    "broad real-model accuracy or battery benchmarks"
+    "broad real-model quality or battery benchmarks"
+  ],
+  "known_issues": [
+    "Existing handbook export produced a zero-byte file during earlier inspection; not repaired or used as evidence in this release."
   ]
 }
