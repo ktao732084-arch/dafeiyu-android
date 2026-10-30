@@ -14,7 +14,7 @@
 
 <a href="docs/promo/dafeiyu-promo.mp4"><img src="docs/promo/dafeiyu-promo.webp" width="800" alt="大肥鱼宣传片：从深海游上来的鲸鱼娘、本机记忆、五种性格、一百多段动作、五章任务线"></a>
 
-<sub>▲ 宣传片（36 秒）· 点击画面观看 <a href="docs/promo/dafeiyu-promo.mp4">高清 MP4</a></sub>
+<sub>▲ 宣传片（36 秒）· 动图无声，点击观看带原创配乐的 <a href="docs/promo/dafeiyu-promo.mp4">高清 MP4</a></sub>
 
 [**下载 APK**](https://github.com/ktao732084-arch/dafeiyu-android/releases/latest) · [快速开始](#快速开始) · [功能细节](docs/FEATURES.md) · [更新记录](CHANGELOG.md) · [验证记录](VALIDATION.md)
 
@@ -134,7 +134,7 @@ JVM 与 Robolectric 不等同于 Android ART，涉及正则、JSON、文件系�
 | 应用内更新 | [UPDATES.md](docs/UPDATES.md) · [更新站点部署](deploy/updates/README.md) |
 | 可选 Python 记忆服务 | [memory-service/README.md](memory-service/README.md) |
 | 来源与溯源 | [SOURCE_MAP.md](SOURCE_MAP.md) · [PROVENANCE.json](PROVENANCE.json) |
-| 宣传片重新渲染 | [tools/promo/render_promo.py](tools/promo/render_promo.py) |
+| 宣传片重新渲染 | [tools/promo/README.md](tools/promo/README.md) |
 
 </details>
 

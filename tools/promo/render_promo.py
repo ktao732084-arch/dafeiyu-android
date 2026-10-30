@@ -5,7 +5,10 @@ Each clip is 1280x480: the left half is colour, the right half is the alpha mask
 with Pillow over a shared deep-sea background, piped into ffmpeg, then downscaled to an animated
 image for the README.
 
-    python3 tools/promo/render_promo.py --font-dir <dir with noto-sans-sc-{400,700,900}.(woff2|ttf|otf)>
+    python3 tools/promo/render_promo.py --font-dir <dir with noto-sans-sc-{400,700,900}.(woff2|ttf|otf)> \
+        [--phone-dir <dir with up to two real-phone screen recordings>]
+
+The soundtrack is synthesised by soundtrack.py, so the video carries no third-party music.
 
 Outputs docs/promo/dafeiyu-promo.mp4, docs/promo/dafeiyu-promo.webp (animated, for the README) and
 docs/promo/cover.png.
@@ -17,15 +20,21 @@ import math
 import os
 import random
 import subprocess
+import sys
+import wave
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import soundtrack  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 CLIPS = os.path.join(ROOT, 'assets', 'main')
 OUT = os.path.join(ROOT, 'docs', 'promo')
 W, H, FPS = 1280, 720, 30
-DURATION = 36.0
+DURATION = 36.0  # without phone footage
+PHONE_AT, PHONE_LEN = 9.6, 7.0
 
 INK = (240, 248, 255)
 MUTED = (178, 206, 236)
@@ -104,6 +113,50 @@ class Clip:
                 frame = np.frombuffer(raw, np.uint8).reshape(self.h, self.w * 2, 3)
                 rgba = np.dstack([frame[:, :self.w], frame[:, self.w:, 1]])
                 return Image.fromarray(rgba, 'RGBA')
+            self.proc.wait()
+            self.proc = None
+        raise RuntimeError('cannot read ' + self.path)
+
+    def close(self):
+        if self.proc:
+            self.proc.kill()
+            self.proc = None
+
+
+class PhoneClip:
+    """A screen recording from a real phone, shown inside a drawn handset. Loops like Clip."""
+
+    SCREEN_H = 600
+    BEZEL = 12
+
+    def __init__(self, path):
+        self.path = path
+        probe = subprocess.run(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-show_entries',
+                                'stream=width,height:stream_side_data=rotation', '-of', 'csv=p=0', path],
+                               capture_output=True, text=True, check=True).stdout.split()
+        vw, vh = (int(v) for v in probe[0].split(',')[:2])
+        if any(abs(int(float(r))) in (90, 270) for r in probe[1:] if r.lstrip('-').replace('.', '').isdigit()):
+            vw, vh = vh, vw
+        self.h = self.SCREEN_H
+        self.w = int(round(self.h * vw / vh / 2) * 2)
+        self.outer_w = self.w + 2 * self.BEZEL
+        mask = Image.new('L', (self.w, self.h), 0)
+        ImageDraw.Draw(mask).rounded_rectangle([0, 0, self.w - 1, self.h - 1], 26, fill=255)
+        self.mask = mask
+        self.proc = None
+
+    def next(self):
+        size = self.w * self.h * 3
+        for _ in range(2):
+            if self.proc is None:
+                self.proc = subprocess.Popen(
+                    ['ffmpeg', '-v', 'error', '-i', self.path, '-vf', f'fps={FPS},scale={self.w}:{self.h}:flags=lanczos',
+                     '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'], stdout=subprocess.PIPE)
+            raw = self.proc.stdout.read(size)
+            if len(raw) == size:
+                img = Image.frombytes('RGB', (self.w, self.h), raw).convert('RGBA')
+                img.putalpha(self.mask)
+                return img
             self.proc.wait()
             self.proc = None
         raise RuntimeError('cannot read ' + self.path)
@@ -197,6 +250,22 @@ class Canvas:
         layer.paste(frame, (x, y), frame)
         self.img.alpha_composite(layer)
 
+    def phone(self, screen, xy, alpha=1.0):
+        """A handset with screen inside; xy is its top-left corner."""
+        b = PhoneClip.BEZEL
+        x, y = xy
+        w, h = screen.width + 2 * b, screen.height + 2 * b
+        if alpha < 0.999:
+            screen = screen.copy()
+            screen.putalpha(screen.getchannel('A').point(lambda v: int(v * alpha)))
+        y += (1 - alpha) * 30
+
+        def body(d, layer):
+            d.rounded_rectangle([x + 4, y + 10, x + w + 4, y + h + 10], 38, fill=(0, 6, 20, 120))
+            d.rounded_rectangle([x, y, x + w, y + h], 36, fill=(18, 24, 36, 255), outline=(120, 150, 190, 255), width=2)
+        self.layer(alpha, body)
+        self.img.alpha_composite(screen, (int(x + b), int(y + b)))
+
     def card(self, box, alpha=1.0, radius=22, fill=CARD, opacity=200, outline=(120, 190, 255, 70)):
         def draw(d, _):
             d.rounded_rectangle(box, radius, fill=fill + (opacity,), outline=outline, width=2)
@@ -261,11 +330,29 @@ ALL_TEXT = ['深海又暗又安静，', '她吐出的泡泡，总是空的。', 
             '示意画面', '五种性格，相遇时选定', '你说「我回来了。」', '一百多段动作，跟着作息与节日变',
             '清晨刷牙 · 午后犯困 · 夜里打盹 · 中秋赏月 · 冬天堆雪人', '五章任务线，攒满泡泡瓶',
             '每一段真实的相处，都会变成回忆泡泡', '第', '章', '现在下载', 'Android 8.0+ · 免费 · 覆盖安装保留数据',
+            '真机实拍', '她就住在', '你的手机桌面上', '悬浮在任何 App 上层，轻点、拎起、喂食都有回应',
             WHALE_LINE, REPO] + CREDIT + [s for _, s in CHAT] + [n + r for n, r, _ in PERSONAS] + \
            [a for a, _ in ACTIONS] + [a + b for a, b in CHAPTERS] + list('一二三四五')
 
 
-def render(fonts, out_mp4):
+def cues(phone_len):
+    """Where the soundtrack should hit, mirroring the timings in render()."""
+    p = phone_len
+    scenes = {'light': 3.0, 'title': 5.2, 'beat': 10.0, 'busy': (21.0 + p, 26.2 + p),
+              'whale': 31.2 + p, 'end': 33.9 + p}
+    out = [(6.0 + k * 0.15, 'tick', k) for k in range(5)]
+    if p:
+        out += [(PHONE_AT + 0.2 * k, 'pop', k) for k in range(2)]
+    out += [(9.9 + p + k * 0.62, 'pop', k) for k in range(len(CHAT))]
+    out += [(15.8 + p + k * 0.28, 'pop', k) for k in range(len(PERSONAS))]
+    out += [(21.4 + p + k * 0.2, 'pop', k) for k in range(len(ACTIONS))]
+    for k in range(len(CHAPTERS)):  # when the progress line reaches node k
+        x = 1 - (1 - k / 4) ** (1 / 3)
+        out.append((26.8 + p + 3.2 * x, 'chime', k))
+    return scenes, out
+
+
+def render(fonts, out_mp4, phone=()):
     ocean = Ocean()
     clips = {}
 
@@ -284,10 +371,12 @@ def render(fonts, out_mp4):
          '-i', '-', '-c:v', 'libx264', '-preset', 'slow', '-crf', '20', '-pix_fmt', 'yuv420p',
          '-movflags', '+faststart', out_mp4], stdin=subprocess.PIPE)
 
-    total = int(DURATION * FPS)
+    phone_len = PHONE_LEN if phone else 0.0
+    total = int((DURATION + phone_len) * FPS)
     cover = None
     for i in range(total):
         t = i / FPS
+        u = t - phone_len  # clock for every scene after the phone footage
         depth = 1 - ease((t - 2.5) / 3.0)
         c = Canvas(ocean.frame(t, depth), fonts)
 
@@ -323,30 +412,42 @@ def render(fonts, out_mp4):
         else:
             drop('s2')
 
+        # 2b. optional real-phone footage, inserted after the title and pushing everything after it back
+        if phone and PHONE_AT - 0.2 < t < PHONE_AT + phone_len + 0.2:
+            a = fade(t, PHONE_AT, PHONE_AT + phone_len)
+            c.card([90, 236, 210, 276], a, radius=20, fill=(255, 214, 140), opacity=235, outline=(0, 0, 0, 0))
+            c.text((150, 256), '真机实拍', 22, 900, fill=(40, 30, 10), alpha=a, anchor='mm', shadow=False)
+            c.text((90, 300), '她就住在', 60, 900, alpha=a, dy=24)
+            c.text((90, 378), '你的手机桌面上', 60, 900, fill=ACCENT, alpha=fade(t, PHONE_AT + 0.2, PHONE_AT + phone_len), dy=24)
+            c.text((92, 470), '悬浮在任何 App 上层，轻点、拎起、喂食都有回应', 22, 400, fill=MUTED,
+                   alpha=fade(t, PHONE_AT + 0.4, PHONE_AT + phone_len), dy=12)
+            for k, pc in enumerate(phone):
+                c.phone(pc.next(), (1250 - (len(phone) - k) * pc.outer_w - (len(phone) - 1 - k) * 30, 40), fade(t, PHONE_AT + 0.2 * k, PHONE_AT + phone_len))
+
         # 3. 9.6–15.2s  memory
-        if 9.4 < t < 15.4:
-            a = fade(t, 9.6, 15.2)
+        if 9.4 < u < 15.4:
+            a = fade(u, 9.6, 15.2)
             c.card([90, 70, 640, 650], a, radius=34, opacity=170)
             c.text((620, 628), '示意画面', 18, 400, fill=MUTED, alpha=a * 0.8, anchor='rs', shadow=False)
             y = 100
             for k, (mine, s) in enumerate(CHAT):
-                ba = fade(t, 9.9 + k * 0.62, 15.2, 0.3)
+                ba = fade(u, 9.9 + k * 0.62, 15.2, 0.3)
                 y += c.bubble(610 if mine else 120, y, s, mine, ba, size=23, max_w=440) + 14
             c.text((720, 150), '她会记得你', 64, 900, alpha=a, dy=24)
-            c.text((722, 262), '记忆引擎直接跑在手机里，', 30, 700, fill=MUTED, alpha=fade(t, 10.2, 15.2), dy=16)
-            c.text((722, 308), '会更正、会归档、会想起往事。', 30, 700, fill=MUTED, alpha=fade(t, 10.5, 15.2), dy=16)
-            c.text((722, 372), '聊天、记忆、Key 都留在本机', 26, 400, fill=ACCENT, alpha=fade(t, 10.9, 15.2), dy=16)
+            c.text((722, 262), '记忆引擎直接跑在手机里，', 30, 700, fill=MUTED, alpha=fade(u, 10.2, 15.2), dy=16)
+            c.text((722, 308), '会更正、会归档、会想起往事。', 30, 700, fill=MUTED, alpha=fade(u, 10.5, 15.2), dy=16)
+            c.text((722, 372), '聊天、记忆、Key 都留在本机', 26, 400, fill=ACCENT, alpha=fade(u, 10.9, 15.2), dy=16)
             c.sprite(clip('s3', '099', 330), (960, 690), alpha=a)
         else:
             drop('s3')
 
         # 4. 15.2–21.0s  five personalities
-        if 15.0 < t < 21.2:
-            a = fade(t, 15.2, 21.0)
+        if 15.0 < u < 21.2:
+            a = fade(u, 15.2, 21.0)
             c.text((W / 2, 92), '五种性格，相遇时选定', 56, 900, alpha=a, anchor='mm', dy=20)
-            c.text((W / 2, 152), '你说「我回来了。」', 28, 700, fill=MUTED, alpha=fade(t, 15.5, 21.0), anchor='mm')
+            c.text((W / 2, 152), '你说「我回来了。」', 28, 700, fill=MUTED, alpha=fade(u, 15.5, 21.0), anchor='mm')
             for k, (name, reply, clip_id) in enumerate(PERSONAS):
-                ka = fade(t, 15.8 + k * 0.28, 21.0)
+                ka = fade(u, 15.8 + k * 0.28, 21.0)
                 x0 = 50 + k * 240
                 c.card([x0, 380, x0 + 220, 640], ka, radius=24, opacity=190)
                 c.sprite(clip(f's4{k}', clip_id, 240), (x0 + 110, 420), alpha=ka)
@@ -366,13 +467,13 @@ def render(fonts, out_mp4):
             drop(*[f's4{k}' for k in range(5)])
 
         # 5. 21.0–26.2s  actions
-        if 20.8 < t < 26.4:
-            a = fade(t, 21.0, 26.2)
+        if 20.8 < u < 26.4:
+            a = fade(u, 21.0, 26.2)
             c.text((W / 2, 92), '一百多段动作，跟着作息与节日变', 52, 900, alpha=a, anchor='mm', dy=20)
             c.text((W / 2, 150), '清晨刷牙 · 午后犯困 · 夜里打盹 · 中秋赏月 · 冬天堆雪人', 26, 400,
-                   fill=MUTED, alpha=fade(t, 21.3, 26.2), anchor='mm')
+                   fill=MUTED, alpha=fade(u, 21.3, 26.2), anchor='mm')
             for k, (label, clip_id) in enumerate(ACTIONS):
-                ka = fade(t, 21.4 + k * 0.2, 26.2)
+                ka = fade(u, 21.4 + k * 0.2, 26.2)
                 cx = 160 + k * 240
                 c.sprite(clip(f's5{k}', clip_id, 400, 1.5), (cx, 560), alpha=ka)
                 c.text((cx, 610), label, 28, 700, fill=WARM, alpha=ka, anchor='mm')
@@ -380,12 +481,12 @@ def render(fonts, out_mp4):
             drop(*[f's5{k}' for k in range(5)])
 
         # 6. 26.2–31.2s  quest line
-        if 26.0 < t < 31.4:
-            a = fade(t, 26.2, 31.2)
+        if 26.0 < u < 31.4:
+            a = fade(u, 26.2, 31.2)
             c.text((90, 96), '五章任务线，攒满泡泡瓶', 56, 900, alpha=a, dy=20)
-            c.text((92, 180), '每一段真实的相处，都会变成回忆泡泡', 28, 400, fill=MUTED, alpha=fade(t, 26.5, 31.2), dy=12)
+            c.text((92, 180), '每一段真实的相处，都会变成回忆泡泡', 28, 400, fill=MUTED, alpha=fade(u, 26.5, 31.2), dy=12)
             c.sprite(clip('s6', '001', 400), (1060, 380), alpha=a)
-            progress = ease((t - 26.8) / 3.2)
+            progress = ease((u - 26.8) / 3.2)
             x0, x1, ly = 150, 1130, 470
 
             def line(d, _, p=progress):
@@ -395,7 +496,7 @@ def render(fonts, out_mp4):
             for k, (name, task) in enumerate(CHAPTERS):
                 cx = x0 + (x1 - x0) * k / 4
                 lit = progress >= k / 4 - 1e-6
-                na = fade(t, 26.6 + k * 0.18, 31.2)
+                na = fade(u, 26.6 + k * 0.18, 31.2)
 
                 def node(d, _, cx=cx, lit=lit):
                     r = 26
@@ -411,11 +512,11 @@ def render(fonts, out_mp4):
             drop('s6')
 
         # 7. 31.2–36s  the blue whale, then the end card
-        if t > 31.0:
-            a = fade(t, 31.2, 33.9, 0.4)
+        if u > 31.0:
+            a = fade(u, 31.2, 33.9, 0.4)
             c.sprite(clip('s7', '089', 640, 2.2), (W / 2, 640), alpha=a)
-            c.text((W / 2, 90), WHALE_LINE, 34, 700, fill=INK, alpha=fade(t, 31.6, 33.9, 0.4), anchor='mm', dy=12)
-            e = fade(t, 33.9, DURATION + 1, 0.5)
+            c.text((W / 2, 90), WHALE_LINE, 34, 700, fill=INK, alpha=fade(u, 31.6, 33.9, 0.4), anchor='mm', dy=12)
+            e = fade(u, 33.9, DURATION + 1, 0.5)
             c.sprite(clip('s8', '054', 400), (330, 600), alpha=e)
             c.text((560, 180), '大肥鱼', 112, 900, alpha=e, dy=20)
             c.text((566, 350), '现在下载', 34, 700, fill=ACCENT, alpha=e, dy=12)
@@ -431,6 +532,8 @@ def render(fonts, out_mp4):
     enc.wait()
     for k in list(clips):
         drop(k)
+    for pc in phone:
+        pc.close()
     return cover
 
 
@@ -439,19 +542,37 @@ def main():
     ap.add_argument('--font-dir', required=True)
     ap.add_argument('--preview-width', type=int, default=800)
     ap.add_argument('--preview-fps', type=int, default=15)
+    ap.add_argument('--phone-dir', help='up to two real-phone screen recordings (*.mp4), shown side by side after the title')
+    ap.add_argument('--out', default=OUT)
     args = ap.parse_args()
-    os.makedirs(OUT, exist_ok=True)
+    out = args.out
+    os.makedirs(out, exist_ok=True)
     fonts = Fonts(args.font_dir)
     fonts.check(ALL_TEXT)
-    mp4 = os.path.join(OUT, 'dafeiyu-promo.mp4')
-    cover = render(fonts, mp4)
-    cover.convert('RGB').save(os.path.join(OUT, 'cover.png'), optimize=True)
+    phone = [PhoneClip(f) for f in sorted(glob.glob(os.path.join(args.phone_dir, '*.mp4')))[:2]] if args.phone_dir else []
+    phone_len = PHONE_LEN if phone else 0.0
+    mp4 = os.path.join(out, 'dafeiyu-promo.mp4')
+    silent = mp4 + '.video.mp4'
+    cover = render(fonts, silent, phone)
+    music = soundtrack.build(DURATION + phone_len, *cues(phone_len))
+    wav = mp4 + '.wav'
+    with wave.open(wav, 'wb') as w:
+        w.setnchannels(2)
+        w.setsampwidth(2)
+        w.setframerate(soundtrack.SR)
+        w.writeframes((music * 32767).astype('<i2').tobytes())
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', silent, '-i', wav, '-map', '0:v', '-map', '1:a', '-c:v', 'copy',
+                    '-c:a', 'aac', '-b:a', '160k', '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11', '-shortest',
+                    '-movflags', '+faststart', mp4], check=True)
+    os.remove(silent)
+    os.remove(wav)
+    cover.convert('RGB').save(os.path.join(out, 'cover.png'), optimize=True)
     # Animated WebP rather than GIF: a GIF of the same cut is three times the size and banded.
-    preview = os.path.join(OUT, 'dafeiyu-promo.webp')
+    preview = os.path.join(out, 'dafeiyu-promo.webp')
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', mp4, '-vf',
                     f'fps={args.preview_fps},scale={args.preview_width}:-1:flags=lanczos',
                     '-c:v', 'libwebp_anim', '-quality', '62', '-compression_level', '6', '-loop', '0', preview], check=True)
-    for p in (mp4, preview, os.path.join(OUT, 'cover.png')):
+    for p in (mp4, preview, os.path.join(out, 'cover.png')):
         print(p, round(os.path.getsize(p) / 1e6, 2), 'MB')
 
 
