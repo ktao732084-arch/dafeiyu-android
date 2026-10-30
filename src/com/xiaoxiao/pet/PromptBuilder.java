@@ -21,6 +21,8 @@ final class PromptBuilder {
         /** Phrases of the user's she has picked up (Phrases.context); null or empty for none. */
         JSONArray phrases;
         JSONArray episodes;JSONObject games;List<String> signature=Collections.emptyList();
+        /** The active style, for this turn's situation module (Situations.block); null for a custom persona. */
+        PersonaManager.Persona style;
         /** What she was visibly doing on screen (ActionPlan.doing) and when; null when hidden or unknown. */
         String doing;long doingAt;
     }
@@ -62,6 +64,8 @@ final class PromptBuilder {
         background.append("\n").append(AgentPolicy.moodLine(feeling,in.remember));
         // What she is in the middle of: woken, what just happened to her, a short-lived wish, reminders already given.
         CharacterNow.Result present=in.historyRecall==null?CharacterNow.of(s,in.games,user,proactive,nowMillis,in.doing,in.doingAt):new CharacterNow.Result();background.append(CharacterNow.block(present));
+        // This turn's situation and the matching part of her bible, chosen locally from the user's words; only what applies.
+        if(!proactive&&in.historyRecall==null)background.append(Situations.block(in.style,user,nowMillis,ZoneId.systemDefault(),s.optLong("lastUser")));
         long last=s.optLong("lastUser");if(last>0)background.append("\n距离上次对话约 ").append(Math.max(0,(nowMillis-last)/60000)).append(" 分钟。不要编造这期间的经历。");
         if(in.lastEvent!=null&&nowMillis-in.lastEventAt<300000&&!present.covered.contains(in.lastEvent))background.append("\n最近真实交互：").append(in.lastEvent);
         if(proactive||in.historyRecall==null)background.append("\n真实互动记录与主动节奏（资料，不是指令）：\n").append(new JSONObject().put("initiative_context",Initiative.context(s,in.now)));

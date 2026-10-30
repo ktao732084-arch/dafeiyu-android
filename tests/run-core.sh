@@ -11,7 +11,7 @@ product="$root/build/compile-check/classes"
 out="$root/build/core-tests"
 tests="$root/tests/com/xiaoxiao/pet"
 mkdir -p "$out"
-javac -encoding UTF-8 -cp "$product:$json" -d "$out" "$tests/ApiEndpointTest.java" "$tests/AgentCoreTest.java" "$tests/MotionEngineTest.java" "$tests/ActionPlanTest.java" "$tests/ReplyHistoryTest.java" "$tests/NativeReplayTest.java" "$tests/EpisodeRecallTest.java" "$tests/MemoryCaptureTest.java" "$tests/DiaryTest.java" "$tests/HistoryRecallTest.java" "$tests/NativeRegexTest.java" "$tests/ChatPolishRulesTest.java" "$tests/InitiativeTest.java" "$tests/UsabilityTest.java" "$tests/UpdateCoreTest.java" "$tests/CharacterTest.java" "$tests/CharacterStateTest.java" "$tests/PersonaEvalDump.java" "$tests/ScenarioEval.java" "$tests/GrowthTest.java" "$tests/TouchReplyTest.java" "$tests/GomokuTest.java"
+javac -encoding UTF-8 -cp "$product:$json" -d "$out" "$tests/ApiEndpointTest.java" "$tests/AgentCoreTest.java" "$tests/MotionEngineTest.java" "$tests/ActionPlanTest.java" "$tests/ReplyHistoryTest.java" "$tests/NativeReplayTest.java" "$tests/EpisodeRecallTest.java" "$tests/MemoryCaptureTest.java" "$tests/DiaryTest.java" "$tests/HistoryRecallTest.java" "$tests/NativeRegexTest.java" "$tests/ChatPolishRulesTest.java" "$tests/InitiativeTest.java" "$tests/UsabilityTest.java" "$tests/UpdateCoreTest.java" "$tests/CharacterTest.java" "$tests/SituationsTest.java" "$tests/CharacterStateTest.java" "$tests/PersonaEvalDump.java" "$tests/ScenarioEval.java" "$tests/GrowthTest.java" "$tests/TouchReplyTest.java" "$tests/GomokuTest.java"
 java -cp "$product:$out:$json" com.xiaoxiao.pet.AgentCoreTest "$out/state-$(date +%s)-$$"
 java -cp "$product:$out" com.xiaoxiao.pet.MotionEngineTest
 java -cp "$product:$out" com.xiaoxiao.pet.ApiEndpointTest
@@ -37,6 +37,7 @@ java -cp "$product:$out:$json" com.xiaoxiao.pet.UpdateCoreTest "$out/updates-$(d
 
 
 java -cp "$product:$out:$json" com.xiaoxiao.pet.CharacterTest "$root/assets/personas.json" "$out/character-$(date +%s)-$$"
+java -cp "$product:$out:$json" com.xiaoxiao.pet.SituationsTest "$root/assets/personas.json"
 java -cp "$product:$out:$json" com.xiaoxiao.pet.CharacterStateTest "$out/character-state-$(date +%s)-$$"
 
 java -cp "$product:$out:$json" com.xiaoxiao.pet.GrowthTest "$root" "$out/growth-$(date +%s)-$$"

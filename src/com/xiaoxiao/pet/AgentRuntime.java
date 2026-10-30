@@ -100,7 +100,7 @@ final class AgentRuntime {
     }
     static JSONArray context(String user,boolean proactive,JSONObject s,JSONArray hits,HistoryRecall.Result history)throws Exception {
         PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.historyRecall=history==null?null:history.evidence;
-        in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.signature=PersonaManager.signature("main");in.nickname=Nickname.current();
+        in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.style=PersonaManager.activeStyle("main");in.signature=PersonaManager.signature("main");in.nickname=Nickname.current();
         String requested=!proactive&&history==null?Nickname.requested(user):null;if(requested!=null)in.nickname=requested;
         in.feeling=store().mood(System.currentTimeMillis());in.mood=in.feeling.optString("emotion","calm");in.timeZone=TimeZone.getDefault().getID();in.now=System.currentTimeMillis();in.initializedAt=PersonaManager.initializedAt("main");
         if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}onScreen(in);in.remember=rememberEnabled();in.diary=diaryEnabled();if(in.remember&&in.diary&&history==null){in.understanding=Understanding.context(s,proactive?"":user);in.phrases=Phrases.context(s,proactive?"":user);}
