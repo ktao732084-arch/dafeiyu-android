@@ -156,7 +156,16 @@ public final class CharacterTest {
    check(diary.getJSONObject(0).getString("content").contains(style.character)&&diary.getJSONObject(0).getString("content").contains("逐字"),"diary shares voice without losing evidence constraints");
   }
   check("neutral".equals(PersonaManager.voice(null,"feed","neutral",new Random(1)))&&"text".equals(PersonaManager.storyLine(null,"text")),"custom/no-style retains neutral text");
-  System.out.println("PASS: "+checks+" character checks");
+  phraseEdges();System.out.println("PASS: "+checks+" character checks");
+ }
+ static void phraseEdges()throws Exception{
+  String day="2026-10-30";JSONObject candidate=new JSONObject().put("phrases",new JSONArray().put(new JSONObject().put("phrase","橘子汽水").put("when","口头禅")));
+  List<JSONObject> secret=java.util.Collections.singletonList(new JSONObject().put("id","secret-fixture").put("user","这只是测试：我的登录密码是橘子汽水").put("reply","知道了"));
+  check(Phrases.parse(candidate.toString(),secret,day).isEmpty(),"a harmless-looking substring from a sensitive user sentence is not learned");
+  List<JSONObject> assistantOnly=java.util.Collections.singletonList(new JSONObject().put("id","assistant-only").put("user","今天怎么样").put("reply","橘子汽水"));
+  check(Phrases.parse(candidate.toString(),assistantOnly,day).isEmpty(),"assistant words are not attributed to the user");
+  check(!Phrases.valid("哈哈哈哈")&&!Phrases.valid("嗯嗯嗯嗯"),"repeated common filler is not a unique catchphrase");
+  check(Phrases.valid("绝绝子")&&Phrases.valid("啊这"),"distinctive short expressions remain learnable");
  }
  static String last(JSONArray messages)throws Exception{return messages.getJSONObject(messages.length()-1).getString("content");}
 }
