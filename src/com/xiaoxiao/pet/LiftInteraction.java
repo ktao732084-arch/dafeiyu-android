@@ -9,7 +9,7 @@ final class LiftInteraction {
     static final long HOLD_MS=5000;
     final PetService.Pet pet;
     boolean active,attempted,suppressed;
-    long serial,startedAt,startedWall;
+    long serial,startedAt,startedWall,visualStartedAt=-1;
     Runnable check;
     String region="head";
     float grabX=.5f,grabY=.4f;
@@ -26,7 +26,8 @@ final class LiftInteraction {
     }
     boolean waist(){return active&&waistView!=null;}
     boolean renderingWaist(){return waistView!=null;}
-    float entry(){if(!UiMotion.enabled())return 1;float t=Math.min(1,duration()/220f);return t*t*(3-2*t);}
+    void visualFrame(){if(visualStartedAt<0)visualStartedAt=SystemClock.uptimeMillis();}
+    float entry(){if(!UiMotion.enabled())return 1;if(visualStartedAt<0)return 0;float t=Math.min(1,(SystemClock.uptimeMillis()-visualStartedAt)/220f);return t*t*(3-2*t);}
     float pinX(){return active?grabX*pet.width:exitOffsetX;}
     float pinY(){return active?grabY*pet.width*.75f:exitOffsetY;}
     void resetForTouch(){if(active)end();finishVisual();}
@@ -45,10 +46,10 @@ final class LiftInteraction {
         if(pet.touchReplyCheck!=null){pet.owner().handler.removeCallbacks(pet.touchReplyCheck);pet.touchReplyCheck=null;}
         if(pet.speech!=null)pet.speech.cancel();pet.endScene();pet.clearBubbleVisual();
         AgentRuntime.touch(holding()+"，手指还没有松开","lift",pet.id,System.currentTimeMillis());
-        active=true;attempted=false;suppressed=false;serial++;startedAt=SystemClock.uptimeMillis();startedWall=System.currentTimeMillis();
+        active=true;attempted=false;suppressed=false;serial++;startedAt=SystemClock.uptimeMillis();startedWall=System.currentTimeMillis();visualStartedAt=-1;
         motion.reset(startedAt,pet.x+grabX*pet.width,pet.y+grabY*pet.width*.75f);
         if("waist".equals(region)&&pet.frame!=null&&pet.video!=null&&"main".equals(pet.role)){
-            try{waistView=new WaistLiftView(pet.owner(),this);waistView.setAlpha(0);pet.frame.addView(waistView,new android.widget.FrameLayout.LayoutParams(-1,-1));pet.video.setAlpha(1);pet.video.suspend(true);}
+            try{waistView=new WaistLiftView(pet.owner(),this);waistView.setAlpha(.01f);pet.frame.addView(waistView,new android.widget.FrameLayout.LayoutParams(-1,-1));pet.video.setAlpha(1);pet.video.suspend(true);}
             catch(java.io.IOException missing){region="head";Data.log(pet.role,"后腰姿态不可用，沿用悬空动画");}
         }
         if(pet.frame!=null)pet.frame.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK);
@@ -120,7 +121,7 @@ final class LiftInteraction {
         if((!active&&!settling)||pet.video==null)return;
         motion.step(SystemClock.uptimeMillis(),pet.x+pinX(),pet.y+pinY(),pet.owner().getResources().getDisplayMetrics().density);
         if(renderingWaist()){
-            if(active){float e=entry();waistView.setAlpha(e);pet.video.setAlpha(1-e);}
+            if(active){float e=entry();waistView.setAlpha(Math.max(.01f,e));pet.video.setAlpha(1-e);}
             waistView.invalidate();return;
         }
         float a=amount();

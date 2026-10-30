@@ -32,6 +32,7 @@ final class WaistLiftView extends View {
     }
     @Override protected void onDraw(Canvas canvas){
         if(!lift.renderingWaist())return;
+        lift.visualFrame();
         PetService.Pet pet=lift.pet;
         float width=lift.poseWidth(),height=width*ASPECT;
         boolean animated=UiMotion.enabled();float t=lift.duration()/1000f;
