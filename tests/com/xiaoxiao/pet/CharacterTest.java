@@ -18,7 +18,7 @@ public final class CharacterTest {
    Set<String> asked=new HashSet<>();for(String[] e:p.examples)asked.add(e[0]);
    if(situations==null)situations=asked;else check(situations.equals(asked),p.id+" answers the same situations as the others, so they can be compared");
    String g=PersonaManager.guidance(p);
-   check(g.contains("性格细节（"+p.name+"）")&&g.contains(p.character)&&g.contains("不是要你变得没有个性")&&g.contains(p.examples.get(0)[1]),p.id+" guidance carries the sheet, the note and the examples");
+   check(g.contains("性格细节（"+p.name+"）")&&g.contains(p.character)&&g.contains("熟一点的人一听就知道是你")&&g.contains(p.examples.get(0)[1]),p.id+" guidance carries the sheet, the note and the examples");
   }
   // The styles really differ: no two give the same answer to the same situation.
   for(int i=0;i<styles.size();i++)for(int j=i+1;j<styles.size();j++)for(int k=0;k<styles.get(i).examples.size();k++)
