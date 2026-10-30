@@ -14,7 +14,7 @@
 
 <a href="docs/promo/dafeiyu-promo.mp4"><img src="docs/promo/dafeiyu-promo.webp" width="800" alt="大肥鱼宣传片：从深海游上来的鲸鱼娘、本机记忆、五种性格、一百多段动作、五章任务线"></a>
 
-<sub>▲ 宣传片（36 秒）· 动图无声，点击观看带原创配乐的 <a href="docs/promo/dafeiyu-promo.mp4">高清 MP4</a></sub>
+<sub>▲ 宣传片（55 秒，含真机实拍）· 动图无声，点击观看带原创配乐的 <a href="docs/promo/dafeiyu-promo.mp4">高清 MP4</a></sub>
 
 [**下载 APK**](https://github.com/ktao732084-arch/dafeiyu-android/releases/latest) · [快速开始](#快速开始) · [功能细节](docs/FEATURES.md) · [更新记录](CHANGELOG.md) · [验证记录](VALIDATION.md)
 

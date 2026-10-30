@@ -6,7 +6,7 @@ with Pillow over a shared deep-sea background, piped into ffmpeg, then downscale
 image for the README.
 
     python3 tools/promo/render_promo.py --font-dir <dir with noto-sans-sc-{400,700,900}.(woff2|ttf|otf)> \
-        [--phone-dir <dir with up to two real-phone screen recordings>]
+        [--phone-dir <dir with the real-phone screen recordings named in phone_cut.json>]
 
 The soundtrack is synthesised by soundtrack.py, so the video carries no third-party music.
 
@@ -16,6 +16,9 @@ Needs ffmpeg, numpy and Pillow. Fonts are not bundled; any CJK font with three w
 """
 import argparse
 import glob
+import json
+import shutil
+import tempfile
 import math
 import os
 import random
@@ -34,7 +37,9 @@ CLIPS = os.path.join(ROOT, 'assets', 'main')
 OUT = os.path.join(ROOT, 'docs', 'promo')
 W, H, FPS = 1280, 720, 30
 DURATION = 36.0  # without phone footage
-PHONE_AT, PHONE_LEN = 9.6, 7.0
+PHONE_AT = 9.6  # real-phone footage starts here, right after the title
+PHONE_CUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'phone_cut.json')
+SCREEN_H = 560
 
 INK = (240, 248, 255)
 MUTED = (178, 206, 236)
@@ -126,7 +131,7 @@ class Clip:
 class PhoneClip:
     """A screen recording from a real phone, shown inside a drawn handset. Loops like Clip."""
 
-    SCREEN_H = 600
+    SCREEN_H = SCREEN_H
     BEZEL = 12
 
     def __init__(self, path):
@@ -165,6 +170,31 @@ class PhoneClip:
         if self.proc:
             self.proc.kill()
             self.proc = None
+
+
+def cut_phones(phone_dir, cut_path, tmp):
+    """Join and retime each phone's segments from the cut list so it fills exactly one beat."""
+    with open(cut_path, encoding='utf-8') as f:
+        cut = json.load(f)
+    beat = cut['beat']
+    beats = []
+    for b, spec in enumerate(cut['beats']):
+        clips = []
+        for k, segments in enumerate(spec['phones']):
+            inputs, parts = [], []
+            for j, seg in enumerate(segments):
+                inputs += ['-ss', str(seg['from']), '-to', str(seg['to']), '-i', os.path.join(phone_dir, seg['file'])]
+                parts.append(f'[{j}:v]fps={FPS},setpts=PTS-STARTPTS[v{j}]')
+            total = sum(seg['to'] - seg['from'] for seg in segments)
+            graph = ';'.join(parts) + ';' + ''.join(f'[v{j}]' for j in range(len(segments))) + \
+                f'concat=n={len(segments)}:v=1:a=0,setpts=PTS*{beat / total:.6f},fps={FPS},' \
+                f'tpad=stop_mode=clone:stop_duration=2,trim=duration={beat}[out]'  # never short of a beat
+            out = os.path.join(tmp, f'beat{b}-phone{k}.mp4')
+            subprocess.run(['ffmpeg', '-v', 'error', '-y'] + inputs + ['-filter_complex', graph, '-map', '[out]',
+                            '-an', '-c:v', 'libx264', '-crf', '14', '-pix_fmt', 'yuv420p', out], check=True)
+            clips.append(PhoneClip(out))
+        beats.append((spec, clips))
+    return beat, beats
 
 
 class Ocean:
@@ -330,19 +360,19 @@ ALL_TEXT = ['深海又暗又安静，', '她吐出的泡泡，总是空的。', 
             '示意画面', '五种性格，相遇时选定', '你说「我回来了。」', '一百多段动作，跟着作息与节日变',
             '清晨刷牙 · 午后犯困 · 夜里打盹 · 中秋赏月 · 冬天堆雪人', '五章任务线，攒满泡泡瓶',
             '每一段真实的相处，都会变成回忆泡泡', '第', '章', '现在下载', 'Android 8.0+ · 免费 · 覆盖安装保留数据',
-            '真机实拍', '她就住在', '你的手机桌面上', '悬浮在任何 App 上层，轻点、拎起、喂食都有回应',
+            '真机实拍',
             WHALE_LINE, REPO] + CREDIT + [s for _, s in CHAT] + [n + r for n, r, _ in PERSONAS] + \
            [a for a, _ in ACTIONS] + [a + b for a, b in CHAPTERS] + list('一二三四五')
 
 
-def cues(phone_len):
+def cues(phone_len, beat=0.0):
     """Where the soundtrack should hit, mirroring the timings in render()."""
     p = phone_len
     scenes = {'light': 3.0, 'title': 5.2, 'beat': 10.0, 'busy': (21.0 + p, 26.2 + p),
               'whale': 31.2 + p, 'end': 33.9 + p}
     out = [(6.0 + k * 0.15, 'tick', k) for k in range(5)]
     if p:
-        out += [(PHONE_AT + 0.2 * k, 'pop', k) for k in range(2)]
+        out += [(PHONE_AT + b * beat + 0.15 * k, 'pop', b * 2 + k) for b in range(round(p / beat)) for k in range(2)]
     out += [(9.9 + p + k * 0.62, 'pop', k) for k in range(len(CHAT))]
     out += [(15.8 + p + k * 0.28, 'pop', k) for k in range(len(PERSONAS))]
     out += [(21.4 + p + k * 0.2, 'pop', k) for k in range(len(ACTIONS))]
@@ -352,7 +382,7 @@ def cues(phone_len):
     return scenes, out
 
 
-def render(fonts, out_mp4, phone=()):
+def render(fonts, out_mp4, phone=(), beat=0.0):
     ocean = Ocean()
     clips = {}
 
@@ -371,7 +401,7 @@ def render(fonts, out_mp4, phone=()):
          '-i', '-', '-c:v', 'libx264', '-preset', 'slow', '-crf', '20', '-pix_fmt', 'yuv420p',
          '-movflags', '+faststart', out_mp4], stdin=subprocess.PIPE)
 
-    phone_len = PHONE_LEN if phone else 0.0
+    phone_len = beat * len(phone)
     total = int((DURATION + phone_len) * FPS)
     cover = None
     for i in range(total):
@@ -413,16 +443,23 @@ def render(fonts, out_mp4, phone=()):
             drop('s2')
 
         # 2b. optional real-phone footage, inserted after the title and pushing everything after it back
-        if phone and PHONE_AT - 0.2 < t < PHONE_AT + phone_len + 0.2:
-            a = fade(t, PHONE_AT, PHONE_AT + phone_len)
-            c.card([90, 236, 210, 276], a, radius=20, fill=(255, 214, 140), opacity=235, outline=(0, 0, 0, 0))
-            c.text((150, 256), '真机实拍', 22, 900, fill=(40, 30, 10), alpha=a, anchor='mm', shadow=False)
-            c.text((90, 300), '她就住在', 60, 900, alpha=a, dy=24)
-            c.text((90, 378), '你的手机桌面上', 60, 900, fill=ACCENT, alpha=fade(t, PHONE_AT + 0.2, PHONE_AT + phone_len), dy=24)
-            c.text((92, 470), '悬浮在任何 App 上层，轻点、拎起、喂食都有回应', 22, 400, fill=MUTED,
-                   alpha=fade(t, PHONE_AT + 0.4, PHONE_AT + phone_len), dy=12)
-            for k, pc in enumerate(phone):
-                c.phone(pc.next(), (1250 - (len(phone) - k) * pc.outer_w - (len(phone) - 1 - k) * 30, 40), fade(t, PHONE_AT + 0.2 * k, PHONE_AT + phone_len))
+        for k, (spec, pcs) in enumerate(phone):
+            start, end = PHONE_AT + k * beat, PHONE_AT + (k + 1) * beat
+            if not start <= t < end:
+                continue
+            edge = 0.3
+            a = fade(t, start, end, edge)
+            c.card([90, 196, 210, 236], a, radius=20, fill=(255, 214, 140), opacity=235, outline=(0, 0, 0, 0))
+            c.text((150, 216), '真机实拍', 22, 900, fill=(40, 30, 10), alpha=a, anchor='mm', shadow=False)
+            for j, line in enumerate(spec['title']):
+                c.text((90, 262 + j * 70), line, 52, 900, fill=ACCENT if j else INK,
+                       alpha=fade(t, start + 0.1 * j, end, edge), dy=20)
+            for j, line in enumerate(spec['sub']):
+                c.text((92, 430 + j * 38), line, 24, 400, fill=MUTED, alpha=fade(t, start + 0.25, end, edge), dy=10)
+            x = 1250 - sum(pc.outer_w for pc in pcs) - 30 * (len(pcs) - 1)
+            for j, pc in enumerate(pcs):
+                c.phone(pc.next(), (x, (H - SCREEN_H - 2 * PhoneClip.BEZEL) / 2), fade(t, start + 0.1 * j, end, edge))
+                x += pc.outer_w + 30
 
         # 3. 9.6–15.2s  memory
         if 9.4 < u < 15.4:
@@ -532,8 +569,9 @@ def render(fonts, out_mp4, phone=()):
     enc.wait()
     for k in list(clips):
         drop(k)
-    for pc in phone:
-        pc.close()
+    for _, pcs in phone:
+        for pc in pcs:
+            pc.close()
     return cover
 
 
@@ -542,19 +580,23 @@ def main():
     ap.add_argument('--font-dir', required=True)
     ap.add_argument('--preview-width', type=int, default=800)
     ap.add_argument('--preview-fps', type=int, default=15)
-    ap.add_argument('--phone-dir', help='up to two real-phone screen recordings (*.mp4), shown side by side after the title')
+    ap.add_argument('--phone-dir', help='real-phone screen recordings, cut and placed after the title per --phone-cut')
+    ap.add_argument('--phone-cut', default=PHONE_CUT)
     ap.add_argument('--out', default=OUT)
     args = ap.parse_args()
     out = args.out
     os.makedirs(out, exist_ok=True)
     fonts = Fonts(args.font_dir)
     fonts.check(ALL_TEXT)
-    phone = [PhoneClip(f) for f in sorted(glob.glob(os.path.join(args.phone_dir, '*.mp4')))[:2]] if args.phone_dir else []
-    phone_len = PHONE_LEN if phone else 0.0
+    tmp = tempfile.mkdtemp(prefix='promo-phone-')
+    beat, phone = cut_phones(args.phone_dir, args.phone_cut, tmp) if args.phone_dir else (0.0, [])
+    phone_len = beat * len(phone)
+    fonts.check([line for spec, _ in phone for line in spec['title'] + spec['sub']])
     mp4 = os.path.join(out, 'dafeiyu-promo.mp4')
     silent = mp4 + '.video.mp4'
-    cover = render(fonts, silent, phone)
-    music = soundtrack.build(DURATION + phone_len, *cues(phone_len))
+    cover = render(fonts, silent, phone, beat)
+    shutil.rmtree(tmp)
+    music = soundtrack.build(DURATION + phone_len, *cues(phone_len, beat))
     wav = mp4 + '.wav'
     with wave.open(wav, 'wb') as w:
         w.setnchannels(2)
