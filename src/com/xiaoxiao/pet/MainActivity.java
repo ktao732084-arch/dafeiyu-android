@@ -47,6 +47,7 @@ public class MainActivity extends Activity {
   GroupedList.note(content,AgentRuntime.configured()?"模型已接通，聊天内容会发往你设置的模型服务商。":"模型还没接通。推荐 DeepSeek：去官网拿一枚 API Key，粘贴进来就能聊。");
   GroupedList.section(content,"关于");LinearLayout more=GroupedList.group(content);GroupedList.row(more,"关于与开源来源",GroupedList.INFO,GroupedList.GREY,v->about());
   GroupedList.row(more,"检查更新",GroupedList.SHARE,GroupedList.SKY,v->UpdatePanel.show(this));
+  GroupedList.row(more,"问题反馈",GroupedList.CHAT,GroupedList.ORANGE,v->FeedbackPanel.show(this));
   TextView footer=text("大肥鱼 "+version()+" · 非官方社区二创\n记忆只存在这台手机里",12);footer.setTextColor(Apple.SECONDARY);footer.setGravity(Gravity.CENTER);footer.setLineSpacing(dp(3),1);footer.setPadding(0,dp(28),0,0);content.addView(footer);
  }
  /** Opening the app counts as meeting her today. */

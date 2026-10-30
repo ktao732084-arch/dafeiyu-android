@@ -16,6 +16,7 @@ jobs:
           sparse-checkout: |
             tools
             tests
+            deploy/feedback
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
@@ -23,6 +24,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p test_update_publish.py
           python -m unittest discover -s tests -p test_release_sync.py
+          python -m unittest discover -s tests -p test_feedback_relay.py
   android:
     runs-on: ubuntu-latest
     steps:
@@ -37,6 +39,7 @@ jobs:
             /assets/catalog.json
             /assets/story.json
             /assets/personas.json
+            /assets/update-channel.json
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
