@@ -100,6 +100,20 @@ public final class CommitmentsTest {
   AgentStore asideStore=new AgentStore(new File(root,"aside-integration"));
   asideStore.commit(0,user,reply,"calm",null,true,false,null,null,"old-with-aside",at,null,true,null,null,0,"",false,null,false,"这事我先想想。");asideStore.shown("old-with-aside",999);
   check(Commitments.entries(asideStore.snapshot()).length()==0&&asideStore.aside("old-with-aside").equals("这事我先想想。"),"aside and historical commitment exclusion both survive merged commit path");
+  for(String q:new String[]{"我答应过你周末把歌单发给你。","我承诺过明天帮你看稿。","我答应的是周末给你讲故事。"})
+   check(!Commitments.future(q)&&Commitments.dream("{}",Collections.singletonList(turn("retold",q,"",at))).length()==0,"recalling a promise does not create a fresh obligation");
+  JSONObject partialEvidence=AgentStore.empty(0);Commitments.capture(partialEvidence,turn("only-user",user,"",at),false);
+  PromptBuilder.Inputs boundary=new PromptBuilder.Inputs();boundary.persona="测试人格保持原文。";boundary.remember=true;boundary.now=at+1000;boundary.timeZone="Asia/Shanghai";
+  JSONArray bounded=PromptBuilder.build(boundary,"你答应我什么，我答应你什么？",false,partialEvidence,null);
+  String system=bounded.getJSONObject(0).getString("content"),data=bounded.getJSONObject(bounded.length()-1).getString("content");
+  check(system.startsWith(boundary.persona)&&system.contains(Commitments.GUIDANCE)&&!system.contains(user),"memory rules are system instructions without promoting quoted evidence into instructions");
+  check(data.contains(user)&&data.contains("本轮没有提供可核对的原话，不能把用户的提示"),"partial evidence identifies the missing owner independently");
+  check(!PromptBuilder.build(boundary,"今晚吃面还是喝粥",false,partialEvidence,null).getJSONObject(0).getString("content").contains(Commitments.GUIDANCE),"unrelated chat does not receive commitment instructions");
+  check(Commitments.prompt(partialEvidence,"歌单我已经交了，别再催。",false,true).contains("用户本轮关于进展的说明"),"current completion is a user report, not a receipt");
+  check(!Commitments.prompt(partialEvidence,"如果歌单已经交了，约定就取消。",false,true).contains("用户本轮关于进展的说明"),"hypothetical cancellation is not labelled an actual update");
+  boundary.remember=false;String off=PromptBuilder.build(boundary,"我答应你什么？",false,partialEvidence,null).toString();
+  check(!off.contains(user)&&off.contains("本轮没有提供可核对"),"memory-off route preserves uncertainty without revealing stored promises");
+  boundary.historyRecall=new JSONObject();check(!PromptBuilder.build(boundary,"我答应你什么？",false,partialEvidence,null).getJSONObject(0).getString("content").contains(Commitments.GUIDANCE),"historical search keeps its own evidence scope");
   System.out.println("PASS: "+checks+" bilateral commitment checks");
  }
 }

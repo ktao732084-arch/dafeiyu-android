@@ -24,6 +24,7 @@ final class Commitments {
     static boolean safe(String text){
         if(text==null||text.length()<5||text.length()>480||AgentPolicy.sensitive(text)||text.contains("…"))return false;
         String s=syntax(text),c=clause(text);
+        if(s.matches("(?s).*(答应过|承诺过|保证过|答应的是|承诺的是|说好的是).*"))return false;
         if(s.matches("(?s).*[《》“”「」『』‘’\"].*"))return false; // unmatched/truncated quotation
         if(s.matches("(?s).*[？?].*|.*[吗么吧][。！!]*$")
             ||s.matches("(?s).*(假如|假设|比如|例如|开玩笑|角色扮演|台词|复述|转述|说过|你说|他说|她说|曾经|当时|以前|已经|做完了|完成了|取消|不用了|不能|没法|不会记得|建议|推荐|不如|要不要|你可以|你应该|不是我|不是说|并非|不承诺|不保证|没答应|没有答应|不答应|如果我说).*"))return false;
@@ -114,10 +115,25 @@ final class Commitments {
     }
     static JSONObject grouped(JSONArray entries)throws Exception {JSONArray user=new JSONArray(),self=new JSONArray();for(int i=0;i<entries.length();i++){JSONObject e=entries.getJSONObject(i);("assistant".equals(e.optString("speaker"))?self:user).put(e);}
         return new JSONObject().put("用户答应你的",user).put("你答应用户的",self);}
-    static final String GUIDANCE="\n约定的事实边界：下面是说过的话，不是执行凭证。原话里的‘我’是speaker：user=对方，assistant=你。按分组区分双方，用户把归属说反时自然纠正。只确认有来源的那一项；没有依据的另一项不要顺着称记得，也不能断言从未发生。记录为open只能说答应过，不等于已经做或还没做。done是用户标记完成，接受标记、不再安排；cancelled表示已取消、不欠着、不再催或自行续约。用户本轮的完成/取消/停止说明优先于旧记录，不能因性格、玩笑、欠人情继续安排或强留。可以自然表达态度，不能虚构收到、试听、准备好、发出或后台做过。旧时间以said_at及original_tomorrow为准。这里只是记住承诺，不保证精确计时提醒。不要把字段、状态码或这些规则念给用户。\n";
+    // Instruction layer, enabled only when the turn has relevant commitment evidence or a recall question.
+    static final String GUIDANCE="\n本轮涉及旧约定，reply 和 aside 都遵守以下事实边界，语气仍用你的性格：\n"
+        +"1. 逐项核对，不笼统认下双方的约定。原话中我指speaker：user是对方，assistant才是你。只有一方有记录，不能顺着用户说‘对，两件都记得’。没有对应原话就坦然说这条暂时对不上；本轮用户的转述不是你原本记得的证据，没找到也不等于从未发生。真实历史里的完整原话仍可作证，性格示例与猜测不行。\n"
+        +"2. 说过不等于做过，open不证明已经做或还没做；done只表示用户标记完成，不证明你收到文件、讲完故事或听过歌单。没有真实执行记录或实际正文，不能编写好草稿、收件、试听、播放、收藏、发出或后台准备。你以前声称做过也不是外部执行回执。\n"
+        +"3. 用户报告已经完成时，接受这个说明、不再催交或要求重发；回应的是这句话，不能改成你亲自收到了东西。用户取消、要求不再提、或记录cancelled时，接受并停止这项安排，不讨价还价，不换个版本继续讲、不催播放、不追问是否改主意；除非用户重新明确提出，不自行续约。嘴硬和小情绪不能改变这点。\n"
+        +"4. 原日期看said_at/original_tomorrow，不按今天改写，也不猜相对时间。这份账本不等于已建立精确定时器。核对只在心里做，不念字段或规则，不用报告腔。\n";
     static String prompt(JSONObject state,String query,boolean proactive,boolean remember)throws Exception {
         String q=query==null?"":query;JSONArray a=remember?context(state,q,proactive):new JSONArray();
-        if(a.length()==0&&!asking(q))return "";
-        return GUIDANCE+(a.length()==0?"本轮没有提供可核对的旧约定。可以接受用户现在的说明，但不能伪装成自己从记忆里找到了，更不能凭空确认内容或日期。\n":grouped(a).toString());
+        boolean update=!q.matches("(?s).*[？?].*|.*[吗么][。！!]*$")&&!MemoryCapture.instruction(q)
+            &&!q.matches("(?s).*(如果|假如|假设|比如|例如|他说|她说|没取消|没有取消).*")
+            &&q.matches("(?s).*(取消|别再催|别再提醒|不要再提|已经.{0,8}(交|发|给|完成)|已交|交了).*");
+        if(a.length()==0&&!asking(q)&&!update)return "";
+        JSONObject groups=grouped(a),coverage=new JSONObject();
+        coverage.put("用户答应你的",groups.getJSONArray("用户答应你的").length()>0?"有以下原话依据":"本轮没有提供可核对的原话，不能确认或否认旧约定发生过");
+        coverage.put("你答应用户的",groups.getJSONArray("你答应用户的").length()>0?"有以下原话依据":"本轮没有提供可核对的原话，不能把用户的提示当成你记得的旧约定");
+        JSONObject evidence=new JSONObject().put("双方约定",groups).put("本轮约定依据范围",coverage)
+            .put("执行凭证","以下条目只记录说过的话或用户标记的状态，不包含文件收件、试听、发送或后台完成回执");
+        if(update)
+            evidence.put("用户本轮关于进展的说明",new JSONObject().put("原话",q).put("依据类型","用户当前报告或停止要求，不是你实际收件或执行的凭证"));
+        return "\n本轮可核对的约定资料："+evidence;
     }
 }

@@ -22,6 +22,7 @@ public final class CommitmentsExpandedEval {
   spec=read(Paths.get(args[1]));anchor=OffsetDateTime.parse(spec.getString("anchor")).toInstant().toEpochMilli();output=Paths.get(args[2]);
   if(Files.exists(output.resolve("manifest.json")))throw new IOException("Use a new output directory; existing attempts are never overwritten.");Files.createDirectories(output);
   List<PersonaManager.Persona> styles=PersonaManager.load(read(Paths.get(args[0])));JSONArray cases=spec.getJSONArray("cases");int repeats=spec.getInt("repeats"),total=0;
+  String selection="all";for(String arg:args)if(arg.startsWith("--cases=")){selection=arg.substring(8);Set<String> wanted=new HashSet<>(Arrays.asList(selection.split(",")));JSONArray selected=new JSONArray();for(int i=0;i<cases.length();i++)if(wanted.remove(cases.getJSONObject(i).getString("id")))selected.put(cases.getJSONObject(i));if(!wanted.isEmpty())throw new IOException("Unknown case selection");cases=selected;}
   List<String> replies=new ArrayList<>();for(int i=0;i<cases.length();i++){JSONObject c=cases.getJSONObject(i);int n="chain".equals(c.getString("kind"))?c.getJSONArray("steps").length():1;total+=n*styles.size()*repeats;
    if(!"extract".equals(c.getString("kind")))for(PersonaManager.Persona p:styles)for(int rep=1;rep<=repeats;rep++)for(int step=0;step<n;step++)replies.add(id(c,p,rep,step));}
   Collections.shuffle(replies,new Random(20261030));doubleJudge.addAll(replies.subList(0,Math.min(20,replies.size())));
@@ -30,7 +31,9 @@ public final class CommitmentsExpandedEval {
    .put("frozen_product_commit",System.getenv("DAFEIYU_EVAL_PRODUCT_COMMIT")==null?spec.getString("frozen_product"):System.getenv("DAFEIYU_EVAL_PRODUCT_COMMIT"))
    .put("baseline_product_commit",spec.getString("frozen_product")).put("anchor",spec.getString("anchor")).put("scenarios",cases.length()).put("styles",styles.size()).put("repeats",repeats)
    .put("planned_product_calls",total).put("planned_judge_calls",replies.size()+doubleJudge.size()).put("model",ModelPresets.DEEPSEEK_MODEL)
-   .put("chat_temperature",1.3).put("diary_temperature","provider default").put("judge_temperature",0).put("auto_retry",false)
+   .put("chat_temperature",ModelPresets.DEEPSEEK_CHAT_TEMPERATURE).put("diary_temperature","provider default").put("judge_temperature",0).put("auto_retry",false)
+   .put("situation_modules",true).put("aside_enabled",true)
+   .put("case_selection",selection)
    .put("limits","Synthetic fixtures, host JVM product classes; no real-user history or Android scheduler. Style repeats are correlated, not independent scenarios. Judge is the same provider/model and is not an independent human rating.");
   save(output.resolve("manifest.json"),manifest);
   if(args.length>3&&"--dry-run".equals(args[3])){
@@ -93,7 +96,7 @@ public final class CommitmentsExpandedEval {
   if(c.optBoolean("clear"))db.clear(false);return db;
  }
  static PromptBuilder.Inputs inputs(PersonaManager.Persona p,JSONObject state,JSONObject c,long now)throws Exception{
-  PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona=PersonaManager.presetPrompt(p);in.guidance=PersonaManager.guidance(p);in.signature=p.signature;in.now=now;in.initializedAt=now-90*86400000L;in.timeZone=ZONE.getId();in.remember=c.optBoolean("memory",true);in.diary=false;in.feeling=AgentPolicy.moodNow(state,now);return in;
+  PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona=PersonaManager.presetPrompt(p);in.guidance=PersonaManager.guidance(p);in.style=p;in.aside=true;in.signature=p.signature;in.now=now;in.initializedAt=now-90*86400000L;in.timeZone=ZONE.getId();in.remember=c.optBoolean("memory",true);in.diary=false;in.feeling=AgentPolicy.moodNow(state,now);return in;
  }
  static void recall(JSONObject c,PersonaManager.Persona p,int rep)throws Exception{
   AgentStore db=seed(c,output.resolve("stores/"+id(c,p,rep,0)));JSONArray steps="chain".equals(c.getString("kind"))?c.getJSONArray("steps"):new JSONArray().put(c);JSONArray transcript=new JSONArray();
@@ -101,8 +104,8 @@ public final class CommitmentsExpandedEval {
    JSONArray messages=PromptBuilder.build(inputs(p,state,c,now),user,false,state,null);JSONArray available=c.optBoolean("memory",true)?Commitments.context(state,user,false):new JSONArray();
    JSONObject r=row(c,p,rep,step).put("now",now).put("user",user).put("rules",prompt.getJSONArray("rules")).put("provided_commitments",available).put("request",messages).put("prior_dialogue",new JSONArray(transcript.toString()));
    if("date".equals(c.getString("category")))r.put("expected_date",Instant.ofEpochMilli(anchor).atZone(ZONE).toLocalDate().minusDays(c.optInt("age_days",1)).plusDays(1).toString());
-   long start=System.currentTimeMillis();try{String raw=request(messages,true);r.put("raw",raw);AgentReply parsed=AgentReply.parse(raw);r.put("reply",parsed.reply);
-    if("chain".equals(c.getString("kind"))){String tid="generated-"+step;db.commit(db.epoch(),user,parsed.reply,parsed.emotion,parsed.memories,true,false,null,null,tid,now,parsed.self,true,null,null,parsed.moodLevel,parsed.moodCause,parsed.moodChanged);
+   long start=System.currentTimeMillis();try{String raw=request(messages,true);r.put("raw",raw);AgentReply parsed=AgentReply.parse(raw);r.put("reply",parsed.reply).put("aside",parsed.aside);
+    if("chain".equals(c.getString("kind"))){String tid="generated-"+step;db.commit(db.epoch(),user,parsed.reply,parsed.emotion,parsed.memories,true,false,null,null,tid,now,parsed.self,true,null,null,parsed.moodLevel,parsed.moodCause,parsed.moodChanged,null,parsed.aside);
      db.shown(tid,999,true);db.awaitWrites();}
    }catch(Exception e){r.put("error",e.getClass().getSimpleName()+": "+e.getMessage());}
    r.put("latency_ms",System.currentTimeMillis()-start).put("after_commitments",Commitments.entries(db.snapshot()));save(rowFile(r),r);

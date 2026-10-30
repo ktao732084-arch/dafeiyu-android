@@ -2377,7 +2377,7 @@
       "path": "src/com/xiaoxiao/pet/Commitments.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "aca3d9a5a6a77b8317605876e600ecf229063ac90b6beb945d68da5e40a3ac7b"
+      "sha256": "a26ac7411b93d227cb195bca308d4dcb14d74b23f3ac85e31c70588b321ee687"
     },
     {
       "path": "src/com/xiaoxiao/pet/CompactPanel.java",
@@ -2726,7 +2726,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "246b0cd0e7c2789c34e7df09d4603f8ad32d783ba439d47086f6a60ad09249f0"
+      "sha256": "aa366c4da51ee1d3083e61c3be6d3d5909b6e45210012b645b0f9764fb356534"
     },
     {
       "path": "src/com/xiaoxiao/pet/ReplySegments.java",
@@ -2905,7 +2905,7 @@
       "path": "tests/com/xiaoxiao/pet/CommitmentsExpandedEval.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "be060f86790b86c84accc791aab4cc1b6b32ed2844e6aa030bc8746da27931a7"
+      "sha256": "0e224263cb035f37c2400daf16e88d8a14314d45c76a4749d2ccb2537bd77101"
     },
     {
       "path": "tests/com/xiaoxiao/pet/CommitmentsLiveEval.java",
@@ -2917,7 +2917,7 @@
       "path": "tests/com/xiaoxiao/pet/CommitmentsTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "7db5f8917709cb052ddf96925576d19767c4add836f8059cbc3d22824ba2d0dd"
+      "sha256": "07d6fbc76563688875414e688d9d705891be903fedfdc7b974ca582b61e36bc7"
     },
     {
       "path": "tests/com/xiaoxiao/pet/DeviceCoreChecks.java",

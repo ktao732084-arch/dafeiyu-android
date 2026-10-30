@@ -34,6 +34,7 @@ final class PromptBuilder {
     }
     static JSONArray build(Inputs in,String user,boolean proactive,JSONObject s,JSONArray hits)throws Exception {
         long nowMillis=in.now;
+        String commitments=in.historyRecall==null?Commitments.prompt(s,user,proactive,in.remember):"";
         // Stable first: persona, her traits and example dialogues, her situation, how she talks, format, nickname. It changes only with
         // settings, so the provider can cache it together with the history window that follows.
         StringBuilder prompt=new StringBuilder(in.persona);
@@ -50,6 +51,7 @@ final class PromptBuilder {
         if(in.aside)prompt.append(ASIDE);
         prompt.append("emotion：说完这句后的心情，calm/happy/shy/curious/concerned/playful/sleepy 之一；mood_level：强度，1 淡淡的、2 比较明显、3 很强烈；mood_cause：用你自己的视角写起因，20字以内（如「被夸了有点得意」），平静时留空。\nmood_changed：本轮有新的互动或感受变化（包括平复下来）时为 true，并给出这次的起因；只是延续原来的心情时为 false，原来的起始时间会保留，换个说法写同一个起因也算延续。\nmemories：最多3项，逐字摘录本轮用户说的、以后聊天用得上的话：身份、偏好习惯、身体状况、家人朋友和宠物、学习工作、计划约定、近况变化，每项3–240字。只摘原话；问题、假设、角色扮演、寒暄情绪和密码证件不摘。\nself：最多2项，逐字摘录你这条 reply 里关于自己的稳定设定（喜好、习惯、会什么），每项4–80字。memories、self 没有就给空数组。\nnext_check_minutes：2到180的整数，下次什么时候再考虑要不要开口，由这轮内容和你的性格决定，不套固定值。正聊得来可以2到5分钟，有约定按约定，累了、没新话题或对方没回时拉长。这只是考虑时间，不一定开口。\navailability：对方本轮亲口说正在忙、等忙完再聊时为 busy，应用会一直等到对方回来（点击拖动也不算），不用定时去问忙完没有；对方说忙完了、有空了、回来了时为 available；其他情况为 unchanged。只看对方本人现在的状态，引用、历史、假设和别人的忙闲都不算。availability_evidence：逐字摘录那句话，没有就空字符串。\ninitiative：speak 或 quiet。topic：简短的话题名，同一个话题一直用同一个名字。\n历史里你的回复只保留了正文，这一轮仍要返回完整字段。\n");
         if(!in.nickname.isEmpty())prompt.append("\n用户希望被称呼为：").append(new JSONObject().put("name",in.nickname));
+        if(!commitments.isEmpty())prompt.append(Commitments.GUIDANCE);
         JSONArray messages=new JSONArray().put(new JSONObject().put("role","system").put("content",prompt.toString()));
 
         // History: a window that advances four turns at a time (a stable prefix). Its first four turns are
@@ -98,7 +100,7 @@ final class PromptBuilder {
             background.append(new JSONObject().put("remembered_user_words",MemoryLedger.context(s,user,hits)).put("relevant_past",in.episodes!=null?in.episodes:AgentStore.recall(s,user)).put("historical_user_words",MemoryLedger.historicalContext(s,user)));
         }
         if(in.historyRecall==null&&!proactive)background.append(SharedExperience.recallCheck(user));
-        if(in.historyRecall==null)background.append(Commitments.prompt(s,user,proactive,in.remember));
+        background.append(commitments);
         List<String> replies=new ArrayList<>();for(int i=Math.max(0,turns.length()-4);i<turns.length();i++)replies.add(turns.getJSONObject(i).optString("reply"));
         if(in.historyRecall==null)for(String note:AgentPolicy.styleNotes(replies,in.signature))background.append("\n风格提醒：").append(note);
         String ask=proactive?"这是一次应用内部的主动陪伴事件，不是用户发言，而是一次考虑要不要开口的机会。看看你现在的心情、最近真实的互动、没聊完的话题、记忆和约定，自己决定有没有自然想说的话。想说就用你的口吻说一两句，有话题时可以多说些：分享一个自己的小念头、接上刚才的梗、回应刚才的点击拖动，或关心一下已知的安排都行；别每次都变成报时、问候或查户口，也不用总围绕吃的。对方没回的话题就放下，换个新话题或者继续安静。没有新线索、刚聊完，或连续主动都没被回应时，就安静待着，把等待拉长。你只知道记录里的事：对方在其他 App 或现实里做什么你不知道，没展示过的回复对方也没看到。不说话时 reply 严格为[安静陪伴]、initiative 为 quiet，不用说出「我不催你」「不打扰你」「没人理我」这类话。不管说不说都要给 next_check_minutes；availability 为 unchanged，memories 和 self 为空。":user;
