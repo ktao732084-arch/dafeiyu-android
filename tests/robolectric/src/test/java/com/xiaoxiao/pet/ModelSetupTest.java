@@ -35,11 +35,20 @@ public class ModelSetupTest {
     @Test public void keyPasteAndCustomStreamingSwitch()throws Exception{
         open();UiTest.click(dialog,"其他模型 / 自定义");Switch stream=(Switch)UiTest.find(dialog.getWindow().getDecorView(),"流式接收（接口不支持时关闭）");assertTrue(stream.isShown());assertTrue(stream.isChecked());
         android.content.ClipboardManager board=activity.getSystemService(android.content.ClipboardManager.class);
-        board.setPrimaryClip(android.content.ClipData.newPlainText("key","  sk-test-only-1234567890  "));UiTest.click(dialog,"粘贴剪贴板里的 Key");
+        board.setPrimaryClip(android.content.ClipData.newPlainText("key","  sk-test-only-1234567890  "));UiTest.click(dialog,"粘贴");
         assertEquals("sk-test-only-1234567890",field("API Key").getText().toString());assertFalse("the status never shows the whole key",status().contains("test-only-1234567890"));
-        board.setPrimaryClip(android.content.ClipData.newPlainText("key","这不是 一枚 key"));UiTest.click(dialog,"粘贴剪贴板里的 Key");assertTrue(status().contains("不像"));assertEquals("sk-test-only-1234567890",field("API Key").getText().toString());
+        board.setPrimaryClip(android.content.ClipData.newPlainText("key","这不是 一枚 key"));UiTest.click(dialog,"粘贴");assertTrue(status().contains("不像"));assertEquals("sk-test-only-1234567890",field("API Key").getText().toString());
         field("API 地址").setText("https://example.invalid/v1");field("模型名称").setText("mock");stream.setChecked(false);dialog.getButton(-1).performClick();ShadowLooper.idleMainLooper();
         assertTrue(ModelSettings.complete());assertFalse(Data.prefs().getBoolean("agent.stream",true));
+    }
+    /** Saved: one card with the model, balance and small links; no step list and no stack of full-width buttons. */
+    @Test public void savedConnectionIsOneCardNotARowOfButtons()throws Exception{
+        open();android.view.View page=(android.view.View)field("API Key").getParent().getParent();
+        assertEquals("first run: get-Key and paste",2,UiTest.all(page,Button.class).stream().filter(b->b.isShown()&&!(b instanceof CompoundButton)).count());assertFalse(UiTest.find(page,"刷新余额").isShown());assertFalse(UiTest.find(page,"清除已保存的 Key").isShown());
+        dialog.dismiss();ModelSettings.save(ModelPresets.DEEPSEEK_URL,ModelPresets.DEEPSEEK_MODEL,"saved-test-key",false);open();page=(android.view.View)field("API Key").getParent().getParent();
+        assertTrue(UiTest.find(page,"当前使用 DeepSeek V4.1 Flash").isShown());assertTrue(UiTest.find(page,"刷新余额").isShown());assertTrue(UiTest.find(page,"充值").isShown());assertTrue(UiTest.find(page,"清除已保存的 Key").isShown());
+        assertFalse(UiTest.find(page,"去 DeepSeek 官网获取 Key").isShown());assertEquals("only paste stays a button",1,UiTest.all(page,Button.class).stream().filter(b->b.isShown()&&!(b instanceof CompoundButton)).count());
+        UiTest.click(dialog,"其他模型 / 自定义");assertFalse("the card describes the saved DeepSeek connection",UiTest.find(page,"刷新余额").isShown());assertTrue(UiTest.find(page,"测试连接").isShown());
     }
     @Test public void firstRunOnlyShowsKeyAndOfficialLinks(){
         open();assertTrue(((RadioButton)UiTest.find(dialog.getWindow().getDecorView(),"DeepSeek（推荐）")).isChecked());

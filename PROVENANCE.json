@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "f979cde277960b6ca6cb3a4829b98f32a307622488987ff4731ea6c10df8fe03"
+      "sha256": "9897b023df30d3c48b8cbd563b4e89edb555487ae813cd42be0910c50b36af5f"
     },
     {
       "path": "LICENSE",
@@ -78,7 +78,7 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "fd5be3e52e6c4ca90903f45ff528a67284c873d35f3681f8c5d175136250306c",
+      "sha256": "2747ac88129560d3c6f98e366f8218350d5e6ae391dd8e09ef18b05727750fb5",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
@@ -2597,7 +2597,7 @@
       "path": "src/com/xiaoxiao/pet/ModelSetup.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "6bd13464952cd2fe8f1a38039adfc3b5d5cfae021daa21fcfa7c759ea0ee5f2e"
+      "sha256": "69aaf9f73ba8eb1e33553d8c8c9d12fba4d24be1e926e6c8434a0c8b5b04910e"
     },
     {
       "path": "src/com/xiaoxiao/pet/MotionEngine.java",
@@ -3164,7 +3164,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/ModelSetupTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "44d2936a7ab3f7e9aba1c28305389ac6e0f3c4b31afcd5e3b4f54f3d83a9c293"
+      "sha256": "879a8b2be74b87dce0883faac30208cd57463ce378caaa92a2fd8f42a6706eb7"
     },
     {
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/NativeMemoryTest.java",
