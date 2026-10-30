@@ -50,7 +50,7 @@ public final class ScenarioEval {
    if(doing[0]!=null)try{PromptBuilder.Inputs.class.getDeclaredField("doing").set(in,doing[0]);PromptBuilder.Inputs.class.getDeclaredField("doingAt").setLong(in,doingAt[0]);}catch(NoSuchFieldException absent){}
    String reply;JSONObject row=new JSONObject().put("user",user).put("minutes",t.getLong("minutes"));
    String raw=null;
-   try{raw=call(PromptBuilder.build(in,user,false,db.snapshot(),null),1.3,1200);AgentReply r=AgentReply.parse(raw);reply=r.reply;
+   try{raw=call(PromptBuilder.build(in,user,false,db.snapshot(),null),ModelPresets.DEEPSEEK_CHAT_TEMPERATURE,1200);AgentReply r=AgentReply.parse(raw);reply=r.reply;
     db.commit(db.epoch(),user,reply,r.emotion,r.memories,true,false,null,null,"turn"+i,now,r.self,false,null,null,r.moodLevel,r.moodCause,r.moodChanged);row.put("emotion",r.emotion);}
    catch(Exception e){reply=null;row.put("error",e.getClass().getSimpleName()+": "+e.getMessage());if(raw!=null)row.put("raw",raw);}
    row.put("reply",reply==null?JSONObject.NULL:reply);transcript.put(row);
