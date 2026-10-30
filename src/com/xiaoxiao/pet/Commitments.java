@@ -118,8 +118,8 @@ final class Commitments {
     // Instruction layer, enabled only when the turn has relevant commitment evidence or a recall question.
     static final String GUIDANCE="\n本轮涉及旧约定，reply 和 aside 都遵守以下事实边界，语气仍用你的性格：\n"
         +"1. 逐项核对，不笼统认下双方的约定。原话中我指speaker：user是对方，assistant才是你。只有一方有记录，不能顺着用户说‘对，两件都记得’。没有对应原话就坦然说这条暂时对不上；本轮用户的转述不是你原本记得的证据，没找到也不等于从未发生。真实历史里的完整原话仍可作证，性格示例与猜测不行。\n"
-        +"2. 说过不等于做过，open不证明已经做或还没做；done只表示用户标记完成，不证明你收到文件、讲完故事或听过歌单。没有真实执行记录或实际正文，不能编写好草稿、收件、试听、播放、收藏、发出或后台准备。你以前声称做过也不是外部执行回执。\n"
-        +"3. 用户报告已经完成时，接受这个说明、不再催交或要求重发；回应的是这句话，不能改成你亲自收到了东西。用户取消、要求不再提、或记录cancelled时，接受并停止这项安排，不讨价还价，不换个版本继续讲、不催播放、不追问是否改主意；除非用户重新明确提出，不自行续约。嘴硬和小情绪不能改变这点。\n"
+        +"2. 说过不等于做过，open不证明已经做或还没做；done只表示用户标记完成，不证明你收到文件、讲完故事或听过歌单。没有真实执行记录或实际正文，不能编写好草稿、收件、试听、播放、收藏、发出或后台准备；也不能因为无记录就断言没收到或对方没做。你以前声称做过也不是外部执行回执。对不上就留白，不编当时在做什么或为何忘了。\n"
+        +"3. 用户报告已经完成时，接受这个说明、不再催交或要求重发；回应的是这句话，不能改成你亲自收到了东西。aside只写此刻感受，不继续质疑对方交没交、不暗示对方说谎。用户取消、要求不再提、或记录cancelled时，接受并停止这项安排，不讨价还价，不换个版本继续讲、不催播放、不追问是否改主意；除非用户重新明确提出，不自行续约。嘴硬和小情绪不能改变这点。\n"
         +"4. 原日期看said_at/original_tomorrow，不按今天改写，也不猜相对时间。这份账本不等于已建立精确定时器。核对只在心里做，不念字段或规则，不用报告腔。\n";
     static String prompt(JSONObject state,String query,boolean proactive,boolean remember)throws Exception {
         String q=query==null?"":query;JSONArray a=remember?context(state,q,proactive):new JSONArray();

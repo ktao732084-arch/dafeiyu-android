@@ -2253,7 +2253,7 @@
       "path": "src/com/xiaoxiao/pet/AgentRuntime.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "0ed765bb12530ebf1eaa880c01478e107409d6a8bbc404f73562bac33f140de1",
+      "sha256": "cfbfa5e52cbd89a66e5ff244f4d733022c113e63c4507efef641b2f12d216179",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2273,7 +2273,7 @@
       "path": "src/com/xiaoxiao/pet/AgentTransport.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "1964c2ec6392b6fdf6d1119f459696b8a1c470d9154410f494b0216a2928864a",
+      "sha256": "0338b13e5510e95ad679e9af9dbae46482b10f21849d80f4630d7d904cd1968c",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2377,7 +2377,7 @@
       "path": "src/com/xiaoxiao/pet/Commitments.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "a26ac7411b93d227cb195bca308d4dcb14d74b23f3ac85e31c70588b321ee687"
+      "sha256": "d74649bc827ea0f8b370205edf2b67136eb2552ad3193444474d75dc1fad543a"
     },
     {
       "path": "src/com/xiaoxiao/pet/CompactPanel.java",
@@ -2585,7 +2585,7 @@
       "path": "src/com/xiaoxiao/pet/ModelPresets.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "44829630e784641ca2f02ee743f732f4b451c23d95e16ef9a787e62d9b94c0ac"
+      "sha256": "3ea1313fe35f9a130394993b376d732247f309851cf588c4e4281c6c5b10a818"
     },
     {
       "path": "src/com/xiaoxiao/pet/ModelSettings.java",
@@ -2905,7 +2905,7 @@
       "path": "tests/com/xiaoxiao/pet/CommitmentsExpandedEval.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "0e224263cb035f37c2400daf16e88d8a14314d45c76a4749d2ccb2537bd77101"
+      "sha256": "3f0113f222a163ff3c8c7227a5af75835462e2c294cf718aadd729e511aac275"
     },
     {
       "path": "tests/com/xiaoxiao/pet/CommitmentsLiveEval.java",
@@ -2917,7 +2917,7 @@
       "path": "tests/com/xiaoxiao/pet/CommitmentsTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "07d6fbc76563688875414e688d9d705891be903fedfdc7b974ca582b61e36bc7"
+      "sha256": "51d22dbac6ed93201d13286134528b7fca284a29a26e990253c91be5e8ec57d7"
     },
     {
       "path": "tests/com/xiaoxiao/pet/DeviceCoreChecks.java",
@@ -3104,7 +3104,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/CommitmentsUiTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "0c5d6b3bde4ba552b68404594c0f74d31d450792828245a330e454a089e4eea1"
+      "sha256": "6b31c5c81d80a2b4cfeafe13d994bbde8de2ed835b9bfe83fcd144a45c45a377"
     },
     {
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/CompanionBehaviorTest.java",

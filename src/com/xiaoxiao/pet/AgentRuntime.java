@@ -119,7 +119,7 @@ final class AgentRuntime {
     static boolean diaryEnabled(){return Data.prefs().getBoolean("agent.diary",true);}
     /** Her murmur under the reply (小声嘀咕); on by default, off removes it from the prompt and the screen. */
     static boolean asideEnabled(){return Data.prefs().getBoolean("agent.aside",true);}
-    static Model diaryModel=(messages,token,progress)->AgentTransport.request(ModelSettings.read(),messages,token,progress,false,Diary.MAX_TOKENS);
+    static Model diaryModel=(messages,token,progress)->AgentTransport.structured(ModelSettings.read(),messages,token,Diary.MAX_TOKENS);
     /** On app entry or after chat: one idle request per local day, also for days with a finished game only. */
     static void writeDiaryIfDue(){
         if(!diaryEnabled()||!rememberEnabled()||!configured()||!PersonaManager.isInitialized("main")||busy()||!writingDiary.compareAndSet(false,true))return;

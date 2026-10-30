@@ -27,6 +27,10 @@ final class ModelPresets {
     static void chat(String host,String model,JSONObject payload)throws Exception {
         if("api.deepseek.com".equals(host)&&!AgentPolicy.reasoningModel(model))payload.put("temperature",DEEPSEEK_CHAT_TEMPERATURE);
     }
+    /** Explicit JSON tasks only; plain connection checks and other providers retain their protocol. */
+    static void structured(String host,String model,JSONObject payload)throws Exception {
+        if("api.deepseek.com".equals(host)&&!AgentPolicy.reasoningModel(model))payload.put("response_format",new JSONObject().put("type","json_object"));
+    }
     static String httpError(int code){
         switch(code){
             case 401:return "API Key 无效或已失效，请重新复制完整的 Key。";

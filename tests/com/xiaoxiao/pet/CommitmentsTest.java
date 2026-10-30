@@ -114,6 +114,10 @@ public final class CommitmentsTest {
   boundary.remember=false;String off=PromptBuilder.build(boundary,"我答应你什么？",false,partialEvidence,null).toString();
   check(!off.contains(user)&&off.contains("本轮没有提供可核对"),"memory-off route preserves uncertainty without revealing stored promises");
   boundary.historyRecall=new JSONObject();check(!PromptBuilder.build(boundary,"我答应你什么？",false,partialEvidence,null).getJSONObject(0).getString("content").contains(Commitments.GUIDANCE),"historical search keeps its own evidence scope");
+  JSONObject protocol=new JSONObject();ModelPresets.chat("api.deepseek.com","deepseek-flash",protocol);ModelPresets.structured("api.deepseek.com","deepseek-flash",protocol);
+  check(protocol.optDouble("temperature")==1.0&&"json_object".equals(protocol.getJSONObject("response_format").optString("type")),"structured chat retains upstream sampling and requests a JSON object");
+  for(String host:new String[]{"api.openai.com","example.invalid","api.deepseek.com.example.invalid"}){protocol=new JSONObject();ModelPresets.structured(host,"deepseek-flash",protocol);check(!protocol.has("response_format"),"JSON mode does not silently change another provider: "+host);}
+  protocol=new JSONObject();ModelPresets.structured("api.deepseek.com","deepseek-reasoner",protocol);check(!protocol.has("response_format"),"legacy reasoning protocol remains unchanged");
   System.out.println("PASS: "+checks+" bilateral commitment checks");
  }
 }

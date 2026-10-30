@@ -16,7 +16,9 @@ public class CommitmentsUiTest {
   JSONArray promises=Commitments.entries(db.snapshot());assertEquals(2,promises.length());assertEquals("user",promises.getJSONObject(0).getString("speaker"));assertEquals("assistant",promises.getJSONObject(1).getString("speaker"));
   assertTrue(AgentRuntime.context("你答应提醒我的事",false).toString().contains("十分钟后我提醒你喝水"));
   assertTrue(AgentRuntime.context("你答应提醒我的事",false).toString().contains("你答应用户的"));
-  Data.prefs().edit().putBoolean("agent.memory",false).commit();assertFalse(AgentRuntime.context("你答应提醒我的事",false).toString().contains("你答应用户的"));
+  Data.prefs().edit().putBoolean("agent.memory",false).commit();JSONArray disabledRequest=AgentRuntime.context("你答应提醒我的事",false);String disabled=disabledRequest.getJSONObject(disabledRequest.length()-1).getString("content");
+  // The route may explain absence of evidence, but must not inject either stored promise.
+  assertFalse(disabled.contains("十分钟后我提醒你喝水"));assertFalse(disabled.contains("我答应你明天把初稿发给你"));assertTrue(disabled.contains("本轮没有提供可核对"));
  }
  @Test public void sameDreamCallCanSupplementWithoutProducingADiary()throws Exception{
   LocalDate day=LocalDate.now().minusDays(1);long at=day.atTime(19,0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();String quote="这份资料我周末给你。";
