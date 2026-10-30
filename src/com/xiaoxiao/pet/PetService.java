@@ -112,9 +112,16 @@ public class PetService extends Service {
    clearBubble();speechTurn=turnId;speechInteraction=interaction;
    if(speech==null)speech=new SpeechQueue(new SpeechQueue.Clock(){public void later(Runnable task,long delay){handler.postDelayed(task,delay);}public void remove(Runnable task){handler.removeCallbacks(task);}},new SpeechQueue.Sink(){
     public boolean visible(){return Pet.this.visible&&!docked&&frame!=null&&animating();}
-    public void show(String text,int shown,boolean preview){showBubble(!speechInteraction&&!preview&&speech!=null&&speech.parts!=null&&shown>=speech.parts.size()?text+"\n\n点此查看聊天记录":text,false);if(speechInteraction)bubble.setOnClickListener(v->clearBubble());try{AgentRuntime.store().shown(speechTurn,shown);if(!speechInteraction)Chat.historyChanged(Pet.this.id);}catch(Exception e){Data.log(role,"气泡展示状态暂未保存");}}
+    public void show(String text,int shown,boolean preview){boolean last=!speechInteraction&&!preview&&speech!=null&&speech.parts!=null&&shown>=speech.parts.size();showBubble(text,false);if(last){murmur();bubble.append("\n\n点此查看聊天记录");}if(speechInteraction)bubble.setOnClickListener(v->clearBubble());try{AgentRuntime.store().shown(speechTurn,shown);if(!speechInteraction)Chat.historyChanged(Pet.this.id);}catch(Exception e){Data.log(role,"气泡展示状态暂未保存");}}
     public void stop(int shown){clearBubbleVisual();}
    });speech.start(text);
+  }
+  /** Her murmur after the last segment, smaller, grey and italic like in the chat (小声嘀咕). */
+  void murmur(){
+   if(bubble==null||!AgentRuntime.asideEnabled())return;String aside;try{aside=AgentRuntime.store().aside(speechTurn);}catch(Exception e){return;}if(aside.isEmpty())return;
+   android.text.SpannableString line=new android.text.SpannableString(aside);int n=line.length();
+   line.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.ITALIC),0,n,0);line.setSpan(new android.text.style.RelativeSizeSpan(.85f),0,n,0);line.setSpan(new android.text.style.ForegroundColorSpan(Apple.SECONDARY),0,n,0);
+   bubble.append("\n");bubble.append(line);
   }
   void reply(String text){clearBubble();showBubble(text,true);}
   void showBubble(String text,boolean autoHide){
