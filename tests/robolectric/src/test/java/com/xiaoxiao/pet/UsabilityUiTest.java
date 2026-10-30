@@ -45,7 +45,7 @@ public class UsabilityUiTest {
         fixture.put("chapter",5);for(String action:store.unlocked(Data.actions("main")))if(!before.contains(action)){newlyUnlocked=action;break;}
         assertNotNull("chapter fixture has a newly unlocked clip",newlyUnlocked);assertFalse(a.pet.plan.has(newlyUnlocked));a.render();assertSame(video,a.pet.video);assertTrue(a.pet.plan.has(newlyUnlocked));
     }
-    /** 关于 → 问题反馈 opens the 兔小巢 board signed in as this install, or says the build has none. */
+    /** 关于 → 问题反馈 opens the self-hosted board signed in as this install, or says the build has none. */
     @Test public void feedbackOpensTheBoardOrSaysThereIsNone()throws Exception{
         UiTest.click(a.content,"问题反馈");View page=root();
         if(FeedbackPanel.board(a).isEmpty()){assertTrue(UiTest.texts(page).contains("还没有配置反馈页面"));return;}

@@ -49,8 +49,9 @@
 
 ## 问题反馈
 
-- 反馈走兔小巢：`update-channel.json`的`feedback_url`只接受`https://support.qq.com/product/<编号>`，App内WebView打开；不自建服务器，不在安装包里放任何Token或密码。
-- 只传随机openid、短昵称、她的立绘地址和App/Android版本、机型；不得附带聊天、记忆、Key或模型地址。说明见`docs/FEEDBACK.md`。
+- 2026-10-30 用户决定自建，替代 PR #27 的兔小巢方案。`update-channel.json` 的 `feedback_url` 指向自己的 HTTPS `/dafeiyu-feedback/`；App 内 WebView 保留免注册、选截图、看回复。禁止把管理员凭据打入 APK。
+- 随会话只传安装随机身份与 App/Android 版本、机型；不自动附带聊天、记忆、Key 或模型地址。反馈私有存储在北京服务器 SQLite，管理员通过 SSH 查看/回复；不要自动转发到公开 Issue、邮件或第三方。说明见 `docs/FEEDBACK.md`、`deploy/feedback/README.md`。
+- 服务端改动运行 `deploy/feedback/test_feedback.py`；客户端改动运行 `FeedbackTest`、对应 UI 和隔离 Android 检查，真实服务只提交明确标记的合成验收内容。服务部署不等于已发布新 App。
 
 ## 性格表达与状态分层
 

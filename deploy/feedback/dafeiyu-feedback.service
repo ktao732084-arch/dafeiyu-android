@@ -1,0 +1,30 @@
+[Unit]
+Description=Dafeiyu private feedback board
+After=network.target
+
+[Service]
+Type=simple
+User=dafeiyu-feedback
+Group=dafeiyu-feedback
+WorkingDirectory=/opt/dafeiyu-feedback
+EnvironmentFile=/etc/dafeiyu-feedback.env
+ExecStart=/opt/dafeiyu-feedback/venv/bin/python /opt/dafeiyu-feedback/feedback_server.py serve
+Restart=on-failure
+RestartSec=3
+StateDirectory=dafeiyu-feedback
+StateDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+ReadWritePaths=/var/lib/dafeiyu-feedback
+MemoryMax=384M
+TasksMax=64
+LimitNOFILE=256
+
+[Install]
+WantedBy=multi-user.target

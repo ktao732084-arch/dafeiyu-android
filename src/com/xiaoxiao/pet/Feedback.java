@@ -3,31 +3,25 @@ package com.xiaoxiao.pet;
 import org.json.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.util.*;
 
-/**
- * In-app problem reports through 兔小巢 (Tencent's free feedback board): the app opens the product page in a WebView,
- * so there is no server, token or password of ours anywhere. Each install posts under a random id and nickname, so the
- * user can come back and read the developer's replies; the board also receives the app/Android/phone versions.
- * No chat, memory, key or model address is sent. Pure Java apart from the page.
- */
+/** Self-hosted feedback. Only a per-install random identity and the visible device line leave the app. */
 final class Feedback {
-    static final String HOST="support.qq.com";
-    /** Shown next to her posts; 兔小巢 needs an HTTPS PNG/JPG for the logged-in state. */
-    static final String AVATAR="https://cdn.jsdelivr.net/gh/ktao732084-arch/dafeiyu-android@main/assets/main/portrait.png";
-
-    /** The board from update-channel.json: https://support.qq.com/product/<digits>, else empty (no board in this build). */
+    static final String PATH="/dafeiyu-feedback/";
     static String board(JSONObject channel){
         String raw=channel==null?"":channel.optString("feedback_url","").trim();
-        try{URI u=new URI(raw);return "https".equals(u.getScheme())&&HOST.equals(u.getHost())&&u.getPort()==-1&&u.getRawUserInfo()==null&&u.getRawQuery()==null&&u.getRawFragment()==null&&u.getPath()!=null&&u.getPath().matches("/product/\\d{3,12}")?raw:"";}catch(Exception e){return "";}
+        try{URI u=new URI(raw);return "https".equals(u.getScheme())&&u.getHost()!=null&&u.getRawUserInfo()==null&&u.getRawQuery()==null&&u.getRawFragment()==null&&(u.getPort()==-1||u.getPort()==443)&&PATH.equals(u.getRawPath())?raw:"";}catch(Exception e){return "";}
     }
-    /** The page with the device line 兔小巢 shows beside each post. */
-    static String page(String board,String version,long code,String android,String device){
-        return board+"?clientVersion="+enc(version+(code>0?" ("+code+")":""))+"&os=Android&osVersion="+enc(android)+"&clientInfo="+enc(device);
+    static Map<String,String> headers(String id,String version,long code,String android,String device){
+        Map<String,String> result=new LinkedHashMap<>();
+        if(id==null||!id.matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))throw new IllegalArgumentException("Invalid feedback identity");
+        try{JSONObject meta=new JSONObject().put("app_version",(version==null?"":version)+(code>0?" ("+code+")":"")).put("android",android==null?"":android).put("device",device==null?"":device);
+            result.put("Authorization","Bearer "+id);result.put("X-Dafeiyu-Device",Base64.getEncoder().encodeToString(meta.toString().getBytes(StandardCharsets.UTF_8)));
+        }catch(JSONException e){throw new IllegalArgumentException(e);}return result;
     }
-    /** Form body that logs this install in: a random openid, a short nickname (8 characters at most) and her portrait. */
-    static String login(String openid,String nickname){return "openid="+enc(openid)+"&nickname="+enc(nickname)+"&avatar="+enc(AVATAR);}
-    static String nickname(String openid){String hex=openid==null?"":openid.replaceAll("[^0-9a-fA-F]","");return "鱼友"+(hex.length()>=4?hex.substring(0,4):"0000");}
-    /** Links that stay inside the page; everything else opens in the browser or is ignored. */
-    static boolean inside(String url){try{URI u=new URI(url);return "https".equals(u.getScheme())&&u.getHost()!=null&&(u.getHost().equals(HOST)||u.getHost().endsWith(".qq.com")||u.getHost().endsWith(".gtimg.cn")||u.getHost().endsWith(".qpic.cn"));}catch(Exception e){return false;}}
-    static String enc(String s){try{return URLEncoder.encode(s==null?"":s,StandardCharsets.UTF_8.name());}catch(Exception e){return "";}}
+    static boolean inside(String board,String url){
+        try{if(board(new JSONObject().put("feedback_url",board)).isEmpty())return false;URI base=new URI(board),u=new URI(url);int bp=base.getPort()==-1?443:base.getPort(),up=u.getPort()==-1?443:u.getPort();
+            String path=u.getRawPath();return "https".equals(u.getScheme())&&u.getRawUserInfo()==null&&base.getHost().equalsIgnoreCase(u.getHost())&&bp==up&&path!=null&&path.startsWith(PATH)&&path.equals(u.normalize().getRawPath())&&!path.contains("%")&&!path.contains("\\");
+        }catch(Exception e){return false;}
+    }
 }

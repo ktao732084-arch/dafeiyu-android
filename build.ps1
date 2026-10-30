@@ -19,7 +19,7 @@ Copy-Item -LiteralPath "$Root\assets\catalog.json","$Root\assets\persona-default
 if($UpdateUrl){
  $UpdateUri=$null
  if(-not [Uri]::TryCreate($UpdateUrl,[UriKind]::Absolute,[ref]$UpdateUri) -or $UpdateUri.Scheme -ne 'https' -or -not $UpdateUri.Host -or $UpdateUri.UserInfo -or $UpdateUri.Fragment){throw 'UpdateUrl must be an HTTPS manifest URL without credentials or fragment.'}
- # Only the manifest moves; the feedback relay address in the repository's channel file is kept.
+ # Only the manifest moves; the feedback page address in the repository's channel file is kept.
  $Channel=Get-Content -LiteralPath "$Root\assets\update-channel.json" -Raw -Encoding UTF8 | ConvertFrom-Json
  $Channel | Add-Member -NotePropertyName manifest_url -NotePropertyValue $UpdateUrl -Force
  [IO.File]::WriteAllText("$Root\fish-assets\update-channel.json",($Channel | ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
