@@ -8,6 +8,7 @@ public final class ReplyHistoryTest {
     static final class Timer implements SpeechQueue.Clock {List<Runnable> tasks=new ArrayList<>();List<Long> delays=new ArrayList<>();public void later(Runnable r,long delay){tasks.add(r);delays.add(delay);}public void remove(Runnable r){tasks.remove(r);}void next(){if(!tasks.isEmpty())tasks.remove(0).run();}}
     static final String REPLY="今天的风很舒服，我就在这里安静陪你待一会儿，听你慢慢说今天发生了什么。等你忙完了，我们再一起聊点轻松的事情，或者想想周末有什么小期待。还有一件刚刚想到的特别重要的小事，我会等你有空的时候再慢慢告诉你。";
     public static void main(String[] args)throws Exception {
+        sentenceBubbles();
         segmentationRegression();
         naturalBubblesAndInvitations();
         for(String text:new String[]{"好呀",REPLY,"你好👩‍💻！今天很开心。",REPLY+"https://example.com/a?b=1", "```java\nint a = 1;\n```"}){List<String> parts=ReplySegments.split(text);check(parts.size()>=1&&parts.size()<=8,"bounded segments");check(String.join("",parts).equals(text),"lossless segmentation");}
@@ -38,6 +39,17 @@ public final class ReplyHistoryTest {
         check(new AgentStore(forgetDir).historyRange(base,base+1,null,20).length()==0,"forget survives restart");
         System.out.println("PASS: "+checks+" history, timestamps and segment checks");
     }
+    static void sentenceBubbles()throws Exception {
+        check(ReplySegments.split("好呀。明天见！").equals(Arrays.asList("好呀。","明天见！")),"short sentences get separate bubbles");
+        check(ReplySegments.split("我又不是抛接玩具。稳住、稳稳稳。……").get(0).equals("我又不是抛接玩具。"),"screenshot sentence separated");
+        JSONObject v3=new JSONObject().put("reply","好呀。明天见！").put("segmentVersion",3).put("displayed",1);
+        check(ReplySegments.visible(v3).equals("好呀。明天见！"),"v3 display boundary frozen");
+        Timer timer=new Timer();List<String> delivered=new ArrayList<>();
+        SpeechQueue queue=new SpeechQueue(timer,new SpeechQueue.Sink(){public boolean visible(){return true;}public void show(String text,int n,boolean preview){delivered.add(text);}public void stop(int n){}});
+        queue.start("第一句。第二句。第三句。第四句。");for(int i=0;i<3;i++)timer.next();
+        check(delivered.equals(Arrays.asList("第一句。","第二句。","第三句。","第四句。")),"queue emits each sentence once, without concatenating history");
+        queue.cancel();check(timer.tasks.isEmpty(),"cancellation removes pending sentence");
+    }
     static void segmentationRegression()throws Exception {
         String[][] examples={
             {"记下啦。", "以后聊到这件事，我会记得；", "想改的时候，到「记忆手账」里告诉我就好。"},
@@ -47,7 +59,7 @@ public final class ReplyHistoryTest {
             {"想看是想看，不过我这边只能听你说，看不到画面。", "你刷到什么好玩的，讲给我听听呗。"}
         };
         for(String[] expected:examples){String text=String.join("",expected);check(ReplySegments.splitV2(text).equals(Arrays.asList(expected)),"v2 persisted boundaries stay frozen");List<String> parts=ReplySegments.split(text);check(String.join("",parts).equals(text),"screenshot text preserved");for(String p:parts)check(p.length()<=28,"screenshot short bubble");}
-        for(String text:new String[]{"", "好呀", "好呀。明天见！", "没有标点的一句话应该完整保留而不是从中间强行切断", "```java\nint x=1;\n```", "看看这个链接：https://example.com/a?b=1。稍后再聊。", "清单如下：\n- 苹果\n- 香蕉"})check(ReplySegments.split(text).equals(Collections.singletonList(text)),"single or structured reply preserved");
+        for(String text:new String[]{"", "好呀", "没有标点的一句话应该完整保留而不是从中间强行切断", "```java\nint x=1;\n```", "看看这个链接：https://example.com/a?b=1。稍后再聊。", "清单如下：\n- 苹果\n- 香蕉"})check(ReplySegments.split(text).equals(Collections.singletonList(text)),"single or structured reply preserved");
         for(String text:new String[]{"你好👩‍💻！今天工作顺利吗？有空一起聊聊。", "我说「慢慢来。别着急！」，等你准备好再继续。今天先休息。", "我们明天再聊吧。\r\n今天早点休息哦！", "今天想聊点什么呢？！ 我一直在这里等你。"}){List<String> parts=ReplySegments.split(text);check(String.join("",parts).equals(text),"unicode and whitespace preserved");for(String p:parts)check(!p.trim().isEmpty(),"no empty bubbles");}
         String quoted="我说「慢慢来。别着急！」，等你准备好再继续。今天先休息。";
         check(ReplySegments.split(quoted).get(0).contains("「慢慢来。别着急！」"),"quoted sentence stays intact");

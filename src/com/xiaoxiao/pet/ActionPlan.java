@@ -77,6 +77,15 @@ final class ActionPlan {
     static final List<String> WORK=Arrays.asList("写代码","轻快记录","原地敲击桌面互动","工作状态-忙碌点按","工作状态-思考冒泡","工作状态-清点归档","工作状态-原地踱步张望");
     static final List<String> PLAY=Arrays.asList("原地专心玩魔方","原地蹲下玩玩具汽车","鲸鱼吐泡泡特效","原地跳跃抓碎头顶物品","玩游戏气急败坏","小提琴演奏",
         "蓝鲸现世","优雅女仆舞","轻快摇摆舞","可爱宅舞","吹气球","动物环绕","拆礼物","变鸽子","扑克魔术","抽陀螺","吹笛子","撸猫","凭空生花","骑木马","三球抛接","踢毽子","下五子棋","荡秋千");
+    // A deliberate tap can ask for a little performance as well as a greeting. Food, sleep,
+    // balance displays and seasonal events still belong to their actual situations.
+    static final List<String> TAP_ACTIONS=tapActions();
+    private static List<String> tapActions(){
+        LinkedHashSet<String> actions=new LinkedHashSet<>(TAPS);actions.addAll(EVERYDAY);actions.addAll(PLAY);
+        actions.remove(STARTLED);actions.remove(CAUGHT);
+        actions.addAll(Arrays.asList("工作状态-雀跃庆祝","原地漂浮踏步","螃蟹走路","碎碎念-对屏碎碎念"));
+        return Collections.unmodifiableList(new ArrayList<>(actions));
+    }
     static final Map<String,List<String>> EMOTIONS=new HashMap<>();
     static {
         EMOTIONS.put("happy",Arrays.asList("点击回应-开心跃动","点击回应-元气挥手","轻快摇摆舞","工作状态-雀跃庆祝"));
@@ -106,6 +115,7 @@ final class ActionPlan {
     private final ArrayDeque<String> recent=new ArrayDeque<>();
     private final Map<String,Long> played=new HashMap<>();
     private final ArrayDeque<Long> taps=new ArrayDeque<>();
+    private final ArrayDeque<String> recentTaps=new ArrayDeque<>();
     private String lastTap="",lastEmotion="";
     // Wall-clock milliseconds, the same clock as Moment.
     private volatile long lastInteraction=-1,annoyedAt=-1,awakeUntil=0;
@@ -235,8 +245,15 @@ final class ActionPlan {
         else if(taps.size()>=4&&has(ANNOYED)) {pick=ANNOYED;taps.clear();annoyedAt=now;}
         else if(eating(current)&&has(CAUGHT)) pick=CAUGHT;
         else if(WORK.contains(current)&&has(STARTLED)) pick=STARTLED;
-        else {List<String> options=new ArrayList<>();for(String a:TAPS)if(has(a)&&!a.equals(lastTap))options.add(a);pick=options.isEmpty()?lastTap:options.get(random.nextInt(options.size()));}
-        lastTap=pick;return pick;
+        else {
+            List<String> options=new ArrayList<>();
+            for(String a:TAP_ACTIONS)if(has(a)&&!a.equals(current)&&!recentTaps.contains(a))options.add(a);
+            if(options.isEmpty())for(String a:TAP_ACTIONS)if(has(a)&&!a.equals(lastTap))options.add(a);
+            if(options.isEmpty())for(String a:TAP_ACTIONS)if(has(a))options.add(a);
+            pick=options.isEmpty()?IDLE:options.get(random.nextInt(options.size()));
+        }
+        recentTaps.addLast(pick);while(recentTaps.size()>RECENT)recentTaps.removeFirst();
+        lastTap=pick;return remember(pick,now);
     }
     static boolean eating(String action){ return action.startsWith("吃")||MEALS.contains(action)||SNACKS.contains(action)||action.equals("涮火锅"); }
     /** What a clip shows her doing, in words the model can use ("拉小提琴"); null for reactions, idling and UI feedback. */
