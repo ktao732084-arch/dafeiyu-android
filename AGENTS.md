@@ -49,8 +49,8 @@
 
 ## 问题反馈
 
-- App 只把反馈发到`update-channel.json`的`feedback_url`（北京服务器中转），不在安装包里放 GitHub Token、邮箱密码或其他凭据；Token 只存在服务器`/etc/dafeiyu-feedback.env`。
-- 反馈只含用户填写的内容、选填联系方式和 App/Android 版本、机型；不得附带聊天、记忆、Key 或模型地址。改动中转服务跑`tests/test_feedback_relay.py`，部署与发布顺序见`deploy/feedback/README.md`。
+- 反馈走兔小巢：`update-channel.json`的`feedback_url`只接受`https://support.qq.com/product/<编号>`，App内WebView打开；不自建服务器，不在安装包里放任何Token或密码。
+- 只传随机openid、短昵称、她的立绘地址和App/Android版本、机型；不得附带聊天、记忆、Key或模型地址。说明见`docs/FEEDBACK.md`。
 
 ## 性格表达与状态分层
 

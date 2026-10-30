@@ -45,13 +45,12 @@ public class UsabilityUiTest {
         fixture.put("chapter",5);for(String action:store.unlocked(Data.actions("main")))if(!before.contains(action)){newlyUnlocked=action;break;}
         assertNotNull("chapter fixture has a newly unlocked clip",newlyUnlocked);assertFalse(a.pet.plan.has(newlyUnlocked));a.render();assertSame(video,a.pet.video);assertTrue(a.pet.plan.has(newlyUnlocked));
     }
-    /** 关于 → 问题反馈: empty reports are not sent, the draft survives closing, and the attached info is shown. */
-    @Test public void feedbackKeepsTheDraftAndSaysWhatIsAttached()throws Exception{
-        Feedback.connections=u->{throw new AssertionError("no network in this test");};
-        UiTest.click(a.content,"问题反馈");View page=root();assertTrue(UiTest.texts(page).contains("不会附带聊天记录、记忆或 Key"));assertTrue(UiTest.texts(page).contains("Android "));
-        UiTest.click(page,"发送");assertNotNull(UiTest.find(page,"先写下遇到的问题"));
-        ((EditText)UiTest.description(page,"反馈内容")).setText("首页立绘不动");ShadowLooper.idleMainLooper();assertEquals("首页立绘不动",Data.prefs().getString("feedback.draft",""));
-        UiTest.dialog().dismiss();FeedbackPanel.show(a);assertEquals("首页立绘不动",((EditText)UiTest.description(root(),"反馈内容")).getText().toString());
+    /** 关于 → 问题反馈 opens the 兔小巢 board signed in as this install, or says the build has none. */
+    @Test public void feedbackOpensTheBoardOrSaysThereIsNone()throws Exception{
+        UiTest.click(a.content,"问题反馈");View page=root();
+        if(FeedbackPanel.board(a).isEmpty()){assertTrue(UiTest.texts(page).contains("还没有配置反馈页面"));return;}
+        assertTrue(UiTest.texts(page).contains("不含聊天、记忆或 Key"));assertEquals(1,UiTest.all(page,android.webkit.WebView.class).size());
+        String id=Data.prefs().getString("feedback.openid","");assertEquals(36,id.length());UiTest.dialog().dismiss();FeedbackPanel.show(a);assertEquals("one id per install",id,Data.prefs().getString("feedback.openid",""));
     }
     @Test public void clearingTheDiaryAsksFirst()throws Exception{
         java.time.LocalDate day=java.time.LocalDate.now().minusDays(1);assertTrue(AgentRuntime.store().addDiary(AgentRuntime.store().epoch(),Diary.entry(day,"今天陪他聊了晚饭。",new java.util.ArrayList<>(),System.currentTimeMillis())));

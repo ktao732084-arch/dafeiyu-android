@@ -14,7 +14,6 @@ fish-assets/
 .env.*
 local.properties
 deploy/updates/release.local.json
-deploy/feedback/feedback.env
 .idea/
 .vscode/
 *.log
