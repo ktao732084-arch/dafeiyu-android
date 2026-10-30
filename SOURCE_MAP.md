@@ -163,6 +163,10 @@ AppUpdate、UpdateTransport、UpdateApk、UpdateFileProvider、UpdateRuntime、U
 
 公网 IP 接入的 Nginx 路径配置、北京构建入口与 UpdateNetworkInstrumentation 为本项目新增；复用用户已有北京服务器和 IP 证书续期配置。站点最初镜像 v0.4.7；本次以原签名发布 0.4.9.2，保留上游素材归属。UpgradeAcceptance 与 OfflineTestApplication 为本项目新增验证代码：前者仅在新建模拟器使用合成数据验证真实 APK 覆盖安装，后者阻止框架单测意外访问线上更新站点。
 
+## 拟人更新回归（2026-10-30，尚未发布）
+
+`InterjectionEdgeTest`、`PhraseUiTest`和`PersonaUpdateInstrumentation`为本轮AI辅助新增测试，覆盖Claude的连发与表达学习改动。`ChatPage`补齐草稿恢复，`Phrases`补齐敏感来源与常用语气词校验；沿用既有模块和PR #25的来源，不引入新SDK或模型调用。验收见`docs/PERSONA_UPDATE_ACCEPTANCE.md`。
+
 ## 章节任务线（PR #24，尚未发布）
 
 任务规则、剧情配置、任务卡和棋局接入来自Claude的`feature/quest-line`分支（`4e193a9`），保留各模块原有来源。设计参考与边界见`docs/GROWTH_DESIGN.md`；本轮只做主分支整合与验证。`QuestLineInstrumentation.java`为本轮新增的独立Android任务卡、排版和真实本机记忆目标验收，没有引入第三方SDK或动画资源。

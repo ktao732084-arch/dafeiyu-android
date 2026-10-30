@@ -274,6 +274,11 @@ final class ChatPage {
         if(!ask(message))return;
         if(records.length()==0)rows.removeAllViews();stamp(new JSONObject(),System.currentTimeMillis());message(message,true,null,false);typing(true);scroll.post(()->scroll.fullScroll(View.FOCUS_DOWN));if(owner!=null&&owner.visible)owner.thinking();
     }
+    /** Restore submitted text ahead of what the user is still typing; never truncate joined drafts. */
+    void restoreDraft(String submitted){
+        String typed=input.getText().toString();String restored=submitted==null?typed:submitted+(typed.isEmpty()?"":"\n"+typed);
+        input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(Math.max(8000,restored.length()))});input.setText(restored);input.setSelection(input.length());
+    }
     /** Sends one user turn (possibly several messages joined) and wires the reply back into the page. */
     boolean ask(String message){
         draft=message;turnId=null;
@@ -283,12 +288,12 @@ final class ChatPage {
             public void done(String reply,String emotion){if(!dialog.isShowing()||listener!=this)return;from=Long.MIN_VALUE;to=Long.MAX_VALUE;anchor=focus=null;sending=false;sendState();idle();status.setText("");loadLatest();
                 PetService.Pet p=pet();if(p!=null)p.clearBubble();if(overlay&&p!=null&&p.visible&&!p.docked){AgentRuntime.express(id,emotion,reply,turnId);}else speech.start(reply);
                 // Her answer was already saved when these arrived: leave them in the box rather than cut her off mid-bubble.
-                if(more!=null){input.setText(more);more=null;}
+                if(more!=null){restoreDraft(more);more=null;}
             }
-            public void error(String message){if(!dialog.isShowing()||listener!=this)return;sending=false;input.setText(more==null?draft:draft+"\n"+more);more=null;sendState();idle();status.setText(message);retry.setVisibility(draft.isEmpty()?View.GONE:View.VISIBLE);loadLatest();PetService.Pet p=pet();if(p!=null)p.clearBubble();}
+            public void error(String message){if(!dialog.isShowing()||listener!=this)return;sending=false;restoreDraft(more==null?draft:draft+"\n"+more);more=null;sendState();idle();status.setText(message);retry.setVisibility(draft.isEmpty()?View.GONE:View.VISIBLE);loadLatest();PetService.Pet p=pet();if(p!=null)p.clearBubble();}
         };
         if(!AgentRuntime.send(message,false,l)){status.setText("她还在回上一句，稍等一下哦");return false;}
-        listener=l;sending=true;retry.setVisibility(View.GONE);input.setText("");sendState();status.setText("");presence.setText("对方正在输入…");presence.setTextColor(Apple.BLUE);
+        listener=l;sending=true;retry.setVisibility(View.GONE);input.setText("");input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(8000)});sendState();status.setText("");presence.setText("对方正在输入…");presence.setTextColor(Apple.BLUE);
         return true;
     }
     void stopSpeaking(){speech.cancel();PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();}

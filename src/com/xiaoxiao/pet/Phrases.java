@@ -28,13 +28,13 @@ final class Phrases {
         for(int i=0;i<a.length()&&out.size()<PER_DAY;i++){JSONObject p=a.optJSONObject(i);if(p==null)continue;
             String phrase=clean(p.optString("phrase")),when=clean(p.optString("when"));
             if(!valid(phrase)||when.codePointCount(0,when.length())>MAX_WHEN||AgentPolicy.sensitive(when)||!seen.add(phrase))continue;
-            for(JSONObject t:turns)if(t.optString("user").contains(phrase))try{out.add(new JSONObject().put("phrase",phrase).put("when",when).put("evidence",new JSONObject().put("quote",phrase).put("turn",ChatArchive.id(t)).put("date",day)));break;}catch(Exception ignored){}
+            for(JSONObject t:turns)if(t.optString("user").contains(phrase)&&!AgentPolicy.sensitive(t.optString("user")))try{out.add(new JSONObject().put("phrase",phrase).put("when",when).put("evidence",new JSONObject().put("quote",phrase).put("turn",ChatArchive.id(t)).put("date",day)));break;}catch(Exception ignored){}
         }
         return out;
     }
     static boolean valid(String phrase){
         int n=phrase.codePointCount(0,phrase.length());
-        return n>=MIN_PHRASE&&n<=MAX_PHRASE&&!COMMON.contains(phrase)&&!AgentPolicy.sensitive(phrase)&&phrase.matches("(?s).*[\\p{L}].*");
+        return n>=MIN_PHRASE&&n<=MAX_PHRASE&&!COMMON.contains(phrase)&&!phrase.matches("[哈呵嘿嗯啊哦噢]{2,}")&&!AgentPolicy.sensitive(phrase)&&phrase.matches("(?s).*[\\p{L}].*");
     }
     private static String clean(String value){return value==null?"":value.replaceAll("[\\p{Cntrl}\\s]+"," ").trim();}
 

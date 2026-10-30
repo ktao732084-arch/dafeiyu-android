@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "b8169b6968715966c1e4c316ac9c1480aab20d4e7d507a74aaacbfdf852e0590"
+      "sha256": "e92786c8eec70912c645a0d946622bd85b4fafb333ba3fd3b1fa0756e60beb6a"
     },
     {
       "path": "LICENSE",
@@ -85,7 +85,7 @@
       "path": "SOURCE_MAP.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "f7177ac17671145bbb7a719db23f4202163b0070e1c0a67bed751cbe2294c381"
+      "sha256": "1f7e9ca16c84ce8af6a2cf0b19b97913a6e6713ccb660ece5b98b9e0431c39d1"
     },
     {
       "path": "THIRD-PARTY-LICENSE.txt",
@@ -1290,7 +1290,7 @@
       "path": "docs/CHARACTER.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "ecca1758dd58d5c5fa4e0762e9c394c9da02666c16bd0fa3e7b236dc982717e5"
+      "sha256": "64f3f7bac57b77fa093caeed1bf5e05fca2609a381301578279b4415a5eac5de"
     },
     {
       "path": "docs/CHARACTER_INTEGRATION.md",
@@ -1308,7 +1308,7 @@
       "path": "docs/CHAT_HISTORY.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "09b3eb49f891add90fff198b89aa7d2fc6ff6f86d2b3b5a48829610cdfed1563"
+      "sha256": "13931e19574c9a909714b476d85c3afab9d5061ac616cda053682fd8aa82031c"
     },
     {
       "path": "docs/CHAT_PRESENTATION_ACCEPTANCE.md",
@@ -1357,6 +1357,12 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "6752e9c91101716ee773bb68bbd178b6ed5d3b9504ff358976d0965b4a6d178d"
+    },
+    {
+      "path": "docs/PERSONA_UPDATE_ACCEPTANCE.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "4788884626058a516b57a940e48a63347fa6a4116c24f82fce49b24d79afe8fd"
     },
     {
       "path": "docs/PROACTIVE_COMPANION.md",
@@ -1615,6 +1621,12 @@
       "sha256": "fef24c197679915926182fab2e4ea1c0e7315236b45732f9985b65138ef74a50"
     },
     {
+      "path": "instrumentation/PersonaUpdateInstrumentation.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "8e7b14e05f1701e2922531807e8b1b9f89ab94aee561ef0de40eb2306a3fd330"
+    },
+    {
       "path": "instrumentation/QuestLineInstrumentation.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1654,7 +1666,7 @@
       "path": "instrumentation/build-isolated-tests.ps1",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "b43bc32c0274b1b906d298e6b9aa5071583cae0fe0cb3c8908c7bd0f6db3fb01"
+      "sha256": "794da3b9ebcda60c53377f0f53988513a352c08fc7ce5af1adf971985efbb1b6"
     },
     {
       "path": "instrumentation/build-tests.ps1",
@@ -2227,7 +2239,7 @@
       "path": "src/com/xiaoxiao/pet/ChatPage.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "024b45304e1a15a32dc7bd3163ccfb8dce3eb28b657d3cdfc0888a2c8b141583"
+      "sha256": "d0e3ad8b635f475224eb220f5d1bd568fc63616d59c4a57d033aba875c200cc4"
     },
     {
       "path": "src/com/xiaoxiao/pet/ClientPage.java",
@@ -2563,7 +2575,7 @@
       "path": "src/com/xiaoxiao/pet/Phrases.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "ac4b38daeefdf995275140802a95cbab44b9d44cb2c4631800c21efcc7f12c89"
+      "sha256": "02a78ac48915d5af86973a5d9e6c5adda374b24aa6b0147a3489f06ef363131a"
     },
     {
       "path": "src/com/xiaoxiao/pet/ProfilePage.java",
@@ -2725,7 +2737,7 @@
       "path": "tests/com/xiaoxiao/pet/CharacterTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "142cc39d9a0a632addc40c723fee2a0e139c217bc8c3cb3f524a7c57d36864ae"
+      "sha256": "982f94b34c356a88d18ae2df5d18531dae8ac72762a8491a7ffe681d85fb06a0"
     },
     {
       "path": "tests/com/xiaoxiao/pet/ChatPolishRulesTest.java",
@@ -2933,6 +2945,12 @@
       "sha256": "ce629c31ecba61a92f34e8b06a262f5c74b9eed5e27ab84976a42c1cdc75e06e"
     },
     {
+      "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/InterjectionEdgeTest.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "fdde7bb2401744744d4a98c978952d633c4e6fa393efca9ad7cd56a58ded3f70"
+    },
+    {
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/MemoryIntegrationTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -2973,6 +2991,12 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "8410082bee5f7f094c83b9bae5633110b3723e7948ad68f1712d7b35b44449af"
+    },
+    {
+      "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/PhraseUiTest.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "7dc297df6fab490e21c32ded44047a6475e58444e4160b12673ba681e8b6509d"
     },
     {
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/TestKeyStore.java",
@@ -3024,7 +3048,7 @@
       "path": "tests/run-core-device.ps1",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "171ba6fa6ee1026676a0279c447b67461b23a539f8259e793bd5ee4f678a0b44"
+      "sha256": "f57df47d73d3c15db722a6634fcdd16d0ae2a1a15c3897a176460bb3c198770d"
     },
     {
       "path": "tests/run-core.ps1",
