@@ -1320,7 +1320,13 @@
       "path": "docs/COMMITMENTS.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "f44c75eca683102e165551634256d0944223490c8aec6be9bb62e13a8b7586b6"
+      "sha256": "7e356e353f277e185651d9d7fe1dc2232d664643ac554a08f08ddd0d573aff0a"
+    },
+    {
+      "path": "docs/COMMITMENTS_EXPANDED_EVAL.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "c9063c6cab6271e9e286a5f42d4e288096e7c261c9012683df57eb5de3e68200"
     },
     {
       "path": "docs/GOMOKU.md",
@@ -1543,6 +1549,18 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "eb5975287e655906eb821d1e7e712253a7b0cf5a4cba45146955e25caa801547"
+    },
+    {
+      "path": "docs/test-reports/commitments-expanded-review.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "9724f028e093b7b6c98cad2ad37eced12d84c4aa618050e7e8e6dfab6364f826"
+    },
+    {
+      "path": "docs/test-reports/commitments-expanded.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "b56cd96a806eea7ba654ff5f260d3bf319b08133b77fa8c69c4409bf05be6a5a"
     },
     {
       "path": "docs/test-reports/commitments.json",
@@ -2806,6 +2824,12 @@
       "sha256": "3166bb77f9f68fe6be413e66a98ac28a6dfe070dd8c771a7a7c33161de207324"
     },
     {
+      "path": "tests/com/xiaoxiao/pet/CommitmentsExpandedEval.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "993bd0e843615947c1510fa1fb187686dbff7086b7c554455d49152624825701"
+    },
+    {
       "path": "tests/com/xiaoxiao/pet/CommitmentsLiveEval.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -3173,6 +3197,12 @@
       "sha256": "bcadc1bd8fa4795f2b651e5005e7ff2c1c51903f5a6a908c000f4bb90fd36046"
     },
     {
+      "path": "tests/scenarios/commitments-expanded.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "a6209edba846c41e3a7de0b9b25f2bc666b566220130364dd25ab276b084d116"
+    },
+    {
       "path": "tests/test_release_sync.py",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -3213,6 +3243,12 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "650d974f770155b2011e5bfc26c7f9129fdd51382b8c16de7c03cd1788fcab4e"
+    },
+    {
+      "path": "tools/summarize-commitment-eval.py",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "ef5fc34ddbc28ed2eddded2f7612ccd5c8cddfa8690b4a9a31c67f241e33376f"
     },
     {
       "path": "tools/sync-memory-service.py",
