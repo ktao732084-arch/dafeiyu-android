@@ -112,7 +112,7 @@ public class PetService extends Service {
    clearBubble();speechTurn=turnId;speechInteraction=interaction;
    if(speech==null)speech=new SpeechQueue(new SpeechQueue.Clock(){public void later(Runnable task,long delay){handler.postDelayed(task,delay);}public void remove(Runnable task){handler.removeCallbacks(task);}},new SpeechQueue.Sink(){
     public boolean visible(){return Pet.this.visible&&!docked&&frame!=null&&animating();}
-    public void show(String text,int shown,boolean preview){boolean last=!speechInteraction&&!preview&&speech!=null&&speech.parts!=null&&shown>=speech.parts.size();showBubble(text,false);if(last){murmur();bubble.append("\n\n点此查看聊天记录");}if(speechInteraction)bubble.setOnClickListener(v->clearBubble());try{AgentRuntime.store().shown(speechTurn,shown);if(!speechInteraction)Chat.historyChanged(Pet.this.id);}catch(Exception e){Data.log(role,"气泡展示状态暂未保存");}}
+    public void show(String text,int shown,boolean preview){boolean last=!speechInteraction&&!preview&&speech!=null&&speech.parts!=null&&shown>=speech.parts.size();showBubble(text,false);if(last){murmur();bubble.append("\n\n点此查看聊天记录");}if(speechInteraction)bubble.setOnClickListener(v->clearBubble());try{AgentRuntime.store().shown(speechTurn,shown,AgentRuntime.rememberEnabled());if(!speechInteraction)Chat.historyChanged(Pet.this.id);}catch(Exception e){Data.log(role,"气泡展示状态暂未保存");}}
     public void stop(int shown){clearBubbleVisual();}
    });speech.start(text);
   }

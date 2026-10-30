@@ -119,19 +119,26 @@ final class AgentRuntime {
     static boolean diaryEnabled(){return Data.prefs().getBoolean("agent.diary",true);}
     /** Her murmur under the reply (小声嘀咕); on by default, off removes it from the prompt and the screen. */
     static boolean asideEnabled(){return Data.prefs().getBoolean("agent.aside",true);}
-    /** After a chat reply: if a recent day has enough turns and no entry, write one (one model call, one attempt per day). */
+    static Model diaryModel=(messages,token,progress)->AgentTransport.request(ModelSettings.read(),messages,token,progress,false,Diary.MAX_TOKENS);
+    /** On app entry or after chat: one idle request per local day, also for days with a finished game only. */
     static void writeDiaryIfDue(){
-        if(!diaryEnabled()||!rememberEnabled()||!configured()||!writingDiary.compareAndSet(false,true))return;
+        if(!diaryEnabled()||!rememberEnabled()||!configured()||!PersonaManager.isInitialized("main")||busy()||!writingDiary.compareAndSet(false,true))return;
         diaryWorker.execute(()->{try{
-            AgentStore db=store();java.time.ZoneId zone=java.time.ZoneId.systemDefault();java.time.LocalDate day=Diary.due(db.snapshot(),java.time.LocalDate.now(zone),zone);
-            if(day==null||day.toString().equals(Data.prefs().getString("diary.attempted","")))return;
-            Data.prefs().edit().putString("diary.attempted",day.toString()).apply();
-            long epoch=db.epoch();List<JSONObject> turns=db.dayTurns(day,zone);if(turns.isEmpty())return;JSONObject before=db.snapshot();
-            // The same call is her slow loop: besides the diary it may add, confirm or retire her understanding of the user.
-            JSONObject games=null;try{games=GomokuPage.store().context();}catch(Exception unavailable){}
-            String raw=AgentTransport.request(ModelSettings.read(),Diary.request(day,turns,Data.name("main"),Understanding.offered(before),PersonaManager.diaryGuidance("main"),CharacterNow.experiences(before,games,day,zone),Diary.feeling(before,day)),new AgentTransport.Token(),partial->{},false,Diary.MAX_TOKENS);
-            String text=Diary.parse(raw);Understanding.Update update=Understanding.parse(raw,turns,before,day.toString());List<JSONObject> phrases=Phrases.parse(raw,turns,day.toString());
-            if(text!=null&&db.addDiary(epoch,Diary.entry(day,text,turns,System.currentTimeMillis(),Diary.feeling(raw)),update,phrases))Data.log("main","陪伴日记已写好："+day+(update.empty()?"":"，相处理解已更新"));
+            if(busy())return;AgentStore db=store();java.time.ZoneId zone=java.time.ZoneId.systemDefault();java.time.LocalDate today=java.time.LocalDate.now(zone);
+            if(today.toString().equals(Data.prefs().getString("diary.attemptedOn","")))return;
+            long epoch=db.epoch();JSONObject before=db.snapshot();java.time.LocalDate day=null;SharedExperience.Material material=null;
+            for(int back=1;back<=Diary.LOOKBACK_DAYS;back++){java.time.LocalDate candidate=today.minusDays(back);if(Diary.has(before,candidate)||Diary.suppressed(before,candidate))continue;
+                JSONArray results=new JSONArray();try{results=db.dayGames(candidate,zone);}catch(Exception unreadable){/* available chat evidence still works */}
+                SharedExperience.Material offered=SharedExperience.collect(candidate,zone,db.dayTurns(candidate,zone),before,results);
+                if(offered.eligible()){day=candidate;material=offered;break;}}
+            if(day==null||busy()||db.epoch()!=epoch||!diaryEnabled()||!rememberEnabled())return;
+            JSONArray request=SharedExperience.request(day,material,Data.name("main"),Understanding.offered(before),PersonaManager.diaryGuidance("main"));
+            if(!Data.prefs().edit().putString("diary.attempted",day.toString()).putString("diary.attemptedOn",today.toString()).commit())return;
+            String raw=diaryModel.generate(request,new AgentTransport.Token(),partial->{});
+            if(!diaryEnabled()||!rememberEnabled()||memory!=db)return;
+            JSONObject entry=SharedExperience.entry(raw,day,material,System.currentTimeMillis());Understanding.Update update=Understanding.parse(raw,material.turns,before,day.toString());List<JSONObject> phrases=Phrases.parse(raw,material.turns,day.toString());
+            if(entry!=null&&db.addDiary(epoch,entry,update,phrases))Data.log("main","共同经历已写好："+day+(update.empty()?"":"，相处理解已更新"));
+            if(db.addDreamCommitments(epoch,Commitments.dream(raw,material.turns)))Data.log("main","双方约定已补记："+day);
         }catch(Exception e){Data.log("main","陪伴日记暂未写成");}finally{writingDiary.set(false);}});
     }
     static boolean send(String user,boolean proactive,Listener listener) {
@@ -205,7 +212,7 @@ final class AgentRuntime {
                 final AgentReply output=result;final long completedEpoch=epoch;final String explicitWas=explicit;
                 final java.util.concurrent.atomic.AtomicBoolean delivered=new java.util.concurrent.atomic.AtomicBoolean();
                 Runnable completion=()->{if(!delivered.compareAndSet(false,true))return;release(token);if(db.epoch()!=completedEpoch){listener.error("记录已修改，本次已完成的回复不再显示");return;}listener.saved(turnId);listener.done(output.reply,output.emotion);if(explicitWas==null&&history==null)writeDiaryIfDue();};
-                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true,null,history==null&&explicit==null?result.plan:null,result.moodLevel,rememberEnabled()?result.moodCause:"",result.moodChanged,null,asideEnabled()?result.aside:""))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");result.emotion=db.mood(System.currentTimeMillis()).optString("emotion","calm");if(history==null)Nickname.committed(user);token.completed=completion;}
+                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true,null,history==null&&explicit==null?result.plan:null,result.moodLevel,rememberEnabled()?result.moodCause:"",result.moodChanged,null,history==null,asideEnabled()?result.aside:""))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");result.emotion=db.mood(System.currentTimeMillis()).optString("emotion","calm");if(history==null)Nickname.committed(user);token.completed=completion;}
                 main.post(completion);
                 // Growth counts only a committed turn of yours; proactive turns and history questions earn nothing.
                 if(history==null)grow();

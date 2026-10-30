@@ -24,6 +24,7 @@ public final class DeviceCoreChecks {
         run("rule capture",()->MemoryCaptureTest.main(new String[]{root+"/memory-capture",root+"/memory-service"}));
         run("rewrite fidelity",()->RewriteGuardTest.main(new String[0]));
         run("diary",()->DiaryTest.main(new String[]{root+"/diary"}));
+        run("bilateral commitments",()->CommitmentsTest.main(new String[]{root+"/commitments"}));
         run("Unicode regex",NativeRegexTest::run);
         run("nickname and reply polish",()->ChatPolishRulesTest.main(new String[0]));
         run("model initiative",()->InitiativeTest.main(new String[0]));

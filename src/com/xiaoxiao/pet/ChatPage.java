@@ -49,7 +49,7 @@ final class ChatPage {
         input.addTextChangedListener(new Watcher(this::sendState));sendState();
         speech=new SpeechQueue(new SpeechQueue.Clock(){public void later(Runnable r,long delay){handler.postDelayed(r,delay);}public void remove(Runnable r){handler.removeCallbacks(r);}},new SpeechQueue.Sink(){
             public boolean visible(){return dialog.isShowing()&&(!(c instanceof Activity)||!((Activity)c).isFinishing());}
-            public void show(String text,int shown,boolean preview){try{AgentRuntime.store().shown(turnId,shown);loadLatest();status.setText(preview?"她写了一段长长的回复，点气泡下方就能看全文":"");}catch(Exception e){status.setText("展示状态没保存上，可以在聊天记录里查看。");}}
+            public void show(String text,int shown,boolean preview){try{AgentRuntime.store().shown(turnId,shown,AgentRuntime.rememberEnabled());loadLatest();status.setText(preview?"她写了一段长长的回复，点气泡下方就能看全文":"");}catch(Exception e){status.setText("展示状态没保存上，可以在聊天记录里查看。");}}
             public void stop(int shown){}
         });interrupt=()->speech.cancel();refresh=()->{if(dialog.isShowing()&&!sending&&!paged&&from==Long.MIN_VALUE)loadLatest();};
         dialog.setOnDismissListener(d->{if(Chat.historyViews.get(id)==refresh)Chat.historyViews.remove(id);speech.cancel();handler.removeCallbacksAndMessages(null);if(sending){sending=false;AgentRuntime.cancel();}PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();if(Chat.petChats.get(id)==dialog)Chat.petChats.remove(id);if(Chat.presentations.get(id)==interrupt)Chat.presentations.remove(id);if(c instanceof MainActivity&&!((MainActivity)c).isFinishing()&&!((MainActivity)c).isDestroyed())((MainActivity)c).render();});
@@ -261,7 +261,7 @@ final class ChatPage {
         stopSpeaking();
         TextView full=Apple.label(c,AgentPolicy.replyText(turn.optString("reply")),16,false);full.setLineSpacing(dp(4),1);full.setPadding(dp(20),dp(12),dp(20),dp(12));full.setTextIsSelectable(true);ScrollView view=new SpringScrollView(c);view.addView(full);
         AlertDialog details=new Apple.Builder(c).setTitle("她的完整回复").setView(view).setPositiveButton("看完了",null).create();if(overlay)details.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);details.show();
-        try{AgentRuntime.store().shown(turn.getString("id"),ReplySegments.count(turn));turn.put("displayed",ReplySegments.count(turn));render();}catch(Exception e){status.setText("展示状态暂时没保存上");}
+        try{AgentRuntime.store().shown(turn.getString("id"),ReplySegments.count(turn),AgentRuntime.rememberEnabled());turn.put("displayed",ReplySegments.count(turn));render();}catch(Exception e){status.setText("展示状态暂时没保存上");}
     }
     /**
      * While she answers, the box stays open: an empty box stops her, a typed one adds a message. Added messages join the
