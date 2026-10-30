@@ -27,7 +27,8 @@ public final class CommitmentsExpandedEval {
   Collections.shuffle(replies,new Random(20261030));doubleJudge.addAll(replies.subList(0,Math.min(20,replies.size())));
   JSONObject manifest=new JSONObject().put("spec_sha256",hash(Files.readAllBytes(Paths.get(args[1])))).put("personas_sha256",hash(Files.readAllBytes(Paths.get(args[0]))))
    .put("product_dex_sha256",hash(Files.readAllBytes(Paths.get("build/dex/classes.dex"))))
-   .put("frozen_product_commit",spec.getString("frozen_product")).put("anchor",spec.getString("anchor")).put("scenarios",cases.length()).put("styles",styles.size()).put("repeats",repeats)
+   .put("frozen_product_commit",System.getenv("DAFEIYU_EVAL_PRODUCT_COMMIT")==null?spec.getString("frozen_product"):System.getenv("DAFEIYU_EVAL_PRODUCT_COMMIT"))
+   .put("baseline_product_commit",spec.getString("frozen_product")).put("anchor",spec.getString("anchor")).put("scenarios",cases.length()).put("styles",styles.size()).put("repeats",repeats)
    .put("planned_product_calls",total).put("planned_judge_calls",replies.size()+doubleJudge.size()).put("model",ModelPresets.DEEPSEEK_MODEL)
    .put("chat_temperature",1.3).put("diary_temperature","provider default").put("judge_temperature",0).put("auto_retry",false)
    .put("limits","Synthetic fixtures, host JVM product classes; no real-user history or Android scheduler. Style repeats are correlated, not independent scenarios. Judge is the same provider/model and is not an independent human rating.");

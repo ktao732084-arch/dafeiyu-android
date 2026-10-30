@@ -2329,7 +2329,7 @@
       "path": "src/com/xiaoxiao/pet/Commitments.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "499e6b20047f125a38ccfbcd7f944788496da18f5d750e8ecf3423050fe9d88d"
+      "sha256": "aca3d9a5a6a77b8317605876e600ecf229063ac90b6beb945d68da5e40a3ac7b"
     },
     {
       "path": "src/com/xiaoxiao/pet/CompactPanel.java",
@@ -2369,7 +2369,7 @@
       "path": "src/com/xiaoxiao/pet/Diary.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "73132138473427e33c11a89d76799f759581b254aa3565377b49322c55ce0713"
+      "sha256": "b70cfdcc20de7f7e9d4f30a7b584306493a28f0914b4cf7db3575755a7af0dd7"
     },
     {
       "path": "src/com/xiaoxiao/pet/EpisodeIndex.java",
@@ -2666,7 +2666,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "8aec9ddfe6249b8386b87f2c775a3db69160ea4968ef9e8255a952b679870026"
+      "sha256": "9b289c5c20adcf1d6656249f0b181a07d940add009a30c8e7e8dd069ddae9d1d"
     },
     {
       "path": "src/com/xiaoxiao/pet/ReplySegments.java",
@@ -2678,7 +2678,7 @@
       "path": "src/com/xiaoxiao/pet/SharedExperience.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "860ffe03f4bee6368d2ad290e525641ee0df22aa62bd1896658059147f2c356d"
+      "sha256": "767dbb6df62035e83cc9c5df8fa835b24b3292a8d0f93c89e71e459d1fc5e027"
     },
     {
       "path": "src/com/xiaoxiao/pet/SizePanel.java",
@@ -2827,7 +2827,7 @@
       "path": "tests/com/xiaoxiao/pet/CommitmentsExpandedEval.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "993bd0e843615947c1510fa1fb187686dbff7086b7c554455d49152624825701"
+      "sha256": "be060f86790b86c84accc791aab4cc1b6b32ed2844e6aa030bc8746da27931a7"
     },
     {
       "path": "tests/com/xiaoxiao/pet/CommitmentsLiveEval.java",
@@ -2839,7 +2839,7 @@
       "path": "tests/com/xiaoxiao/pet/CommitmentsTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "04421fc6c581849b77022abd6c064aae67dea4af54d9afd24647aae50046e8f3"
+      "sha256": "a2ee13b661f2533e8ac92976f3305842b3ce306e747454a7fda851dc62b9a00d"
     },
     {
       "path": "tests/com/xiaoxiao/pet/DeviceCoreChecks.java",

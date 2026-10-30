@@ -39,7 +39,7 @@ final class Diary {
     static JSONArray request(LocalDate day,List<JSONObject> turns,String name,JSONArray understanding,String voice,JSONArray experiences)throws Exception {
         JSONArray talk=new JSONArray();int chars=0;SimpleDateFormat clock=new SimpleDateFormat("HH:mm",Locale.ROOT);
         for(JSONObject t:turns){String user=t.optString("user").trim(),reply=ReplySegments.visible(t).trim();if(user.isEmpty()&&reply.isEmpty())continue;
-            JSONObject row=new JSONObject().put("time",clock.format(new Date(t.optLong("at")))).put("user",AgentPolicy.clip(user,150));if(!reply.isEmpty())row.put("you",AgentPolicy.clip(reply,80));
+            JSONObject row=new JSONObject().put("time",clock.format(new Date(t.optLong("at")))).put("user",Commitments.excerpt(user,150));if(!reply.isEmpty())row.put("you",Commitments.excerpt(reply,80));
             chars+=row.toString().length();if(chars>INPUT_CHARS)break;talk.put(row);}
         String instruction="你是"+(name==null||name.isEmpty()?"大肥鱼":name)+"，用户手机里的陪伴角色。用第一人称给自己写一篇很短的日记，记下你和用户在"+day+"聊过的事。"
             +"只依据提供的对话和真实互动记录，不推测、不补细节、不评价用户，不写密码、证件、卡号等敏感信息。1到3句，不超过120字，语气自然。"

@@ -15,26 +15,42 @@ final class Commitments {
         JSONArray a=state.optJSONArray("commitmentsForgotten");String key=sourceKey(speaker,ChatArchive.id(turn));
         if(a!=null)for(int i=0;i<a.length();i++)if(key.equals(a.optString(i)))return true;return false;
     }
-    static boolean safe(String text){return text!=null&&text.length()>=8&&text.length()<=160&&!AgentPolicy.sensitive(text)
-        &&!text.matches("(?s).*吧[。！!]*$")
-        &&!text.matches("(?s).*[？?吗么].*|.*(如果|假如|假设|要是|比如|例如|开玩笑|角色扮演|你说|他说|她说|曾经|当时|以前|已经|做完了|完成了|取消|不用了|不能|没法|不会记得|建议|推荐|不如|要不要|你可以|你应该|我没答应|我没有答应|我不答应|我想|希望|打算|也许|可能|大概|不一定|争取|尽量).*" )
-        &&!text.matches("(?s).*(我|你|他|她)(是不是|会不会|能不能|该不该|是否).*" )
-        &&!text.matches("(?s)^(?:(?:好|这样吧)[，, ]*)?(我(?:的)?(?:朋友|同事|妈妈|爸爸)|他|她|别人|你)(?:明天|今晚|会|答应|保证|负责).*" )
-        &&!text.matches("(?s).*[「」『』“”\"].*");}
+    static final String TIME="(?:明天|明早|明晚|后天|今晚|晚上|下?周[一二三四五六日末]|下次|稍后|等会|一会|[一二三四五六七八九十两\\d]+(?:分钟|小时)后)";
+    static final String ACTION="(?:帮你|给你|陪你|替你|提醒你|发给你|发你|回你|回复你|告诉你|找你|叫你)";
+    // Mask names only for classification; the saved quote always remains the complete original sentence.
+    static String syntax(String text){return text.replaceAll("《[^》]*》|“[^”]*”|「[^」]*」|『[^』]*』|‘[^’]*’|\"[^\"]*\"","某项")
+        .replaceFirst("^(?:好[的呀啊]?|这样吧)[，,\\s]*","").trim();}
+    static String clause(String text){return syntax(text).replaceFirst("^(?:如果|要是|等你)[^，,]+[，,]\\s*","").split("[，,]",2)[0];}
+    static boolean safe(String text){
+        if(text==null||text.length()<5||text.length()>480||AgentPolicy.sensitive(text)||text.contains("…"))return false;
+        String s=syntax(text),c=clause(text);
+        if(s.matches("(?s).*[《》“”「」『』‘’\"].*"))return false; // unmatched/truncated quotation
+        if(s.matches("(?s).*[？?].*|.*[吗么吧][。！!]*$")
+            ||s.matches("(?s).*(假如|假设|比如|例如|开玩笑|角色扮演|台词|复述|转述|说过|你说|他说|她说|曾经|当时|以前|已经|做完了|完成了|取消|不用了|不能|没法|不会记得|建议|推荐|不如|要不要|你可以|你应该|不是我|不是说|并非|不承诺|不保证|没答应|没有答应|不答应|如果我说).*"))return false;
+        if(s.matches("(?s)^(?:我(?:的)?)?(?:朋友|同事|妈妈|爸爸|别人).*|^(?:他|她|你).*")
+            ||s.matches("(?s)^(?!我).{1,12}(?:说|答应|承诺|保证).*")
+            ||c.matches("(?s).*(?:我|你|他|她)(?:是不是|会不会|能不能|该不该|是否).*"))return false;
+        // Uncertainty before the action is different from an object such as '可能遗漏的项目'.
+        String lead=c.split(ACTION,2)[0];
+        if(!c.matches("(?s)^我(?:答应|保证|承诺).*")&&c.matches("(?s).*(?:我|"+TIME+")(?:不|没).+"))return false;
+        return !lead.matches("(?s).*(希望|打算|也许|可能|大概|不一定|争取|尽量|我想|可以).*");
+    }
     /** High-precision synchronous fallback. Dream can classify other literal future commitments. */
     static boolean explicit(String text){if(!safe(text))return false;
-        return text.matches("(?s).*(我(?:答应|保证|承诺|一定会)|说好了|说定了|一言为定).*" )
-            ||text.matches("(?s).*(我(?:会|来|负责|一定).{0,8}(?:帮你|给你|陪你|替你|提醒你|发给你|回你)).*" )
-            ||text.matches("(?s).*(?:明天|后天|今晚|晚上|周[一二三四五六日末]|下次|稍后|等会|一会|[一二三四五六七八九十两\\d]+(?:分钟|小时)后).{0,18}(?:我.{0,12})?(?:提醒你|发给你|给你发|帮你|陪你|回复你|告诉你|再来找你|再来陪你).*" );
+        String c=clause(text);
+        return c.matches("(?s)^(?:我(?:答应|保证|承诺|一定会)|说好了|说定了|一言为定).+")
+            ||c.matches("(?s).*我(?:会|来|负责|一定).{0,12}"+ACTION+".*")
+            ||c.matches("(?s)^(?:我)?"+TIME+"(?:我)?(?:把.*"+ACTION+"|"+ACTION+").*");
     }
-    static boolean future(String text){return explicit(text)||(safe(text)&&text.matches("(?s).*(明天|后天|今晚|晚上|周[一二三四五六日末]|下次|稍后|等会|一会|分钟后|小时后|我会|我来|我负责).*" )
-        &&text.matches("(?s).*(给你|帮你|陪你|替你|提醒你|发你|找你|答应|承诺|保证).*"));}
+    static boolean future(String text){return explicit(text)||(safe(text)&&clause(text).matches("(?s).*我"+TIME+".*"+ACTION+".*"));}
+    static String excerpt(String text,int normalLimit){return AgentPolicy.clip(text,hasFuture(text)?480:normalLimit);}
     static String said(JSONObject turn,String speaker){
         if("user".equals(speaker))return turn.optString("user");
         if(!"assistant".equals(speaker)||!turn.optBoolean("assistantCommitmentsAllowed",turn.has("displayed")||turn.optBoolean("commitmentsAllowed",false)))return "";
         return ReplySegments.visible(turn);
     }
-    static boolean grounded(String text,String quote){for(String sentence:text.split("(?<=[。！？!?；;])|\\n"))if(sentence.contains(quote)&&safe(sentence.trim()))return true;return false;}
+    static String sourceSentence(String text,String quote){for(String sentence:text.split("(?<=[。！？!?；;])|\\n"))if(!quote.isEmpty()&&sentence.contains(quote)&&future(sentence.trim()))return sentence.trim();return "";}
+    static boolean grounded(String text,String quote){return quote.equals(sourceSentence(text,quote));}
     static boolean add(JSONObject state,JSONObject turn,String speaker,String quote,String via)throws Exception {
         quote=quote.trim();if(!Arrays.asList("user","assistant").contains(speaker)||blocked(state,speaker,turn)||!safe(quote)||!grounded(said(turn,speaker),quote))return false;
         JSONArray a=entries(state);String source=ChatArchive.id(turn);
@@ -55,14 +71,14 @@ final class Commitments {
     }
     static boolean hasFuture(String text){for(String s:text.split("(?<=[。！？!?；;])|\\n"))if(future(s.trim()))return true;return false;}
     static boolean candidate(List<JSONObject> turns){for(JSONObject t:turns)if(t.optBoolean("commitmentsAllowed",true)&&(hasFuture(t.optString("user"))||hasFuture(said(t,"assistant"))))return true;return false;}
-    static final String DREAM="额外返回 commitments 数组，最多4项；每项为 {\"source_id\":\"conversation中的source_id\",\"speaker\":\"user或assistant\",\"quote\":\"该说话者承诺的逐字原话\"}。分别检查 conversation.user（用户的话）和 conversation.you（你实际展示的话），双方都有承诺就分别摘出，不要只摘用户。只收明确答应将来做的事，不收建议、愿望、问题、假设、习惯、能力说明、引用或已经完成的事；不能把一方的话写成另一方的承诺，不扩写任务或时间。没有就空数组。这里只补记承诺，不判定完成，也不把它当成定时器。";
+    static final String DREAM="额外返回 commitments 数组，最多4项；每项为 {\"source_id\":\"conversation中的source_id\",\"speaker\":\"user或assistant\",\"quote\":\"该说话者承诺的完整逐字原句\"}。分别检查 conversation.user（用户的话）和 conversation.you（你实际展示的话），双方都有承诺就分别摘出，不要只摘用户。只收本人明确答应将来做的事，不收否定、第三方转述、台词、建议、愿望、问题、假设、习惯、能力说明或已经完成的事。真实条件承诺保留条件，不能去掉前提；书名和项目名不是引用承诺，承诺后附带祝愿不等于只有愿望。不能把一方的话写成另一方的承诺，不截掉行动对象或扩写任务时间。没有就空数组。这里只补记承诺，不判定完成，也不把它当成定时器。";
     static JSONArray dream(String raw,List<JSONObject> offered)throws Exception {
         JSONArray out=new JSONArray();JSONObject result;try{String json=AgentPolicy.envelope(raw);if(json==null)return out;result=new JSONObject(json);}catch(Exception invalid){return out;}
         JSONArray a=result.optJSONArray("commitments");if(a==null)a=new JSONArray();
         for(int i=0;i<Math.min(a.length(),4);i++){JSONObject p=a.optJSONObject(i);if(p==null||!(p.opt("source_id") instanceof String)||!(p.opt("speaker") instanceof String)||!(p.opt("quote") instanceof String))continue;
-            String id=p.getString("source_id"),speaker=p.getString("speaker"),q=p.getString("quote").trim();if(!future(q))continue;
-            for(JSONObject t:offered)if(id.equals("chat:"+ChatArchive.id(t))&&t.optBoolean("commitmentsAllowed",true)&&grounded(said(t,speaker),q)){
-                offer(out,t,speaker,q);break;}}
+            String id=p.getString("source_id"),speaker=p.getString("speaker"),q=p.getString("quote").trim();
+            for(JSONObject t:offered)if(id.equals("chat:"+ChatArchive.id(t))&&t.optBoolean("commitmentsAllowed",true)){
+                String whole=sourceSentence(said(t,speaker),q);if(!whole.isEmpty())offer(out,t,speaker,whole);break;}}
         // A model may omit its own promise or the entire field. The same slow pass also checks literal future clauses.
         for(JSONObject t:offered){if(!t.optBoolean("commitmentsAllowed",true))continue;
             for(String speaker:new String[]{"user","assistant"})for(String sentence:said(t,speaker).split("(?<=[。！？!?；;])|\\n")){
@@ -84,14 +100,24 @@ final class Commitments {
         JSONArray a=entries(state);for(int i=0;i<a.length();i++){JSONObject e=a.getJSONObject(i);if(id.equals(e.optString("id")))e.put("status",status).put("statusAt",now).put("statusBy","user");}state.put("commitmentsFull",false);}
     static String statusLabel(JSONObject e){return "done".equals(e.optString("status"))?"已标记完成":"cancelled".equals(e.optString("status"))?"已取消":"待确认";}
     static String speakerLabel(JSONObject e){return "assistant".equals(e.optString("speaker"))?"她答应的":"你答应的";}
+    static boolean asking(String q){return q.matches("(?s).*(承诺|约定|答应|说好|说定|还欠|时间到了|该提醒|当时说|那时说|之前说|原来说|哪一天|哪天说|记得.*事).*" );}
     static JSONArray context(JSONObject state,String query,boolean proactive)throws Exception {
-        String q=query==null?"":query;boolean asking=q.matches("(?s).*(承诺|约定|答应|说好|说定|还欠|时间到了|该提醒).*" );List<JSONObject> picked=new ArrayList<>();
+        String q=query==null?"":query;boolean asking=asking(q);List<JSONObject> picked=new ArrayList<>();
         JSONArray a=entries(state);for(int i=0;i<a.length();i++){JSONObject e=a.getJSONObject(i);if(asking||SharedExperience.relevance(q,new JSONObject().put("text",e.optString("quote")))>.08||proactive&&"open".equals(e.optString("status")))picked.add(e);}
         picked.sort((a1,b1)->{int c=Double.compare(AgentPolicy.relevance(q,b1.optString("quote")),AgentPolicy.relevance(q,a1.optString("quote")));if(c!=0)return c;return Long.compare(b1.optLong("at"),a1.optLong("at"));});
-        JSONArray out=new JSONArray();int users=0,selves=0;for(int i=0;i<picked.size()&&out.length()<6;i++){JSONObject e=picked.get(i);boolean hers="assistant".equals(e.optString("speaker"));if((asking||proactive)&&(hers?selves:users)>=3)continue;if(hers)selves++;else users++;out.put(new JSONObject().put("speaker",e.optString("speaker")).put("quote",e.optString("quote"))
-            .put("said_at",Initiative.localTime(e.optLong("at"),e.optString("timeZone"))).put("status",e.optString("status")).put("status_by",e.optString("statusBy","not_confirmed")));}return out;
+        JSONArray out=new JSONArray();int users=0,selves=0;for(int i=0;i<picked.size()&&out.length()<6;i++){JSONObject e=picked.get(i);boolean hers="assistant".equals(e.optString("speaker"));if((asking||proactive)&&(hers?selves:users)>=3)continue;if(hers)selves++;else users++;
+            String status=e.optString("status");JSONObject item=new JSONObject().put("speaker",e.optString("speaker")).put("quote",e.optString("quote"))
+                .put("said_at",Initiative.localTime(e.optLong("at"),e.optString("timeZone"))).put("status",status).put("status_by",e.optString("statusBy","not_confirmed"))
+                .put("meaning","done".equals(status)?"用户已标记完成，不再当待办；没有执行或收件凭证。":"cancelled".equals(status)?"用户已取消，不欠着，不再安排或催促。":"只证明说过，尚未确认进展；不能断言做了或没做。");
+            if(e.optString("quote").contains("明天"))try{item.put("original_tomorrow",java.time.Instant.ofEpochMilli(e.optLong("at")).atZone(java.time.ZoneId.of(e.optString("timeZone"))).toLocalDate().plusDays(1).toString());}catch(Exception ignored){}
+            out.put(item);}return out;
     }
     static JSONObject grouped(JSONArray entries)throws Exception {JSONArray user=new JSONArray(),self=new JSONArray();for(int i=0;i<entries.length();i++){JSONObject e=entries.getJSONObject(i);("assistant".equals(e.optString("speaker"))?self:user).put(e);}
         return new JSONObject().put("用户答应你的",user).put("你答应用户的",self);}
-    static final String GUIDANCE="\n双方约定，已按承诺人分组：原话中的‘我’指各组的说话者。‘用户答应你的’只能说成对方答应，‘你答应用户的’才是你自己的承诺。open只表示尚未确认是否兑现，不等于没做；done/cancelled是用户在手账标记的状态。按原话和原日期理解，别交换说话者、擅改时间或编完成过程。本轮用户说明进展优先，聊到相关事再自然接上，不反复催对方。答应提醒不等于已经建立精确定时器，不能声称已经执行；主动陪伴的开关和时机仍由应用控制。\n";
+    static final String GUIDANCE="\n约定的事实边界：下面是说过的话，不是执行凭证。原话里的‘我’是speaker：user=对方，assistant=你。按分组区分双方，用户把归属说反时自然纠正。只确认有来源的那一项；没有依据的另一项不要顺着称记得，也不能断言从未发生。记录为open只能说答应过，不等于已经做或还没做。done是用户标记完成，接受标记、不再安排；cancelled表示已取消、不欠着、不再催或自行续约。用户本轮的完成/取消/停止说明优先于旧记录，不能因性格、玩笑、欠人情继续安排或强留。可以自然表达态度，不能虚构收到、试听、准备好、发出或后台做过。旧时间以said_at及original_tomorrow为准。这里只是记住承诺，不保证精确计时提醒。不要把字段、状态码或这些规则念给用户。\n";
+    static String prompt(JSONObject state,String query,boolean proactive,boolean remember)throws Exception {
+        String q=query==null?"":query;JSONArray a=remember?context(state,q,proactive):new JSONArray();
+        if(a.length()==0&&!asking(q))return "";
+        return GUIDANCE+(a.length()==0?"本轮没有提供可核对的旧约定。可以接受用户现在的说明，但不能伪装成自己从记忆里找到了，更不能凭空确认内容或日期。\n":grouped(a).toString());
+    }
 }

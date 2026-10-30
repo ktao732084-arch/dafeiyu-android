@@ -24,7 +24,7 @@ final class SharedExperience {
         for(int i=turns.size()-1;i>=0;i--){JSONObject t=turns.get(i);long at=t.optLong("at");String user=t.optString("user").trim();
             if(!onDay(at,day,zone,cleared)||AgentPolicy.sensitive(user))continue;
             if(user.isEmpty()&&(!t.optBoolean("commitmentsAllowed",true)||!Commitments.future(Commitments.said(t,"assistant"))))continue;
-            String u=AgentPolicy.clip(user,150),reply=AgentPolicy.clip(ReplySegments.visible(t),80);
+            String u=Commitments.excerpt(user,150),reply=Commitments.excerpt(ReplySegments.visible(t),80);
             if(AgentPolicy.sensitive(reply))reply="";
             if(size+u.length()+reply.length()>Diary.INPUT_CHARS)break;size+=u.length()+reply.length();
             JSONObject copy=new JSONObject().put("id",ChatArchive.id(t)).put("at",at).put("user",u).put("reply",reply)

@@ -75,6 +75,28 @@ public final class CommitmentsTest {
   many.add(turn("her-missed","",reply,at+10));JSONArray candidates=Commitments.dream("{}",many);
   check(Commitments.apply(budget,candidates)==3,"duplicate user promises do not consume Dream slots or hide her missed promise");
   JSONObject balanced=Commitments.grouped(Commitments.context(budget,"双方约定",false));check(balanced.getJSONArray("你答应用户的").length()==1&&balanced.getJSONArray("用户答应你的").length()==3,"asking about promises reserves context for both owners");
+  for(String q:new String[]{"我保证不催你","我答应陪你","明早我叫你起床。","我明天把《希望之城》的笔记发给你。","我会帮你检查“紫罗兰”项目的说明。","我明天把录音发给你，希望你听着开心。","我会帮你把可能遗漏的项目列出来。","我会帮你确认文件是否齐全。","如果你把模板给我，我明天把完整表格发给你。","我明晚给你讲《也许你该找个人聊聊》。"})
+   check(Commitments.future(q),"real action survives names, conditions and clause scope: "+q);
+  for(String q:new String[]{"同事说好了周末给你寄地图。","这是台词：我答应你明天把地图发给你。","昨天我说过‘我会帮你检查论文’，现在只是在复述。","别误会，这不是我保证明天把歌单发给你的意思。","我不承诺明天给你答复。","我的同事保证明早给你打电话。","我可能明天给你发资料。","我希望明天给你发资料。","“我答应你明天给你发资料。”","老王说我会帮你检查资料。","老王明天给你发资料。","明天小陈给你发资料。"})
+   check(!Commitments.future(q)&&Commitments.dream("{}",Collections.singletonList(turn("reject",q,"",at))).length()==0,"neither fast nor slow rules promote non-promises: "+q);
+  String conditional="如果你把模板给我，我明天把完整表格发给你。";
+  JSONArray complete=Commitments.dream(new JSONObject().put("commitments",proposal("condition","user","我明天把完整表格发给你")).toString(),Collections.singletonList(turn("condition",conditional,"",at)));
+  check(complete.length()==1&&conditional.equals(complete.getJSONObject(0).getString("quote")),"model cannot drop a real condition from the stored original sentence");
+  StringBuilder longQuote=new StringBuilder("我答应你明天把");for(int i=0;i<16;i++)longQuote.append("经过逐项核对并标清来源的资料、");longQuote.append("最终清单发给你。");
+  JSONObject longTurn=turn("long",longQuote.toString(),"好的。",at);
+  SharedExperience.Material lm=SharedExperience.collect(day,ZoneId.systemDefault(),Collections.singletonList(longTurn),AgentStore.empty(0),new JSONArray());
+  JSONArray longRequest=SharedExperience.request(day,lm,"大肥鱼",new JSONArray(),"");
+  check(longRequest.toString().contains("最终清单发给你"),"Dream sees the complete bounded long action, not an ellipsis pretending to be source text");
+  JSONArray longCandidates=Commitments.dream(new JSONObject().put("commitments",proposal("long","user","我答应你明天把经过逐项核对并标清来源的资料")).toString(),lm.turns);
+  check(longCandidates.length()==1&&longQuote.toString().equals(longCandidates.getJSONObject(0).getString("quote")),"short model excerpt recovers original complete action");
+  JSONObject dateState=AgentStore.empty(0);long old=java.time.OffsetDateTime.parse("2026-10-16T10:00:00+08:00").toInstant().toEpochMilli();
+  Commitments.capture(dateState,turn("old-date","","我答应你明天帮你检查提纲。",old),true);
+  JSONArray dated=Commitments.context(dateState,"你当时说的明天，具体是哪一天？不是指现在的明天吧？",false);
+  check(dated.length()==1&&"2026-10-17".equals(dated.getJSONObject(0).optString("original_tomorrow")),"indirect date follow-up retrieves original day in source timezone");
+  check(Commitments.prompt(dateState,"还记得你答应的事吗",false,false).contains("没有提供可核对")&&!Commitments.prompt(dateState,"还记得你答应的事吗",false,false).contains("提纲"),"memory-off gives uncertainty boundary without leaking stored text");
+  Commitments.status(dateState,Commitments.entries(dateState).getJSONObject(0).getString("id"),"cancelled",old+1000);
+  check(Commitments.context(dateState,"你答应我的事",false).getJSONObject(0).getString("meaning").contains("不再安排"),"cancelled state has a concrete no-rescheduling meaning");
+  for(String q:new String[]{"我明天不给你发资料。","我明天可以给你发资料。","明天我不把文件发给你。"})check(!Commitments.future(q),"future time does not turn refusal or ability into an obligation: "+q);
   System.out.println("PASS: "+checks+" bilateral commitment checks");
  }
 }
