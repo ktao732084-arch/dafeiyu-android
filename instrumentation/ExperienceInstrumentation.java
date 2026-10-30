@@ -51,7 +51,7 @@ public final class ExperienceInstrumentation extends Instrumentation {
    check(find("你答应的")!=null&&find("她答应的")!=null,"two owners rendered separately");click("她答应的");click("管理");click("标记完成");Chat.storage.submit(()->{}).get(10,TimeUnit.SECONDS);waitForIdleSync();
    check("done".equals(Commitments.entries(db.snapshot()).getJSONObject(1).optString("status")),"manual completion stored without executing a task");
    result.putString("stream","PASS: "+checks+" Android shared-experience checks\n");
-  }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e);result.putString("stack",android.util.Log.getStackTraceString(e));}
+  }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e);result.putString("stack",android.util.Log.getStackTraceString(e));sendStatus(code,result);}
   finally{AgentRuntime.diaryModel=original;try{main(()->{AgentRuntime.cancel();Data.prefs().edit().putBoolean("agent.diary",false).commit();if(activity!=null)activity.finish();});}catch(Throwable ignored){}}
   finish(code,result);
  }

@@ -1545,6 +1545,12 @@
       "sha256": "eb5975287e655906eb821d1e7e712253a7b0cf5a4cba45146955e25caa801547"
     },
     {
+      "path": "docs/test-reports/commitments.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "161b16e3f3b8e02f027fa801de3d32f42c56267841b864d3bfc0f857ca480e00"
+    },
+    {
       "path": "docs/test-reports/memory-replay-android.json",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1642,7 +1648,7 @@
       "path": "instrumentation/ExperienceInstrumentation.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "f0ff22814a1d3bf9764c3a1574275999c49dc5c4da4c1470dd82bbd2e89cf752"
+      "sha256": "c438d2191774fe456ded99a012da6e54770057e0b16069c257de39871e930f9f"
     },
     {
       "path": "instrumentation/ExperienceNotebookActivity.java",
