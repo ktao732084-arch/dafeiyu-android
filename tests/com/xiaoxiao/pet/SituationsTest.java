@@ -82,7 +82,9 @@ public final class SituationsTest {
   for(PersonaManager.Persona p:styles){String g=PersonaManager.guidance(p);
    check(g.contains(p.examples.get(0)[1])&&g.contains(p.examples.get(1)[1])&&g.contains(p.examples.get(8)[1]),p.id+" keeps its core examples");
    check(!g.contains(p.examples.get(3)[0])&&!g.contains(p.examples.get(12)[1])&&!g.contains("关于吃"),p.id+" no longer carries the other examples or the bible in the system message");
-   check(g.length()<1100,p.id+" guidance is short ("+g.length()+")");}
+   check(g.length()<1100,p.id+" guidance is short ("+g.length()+")");
+   // Who she is, not a correction of earlier rules (Alice: a trait carries further than a prohibition).
+   check(g.contains("就是你这个人")&&g.contains("你也有分寸")&&!g.contains("前面说少用"),p.id+" describes her as a person");}
  }
 
  static void prompts(List<PersonaManager.Persona> styles)throws Exception{

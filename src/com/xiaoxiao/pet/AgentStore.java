@@ -147,9 +147,11 @@ final class AgentStore {
         return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,initiative,moodLevel,moodCause,null,interaction);
     }
     synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause,Boolean moodChanged,JSONObject interaction)throws Exception {
-        return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,initiative,moodLevel,moodCause,moodChanged,interaction,true);
+        return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,initiative,moodLevel,moodCause,moodChanged,interaction,true,"");
     }
-    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause,Boolean moodChanged,JSONObject interaction,boolean captureCommitments)throws Exception {
+    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause,Boolean moodChanged,JSONObject interaction,boolean captureCommitments)throws Exception {return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,initiative,moodLevel,moodCause,moodChanged,interaction,captureCommitments,"");}
+    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause,Boolean moodChanged,JSONObject interaction,String aside)throws Exception {return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,initiative,moodLevel,moodCause,moodChanged,interaction,true,aside);}
+    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause,Boolean moodChanged,JSONObject interaction,boolean captureCommitments,String aside)throws Exception {
         if(epoch!=epoch())return false;
         JSONObject next=plan==null?snapshot():MemoryLedger.copy(plan.state);long now=observed>0?observed:System.currentTimeMillis();String tid=turnId==null?UUID.randomUUID().toString():turnId;
         MemoryLedger.migrate(next);if(plan!=null)next.put("memoryStatus",plan.status);
@@ -177,6 +179,7 @@ final class AgentStore {
         JSONObject turn=new JSONObject().put("id",tid).put("at",now).put("receivedAt",now).put("repliedAt",System.currentTimeMillis()).put("timeZone",zone.getId()).put("utcOffsetMinutes",zone.getRules().getOffset(java.time.Instant.ofEpochMilli(now)).getTotalSeconds()/60).put("user",user).put("reply",reply).put("proactive",proactive);
         turn.put("segmentVersion",ReplySegments.VERSION);
         if(interaction!=null)turn.put("interaction",new JSONObject(interaction.toString()));
+        if(aside!=null&&!aside.isEmpty())turn.put("aside",aside);
         if(awaitingDisplay)turn.put("displayed",0);turns.put(turn);final JSONObject added=turn;
         turn.put("commitmentsAllowed",remember&&captureCommitments);
         if(remember&&captureCommitments){Commitments.capture(next,turn,false);if(!awaitingDisplay)Commitments.capture(next,turn,true);}
@@ -261,6 +264,11 @@ final class AgentStore {
         if(!plan.valid())return HistoryRecall.build(plan,new HistoryRecall.Scan());
         try{return HistoryRecall.build(plan,transcript.search(state.getJSONArray("turns"),plan,token));}
         catch(IOException failure){token.check();return new HistoryRecall.Result(plan,new JSONObject().put("status","error").put("range",plan.label).put("records",new JSONArray()));}
+    }
+    /** The murmur saved with a recent turn, or "" (the pet bubble shows it under the last segment). */
+    synchronized String aside(String id){
+        if(id==null)return "";try{JSONArray turns=state.getJSONArray("turns");for(int i=turns.length()-1;i>=0;i--){JSONObject t=turns.getJSONObject(i);if(id.equals(ChatArchive.id(t)))return t.optString("aside");}}catch(Exception e){/* no turns yet */}
+        return "";
     }
     synchronized void shown(String id,int count)throws Exception {shown(id,count,true);}
     synchronized void shown(String id,int count,boolean remember)throws Exception {

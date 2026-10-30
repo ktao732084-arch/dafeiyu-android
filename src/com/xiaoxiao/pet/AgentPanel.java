@@ -19,6 +19,8 @@ final class AgentPanel {
   GroupedList.note(l,"不开时，她会参考时间和自己的性格决定。");
   GroupedList.toggle(GroupedList.group(l),"写陪伴日记",AgentRuntime.diaryEnabled(),(v,on)->Data.prefs().edit().putBoolean("agent.diary",on).apply());
   GroupedList.note(l,"每天最多一次模型请求，从最近几天的聊天或已完成棋局中留下一段共同经历和回想，并补记双方明确说过的约定。可在记忆手账的「我们的经历」查看依据或删除。");
+  GroupedList.toggle(GroupedList.group(l),"小声嘀咕",AgentRuntime.asideEnabled(),(v,on)->Data.prefs().edit().putBoolean("agent.aside",on).apply());
+  GroupedList.note(l,"回复下面偶尔多一行小字，是她没说出口的小念头。正式回答不受影响；关掉后她不再嘀咕，以前的也不再显示。");
   GroupedList.section(l,"安静一会儿");LinearLayout quiet=GroupedList.group(l);
   // One row that shows whether quiet time is on and until when, instead of two rows that both always look available.
   Button focus=GroupedList.row(quiet,focusLabel(),GroupedList.MOON,GroupedList.VIOLET,null);

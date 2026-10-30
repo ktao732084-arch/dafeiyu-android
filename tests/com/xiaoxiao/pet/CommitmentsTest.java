@@ -97,6 +97,9 @@ public final class CommitmentsTest {
   Commitments.status(dateState,Commitments.entries(dateState).getJSONObject(0).getString("id"),"cancelled",old+1000);
   check(Commitments.context(dateState,"你答应我的事",false).getJSONObject(0).getString("meaning").contains("不再安排"),"cancelled state has a concrete no-rescheduling meaning");
   for(String q:new String[]{"我明天不给你发资料。","我明天可以给你发资料。","明天我不把文件发给你。"})check(!Commitments.future(q),"future time does not turn refusal or ability into an obligation: "+q);
+  AgentStore asideStore=new AgentStore(new File(root,"aside-integration"));
+  asideStore.commit(0,user,reply,"calm",null,true,false,null,null,"old-with-aside",at,null,true,null,null,0,"",false,null,false,"这事我先想想。");asideStore.shown("old-with-aside",999);
+  check(Commitments.entries(asideStore.snapshot()).length()==0&&asideStore.aside("old-with-aside").equals("这事我先想想。"),"aside and historical commitment exclusion both survive merged commit path");
   System.out.println("PASS: "+checks+" bilateral commitment checks");
  }
 }

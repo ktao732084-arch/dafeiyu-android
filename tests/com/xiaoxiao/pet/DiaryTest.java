@@ -103,5 +103,12 @@ public final class DiaryTest {
   JSONObject distant=SharedExperience.entry("{\"moment\":{\"source_id\":\"chat:topic3\",\"reflection\":\"小步子也不错。\"}}",day,topicM,at+86400000);
   check(SharedExperience.contextQuotes(distant).length()==0,"old conversation before the fifteen-minute window is not attached");
   check(!SharedExperience.recallCheck("小灯塔你还记得吗？").isEmpty()&&SharedExperience.recallCheck("晚饭吃面吧").isEmpty(),"uncertainty cue is conditional on a memory question");
+  JSONObject feelingState=AgentStore.empty(0);Diary.add(feelingState,Diary.entry(day.minusDays(1),"昨天聊了会儿。",Collections.emptyList(),at,"这几天聊得很轻松"));
+  SharedExperience.Material feelingM=SharedExperience.collect(day,zone,turns,feelingState,new JSONArray());
+  check(SharedExperience.request(day,feelingM,"小鲸",new JSONArray(),"").toString().contains("这几天聊得很轻松"),"shared Dream carries upstream relationship feeling");
+  JSONObject felt=SharedExperience.entry("{\"moment\":{\"source_id\":\"chat:chat2\",\"reflection\":\"回想起来，我也期待那片海。\"},\"feeling\":\"最近聊着很放松\"}",day,feelingM,at+1000);
+  check("最近聊着很放松".equals(felt.optString("feeling"))&&felt.getJSONArray("sources").length()==4,"moment and relationship feeling coexist with all supporting chats");
+  Diary.add(feelingState,felt);Diary.dropSources(feelingState,Collections.singleton("chat0"));
+  check(Diary.entries(feelingState).length()==1,"deleting a feeling source removes the dependent page without deleting other days");
  }
 }

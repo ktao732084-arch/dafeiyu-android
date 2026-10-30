@@ -96,6 +96,14 @@ final class Growth {
         for(int i=1;i<chapter(g);i++)latch(g,i,"earlier");return true;
     }
     static int chapter(JSONObject g){return Math.max(1,Math.min(MAX_CHAPTER,g.optInt("chapter",1)));}
+    /**
+     * The jar in words for the home screen (docs/GROWTH_DESIGN.md): how full it looks, not a count, so the
+     * relationship does not read like a score to grind. The quest card keeps the exact numbers as goals.
+     */
+    static String jar(int bond,int cap){
+        if(cap<=0||bond>=cap)return "满了";double f=(double)Math.max(0,bond)/cap;
+        return f<.1?"刚开始装":f<.5?"装了一些":f<.8?"过半了":"快满了";
+    }
     static int bond(JSONObject g){return g.optInt("bond");}
     /** 相识第几天, counted like AgentPolicy.relationship(): the first meeting is day 1. */
     static int day(long since,long now){return since<=0||now<since?0:(int)((now-since)/DAY)+1;}

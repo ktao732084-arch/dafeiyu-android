@@ -142,6 +142,13 @@ final class ChatPage {
             List<String> bubbles=t.optInt("segmentVersion",1)>=ReplySegments.VERSION?Collections.singletonList(text):ReplySegments.split(text);
             for(int j=0;j<bubbles.size();j++){boolean last=i==shown-1&&j==bubbles.size()-1;message(bubbles.get(j).trim(),false,last?pending:null,last?reason:null,last&&invite);}
         }
+        if(shown>=parts.size()&&AgentRuntime.asideEnabled())aside(t.optString("aside"));
+    }
+    /** Her murmur under the reply: small, grey and italic, outside the bubble, so it never reads as part of the answer. */
+    void aside(String text){
+        if(text.isEmpty())return;
+        TextView murmur=Apple.label(c,text,12,false);murmur.setTextColor(Apple.SECONDARY);murmur.setTypeface(murmur.getTypeface(),android.graphics.Typeface.ITALIC);murmur.setAlpha(.85f);
+        murmur.setMaxWidth(bubbleWidth);murmur.setPadding(dp(48),0,0,dp(4));rows.addView(murmur,new LinearLayout.LayoutParams(-1,-2));
     }
     void empty(){
         LinearLayout hello=column();hello.setGravity(Gravity.CENTER_HORIZONTAL);hello.setPadding(dp(24),dp(overlay?12:56),dp(24),dp(24));

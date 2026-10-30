@@ -76,6 +76,7 @@ final class MemoryPanel {
                 TextView when=a.text(date,12);when.setTextColor(Apple.SECONDARY);page.addView(when);
                 if(!fact.isEmpty())page.addView(a.text("发生的事："+SharedExperience.displayFact(r),15));
                 TextView words=a.text((fact.isEmpty()?"旧日记：":"她的回想：")+r.optString("text"),15);words.setLineSpacing(a.dp(3),1);words.setPadding(0,a.dp(6),0,0);page.addView(words);
+            if(!r.optString("feeling").isEmpty()){TextView feeling=a.text("那几天的感觉："+r.optString("feeling"),13);feeling.setTextColor(Apple.SECONDARY);feeling.setPadding(0,a.dp(6),0,0);page.addView(feeling);}
                 a.button(page,"查看依据",v->new Apple.Builder(a).setTitle(date+" · 依据").setMessage(SharedExperience.evidence(r)).setPositiveButton("知道了",null).show());
                 a.button(page,"删除这篇",v->new Apple.Builder(a).setTitle("删除这篇小记？").setMessage("这篇经历和回想会删除，并停止自动补写。原聊天、棋局和关于你的事实记忆仍保留。").setNegativeButton("留着",null)
                     .setPositiveButton("删除",(d,w)->Chat.store(a,()->AgentRuntime.store().forgetDiary(date),fill[0],e->AgentPanel.fail(a,e))).show());

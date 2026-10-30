@@ -8,6 +8,7 @@ import java.util.*;
 final class SharedExperience {
     static final int MAX_EVENTS=12;
     static final class Material {
+        String lastFeeling="";
         final List<JSONObject> turns=new ArrayList<>();
         final JSONArray events=new JSONArray();
         final Map<String,JSONObject> sources=new LinkedHashMap<>();
@@ -19,7 +20,7 @@ final class SharedExperience {
     }
     static boolean onDay(long at,LocalDate day,ZoneId zone,long cleared){return at>cleared&&Diary.day(at,zone).equals(day);}
     static Material collect(LocalDate day,ZoneId zone,List<JSONObject> turns,JSONObject state,JSONArray games)throws Exception {
-        Material m=new Material();long cleared=state.optLong("diaryClearedAt");int size=0;
+        Material m=new Material();m.lastFeeling=Diary.feeling(state,day);long cleared=state.optLong("diaryClearedAt");int size=0;
         // Retain a bounded, chronological recent excerpt. Sources are exactly what the request can see.
         for(int i=turns.size()-1;i>=0;i--){JSONObject t=turns.get(i);long at=t.optLong("at");String user=t.optString("user").trim();
             if(!onDay(at,day,zone,cleared)||AgentPolicy.sensitive(user))continue;
@@ -57,7 +58,7 @@ final class SharedExperience {
         +"这是现在回想的感受，不是回忆画面，也不是当时已经记录下来的心情。只知道输赢就只依据输赢，不能补败因、某一步怎么下、声音动作、当时走神或心里一惊；聊天也不补用户动机、后来自己经历过的事或新约定。过去的反应只有原话明确记下才可引用。回想不改变当前心情。"
         +"只有棋局等经历而没有文字聊天时，仍可写这一条回想；understanding、confirmed、outdated都为空。";
     static JSONArray request(LocalDate day,Material m,String name,JSONArray understanding,String voice)throws Exception {
-        JSONArray req=Diary.request(day,m.turns,name,understanding,voice,m.events);
+        JSONArray req=Diary.request(day,m.turns,name,understanding,voice,m.events,m.lastFeeling);
         JSONObject system=req.getJSONObject(0);system.put("content",system.getString("content")+INSTRUCTION+Commitments.DREAM);
         JSONObject material=new JSONObject(req.getJSONObject(1).getString("content"));JSONArray talk=material.getJSONArray("conversation");
         for(int i=0;i<talk.length();i++)talk.getJSONObject(i).put("source_id","chat:"+ChatArchive.id(m.turns.get(i)));
@@ -72,7 +73,9 @@ final class SharedExperience {
             if(!(proposed.opt("source_id") instanceof String)||!(proposed.opt("reflection") instanceof String))return null;
             int length=reflection.codePointCount(0,reflection.length());
             if(source!=null&&length>0&&length<=80&&!AgentPolicy.sensitive(reflection)&&!reflection.matches("(?s).*[\\p{Cntrl}].*")){
-                JSONObject page=Diary.entry(day,reflection,Collections.emptyList(),writtenAt);JSONArray ids=new JSONArray();if(source.has("turnId"))ids.put(source.getString("turnId"));
+                String feeling=Diary.feeling(raw);JSONObject page=Diary.entry(day,reflection,Collections.emptyList(),writtenAt,feeling);JSONArray ids=new JSONArray();if(source.has("turnId"))ids.put(source.getString("turnId"));
+                // The feeling may use any offered chat, not just the one selected for the moment.
+                if(!feeling.isEmpty())for(JSONObject t:m.turns){String id=ChatArchive.id(t);if(!id.equals(source.optString("turnId")))ids.put(id);}
                 JSONObject saved=new JSONObject(source.toString());
                 if(source.has("turnId")){JSONArray context=new JSONArray();int selected=-1;
                     for(int i=0;i<m.turns.size();i++)if(source.getString("turnId").equals(ChatArchive.id(m.turns.get(i)))){selected=i;break;}
@@ -86,7 +89,7 @@ final class SharedExperience {
             // Do not accept an ungrounded moment as a free-form diary fallback.
             return null;
         }
-        String text=Diary.parse(raw);return text==null||m.turns.isEmpty()?null:Diary.entry(day,text,m.turns,writtenAt);
+        String text=Diary.parse(raw);return text==null||m.turns.isEmpty()?null:Diary.entry(day,text,m.turns,writtenAt,Diary.feeling(raw));
     }
     static String fact(JSONObject page){JSONObject m=page.optJSONObject("moment");return m==null?"":m.optString("fact");}
     static String displayFact(JSONObject page){JSONObject m=page.optJSONObject("moment");String f=fact(page);if(m==null)return f;
