@@ -210,6 +210,9 @@ Gomoku.java（自由规则、入门棋形策略）、GomokuStore.java（棋谱/�
 
 同时保留[278fca4](https://github.com/ktao732084-arch/dafeiyu-android/commit/278fca4)的自然分段、旧展示状态兼容和养成时机修复；相关框架与Android检查在最终DEX上复验。
 
+### 自建问题反馈（2026-10-30，PR #27）
+
+客户端入口、WebView、随机安装身份及系统图片选择回调沿用 `feature/feedback` 的 `381e743`，按用户要求替换兔小巢登录与域名规则。服务端借鉴该分支早期 `4702c2e` 的 HTTPS 中转部署布局、字段边界和反馈限流思路，改为本项目实现的私有 SQLite 反馈页，不复制 GitHub Token 中转路径。新增服务、前端页面、去重/身份隔离及管理/备份脚本均为本项目实现。截图解码使用 [Pillow](https://github.com/python-pillow/Pillow)（requirements 固定版本，许可随该依赖发布）；没有引入其他桌面、视觉或未来能力代码。
 
 ## 桌面气泡、点击与提起互动（同批未发布）
 

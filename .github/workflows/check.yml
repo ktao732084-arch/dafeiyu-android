@@ -37,6 +37,7 @@ jobs:
             /assets/catalog.json
             /assets/story.json
             /assets/personas.json
+            /assets/update-channel.json
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -76,3 +77,15 @@ jobs:
           for k in changed: print('changed:', k, base.get(k), '->', now.get(k))
           sys.exit(1 if changed else 0)
           PY
+
+  feedback-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: deploy/feedback
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: pip install -r deploy/feedback/requirements.txt
+      - run: python -m unittest discover -s deploy/feedback -p 'test_*.py'

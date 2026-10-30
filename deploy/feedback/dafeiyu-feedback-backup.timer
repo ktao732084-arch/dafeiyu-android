@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily private feedback backup at 04:15 Asia/Shanghai
+
+[Timer]
+OnCalendar=*-*-* 20:15:00 UTC
+RandomizedDelaySec=10m
+Persistent=true
+Unit=dafeiyu-feedback-backup.service
+
+[Install]
+WantedBy=timers.target

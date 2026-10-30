@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>大肥鱼 · 问题反馈</title><link rel="stylesheet" href="style.css"><script defer src="app.js"></script></head>
+<body><main>
+<section class="card"><h1>把问题告诉我们</h1><p class="muted">哪里不对，或者希望大肥鱼学会什么，都可以写在这里。</p>
+<form id="form"><label for="text">反馈内容</label><textarea id="text" required maxlength="2000" rows="5" placeholder="发生了什么？当时在做什么？"></textarea>
+<label for="contact">联系方式 <span class="muted">选填</span></label><input id="contact" maxlength="100" autocomplete="off" placeholder="方便进一步联系你，也可以留空">
+<label for="image">截图 <span class="muted">选填，一张，不超过 3 MB</span></label><input id="image" type="file" accept="image/png,image/jpeg,image/webp"><img id="preview" hidden alt="待发送截图"><button id="remove" type="button" class="quiet" hidden>移除截图</button>
+<p class="muted small">请检查你填写的内容和截图，不要包含密码、API Key 或不想分享的个人信息。反馈仅你和开发者可见。</p>
+<button id="send" type="submit" disabled>发送反馈</button><p id="status" role="status" aria-live="polite">正在连接…</p></form></section>
+<section><div class="heading"><h2>我的反馈</h2><button id="refresh" class="quiet" type="button">刷新</button></div><p class="muted small">开发者的回复会显示在这里。清除应用数据或卸载后，原来的反馈身份无法自动找回。</p><div id="reports"></div></section>
+</main></body></html>

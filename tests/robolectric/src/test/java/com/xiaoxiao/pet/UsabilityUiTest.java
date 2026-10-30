@@ -24,7 +24,7 @@ public class UsabilityUiTest {
     /** Each place is reachable once from where it belongs: no second story row, chat row or notebook loop. */
     @Test public void everyEntryAppearsOnceWhereItBelongs()throws Exception{
         a.render();java.util.Map<String,Integer> seen=new java.util.HashMap<>();for(TextView v:UiTest.all(a.content,TextView.class))seen.merge(v.getText().toString(),1,Integer::sum);
-        for(String entry:new String[]{"和她聊聊","我们的故事","一起下五子棋","记忆手账","名字与称呼","模型连接","陪伴设置","桌宠设置","检查更新"})assertEquals(entry,Integer.valueOf(1),seen.get(entry));
+        for(String entry:new String[]{"和她聊聊","我们的故事","一起下五子棋","记忆手账","名字与称呼","模型连接","陪伴设置","桌宠设置","检查更新","问题反馈"})assertEquals(entry,Integer.valueOf(1),seen.get(entry));
         assertNull(UiTest.find(a.content,"最近聊天"));assertNull(UiTest.find(a.content,"她的小动作"));
         AgentPanel.memories(a);View notebook=root();assertNull(UiTest.find(notebook,"我们的故事"));assertNotNull(UiTest.find(notebook,"我们的经历"));assertNotNull(UiTest.find(notebook,"最近互动"));
         GrowthPanel.show(a);View story=root();assertTrue(UiTest.texts(story).contains("泡泡瓶"));assertFalse(UiTest.texts(story).contains("记忆泡泡"));assertNull(UiTest.find(story,"她的日记"));
@@ -44,6 +44,13 @@ public class UsabilityUiTest {
         String newlyUnlocked=null;java.util.Set<String> before=store.unlocked(Data.actions("main"));
         fixture.put("chapter",5);for(String action:store.unlocked(Data.actions("main")))if(!before.contains(action)){newlyUnlocked=action;break;}
         assertNotNull("chapter fixture has a newly unlocked clip",newlyUnlocked);assertFalse(a.pet.plan.has(newlyUnlocked));a.render();assertSame(video,a.pet.video);assertTrue(a.pet.plan.has(newlyUnlocked));
+    }
+    /** 关于 → 问题反馈 opens the self-hosted board signed in as this install, or says the build has none. */
+    @Test public void feedbackOpensTheBoardOrSaysThereIsNone()throws Exception{
+        UiTest.click(a.content,"问题反馈");View page=root();
+        if(FeedbackPanel.board(a).isEmpty()){assertTrue(UiTest.texts(page).contains("还没有配置反馈页面"));return;}
+        assertTrue(UiTest.texts(page).contains("不含聊天、记忆或 Key"));assertEquals(1,UiTest.all(page,android.webkit.WebView.class).size());
+        String id=Data.prefs().getString("feedback.openid","");assertEquals(36,id.length());UiTest.dialog().dismiss();FeedbackPanel.show(a);assertEquals("one id per install",id,Data.prefs().getString("feedback.openid",""));
     }
     @Test public void clearingTheDiaryAsksFirst()throws Exception{
         java.time.LocalDate day=java.time.LocalDate.now().minusDays(1);assertTrue(AgentRuntime.store().addDiary(AgentRuntime.store().epoch(),Diary.entry(day,"今天陪他聊了晚饭。",new java.util.ArrayList<>(),System.currentTimeMillis())));

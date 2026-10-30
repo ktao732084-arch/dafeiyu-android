@@ -22,4 +22,5 @@ Run "$Sdk/platform-tools/adb.exe" @('-s',$Serial,'shell','mkdir','-p',"$remote/a
 Run "$Sdk/platform-tools/adb.exe" @('-s',$Serial,'push',"$root/assets/personas.json","$remote/assets/personas.json")
 Run "$Sdk/platform-tools/adb.exe" @('-s',$Serial,'push',"$root/assets/story.json","$remote/assets/story.json")
 Run "$Sdk/platform-tools/adb.exe" @('-s',$Serial,'push',"$root/assets/catalog.json","$remote/assets/catalog.json")
+Run "$Sdk/platform-tools/adb.exe" @('-s',$Serial,'push',"$root/assets/update-channel.json","$remote/assets/update-channel.json")
 Run "$Sdk/platform-tools/adb.exe" @('-s',$Serial,'shell',"CLASSPATH=$remote/product.dex`:$remote/checks.dex",'app_process','/system/bin','com.xiaoxiao.pet.DeviceCoreChecks',$remote)
