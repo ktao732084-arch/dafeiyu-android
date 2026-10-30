@@ -1446,7 +1446,7 @@
       "path": "docs/FEEDBACK_ACCEPTANCE.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "58af464ec2d171f28e548ef295533f66cfeb2d500884b1fda8db479c46821767"
+      "sha256": "d7e413fd08438acbd4216a1fb6671eda392b5cd66f1f8bae6f0210697b017fcb"
     },
     {
       "path": "docs/GOMOKU.md",
@@ -1749,6 +1749,12 @@
       "sha256": "161b16e3f3b8e02f027fa801de3d32f42c56267841b864d3bfc0f857ca480e00"
     },
     {
+      "path": "docs/test-reports/feedback-results.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "83c45a791ebe0864fcca9c49a1ea347394904165c3d41fb902a69a67c7b49b73"
+    },
+    {
       "path": "docs/test-reports/memory-replay-android.json",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1876,7 +1882,7 @@
       "path": "instrumentation/FeedbackInstrumentation.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "040f5ec0a05bfe8d1559d90fd50aa0bcfcbed00dec42aa21229959ea996abf4c"
+      "sha256": "378425054202a3b156e723598835f0701666705ae1d370c949cb4b96c83ec9b5"
     },
     {
       "path": "instrumentation/HeroPetInstrumentation.java",
