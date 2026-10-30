@@ -1320,13 +1320,19 @@
       "path": "docs/COMMITMENTS.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "7e356e353f277e185651d9d7fe1dc2232d664643ac554a08f08ddd0d573aff0a"
+      "sha256": "9a3f5d27f9b92f2b7a99fff9b575497897404be421a1805fec8c430fd3901982"
     },
     {
       "path": "docs/COMMITMENTS_EXPANDED_EVAL.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "c9063c6cab6271e9e286a5f42d4e288096e7c261c9012683df57eb5de3e68200"
+    },
+    {
+      "path": "docs/COMMITMENTS_FIX_EVAL.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "67096a2f40165ca837a39dbe2216f91c5682fb97fa8fdb8d783ab9122af2cc31"
     },
     {
       "path": "docs/GOMOKU.md",
@@ -1561,6 +1567,18 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "b56cd96a806eea7ba654ff5f260d3bf319b08133b77fa8c69c4409bf05be6a5a"
+    },
+    {
+      "path": "docs/test-reports/commitments-fixed-review.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "971173f142b676b3755a2010298b86897c58550c44d6902d2eb4771adb24bb9e"
+    },
+    {
+      "path": "docs/test-reports/commitments-fixed.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "d8f56ced5ed9a8035fd9a21b5baebdcc34c76137aef9382a206a12713ee65bf1"
     },
     {
       "path": "docs/test-reports/commitments.json",
