@@ -35,7 +35,8 @@ public class UsabilityUiTest {
         a.render();a.render();assertEquals("one player across re-renders",1,UiTest.all(a.content,AlphaVideo.class).size());
         AlphaVideo video=UiTest.all(a.content,AlphaVideo.class).get(0);assertSame(a.pet.video,video);assertEquals(Data.idle("main"),video.pending);
         View stage=(View)video.getParent();assertEquals("蓝色鲸鱼娘大肥鱼",stage.getContentDescription());assertEquals(1,UiTest.all(stage,ImageView.class).size());
-        stage.performClick();CountDownLatch played=new CountDownLatch(1);video.queueEvent(played::countDown);assertTrue(played.await(5,TimeUnit.SECONDS));assertTrue(video.pending,ActionPlan.TAPS.contains(video.pending));
+        stage.performClick();CountDownLatch played=new CountDownLatch(1);video.queueEvent(played::countDown);assertTrue(played.await(5,TimeUnit.SECONDS));assertTrue(video.pending,ActionPlan.TAP_ACTIONS.contains(video.pending));
+        assertTrue("tap stays within chapter unlocks: "+video.pending,GrowthStore.get().unlocked(Data.actions("main")).contains(video.pending));
         a.pet.pause();assertTrue(video.suspended);a.pet.resume();assertFalse(video.suspended);
     }
     @Test public void homePortraitRefreshesChapterUnlocksWithoutRestart()throws Exception{

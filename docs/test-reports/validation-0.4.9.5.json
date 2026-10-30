@@ -1,0 +1,169 @@
+{
+  "version": "0.4.9.5",
+  "version_code": 19,
+  "apk_sha256": "49b99f189797b9ddc8e8f39a8dde690131f33a8a44e8faf96295ad3e5cf9b43a",
+  "apk_size": 91582920,
+  "framework_unique_passed": 161,
+  "framework_failed": 0,
+  "framework_failed_final_reports": 0,
+  "framework_skipped": 0,
+  "final_build_framework_rechecked": 161,
+  "framework_suites": [
+    {
+      "suite": "com.xiaoxiao.pet.ChatPolishTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.CompanionBehaviorTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.ConversationTest",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.GomokuUiTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.GrowthUiTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.HistoryRecallIntegrationTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.InitiativeRuntimeTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.InterjectionEdgeTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.MemoryIntegrationTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.ModelSetupTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.NativeMemoryTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.PersonaContinuityTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.PhraseUiTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.TouchReplyRuntimeTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.UiTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.UpdateTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.UsabilityUiTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "android_art_core_suites": 21,
+  "android_runtime_instrumentation_checks": 72,
+  "android_touch_checks": 19,
+  "android_chat_presentation_checks": 36,
+  "android_animated_home_checks": 24,
+  "android_quest_line_checks": 34,
+  "android_persona_update_checks": 19,
+  "rewrite_fidelity_rule_checks": 27,
+  "release_sync_checks": 18,
+  "release_prepare_checks": 7,
+  "live_smoke": {
+    "device": "MuMu emulator-5554 / Android 15 API35 x86_64",
+    "model": "deepseek-flash / api.deepseek.com",
+    "persona": "classic; unchanged persona assets and frozen profile",
+    "upgrade": "Final signed 0.4.9.5/code19 installed with -r over local 0.4.9.4/code18; original application was not cleared or uninstalled.",
+    "conversation_turns": 12,
+    "guarded_rewrite_turns": 10,
+    "explicit_content_change_turns": 1,
+    "ordinary_chat_turns": 1,
+    "deliberately_changed_candidates": 8,
+    "fidelity_failures_in_this_sample": 0,
+    "original_preferences_unchanged": true,
+    "original_history_and_growth_unchanged": true,
+    "raw_evidence": "Private local reports only; not committed to the public repository."
+  },
+  "distribution": {
+    "method": "release.ps1 -Publish, final verification required",
+    "github": "v0.4.9.5",
+    "domestic_manifest": "https://81.70.79.133/dafeiyu-updates/stable.json"
+  },
+  "limits": [
+    "Android15 emulator only, not a physical-phone matrix.",
+    "Model proofreading is not a formal proof of semantic equivalence; local locks are conservative and may retain the source.",
+    "Protection requires an identifiable rewrite source; translation, ambiguous sources and explicit meaning changes are outside the source-lock path.",
+    "Small real-model sample with classic persona, not all providers or personalities.",
+    "Established memory-engine baseline remains 145/166 expectations; the 21 known unmet items are not claimed fixed."
+  ]
+}

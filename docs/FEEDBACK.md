@@ -21,4 +21,4 @@
 
 ## 验证范围
 
-本地服务端单元/HTTP 集成测试、Android 核心 ART、Robolectric 入口与真实 WebView 验证，以及部署后的 HTTPS 验收结果见 [反馈验收](FEEDBACK_ACCEPTANCE.md)。本功能尚未公开发布 APK；生产 App 现有用户需等后续合并、发布后才看到入口。
+本地服务端单元/HTTP 集成测试、Android 核心 ART、Robolectric 入口与真实 WebView 验证，以及部署后的 HTTPS 验收结果见 [反馈验收](FEEDBACK_ACCEPTANCE.md)。本功能随0.4.9.6安装包发布；已有用户升级后即可看到入口。
