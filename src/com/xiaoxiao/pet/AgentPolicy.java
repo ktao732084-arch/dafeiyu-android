@@ -86,6 +86,19 @@ final class AgentPolicy {
         return open>=0&&close>open&&text.indexOf("\"reply\"",open)>open?text.substring(open,close+1):null;
     }
     /** What the bubble may show while streaming: the reply field, or plain text when the model ignored JSON. */
+    static final int ASIDE_MAX=30;
+    /**
+     * Her murmur (docs/CHARACTER.md, 小声嘀咕): one short line beside the reply, or "" when there is none, it is
+     * too long, repeats the reply, carries a channel label or something sensitive. Markdown italics and brackets
+     * the model may wrap it in are removed; the app renders it small and in italics itself.
+     */
+    static String aside(Object value,String reply){
+        if(!(value instanceof String))return "";
+        String t=((String)value).replaceAll("[\\p{Cntrl}\\s]+"," ").trim().replaceAll("^[*_（(「“\"]+|[*_）)」”\"]+$","").trim();
+        int n=t.codePointCount(0,t.length());if(n<2||n>ASIDE_MAX||sensitive(t)||!replyText(t).equals(t))return "";
+        String bare=t.replaceAll("[\\p{P}\\s~～…]+","");if(bare.isEmpty()||reply!=null&&reply.replaceAll("[\\p{P}\\s~～…]+","").contains(bare))return "";
+        return t;
+    }
     static String replyText(String text){return text.replaceFirst("(?i)^(?:\\s*\\[(?:tool|assistant)\\]\\s*)+","");}
     static String streamPreview(String raw) {
         String text=raw.replaceAll("(?s)<think>.*?</think>","").trim();
