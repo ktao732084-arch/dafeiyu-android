@@ -18,7 +18,7 @@ final class AgentPanel {
   GroupedList.toggle(GroupedList.group(l),"夜间安静（23:00–08:00）",Data.prefs().getBoolean("agent.quietNight",false),(v,on)->{Data.prefs().edit().putBoolean("agent.quietNight",on).apply();if(on)AgentRuntime.interruptProactive();proactiveHint(hint[0]);});
   GroupedList.note(l,"不开时，她会参考时间和自己的性格决定。");
   GroupedList.toggle(GroupedList.group(l),"写陪伴日记",AgentRuntime.diaryEnabled(),(v,on)->Data.prefs().edit().putBoolean("agent.diary",on).apply());
-  GroupedList.note(l,"每天最多一次模型请求，从最近几天的聊天或已完成棋局中留下一段共同经历和回想。可在记忆手账的「我们的经历」查看依据或删除。");
+  GroupedList.note(l,"每天最多一次模型请求，从最近几天的聊天或已完成棋局中留下一段共同经历和回想，并补记双方明确说过的约定。可在记忆手账的「我们的经历」查看依据或删除。");
   GroupedList.section(l,"安静一会儿");LinearLayout quiet=GroupedList.group(l);
   // One row that shows whether quiet time is on and until when, instead of two rows that both always look available.
   Button focus=GroupedList.row(quiet,focusLabel(),GroupedList.MOON,GroupedList.VIOLET,null);
@@ -57,7 +57,7 @@ final class AgentPanel {
   GroupedList.note(l,"关于你的记忆来自你亲口说过的话；我们的经历另留发生的事与她的回想。事实记忆可以修改、固定或忘记；忘记时会删除来源对话和相关小记。");
   if(snapshot.optBoolean("recovered")){TextView warn=GroupedList.note(l,"上次数据出了点状况，已经从本机备份恢复。建议导出一份手账。");warn.setTextColor(Apple.DANGER);}
   final AlertDialog[] dialog=new AlertDialog[1];
-  LinearLayout hers=GroupedList.group(l);GroupedList.row(hers,"我们的经历",GroupedList.BOOK,GroupedList.VIOLET,v->MemoryPanel.diary(a));GroupedList.row(hers,"她对你的了解",GroupedList.TAG,GroupedList.ORANGE,v->MemoryPanel.understanding(a));GroupedList.row(hers,"她说过的自己",GroupedList.HEART,GroupedList.PINK,v->MemoryPanel.self(a));
+  LinearLayout hers=GroupedList.group(l);GroupedList.row(hers,"双方约定",GroupedList.BOOK,GroupedList.SKY,v->MemoryPanel.commitments(a));GroupedList.row(hers,"我们的经历",GroupedList.BOOK,GroupedList.VIOLET,v->MemoryPanel.diary(a));GroupedList.row(hers,"她对你的了解",GroupedList.TAG,GroupedList.ORANGE,v->MemoryPanel.understanding(a));GroupedList.row(hers,"她说过的自己",GroupedList.HEART,GroupedList.PINK,v->MemoryPanel.self(a));
   TextView count=GroupedList.section(l,"关于你的记忆 · "+entries.length()+" 条");
   LinearLayout holder=a.column();final JSONArray[] list={entries};Runnable[] fill=new Runnable[1];
   // The editor opens on top of the notebook; after a save or forget the list refreshes in place.
@@ -93,7 +93,7 @@ final class AgentPanel {
   for(int i=0;i<Math.min(view.shown,rows.size());i++){JSONObject m=rows.get(i);String id=m.optString("id");GroupedList.entry(list,(m.optBoolean("pinned")?"★ ":"")+m.optString("text"),v->edit(a,m,id,reload));}
   if(rows.size()>view.shown){Button more=GroupedList.row(list,"再显示 "+Math.min(PAGE,rows.size()-view.shown)+" 条（共 "+rows.size()+" 条）",v->{view.shown+=PAGE;fillMemories(a,holder,entries,view,reload);});more.setTextColor(Apple.BLUE);}
  }
- static void confirmClear(MainActivity a,boolean all,Dialog parent){new Apple.Builder(a).setTitle(all?"真的要全部忘掉吗？":"清空聊天记录？").setMessage(all?"会停下当前回复，清除这台手机上的对话、记忆、情绪、棋局和战绩记录。模型连接和她的性格会保留，已导出的文件不受影响。":"会停下当前回复，清除聊天、共同经历与回想、相处理解和最近互动。关于你的事实记忆、她说过的自己及棋局仍保留；旧材料不再补写小记。").setNegativeButton("取消",null).setPositiveButton("确认清除",(d,w)->{Chat.interruptPresentation("main");AgentRuntime.cancel();Chat.store(a,()->AgentRuntime.store().clear(all),()->{parent.dismiss();memories(a);},e->fail(a,e));}).show();}
+ static void confirmClear(MainActivity a,boolean all,Dialog parent){new Apple.Builder(a).setTitle(all?"真的要全部忘掉吗？":"清空聊天记录？").setMessage(all?"会停下当前回复，清除这台手机上的对话、记忆、情绪、棋局和战绩记录。模型连接和她的性格会保留，已导出的文件不受影响。":"会停下当前回复，清除聊天、共同经历与回想、双方约定、相处理解和最近互动。关于你的事实记忆、她说过的自己及棋局仍保留；旧材料不再补写小记。").setNegativeButton("取消",null).setPositiveButton("确认清除",(d,w)->{Chat.interruptPresentation("main");AgentRuntime.cancel();Chat.store(a,()->AgentRuntime.store().clear(all),()->{parent.dismiss();memories(a);},e->fail(a,e));}).show();}
  static void edit(MainActivity a,JSONObject memory,String id,Runnable saved){
   LinearLayout l=a.column();l.setPadding(a.dp(18),0,a.dp(18),a.dp(12));EditText text=Chat.field(a,l,"一件想让她一直记得的事",memory==null?"":memory.optString("text"),false);text.setSingleLine(false);text.setMinLines(3);text.setMaxLines(8);text.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(240)});Switch pinned=new Switch(a);pinned.setText("固定这条记忆（每次聊天都带上）");pinned.setTextColor(Apple.INK);pinned.setTextSize(14);pinned.setMinHeight(a.dp(52));pinned.setChecked(memory==null||memory.optBoolean("pinned"));l.addView(pinned);
   if(memory!=null){String source=memory.optString("source");TextView details=a.text("记录于 "+new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm",java.util.Locale.CHINA).format(new java.util.Date(memory.optLong("at")))+"\n来源："+(source.startsWith("你")?source:"你的对话原话"),12);details.setTextColor(Apple.SECONDARY);l.addView(details);}

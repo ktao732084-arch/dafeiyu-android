@@ -76,6 +76,7 @@ final class PromptBuilder {
             background.append(new JSONObject().put("remembered_user_words",MemoryLedger.context(s,user,hits)).put("relevant_past",in.episodes!=null?in.episodes:AgentStore.recall(s,user)).put("historical_user_words",MemoryLedger.historicalContext(s,user)));
         }
         if(in.historyRecall==null&&!proactive)background.append(SharedExperience.recallCheck(user));
+        if(in.remember&&in.historyRecall==null){JSONArray commitments=Commitments.context(s,user,proactive);if(commitments.length()>0)background.append(Commitments.GUIDANCE).append(commitments);}
         List<String> replies=new ArrayList<>();for(int i=Math.max(0,turns.length()-4);i<turns.length();i++)replies.add(turns.getJSONObject(i).optString("reply"));
         if(in.historyRecall==null)for(String note:AgentPolicy.styleNotes(replies,in.signature))background.append("\n风格提醒：").append(note);
         String ask=proactive?"这是一次应用内部的主动陪伴事件，不是用户发言，而是一次考虑要不要开口的机会。看看你现在的心情、最近真实的互动、没聊完的话题、记忆和约定，自己决定有没有自然想说的话。想说就用你的口吻说一两句，有话题时可以多说些：分享一个自己的小念头、接上刚才的梗、回应刚才的点击拖动，或关心一下已知的安排都行；别每次都变成报时、问候或查户口，也不用总围绕吃的。对方没回的话题就放下，换个新话题或者继续安静。没有新线索、刚聊完，或连续主动都没被回应时，就安静待着，把等待拉长。你只知道记录里的事：对方在其他 App 或现实里做什么你不知道，没展示过的回复对方也没看到。不说话时 reply 严格为[安静陪伴]、initiative 为 quiet，不用说出「我不催你」「不打扰你」「没人理我」这类话。不管说不说都要给 next_check_minutes；availability 为 unchanged，memories 和 self 为空。":user;

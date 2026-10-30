@@ -12,7 +12,7 @@ import java.util.*;
  * turns they came from, so forgetting or clearing those turns removes the entry too.
  */
 final class Diary {
-    static final int KEEP=400,MIN_TURNS=3,LOOKBACK_DAYS=3,MAX_CHARS=160,INPUT_CHARS=6000,MAX_TOKENS=950;
+    static final int KEEP=400,MIN_TURNS=3,LOOKBACK_DAYS=3,MAX_CHARS=160,INPUT_CHARS=6000,MAX_TOKENS=1300;
 
     static JSONArray entries(JSONObject state){JSONArray a=state.optJSONArray("diary");return a==null?new JSONArray():a;}
     static boolean has(JSONObject state,LocalDate day){JSONArray a=entries(state);for(int i=0;i<a.length();i++){JSONObject e=a.optJSONObject(i);if(e!=null&&day.toString().equals(e.optString("date")))return true;}return false;}
@@ -38,8 +38,8 @@ final class Diary {
     /** experiences: what happened to her that day (CharacterNow.experiences), so the diary can hold her own feelings too. */
     static JSONArray request(LocalDate day,List<JSONObject> turns,String name,JSONArray understanding,String voice,JSONArray experiences)throws Exception {
         JSONArray talk=new JSONArray();int chars=0;SimpleDateFormat clock=new SimpleDateFormat("HH:mm",Locale.ROOT);
-        for(JSONObject t:turns){String user=t.optString("user").trim();if(user.isEmpty())continue;
-            JSONObject row=new JSONObject().put("time",clock.format(new Date(t.optLong("at")))).put("user",AgentPolicy.clip(user,150));String reply=ReplySegments.visible(t).trim();if(!reply.isEmpty())row.put("you",AgentPolicy.clip(reply,80));
+        for(JSONObject t:turns){String user=t.optString("user").trim(),reply=ReplySegments.visible(t).trim();if(user.isEmpty()&&reply.isEmpty())continue;
+            JSONObject row=new JSONObject().put("time",clock.format(new Date(t.optLong("at")))).put("user",AgentPolicy.clip(user,150));if(!reply.isEmpty())row.put("you",AgentPolicy.clip(reply,80));
             chars+=row.toString().length();if(chars>INPUT_CHARS)break;talk.put(row);}
         String instruction="你是"+(name==null||name.isEmpty()?"大肥鱼":name)+"，用户手机里的陪伴角色。用第一人称给自己写一篇很短的日记，记下你和用户在"+day+"聊过的事。"
             +"只依据提供的对话和真实互动记录，不推测、不补细节、不评价用户，不写密码、证件、卡号等敏感信息。1到3句，不超过120字，语气自然。"

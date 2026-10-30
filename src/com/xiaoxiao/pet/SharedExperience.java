@@ -11,7 +11,7 @@ final class SharedExperience {
         final List<JSONObject> turns=new ArrayList<>();
         final JSONArray events=new JSONArray();
         final Map<String,JSONObject> sources=new LinkedHashMap<>();
-        boolean eligible(){return turns.size()>=Diary.MIN_TURNS||hasFinishedGame();}
+        boolean eligible(){return turns.size()>=Diary.MIN_TURNS||hasFinishedGame()||Commitments.candidate(turns);}
         boolean hasFinishedGame(){for(JSONObject s:sources.values())if("game".equals(s.optString("kind")))return true;return false;}
     }
     static String interactionId(JSONObject e)throws Exception {
@@ -22,16 +22,19 @@ final class SharedExperience {
         Material m=new Material();long cleared=state.optLong("diaryClearedAt");int size=0;
         // Retain a bounded, chronological recent excerpt. Sources are exactly what the request can see.
         for(int i=turns.size()-1;i>=0;i--){JSONObject t=turns.get(i);long at=t.optLong("at");String user=t.optString("user").trim();
-            if(user.isEmpty()||!onDay(at,day,zone,cleared)||AgentPolicy.sensitive(user))continue;
+            if(!onDay(at,day,zone,cleared)||AgentPolicy.sensitive(user))continue;
+            if(user.isEmpty()&&(!t.optBoolean("commitmentsAllowed",true)||!Commitments.future(Commitments.said(t,"assistant"))))continue;
             String u=AgentPolicy.clip(user,150),reply=AgentPolicy.clip(ReplySegments.visible(t),80);
             if(AgentPolicy.sensitive(reply))reply="";
             if(size+u.length()+reply.length()>Diary.INPUT_CHARS)break;size+=u.length()+reply.length();
-            JSONObject copy=new JSONObject().put("id",ChatArchive.id(t)).put("at",at).put("user",u).put("reply",reply);
+            JSONObject copy=new JSONObject().put("id",ChatArchive.id(t)).put("at",at).put("user",u).put("reply",reply)
+                .put("timeZone",t.optString("timeZone",zone.getId())).put("repliedAt",t.optLong("repliedAt",at)).put("commitmentsAllowed",t.optBoolean("commitmentsAllowed",true))
+                .put("assistantCommitmentsAllowed",t.optBoolean("assistantCommitmentsAllowed",true)&&(t.has("displayed")?t.optInt("displayed")>=ReplySegments.count(t):t.optBoolean("commitmentsAllowed",false)));
             m.turns.add(0,copy);
         }
         for(JSONObject t:m.turns){String id="chat:"+ChatArchive.id(t);m.sources.put(id,new JSONObject().put("id",id).put("kind","chat")
             .put("turnId",ChatArchive.id(t)).put("at",t.optLong("at")).put("timeZone",zone.getId())
-            .put("user",t.optString("user")).put("reply",t.optString("reply")).put("fact","用户原话摘录：「"+t.optString("user")+"」"));}
+            .put("user",t.optString("user")).put("reply",t.optString("reply")).put("fact",t.optString("user").isEmpty()?"她实际展示的回复摘录：「"+t.optString("reply")+"」":"用户原话摘录：「"+t.optString("user")+"」"));}
         List<JSONObject> events=new ArrayList<>();JSONArray interactions=state.optJSONArray("interactions");
         if(interactions!=null)for(int i=0;i<interactions.length();i++){JSONObject e=interactions.optJSONObject(i);if(e==null)continue;
             long at=e.optLong("at");String note=e.optString("note");if(!CharacterNow.EXPERIENCES.contains(e.optString("kind"))||!onDay(at,day,zone,cleared)||note.isEmpty()||AgentPolicy.sensitive(note))continue;
@@ -55,7 +58,7 @@ final class SharedExperience {
         +"只有棋局等经历而没有文字聊天时，仍可写这一条回想；understanding、confirmed、outdated都为空。";
     static JSONArray request(LocalDate day,Material m,String name,JSONArray understanding,String voice)throws Exception {
         JSONArray req=Diary.request(day,m.turns,name,understanding,voice,m.events);
-        JSONObject system=req.getJSONObject(0);system.put("content",system.getString("content")+INSTRUCTION);
+        JSONObject system=req.getJSONObject(0);system.put("content",system.getString("content")+INSTRUCTION+Commitments.DREAM);
         JSONObject material=new JSONObject(req.getJSONObject(1).getString("content"));JSONArray talk=material.getJSONArray("conversation");
         for(int i=0;i<talk.length();i++)talk.getJSONObject(i).put("source_id","chat:"+ChatArchive.id(m.turns.get(i)));
         while(m.turns.size()>talk.length()){JSONObject omitted=m.turns.remove(m.turns.size()-1);m.sources.remove("chat:"+ChatArchive.id(omitted));}
@@ -88,7 +91,7 @@ final class SharedExperience {
     static String fact(JSONObject page){JSONObject m=page.optJSONObject("moment");return m==null?"":m.optString("fact");}
     static String displayFact(JSONObject page){JSONObject m=page.optJSONObject("moment");String f=fact(page);if(m==null)return f;
         if("game".equals(m.optString("kind")))return f.replace("用户","你").replace("桌宠","她");
-        if("chat".equals(m.optString("kind")))return "你当时说（摘录）：「"+m.optString("user")+"」";
+        if("chat".equals(m.optString("kind")))return m.optString("user").isEmpty()?"她当时说（摘录）：「"+m.optString("reply")+"」":"你当时说（摘录）：「"+m.optString("user")+"」";
         if(f.startsWith("用户喂你吃了"))return "你给她喂了"+f.substring("用户喂你吃了".length());
         return f.replace("你和用户", "你和她").replace("你在睡觉时被用户", "她在睡觉时被你");
     }

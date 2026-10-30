@@ -14,7 +14,7 @@ public final class ExperienceInstrumentation extends Instrumentation {
   java.util.List<AccessibilityNodeInfo> nodes=root.findAccessibilityNodeInfosByText(text);
   for(AccessibilityNodeInfo n:nodes)if(n.getText()!=null&&n.getText().toString().equals(text))return n;
   for(AccessibilityNodeInfo n:nodes)if(n.getText()!=null&&n.getText().toString().contains(text))return n;return null;}
- void click(String text){AccessibilityNodeInfo n=find(text);check(n!=null,"visible control: "+text);check(n.performAction(AccessibilityNodeInfo.ACTION_CLICK),"click: "+text);waitForIdleSync();}
+ void click(String text){AccessibilityNodeInfo n=find(text);check(n!=null,"visible control: "+text);while(n!=null&&!n.isClickable())n=n.getParent();check(n!=null&&n.performAction(AccessibilityNodeInfo.ACTION_CLICK),"click: "+text);waitForIdleSync();}
  public void onStart(){Bundle result=new Bundle();int code=Activity.RESULT_OK;AgentRuntime.Model original=AgentRuntime.diaryModel;
   try{
    main(()->{Data.init(getTargetContext());Data.prefs().edit().clear().putBoolean("agent.diary",false).putBoolean("agent.proactive",false).commit();
@@ -43,6 +43,13 @@ public final class ExperienceInstrumentation extends Instrumentation {
    check(Diary.entries(db.snapshot()).length()==0&&Diary.suppressed(db.snapshot(),day),"single-page deletion leaves suppression marker");
    check(!db.addDiary(epoch,page)&&games.hasResult(game.id,game.finishedAt,game.outcome()),"late page rejected, real game retained");
    check(Diary.suppressed(new AgentStore(dir).snapshot(),day),"deleted page remains suppressed after store reopen");
+   click("关闭");
+   check(db.commit(db.epoch(),"我答应你明天把初稿发给你。","十分钟后我提醒你喝水。","calm",null,true,false,null,null,"bilateral",System.currentTimeMillis(),null,true),"promise turn saved");
+   check(Commitments.entries(db.snapshot()).length()==1,"only user promise before display");db.shown("bilateral",999,true);db.awaitWrites();check(Commitments.entries(db.snapshot()).length()==2,"visible assistant promise captured on Android");
+   main(()->MemoryPanel.commitments(activity));waitForIdleSync();SystemClock.sleep(450);
+   File promiseShot=new File(getTargetContext().getExternalFilesDir(null),"bilateral-commitments.png");try(FileOutputStream out=new FileOutputStream(promiseShot)){check(getUiAutomation().takeScreenshot().compress(android.graphics.Bitmap.CompressFormat.PNG,100,out),"promise notebook screenshot saved");}
+   check(find("你答应的")!=null&&find("她答应的")!=null,"two owners rendered separately");click("她答应的");click("管理");click("标记完成");Chat.storage.submit(()->{}).get(10,TimeUnit.SECONDS);waitForIdleSync();
+   check("done".equals(Commitments.entries(db.snapshot()).getJSONObject(1).optString("status")),"manual completion stored without executing a task");
    result.putString("stream","PASS: "+checks+" Android shared-experience checks\n");
   }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e);result.putString("stack",android.util.Log.getStackTraceString(e));}
   finally{AgentRuntime.diaryModel=original;try{main(()->{AgentRuntime.cancel();Data.prefs().edit().putBoolean("agent.diary",false).commit();if(activity!=null)activity.finish();});}catch(Throwable ignored){}}

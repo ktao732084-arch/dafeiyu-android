@@ -122,6 +122,7 @@ final class AgentRuntime {
             if(!diaryEnabled()||!rememberEnabled()||memory!=db)return;
             JSONObject entry=SharedExperience.entry(raw,day,material,System.currentTimeMillis());Understanding.Update update=Understanding.parse(raw,material.turns,before,day.toString());
             if(entry!=null&&db.addDiary(epoch,entry,update))Data.log("main","共同经历已写好："+day+(update.empty()?"":"，相处理解已更新"));
+            if(db.addDreamCommitments(epoch,Commitments.dream(raw,material.turns)))Data.log("main","双方约定已补记："+day);
         }catch(Exception e){Data.log("main","陪伴日记暂未写成");}finally{writingDiary.set(false);}});
     }
     static boolean send(String user,boolean proactive,Listener listener) {
@@ -193,7 +194,7 @@ final class AgentRuntime {
                 final AgentReply output=result;final long completedEpoch=epoch;final String explicitWas=explicit;
                 final java.util.concurrent.atomic.AtomicBoolean delivered=new java.util.concurrent.atomic.AtomicBoolean();
                 Runnable completion=()->{if(!delivered.compareAndSet(false,true))return;release(token);if(db.epoch()!=completedEpoch){listener.error("记录已修改，本次已完成的回复不再显示");return;}listener.saved(turnId);listener.done(output.reply,output.emotion);if(explicitWas==null&&history==null)writeDiaryIfDue();};
-                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true,null,history==null&&explicit==null?result.plan:null,result.moodLevel,rememberEnabled()?result.moodCause:"",result.moodChanged))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");result.emotion=db.mood(System.currentTimeMillis()).optString("emotion","calm");if(history==null)Nickname.committed(user);token.completed=completion;}
+                synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(epoch,user,result.reply,result.emotion,result.memories,rememberEnabled(),proactive,explicit,memoryPlan,turnId,observed,result.self,true,null,history==null&&explicit==null?result.plan:null,result.moodLevel,rememberEnabled()?result.moodCause:"",result.moodChanged,null,history==null))throw new IOException("记忆或记录已修改，本次回复未保存，请重新发送");result.emotion=db.mood(System.currentTimeMillis()).optString("emotion","calm");if(history==null)Nickname.committed(user);token.completed=completion;}
                 main.post(completion);
                 // Growth counts only a committed turn of yours; proactive turns and history questions earn nothing.
                 if(history==null)grow();
