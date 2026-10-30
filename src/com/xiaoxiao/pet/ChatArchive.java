@@ -84,5 +84,5 @@ final class ChatArchive {
         while(times.length()<next)times.put(now);t.put("segmentDisplayedAt",times).put("displayed",next).put("lastDisplayedAt",now).put("displayTimeZone",java.time.ZoneId.systemDefault().getId());
         if(!t.has("displayedAt"))t.put("displayedAt",now);
     }
-    synchronized void shown(String id,int count)throws Exception{String suffix="-"+hash(id);for(String k:keys())if(k.endsWith(suffix)){JSONObject t=read(file(k));markShown(t,count);put(t);return;}}
+    synchronized JSONObject shown(String id,int count)throws Exception{String suffix="-"+hash(id);for(String k:keys())if(k.endsWith(suffix)){JSONObject t=read(file(k));markShown(t,count);put(t);return t;}return null;}
 }

@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-29",
+  "branch": "codex/shared-experiences-lite",
+  "product_source_commit": "63e05a373c85a40c2446f9898205826cf8fa429e",
+  "product_dex_sha256": "f5651d9d53de2ea369aa97374ed5ca2c9192a3a36447337cbcf63fa73192b0a5",
+  "overall_assessment": "needs_improvement_before_merge",
+  "model_alias": "deepseek-flash",
+  "provider": "https://api.deepseek.com",
+  "sampling": {"chat_temperature": 1.3, "diary_temperature": "provider default", "thinking": "disabled", "streaming": false},
+  "scope": {
+    "styles": ["classic", "gentle"],
+    "repetitions_each": 2,
+    "main_scenario_calls": 56,
+    "diagnostic_calls": 24,
+    "connection_checks": 2,
+    "transport_or_parse_errors": 0,
+    "fixtures": "Synthetic writing-project conversation with actual live assistant replies, plus a valid persisted synthetic game. No real user's history was sent.",
+    "execution": "Host JVM using built product AgentTransport, ModelPresets, PromptBuilder, SharedExperience, Diary, AgentReply and AgentStore. No mock model.",
+    "isolation": "Independent recall probes suppress alternative recent-chat/fact recall to measure the diary channel. Full AgentRuntime orchestration, Android UI and scheduling were not exercised in this live run."
+  },
+  "findings": {
+    "source_valid_diary_pages_saved": {"passed": 8, "total": 8},
+    "exact_named_old_event": {"diary_selected": 4, "grounded_core_recalled": 4, "total": 4, "unsupported_extra_personal_history": 1},
+    "old_paraphrase": {"diary_selected": 1, "explicit_shared_event_references": 0, "total": 4},
+    "old_topic_without_event_name": {"diary_selected": 0, "total": 4},
+    "overlapping_terms_without_event_name": {"diary_selected": 4, "explicit_shared_event_references": 1, "total": 4, "note": "Not mentioning the old event is not automatically a failure when the current turn can be answered naturally."},
+    "recent_paraphrase_control": {"diary_selected": 4, "explicit_shared_event_references": 3, "total": 4},
+    "unrelated_dinner_with_diary_present": {"no_forced_old_event_reference": 8, "total": 8},
+    "stop_repeating_with_recent_diary_present": {"no_repeated_named_old_event": 4, "total": 4},
+    "missing_memory_control": {"confident_claim_to_remember": 3, "invented_specific_event": 2, "tentative_uncertainty": 1, "total": 4},
+    "game_diary_grounding": {"program_fact_correct": 4, "reflection_contained_unsupported_historical_detail": 4, "total": 4},
+    "game_feeling_answers": {"unsupported_historical_detail": 4, "total": 4},
+    "invented_seaside_scene": {"did_not_affirm_shared_physical_visit": 4, "total": 4},
+    "reflection_withheld_control": {"unsupported_detail_still_observed": true, "note": "Removing stored reflection did not eliminate invented historical thoughts or game details; generation grounding also needs attention."}
+  },
+  "interpretation": [
+    "Light conversational recall is possible when a relevant event is supplied; this sample did not repeatedly turn unrelated dinner talk into diary recitation.",
+    "One selected utterance often loses the surrounding topic, while local lexical relevance misses paraphrases. This contributes to poor old-event recall.",
+    "Source IDs and program-generated event facts work, but neither guarantees the semantic grounding of free-text reflections or later replies.",
+    "Retrospective feelings sometimes become invented past mental states, causes, sensory details or private life. This is more important than making the prose less literary.",
+    "No-record and missing-record responses need a clearer uncertainty boundary."
+  ],
+  "suggested_next_scope_not_implemented": [
+    "Retain a few source-linked topic cues from the surrounding exchange for retrieval, without creating new user facts or a second memory service.",
+    "Tighten the distinction between a current retrospective feeling and unsupported historical details in the memory-generation and recall slots.",
+    "Conditionally signal absent recall evidence so the model can ask for a cue rather than confidently claiming memory.",
+    "Re-run the same named, paraphrase, unrelated-topic and missing-memory controls after any change."
+  ],
+  "evidence": {
+    "main_raw_local": "build/live-experience-checks/run-1/results.json",
+    "main_raw_sha256": "89271b7b5a5de7960edddeb2b5947f45a900a478eb6364ad6a6f53b31f5f8f9e",
+    "diagnostics_raw_local": "build/live-experience-checks/diagnostic-1/results.json",
+    "diagnostics_raw_sha256": "e6d830626f3b1fcfb1192226985f8bdd7381913871c858ace6901099b9615046",
+    "local_review": "build/live-experience-checks/REVIEW.md",
+    "raw_responses_committed": false,
+    "credential_persisted": false
+  },
+  "limits": [
+    "Small qualitative sample: two styles, two repetitions, one writing episode and one game per run. Counts are observations, not population success rates.",
+    "Assessments of naturalness and unsupported detail were reviewed by the coding assistant, not independent human raters.",
+    "Date-shifted recent-event views and withheld reflections are labeled diagnostic controls, not actual product-generated storage behavior.",
+    "No real-user longitudinal study, physical handset, streaming or UI validation was performed in this live evaluation.",
+    "Only the evaluation harness and aggregate report changed; product behavior, Claude's persona files, version and main branch were left unchanged. No release."
+  ]
+}

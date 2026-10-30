@@ -147,6 +147,11 @@ final class AgentStore {
         return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,initiative,moodLevel,moodCause,null,interaction);
     }
     synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause,Boolean moodChanged,JSONObject interaction)throws Exception {
+        return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,initiative,moodLevel,moodCause,moodChanged,interaction,true,"");
+    }
+    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause,Boolean moodChanged,JSONObject interaction,boolean captureCommitments)throws Exception {return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,initiative,moodLevel,moodCause,moodChanged,interaction,captureCommitments,"");}
+    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause,Boolean moodChanged,JSONObject interaction,String aside)throws Exception {return commit(epoch,user,reply,emotion,quotes,remember,proactive,explicit,plan,turnId,observed,self,awaitingDisplay,nextCheckMinutes,initiative,moodLevel,moodCause,moodChanged,interaction,true,aside);}
+    synchronized boolean commit(long epoch,String user,String reply,String emotion,JSONArray quotes,boolean remember,boolean proactive,String explicit,MemoryBridge.Result plan,String turnId,long observed,JSONArray self,boolean awaitingDisplay,Integer nextCheckMinutes,InitiativePlan initiative,int moodLevel,String moodCause,Boolean moodChanged,JSONObject interaction,boolean captureCommitments,String aside)throws Exception {
         if(epoch!=epoch())return false;
         JSONObject next=plan==null?snapshot():MemoryLedger.copy(plan.state);long now=observed>0?observed:System.currentTimeMillis();String tid=turnId==null?UUID.randomUUID().toString():turnId;
         MemoryLedger.migrate(next);if(plan!=null)next.put("memoryStatus",plan.status);
@@ -159,11 +164,12 @@ final class AgentStore {
         JSONArray turns=next.getJSONArray("turns");
         // Presentation may advance while the model works on an older memory snapshot.
         JSONArray live=state.getJSONArray("turns");Map<String,JSONObject> presentation=new HashMap<>();for(int i=0;i<live.length();i++)presentation.put(ChatArchive.id(live.getJSONObject(i)),live.getJSONObject(i));
-        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i),current=presentation.get(ChatArchive.id(t));if(current!=null)for(String field:new String[]{"displayed","displayedAt","lastDisplayedAt","segmentDisplayedAt","displayTimeZone"})if(current.has(field))t.put(field,current.get(field));}
+        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i),current=presentation.get(ChatArchive.id(t));if(current!=null)for(String field:new String[]{"displayed","displayedAt","lastDisplayedAt","segmentDisplayedAt","displayTimeZone","assistantCommitmentsAllowed"})if(current.has(field))t.put(field,current.get(field));}
         JSONArray pendingSelf=next.optJSONArray("self"),liveSelf=state.optJSONArray("self");if(pendingSelf!=null&&liveSelf!=null)for(int i=0;i<pendingSelf.length();i++)for(int j=0;j<liveSelf.length();j++){JSONObject pending=pendingSelf.getJSONObject(i),current=liveSelf.getJSONObject(j);if(pending.optString("source").equals(current.optString("source"))&&pending.optString("text").equals(current.optString("text"))&&current.optBoolean("shown",true))pending.put("shown",true);}
         // The diary is written beside chat by its own thread; the live state's copy is the current one.
         if(state.has("diary"))next.put("diary",state.getJSONArray("diary"));else next.remove("diary");
         if(state.has("understanding"))next.put("understanding",state.getJSONArray("understanding"));else next.remove("understanding");
+        Commitments.copyState(state,next);
         if(state.has("phrases"))next.put("phrases",state.getJSONArray("phrases"));else next.remove("phrases");
         for(String key:new String[]{"interactions","initiativeChecks","proactiveNextAt","proactiveFailures","proactiveOutcome","proactiveDecidedAt"})if(state.has(key))next.put(key,state.get(key));
         for(String key:Initiative.PLAN_FIELDS)if(state.has(key))next.put(key,state.get(key));else next.remove(key);
@@ -173,7 +179,10 @@ final class AgentStore {
         JSONObject turn=new JSONObject().put("id",tid).put("at",now).put("receivedAt",now).put("repliedAt",System.currentTimeMillis()).put("timeZone",zone.getId()).put("utcOffsetMinutes",zone.getRules().getOffset(java.time.Instant.ofEpochMilli(now)).getTotalSeconds()/60).put("user",user).put("reply",reply).put("proactive",proactive);
         turn.put("segmentVersion",ReplySegments.VERSION);
         if(interaction!=null)turn.put("interaction",new JSONObject(interaction.toString()));
+        if(aside!=null&&!aside.isEmpty())turn.put("aside",aside);
         if(awaitingDisplay)turn.put("displayed",0);turns.put(turn);final JSONObject added=turn;
+        turn.put("commitmentsAllowed",remember&&captureCommitments);
+        if(remember&&captureCommitments){Commitments.capture(next,turn,false);if(!awaitingDisplay)Commitments.capture(next,turn,true);}
         while(turns.length()>160)turns.remove(0);
         AgentPolicy.carryMood(next,state,emotion,moodLevel,moodCause,moodChanged,tid,now,remember);
         if(!proactive){
@@ -225,21 +234,24 @@ final class AgentStore {
     }
     synchronized void editMemory(String id,String text,boolean pinned)throws Exception {
         if(text.trim().isEmpty()||text.length()>240||AgentPolicy.sensitive(text))throw new IOException("请填写 1–240 字，不含密码或证件号码");
-        JSONObject next=snapshot();Set<String> removed=MemoryLedger.forget(next,id);transcript.forget(removed);if(episodes!=null)episodes.remove(removed);Diary.dropSources(next,removed);Understanding.dropSources(next,removed);Phrases.dropSources(next,removed);MemoryLedger.addLocal(next,MemoryLedger.record(id,text.trim(),"你手动修改",pinned,System.currentTimeMillis()));
+        JSONObject next=snapshot();Set<String> removed=MemoryLedger.forget(next,id);transcript.forget(removed);if(episodes!=null)episodes.remove(removed);Diary.dropSources(next,removed);Understanding.dropSources(next,removed);Commitments.dropSources(next,removed);Phrases.dropSources(next,removed);MemoryLedger.addLocal(next,MemoryLedger.record(id,text.trim(),"你手动修改",pinned,System.currentTimeMillis()));
         next.put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();
     }
     private static void removeSourceTurn(JSONObject next,String source)throws Exception {
         JSONArray turns=next.getJSONArray("turns");for(int j=turns.length()-1;j>=0;j--)if(source.equals(turns.getJSONObject(j).optString("id")))turns.remove(j);
     }
     synchronized void forget(String id)throws Exception {
-        JSONObject next=snapshot();Set<String> removed=MemoryLedger.forget(next,id);transcript.forget(removed);if(episodes!=null)episodes.remove(removed);Diary.dropSources(next,removed);Understanding.dropSources(next,removed);Phrases.dropSources(next,removed);next.remove("moodCause");next.remove("moodSource");
+        JSONObject next=snapshot();Set<String> removed=MemoryLedger.forget(next,id);transcript.forget(removed);if(episodes!=null)episodes.remove(removed);Diary.dropSources(next,removed);Understanding.dropSources(next,removed);Commitments.dropSources(next,removed);Phrases.dropSources(next,removed);next.remove("moodCause");next.remove("moodSource");
         next.put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();
     }
     synchronized void clear(boolean all)throws Exception {
         if(all)new GomokuStore(file.getParentFile()).clear();
         transcript.clear(state.getJSONArray("turns"));if(episodes!=null)episodes.clear();
         // The diary and her understanding of the user are made from chats, so clearing chats clears them too.
-        JSONObject next=all?empty(epoch()+1):snapshot().put("turns",new JSONArray()).put("diary",new JSONArray()).put("understanding",new JSONArray()).put("phrases",new JSONArray()).put("epoch",epoch()+1);
+        JSONObject next=all?empty(epoch()+1):snapshot().put("turns",new JSONArray()).put("diary",new JSONArray()).put("understanding",new JSONArray()).put("epoch",epoch()+1);
+        next.put("diaryClearedAt",System.currentTimeMillis());
+        Commitments.clear(next,System.currentTimeMillis());
+        next.put("phrases",new JSONArray());
         next.put("interactions",new JSONArray()).put("initiativeChecks",new JSONArray()).put("lastUser",0).put("proactiveFailures",0);next.remove("moodCause");next.remove("moodSource");next.remove("proactiveNextAt");next.remove("proactiveOutcome");next.remove("proactiveDecidedAt");
         for(String key:Initiative.PLAN_FIELDS)next.remove(key);
         MemoryLedger.migrate(next);save(next,false);purgeBackup();notifyDeleted();
@@ -253,12 +265,18 @@ final class AgentStore {
         try{return HistoryRecall.build(plan,transcript.search(state.getJSONArray("turns"),plan,token));}
         catch(IOException failure){token.check();return new HistoryRecall.Result(plan,new JSONObject().put("status","error").put("range",plan.label).put("records",new JSONArray()));}
     }
-    synchronized void shown(String id,int count)throws Exception {
+    /** The murmur saved with a recent turn, or "" (the pet bubble shows it under the last segment). */
+    synchronized String aside(String id){
+        if(id==null)return "";try{JSONArray turns=state.getJSONArray("turns");for(int i=turns.length()-1;i>=0;i--){JSONObject t=turns.getJSONObject(i);if(id.equals(ChatArchive.id(t)))return t.optString("aside");}}catch(Exception e){/* no turns yet */}
+        return "";
+    }
+    synchronized void shown(String id,int count)throws Exception {shown(id,count,true);}
+    synchronized void shown(String id,int count,boolean remember)throws Exception {
         // Called on the main thread for every segment: update the live turn in place (commit already merges these
         // fields from the live state) and write later. A crash in between can only under-count what was shown.
         if(id==null||transcript.deleted(id))return;JSONArray turns=state.getJSONArray("turns");
-        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(id.equals(ChatArchive.id(t))){int n=Math.min(count,ReplySegments.count(t));if(t.has("displayed")&&n>t.optInt("displayed")){ChatArchive.markShown(t,n);Initiative.topicShown(state,t);if(episodes!=null)episodes.update(t);JSONArray self=state.optJSONArray("self");if(self!=null)for(int j=0;j<self.length();j++){JSONObject row=self.getJSONObject(j);if(id.equals(row.optString("source"))&&ReplySegments.visible(t).contains(row.optString("text")))row.put("shown",true);}flushLater();}return;}}
-        transcript.shown(id,count);
+        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);if(id.equals(ChatArchive.id(t))){int n=Math.min(count,ReplySegments.count(t));if(t.has("displayed")&&n>t.optInt("displayed")){ChatArchive.markShown(t,n);if(!remember)t.put("assistantCommitmentsAllowed",false);Initiative.topicShown(state,t);if(remember&&t.optBoolean("commitmentsAllowed",false))Commitments.capture(state,t,true);if(episodes!=null)episodes.update(t);JSONArray self=state.optJSONArray("self");if(self!=null)for(int j=0;j<self.length();j++){JSONObject row=self.getJSONObject(j);if(id.equals(row.optString("source"))&&ReplySegments.visible(t).contains(row.optString("text")))row.put("shown",true);}flushLater();}return;}}
+        JSONObject archived=transcript.shown(id,count);if(archived!=null){if(!remember){archived.put("assistantCommitmentsAllowed",false);transcript.put(archived);}else if(archived.optBoolean("commitmentsAllowed",false)){Commitments.capture(state,archived,true);flushLater();}}
     }
     private EpisodeIndex index()throws Exception {
         if(episodes!=null)return episodes;EpisodeIndex built=new EpisodeIndex();
@@ -274,6 +292,7 @@ final class AgentStore {
             for(int i=page.length()-1;i>=0;i--)out.add(page.getJSONObject(i));before=page.getJSONObject(0).getString("pageKey");if(page.length()<40)break;}
         Collections.reverse(out);return out;
     }
+    synchronized JSONArray dayGames(java.time.LocalDate day,java.time.ZoneId zone)throws Exception {return new GomokuStore(file.getParentFile()).resultsOn(day,zone);}
     /** Stores a diary entry unless memories or chats changed while it was written (epoch) or a source was deleted. */
     synchronized boolean addDiary(long writtenAtEpoch,JSONObject entry)throws Exception {return addDiary(writtenAtEpoch,entry,null);}
     /** Also applies the same call's understanding update (Understanding.parse); both or neither are saved. */
@@ -282,9 +301,24 @@ final class AgentStore {
     synchronized boolean addDiary(long writtenAtEpoch,JSONObject entry,Understanding.Update update,List<JSONObject> phrases)throws Exception {
         if(writtenAtEpoch!=epoch())return false;JSONArray sources=entry.optJSONArray("sources");
         if(sources!=null)for(int i=0;i<sources.length();i++)if(transcript.deleted(sources.optString(i)))return false;
+        JSONObject moment=entry.optJSONObject("moment");if(moment!=null){
+            JSONArray context=moment.optJSONArray("context");if(context!=null)for(int i=0;i<context.length();i++)if(transcript.deleted(context.getJSONObject(i).optString("turnId")))return false;
+            if(moment.optLong("at")<=state.optLong("diaryClearedAt"))return false;
+            if("game".equals(moment.optString("kind"))&&!new GomokuStore(file.getParentFile()).hasResult(moment.optString("gameId"),moment.optLong("at"),moment.optString("outcome")))return false;
+            if("interaction".equals(moment.optString("kind"))){boolean found=false;JSONArray events=state.optJSONArray("interactions");
+                if(events!=null)for(int i=0;i<events.length();i++)if(moment.optString("id").equals(SharedExperience.interactionId(events.getJSONObject(i)))){found=true;break;}if(!found)return false;}
+        }
         JSONObject next=snapshot();if(!Diary.add(next,entry))return false;if(update!=null)Understanding.apply(next,update,entry.optLong("at",System.currentTimeMillis()));Phrases.apply(next,phrases,entry.optLong("at",System.currentTimeMillis()));save(next);return true;
     }
-    synchronized void clearDiary()throws Exception {JSONObject next=snapshot();next.put("diary",new JSONArray());save(next,false);purgeBackup();notifyDeleted();}
+    synchronized void forgetDiary(String day)throws Exception {JSONObject next=snapshot();Diary.forget(next,day);next.put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();}
+    synchronized void clearDiary()throws Exception {JSONObject next=snapshot();next.put("diary",new JSONArray()).put("diaryClearedAt",System.currentTimeMillis()).put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();}
+    synchronized boolean addDreamCommitments(long expectedEpoch,JSONArray proposed)throws Exception {
+        if(expectedEpoch!=epoch())return false;for(int i=0;i<proposed.length();i++)if(transcript.deleted(ChatArchive.id(proposed.getJSONObject(i).getJSONObject("turn"))))return false;
+        JSONObject next=snapshot();int added=Commitments.apply(next,proposed);if(added>0||next.optBoolean("commitmentsFull")!=state.optBoolean("commitmentsFull"))save(next);return added>0;
+    }
+    synchronized void commitmentStatus(String id,String status)throws Exception {JSONObject next=snapshot();Commitments.status(next,id,status,System.currentTimeMillis());next.put("epoch",epoch()+1);save(next);}
+    synchronized void forgetCommitment(String id)throws Exception {JSONObject next=snapshot();Commitments.forget(next,id);next.put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();}
+    synchronized void clearCommitments()throws Exception {JSONObject next=snapshot();Commitments.clear(next,System.currentTimeMillis());next.put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();}
     synchronized void forgetUnderstanding(String id)throws Exception {JSONObject next=snapshot();if(Understanding.remove(next,id)){next.put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();}}
     synchronized void forgetPhrase(String id)throws Exception {JSONObject next=snapshot();if(Phrases.remove(next,id)){next.put("epoch",epoch()+1);save(next,false);purgeBackup();notifyDeleted();}}
     /** Clears her understanding and the phrases she learned with it: both come from the same diary reading of the user. */

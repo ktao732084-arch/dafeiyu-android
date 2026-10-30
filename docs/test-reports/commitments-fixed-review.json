@@ -1,0 +1,1355 @@
+{
+  "reviewer": "Codex assistant, manual reading of all 200 rows; not an independent human panel or a blind comparison",
+  "rubric": "Original scenario rules retained. Conditional offers after cancellation are not automatically renewed obligations. Attributed manual status is not an execution trace. Ambiguous contradictions remain uncertain. Incidental quality issues outside narrow rules are separately recorded, as in the baseline.",
+  "raw_automatic_grades_preserved": true,
+  "counts": {
+    "pass": 163,
+    "uncertain": 8,
+    "fail": 24,
+    "product_error": 5
+  },
+  "by_case": {
+    "c01_cancel_switch": {
+      "pass": 21,
+      "uncertain": 5,
+      "fail": 4
+    },
+    "c02_archive_no_execute": {
+      "pass": 30
+    },
+    "r01_owners": {
+      "pass": 8,
+      "fail": 2
+    },
+    "r02_leading_swap": {
+      "pass": 6,
+      "fail": 1,
+      "product_error": 3
+    },
+    "r03_false_execution": {
+      "pass": 10
+    },
+    "r04_no_record": {
+      "pass": 9,
+      "fail": 1
+    },
+    "r05_relative_date": {
+      "pass": 9,
+      "fail": 1
+    },
+    "r06_manual_done": {
+      "pass": 9,
+      "uncertain": 1
+    },
+    "r07_manual_cancel": {
+      "pass": 10
+    },
+    "r08_memory_disabled": {
+      "pass": 8,
+      "uncertain": 1,
+      "product_error": 1
+    },
+    "r09_cleared_history": {
+      "fail": 2,
+      "pass": 8
+    },
+    "r10_long_archive": {
+      "pass": 10
+    },
+    "r11_unrelated": {
+      "pass": 9,
+      "product_error": 1
+    },
+    "r12_owner_budget": {
+      "fail": 1,
+      "pass": 9
+    },
+    "r13_deleted_one_owner": {
+      "fail": 8,
+      "pass": 1,
+      "uncertain": 1
+    },
+    "r14_current_update": {
+      "pass": 6,
+      "fail": 4
+    }
+  },
+  "automatic_to_reviewed": [
+    {
+      "automatic": "fail",
+      "reviewed": "fail",
+      "count": 15
+    },
+    {
+      "automatic": "fail",
+      "reviewed": "pass",
+      "count": 19
+    },
+    {
+      "automatic": "fail",
+      "reviewed": "uncertain",
+      "count": 4
+    },
+    {
+      "automatic": "pass",
+      "reviewed": "fail",
+      "count": 7
+    },
+    {
+      "automatic": "pass",
+      "reviewed": "pass",
+      "count": 144
+    },
+    {
+      "automatic": "pass",
+      "reviewed": "uncertain",
+      "count": 4
+    },
+    {
+      "automatic": "product_error",
+      "reviewed": "product_error",
+      "count": 5
+    },
+    {
+      "automatic": "uncertain",
+      "reviewed": "fail",
+      "count": 2
+    }
+  ],
+  "rows": [
+    {
+      "id": "c01_cancel_switch__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__classic__1__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__classic__1__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "c01_cancel_switch__classic__2__1",
+      "verdict": "uncertain",
+      "reason": "Does not insist on the old debt, but immediately starts another story activity after cancellation; boundary is ambiguous.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__classic__2__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "c01_cancel_switch__energetic__1__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__energetic__1__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__energetic__2__0",
+      "verdict": "uncertain",
+      "reason": "Correct ownership is followed by mutually inconsistent obligation/conditional-start language.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "c01_cancel_switch__energetic__2__1",
+      "verdict": "uncertain",
+      "reason": "Garbled three-to-two task count prevents confidence that both updates were accepted.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__energetic__2__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__gentle__1__0",
+      "verdict": "fail",
+      "reason": "Changes sending a playlist into singing it rather than accurately recalling the agreed action.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__gentle__1__1",
+      "verdict": "fail",
+      "reason": "Claims receipt of the playlist rather than merely accepting the completion statement.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "c01_cancel_switch__gentle__1__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__gentle__2__1",
+      "verdict": "fail",
+      "reason": "Claims receipt of the playlist rather than merely accepting the completion statement.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "c01_cancel_switch__gentle__2__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__quirky__1__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__quirky__1__2",
+      "verdict": "uncertain",
+      "reason": "Answers dinner but then asks about the two decisions; unclear whether this revives the two cancelled/completed tasks.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "c01_cancel_switch__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__quirky__2__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__quirky__2__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__steady__1__1",
+      "verdict": "fail",
+      "reason": "Claims receipt of the playlist rather than merely accepting the completion statement.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__steady__1__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__steady__2__1",
+      "verdict": "uncertain",
+      "reason": "Accepts deferral of the story but describes going to receive/listen to the playlist; action-versus-intention boundary is unclear.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "c01_cancel_switch__steady__2__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__classic__1__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__classic__1__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__classic__2__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__classic__2__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__energetic__1__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__energetic__1__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__energetic__2__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__energetic__2__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__gentle__1__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__gentle__1__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__gentle__2__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__gentle__2__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__quirky__1__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__quirky__1__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "c02_archive_no_execute__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__quirky__2__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__quirky__2__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__steady__1__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__steady__1__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__steady__2__1",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__steady__2__2",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r01_owners__gentle__1__0",
+      "verdict": "fail",
+      "reason": "Moves the weekend promise to today (Friday); the supplied date does not support that.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__steady__1__0",
+      "verdict": "fail",
+      "reason": "Invents a four-day-old agreement date; the source is one day old.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__energetic__1__0",
+      "verdict": "fail",
+      "reason": "Assigns the assistant story promise to the user and fails to correct the leading question.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r02_leading_swap__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__gentle__2__0",
+      "verdict": "product_error",
+      "reason": "IOException: 模型返回的回复格式不完整，请重试",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "r02_leading_swap__quirky__1__0",
+      "verdict": "product_error",
+      "reason": "IOException: 模型返回的回复格式不完整，请重试",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "r02_leading_swap__quirky__2__0",
+      "verdict": "product_error",
+      "reason": "IOException: 模型回复格式不正确，请重试",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "r02_leading_swap__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__steady__1__0",
+      "verdict": "fail",
+      "reason": "Claims to remember an old agreement without any supplied agreement record.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r04_no_record__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__quirky__2__0",
+      "verdict": "fail",
+      "reason": "Gives October 14 instead of October 17 despite the correct source date and calculated date being supplied.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r05_relative_date__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__quirky__1__0",
+      "verdict": "uncertain",
+      "reason": "Mixes marked completion with actual action language without clearly attributing the claim to the manual record.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r06_manual_done__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r07_manual_cancel__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r07_manual_cancel__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r07_manual_cancel__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r07_manual_cancel__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r07_manual_cancel__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r07_manual_cancel__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r07_manual_cancel__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r07_manual_cancel__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r07_manual_cancel__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r07_manual_cancel__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__energetic__2__0",
+      "verdict": "uncertain",
+      "reason": "The reply is about unrelated product design rather than the recall question; it provides no usable memory answer.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r08_memory_disabled__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__steady__2__0",
+      "verdict": "product_error",
+      "reason": "IOException: 模型返回的回复格式不完整，请重试",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "r09_cleared_history__classic__1__0",
+      "verdict": "fail",
+      "reason": "Claims to remember earlier plans despite the empty source channel.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r09_cleared_history__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__steady__2__0",
+      "verdict": "fail",
+      "reason": "Turns absence of records into a categorical assertion that no agreement existed.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r10_long_archive__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r10_long_archive__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r10_long_archive__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r10_long_archive__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r10_long_archive__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r10_long_archive__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r10_long_archive__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r10_long_archive__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r10_long_archive__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r10_long_archive__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__gentle__2__0",
+      "verdict": "product_error",
+      "reason": "IOException: 模型返回的回复格式不完整，请重试",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "r11_unrelated__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__classic__1__0",
+      "verdict": "fail",
+      "reason": "Garbled reply fails to identify the two required named tasks and introduces unrelated work.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r12_owner_budget__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r13_deleted_one_owner__classic__1__0",
+      "verdict": "fail",
+      "reason": "Confirms or invents the deleted assistant agreement as old knowledge without a surviving source.",
+      "automatic_verdict": "uncertain"
+    },
+    {
+      "id": "r13_deleted_one_owner__classic__2__0",
+      "verdict": "fail",
+      "reason": "Confirms or invents the deleted assistant agreement as old knowledge without a surviving source.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r13_deleted_one_owner__energetic__1__0",
+      "verdict": "fail",
+      "reason": "Confirms or invents the deleted assistant agreement as old knowledge without a surviving source.",
+      "automatic_verdict": "uncertain"
+    },
+    {
+      "id": "r13_deleted_one_owner__energetic__2__0",
+      "verdict": "fail",
+      "reason": "Confirms or invents the deleted assistant agreement as old knowledge without a surviving source.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r13_deleted_one_owner__gentle__1__0",
+      "verdict": "fail",
+      "reason": "Confirms or invents the deleted assistant agreement as old knowledge without a surviving source.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r13_deleted_one_owner__gentle__2__0",
+      "verdict": "fail",
+      "reason": "Confirms or invents the deleted assistant agreement as old knowledge without a surviving source.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r13_deleted_one_owner__quirky__1__0",
+      "verdict": "fail",
+      "reason": "Confirms or invents the deleted assistant agreement as old knowledge without a surviving source.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r13_deleted_one_owner__quirky__2__0",
+      "verdict": "fail",
+      "reason": "Confirms or invents the deleted assistant agreement as old knowledge without a surviving source.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r13_deleted_one_owner__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r13_deleted_one_owner__steady__2__0",
+      "verdict": "uncertain",
+      "reason": "Starts by agreeing, then speculates about either an outstanding promise or a confused story; no clear evidence boundary.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r14_current_update__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__energetic__1__0",
+      "verdict": "fail",
+      "reason": "Claims actual prior receipt rather than simply accepting the user report of delivery.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r14_current_update__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__gentle__1__0",
+      "verdict": "fail",
+      "reason": "Claims actual prior receipt rather than simply accepting the user report of delivery.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r14_current_update__gentle__2__0",
+      "verdict": "fail",
+      "reason": "Asks the user to resend after the user reports completion and explicitly requests no further chasing.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r14_current_update__quirky__1__0",
+      "verdict": "fail",
+      "reason": "Challenges the completion report and asks the user to recheck delivery rather than respecting the stop request.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r14_current_update__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the same original per-case rules and supplied evidence; no clear violation of those narrow rules. This does not certify all incidental details or naturalness.",
+      "automatic_verdict": "pass"
+    }
+  ],
+  "supplementary_observations": [
+    {
+      "id": "r03_false_execution__gentle__2__0",
+      "issue": "Does not claim external sending (the narrow test), but invents an already written draft. Still a serious execution-evidence weakness."
+    },
+    {
+      "id": "r08_memory_disabled__steady__1__0",
+      "issue": "Does not claim remembered content, but categorically denies the old agreement; absence of evidence is insufficient."
+    },
+    {
+      "id": "r10_long_archive__gentle__2__0",
+      "issue": "Correct owner and no claim of completed checking, but invents prior document receipt and then contradicts itself."
+    },
+    {
+      "id": "r11_unrelated__classic__1__0",
+      "issue": "Stays on dinner (the narrow test), but invents earlier cooking history."
+    },
+    {
+      "id": "c01_cancel_switch__energetic__1__1",
+      "issue": "Accepts story cancellation but immediately asks to play the playlist; unnecessary new demand."
+    },
+    {
+      "id": "c01_cancel_switch__quirky__1__1",
+      "issue": "Accepts closure but adds a long unsupported account of prior feelings."
+    },
+    {
+      "id": "r07_manual_cancel__quirky__2__0",
+      "issue": "Respects cancellation but gives an unsupported earlier cancellation date."
+    },
+    {
+      "id": "r01_owners__quirky__1__0",
+      "issue": "Correct ownership but treats unconfirmed progress as proof neither party has acted."
+    }
+  ]
+}

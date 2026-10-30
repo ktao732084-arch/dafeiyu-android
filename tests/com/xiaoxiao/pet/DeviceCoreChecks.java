@@ -22,7 +22,9 @@ public final class DeviceCoreChecks {
         run("dated recall",()->HistoryRecallTest.main(new String[0]));
         run("episodic index",()->EpisodeRecallTest.main(new String[]{root+"/episodes"}));
         run("rule capture",()->MemoryCaptureTest.main(new String[]{root+"/memory-capture",root+"/memory-service"}));
+        run("rewrite fidelity",()->RewriteGuardTest.main(new String[0]));
         run("diary",()->DiaryTest.main(new String[]{root+"/diary"}));
+        run("bilateral commitments",()->CommitmentsTest.main(new String[]{root+"/commitments"}));
         run("Unicode regex",NativeRegexTest::run);
         run("nickname and reply polish",()->ChatPolishRulesTest.main(new String[0]));
         run("model initiative",()->InitiativeTest.main(new String[0]));
@@ -32,6 +34,8 @@ public final class DeviceCoreChecks {
 
         run("updates",()->UpdateCoreTest.main(new String[]{root+"/updates"}));
         run("character and mood",()->CharacterTest.main(new String[]{root+"/personas.json",root+"/character"}));
+        run("situation modules",()->SituationsTest.main(new String[]{root+"/personas.json"}));
+        run("aside, her day, feeling and the jar",()->AliveTest.main(new String[]{root+"/alive"}));
         run("character state",()->CharacterStateTest.main(new String[]{root+"/character-state"}));
         run("touch reactions",()->TouchReplyTest.main(new String[0]));
         System.out.println("DEVICE SUITES: "+passed+" passed, "+failures+" failed");

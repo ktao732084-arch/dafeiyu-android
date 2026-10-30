@@ -49,7 +49,7 @@ final class ChatPage {
         input.addTextChangedListener(new Watcher(this::sendState));sendState();
         speech=new SpeechQueue(new SpeechQueue.Clock(){public void later(Runnable r,long delay){handler.postDelayed(r,delay);}public void remove(Runnable r){handler.removeCallbacks(r);}},new SpeechQueue.Sink(){
             public boolean visible(){return dialog.isShowing()&&(!(c instanceof Activity)||!((Activity)c).isFinishing());}
-            public void show(String text,int shown,boolean preview){try{AgentRuntime.store().shown(turnId,shown);loadLatest();status.setText(preview?"她写了一段长长的回复，点气泡下方就能看全文":"");}catch(Exception e){status.setText("展示状态没保存上，可以在聊天记录里查看。");}}
+            public void show(String text,int shown,boolean preview){try{AgentRuntime.store().shown(turnId,shown,AgentRuntime.rememberEnabled());loadLatest();status.setText(preview?"她写了一段长长的回复，点气泡下方就能看全文":"");}catch(Exception e){status.setText("展示状态没保存上，可以在聊天记录里查看。");}}
             public void stop(int shown){}
         });interrupt=()->speech.cancel();refresh=()->{if(dialog.isShowing()&&!sending&&!paged&&from==Long.MIN_VALUE)loadLatest();};
         dialog.setOnDismissListener(d->{if(Chat.historyViews.get(id)==refresh)Chat.historyViews.remove(id);speech.cancel();handler.removeCallbacksAndMessages(null);if(sending){sending=false;AgentRuntime.cancel();}PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();if(Chat.petChats.get(id)==dialog)Chat.petChats.remove(id);if(Chat.presentations.get(id)==interrupt)Chat.presentations.remove(id);if(c instanceof MainActivity&&!((MainActivity)c).isFinishing()&&!((MainActivity)c).isDestroyed())((MainActivity)c).render();});
@@ -142,6 +142,13 @@ final class ChatPage {
             List<String> bubbles=t.optInt("segmentVersion",1)>=ReplySegments.VERSION?Collections.singletonList(text):ReplySegments.split(text);
             for(int j=0;j<bubbles.size();j++){boolean last=i==shown-1&&j==bubbles.size()-1;message(bubbles.get(j).trim(),false,last?pending:null,last?reason:null,last&&invite);}
         }
+        if(shown>=parts.size()&&AgentRuntime.asideEnabled())aside(t.optString("aside"));
+    }
+    /** Her murmur under the reply: small, grey and italic, outside the bubble, so it never reads as part of the answer. */
+    void aside(String text){
+        if(text.isEmpty())return;
+        TextView murmur=Apple.label(c,text,12,false);murmur.setTextColor(Apple.SECONDARY);murmur.setTypeface(murmur.getTypeface(),android.graphics.Typeface.ITALIC);murmur.setAlpha(.85f);
+        murmur.setMaxWidth(bubbleWidth);murmur.setPadding(dp(48),0,0,dp(4));rows.addView(murmur,new LinearLayout.LayoutParams(-1,-2));
     }
     void empty(){
         LinearLayout hello=column();hello.setGravity(Gravity.CENTER_HORIZONTAL);hello.setPadding(dp(24),dp(overlay?12:56),dp(24),dp(24));
@@ -254,7 +261,7 @@ final class ChatPage {
         stopSpeaking();
         TextView full=Apple.label(c,AgentPolicy.replyText(turn.optString("reply")),16,false);full.setLineSpacing(dp(4),1);full.setPadding(dp(20),dp(12),dp(20),dp(12));full.setTextIsSelectable(true);ScrollView view=new SpringScrollView(c);view.addView(full);
         AlertDialog details=new Apple.Builder(c).setTitle("她的完整回复").setView(view).setPositiveButton("看完了",null).create();if(overlay)details.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);details.show();
-        try{AgentRuntime.store().shown(turn.getString("id"),ReplySegments.count(turn));turn.put("displayed",ReplySegments.count(turn));render();}catch(Exception e){status.setText("展示状态暂时没保存上");}
+        try{AgentRuntime.store().shown(turn.getString("id"),ReplySegments.count(turn),AgentRuntime.rememberEnabled());turn.put("displayed",ReplySegments.count(turn));render();}catch(Exception e){status.setText("展示状态暂时没保存上");}
     }
     /**
      * While she answers, the box stays open: an empty box stops her, a typed one adds a message. Added messages join the
@@ -274,6 +281,11 @@ final class ChatPage {
         if(!ask(message))return;
         if(records.length()==0)rows.removeAllViews();stamp(new JSONObject(),System.currentTimeMillis());message(message,true,null,false);typing(true);scroll.post(()->scroll.fullScroll(View.FOCUS_DOWN));if(owner!=null&&owner.visible)owner.thinking();
     }
+    /** Restore submitted text ahead of what the user is still typing; never truncate joined drafts. */
+    void restoreDraft(String submitted){
+        String typed=input.getText().toString();String restored=submitted==null?typed:submitted+(typed.isEmpty()?"":"\n"+typed);
+        input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(Math.max(8000,restored.length()))});input.setText(restored);input.setSelection(input.length());
+    }
     /** Sends one user turn (possibly several messages joined) and wires the reply back into the page. */
     boolean ask(String message){
         draft=message;turnId=null;
@@ -283,12 +295,12 @@ final class ChatPage {
             public void done(String reply,String emotion){if(!dialog.isShowing()||listener!=this)return;from=Long.MIN_VALUE;to=Long.MAX_VALUE;anchor=focus=null;sending=false;sendState();idle();status.setText("");loadLatest();
                 PetService.Pet p=pet();if(p!=null)p.clearBubble();if(overlay&&p!=null&&p.visible&&!p.docked){AgentRuntime.express(id,emotion,reply,turnId);}else speech.start(reply);
                 // Her answer was already saved when these arrived: leave them in the box rather than cut her off mid-bubble.
-                if(more!=null){input.setText(more);more=null;}
+                if(more!=null){restoreDraft(more);more=null;}
             }
-            public void error(String message){if(!dialog.isShowing()||listener!=this)return;sending=false;input.setText(more==null?draft:draft+"\n"+more);more=null;sendState();idle();status.setText(message);retry.setVisibility(draft.isEmpty()?View.GONE:View.VISIBLE);loadLatest();PetService.Pet p=pet();if(p!=null)p.clearBubble();}
+            public void error(String message){if(!dialog.isShowing()||listener!=this)return;sending=false;restoreDraft(more==null?draft:draft+"\n"+more);more=null;sendState();idle();status.setText(message);retry.setVisibility(draft.isEmpty()?View.GONE:View.VISIBLE);loadLatest();PetService.Pet p=pet();if(p!=null)p.clearBubble();}
         };
         if(!AgentRuntime.send(message,false,l)){status.setText("她还在回上一句，稍等一下哦");return false;}
-        listener=l;sending=true;retry.setVisibility(View.GONE);input.setText("");sendState();status.setText("");presence.setText("对方正在输入…");presence.setTextColor(Apple.BLUE);
+        listener=l;sending=true;retry.setVisibility(View.GONE);input.setText("");input.setFilters(new android.text.InputFilter[]{new android.text.InputFilter.LengthFilter(8000)});sendState();status.setText("");presence.setText("对方正在输入…");presence.setTextColor(Apple.BLUE);
         return true;
     }
     void stopSpeaking(){speech.cancel();PetService.Pet owner=pet();if(owner!=null)owner.clearBubble();}

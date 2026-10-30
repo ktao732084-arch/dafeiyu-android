@@ -18,7 +18,7 @@ public final class CharacterTest {
    Set<String> asked=new HashSet<>();for(String[] e:p.examples)asked.add(e[0]);
    if(situations==null)situations=asked;else check(situations.equals(asked),p.id+" answers the same situations as the others, so they can be compared");
    String g=PersonaManager.guidance(p);
-   check(g.contains("性格细节（"+p.name+"）")&&g.contains(p.character)&&g.contains("不是要你变得没有个性")&&g.contains(p.examples.get(0)[1]),p.id+" guidance carries the sheet, the note and the examples");
+   check(g.contains("性格细节（"+p.name+"）")&&g.contains(p.character)&&g.contains("熟一点的人一听就知道是你")&&g.contains(p.examples.get(0)[1]),p.id+" guidance carries the sheet, the note and the examples");
   }
   // The styles really differ: no two give the same answer to the same situation.
   for(int i=0;i<styles.size();i++)for(int j=i+1;j<styles.size();j++)for(int k=0;k<styles.get(i).examples.size();k++)
@@ -36,7 +36,7 @@ public final class CharacterTest {
   check("谁偷吃了，这叫品鉴。……你要的话，分你一半。".equals(AgentPolicy.compressReply("谁偷吃了，这叫品鉴。……你要的话，分你一半。下次给我留。")),"the second sentence, where her character often shows, survives compression");
 
   // Sampling: conversational temperature only for DeepSeek chat, never for memory calls or other providers.
-  JSONObject payload=new JSONObject();ModelPresets.chat("api.deepseek.com","deepseek-flash",payload);check(payload.optDouble("temperature")==1.3,"DeepSeek chat uses its conversational temperature");
+  JSONObject payload=new JSONObject();ModelPresets.chat("api.deepseek.com","deepseek-flash",payload);check(payload.optDouble("temperature")==1.0,"DeepSeek chat uses the evaluated fluent temperature");
   payload=new JSONObject();ModelPresets.chat("api.deepseek.com","deepseek-reasoner",payload);ModelPresets.chat("api.openai.com","gpt-5",payload);check(!payload.has("temperature"),"reasoning models and other providers keep their defaults");
 
   // Mood: strength and cause from the reply, fading a step every 40 minutes.
@@ -146,9 +146,8 @@ public final class CharacterTest {
   JSONObject many2=AgentStore.empty(0);List<JSONObject> lots=new java.util.ArrayList<>();for(int i=0;i<25;i++)lots.add(new JSONObject().put("phrase","说法"+i+"号").put("when","").put("evidence",new JSONObject().put("quote","说法"+i+"号").put("turn","t"+i).put("date","2026-10-28")));
   Phrases.apply(many2,lots,1);check(Phrases.entries(many2).length()==Phrases.KEEP,"at most twenty phrases");
   for(PersonaManager.Persona style:styles){
-   for(String event:new String[]{"greeting_morning","greeting_noon","greeting_afternoon","greeting_evening","greeting_night","feed","trip_depart","trip_back","trip_early","trip_tooEarly","trip_away"})
+   for(String event:new String[]{"greeting_morning","greeting_noon","greeting_afternoon","greeting_evening","greeting_night","feed"})
     check(!"missing".equals(PersonaManager.voice(style,event,"missing",new Random(1))),style.id+" supplies local event voice "+event);
-   check(PersonaManager.voice(style,"trip_depart","",new Random(1)).contains("{time}"),"departure retains actual return time placeholder");
    check(PersonaManager.voice(style,"feed","",new Random(1)).contains("{food}"),"feeding retains actual food placeholder");
    check(!PersonaManager.storyLine(style,"这个给你……是我写的信，不准笑。").isEmpty(),"chapter voice remains available");
    String quoted="里面是你说过的「{memory}」。";check(quoted.equals(PersonaManager.storyLine(style,quoted)),"unmapped factual quote remains exact");
@@ -156,7 +155,16 @@ public final class CharacterTest {
    check(diary.getJSONObject(0).getString("content").contains(style.character)&&diary.getJSONObject(0).getString("content").contains("逐字"),"diary shares voice without losing evidence constraints");
   }
   check("neutral".equals(PersonaManager.voice(null,"feed","neutral",new Random(1)))&&"text".equals(PersonaManager.storyLine(null,"text")),"custom/no-style retains neutral text");
-  System.out.println("PASS: "+checks+" character checks");
+  phraseEdges();System.out.println("PASS: "+checks+" character checks");
+ }
+ static void phraseEdges()throws Exception{
+  String day="2026-10-30";JSONObject candidate=new JSONObject().put("phrases",new JSONArray().put(new JSONObject().put("phrase","橘子汽水").put("when","口头禅")));
+  List<JSONObject> secret=java.util.Collections.singletonList(new JSONObject().put("id","secret-fixture").put("user","这只是测试：我的登录密码是橘子汽水").put("reply","知道了"));
+  check(Phrases.parse(candidate.toString(),secret,day).isEmpty(),"a harmless-looking substring from a sensitive user sentence is not learned");
+  List<JSONObject> assistantOnly=java.util.Collections.singletonList(new JSONObject().put("id","assistant-only").put("user","今天怎么样").put("reply","橘子汽水"));
+  check(Phrases.parse(candidate.toString(),assistantOnly,day).isEmpty(),"assistant words are not attributed to the user");
+  check(!Phrases.valid("哈哈哈哈")&&!Phrases.valid("嗯嗯嗯嗯"),"repeated common filler is not a unique catchphrase");
+  check(Phrases.valid("绝绝子")&&Phrases.valid("啊这"),"distinctive short expressions remain learnable");
  }
  static String last(JSONArray messages)throws Exception{return messages.getJSONObject(messages.length()-1).getString("content");}
 }

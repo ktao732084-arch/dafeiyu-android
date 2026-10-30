@@ -1,5 +1,13 @@
 # 按模块标注的来源与改动
 
+## 未发布：双方约定
+
+`Commitments.java`、专项核心/框架/真实模型测试及手账接线由本项目独立编写，复用现有存储、聊天展示回执和每日整理。没有复制外部 Agent 的承诺提示词或实现，也不新增第三方记忆/任务服务；既有来源归属不变。
+
+## 未发布：共同经历与回想
+
+`SharedExperience.java`、相关 Diary/Store/Runtime/手账改动及测试为本项目独立实现。仅参考白艾莉调研中事件与主观感受分离、后台整理及有条件检索的机制，没有复制其源码、提示词或角色文案。复用本项目现有拟人记忆引擎、日记和聊天档案，并基于人格分支 `1c6a86b` 的经历素材及人格指导继续开发；各上游来源和许可保持不变。
+
 本项目是开源项目整合与改造，不将上游实现或素材署为本项目原创。下面区分**直接复制、在上游代码上修改、仅参考实现路线、本版新增**。
 
 ## 直接基线与间接来源
@@ -162,6 +170,14 @@ Nickname、ChatPolishRulesTest和ChatPolishTest由本项目新增，称呼识别
 AppUpdate、UpdateTransport、UpdateApk、UpdateFileProvider、UpdateRuntime、UpdatePanel、prepare-update.py、部署模板及相应测试均为本项目新增实现。使用 Android 平台网络、包管理器、ContentProvider 和系统安装界面；没有引入第三方更新 SDK、动态服务端或外部 Agent 代码。合入当前主分支后以 0.4.9.2 发布，保留原产品与素材归属。
 
 公网 IP 接入的 Nginx 路径配置、北京构建入口与 UpdateNetworkInstrumentation 为本项目新增；复用用户已有北京服务器和 IP 证书续期配置。站点最初镜像 v0.4.7；本次以原签名发布 0.4.9.2，保留上游素材归属。UpgradeAcceptance 与 OfflineTestApplication 为本项目新增验证代码：前者仅在新建模拟器使用合成数据验证真实 APK 覆盖安装，后者阻止框架单测意外访问线上更新站点。
+
+## 情境模块与设定集分册（尚未发布）
+
+`Situations.java`、`SituationsTest.java`，以及 `personas.json` 中的 `situations`、`bible`、`coreExamples` 和各风格的情境做法与示例，由本项目编写。只借鉴白艾莉公开工程方法论（[itshen/Alice_methodology](https://github.com/itshen/Alice_methodology)，MIT，Copyright (c) 2026 Miyang Tech）中“提示词分层、稳定人格在前、按需激活的模块、设定集写具体”的机制，未导入其代码、提示词或角色文案。`PersonaManager`、`PromptBuilder`、`AgentRuntime` 与评测工具在既有实现上接线。
+
+## 拟人更新回归（2026-10-30，尚未发布）
+
+`InterjectionEdgeTest`、`PhraseUiTest`和`PersonaUpdateInstrumentation`为本轮AI辅助新增测试，覆盖Claude的连发与表达学习改动。`ChatPage`补齐草稿恢复，`Phrases`补齐敏感来源与常用语气词校验；沿用既有模块和PR #25的来源，不引入新SDK或模型调用。验收见`docs/PERSONA_UPDATE_ACCEPTANCE.md`。
 
 ## 章节任务线（PR #24，尚未发布）
 

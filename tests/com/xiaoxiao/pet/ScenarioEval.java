@@ -42,7 +42,7 @@ public final class ScenarioEval {
    }}
   JSONArray turns=sc.getJSONArray("turns");
   for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);long now=t0+t.getLong("minutes")*60000;String user=t.getString("user");
-   PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona=PersonaManager.presetPrompt(style);in.guidance=PersonaManager.guidance(style);in.signature=style.signature;
+   PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona=PersonaManager.presetPrompt(style);in.guidance=PersonaManager.guidance(style);in.style=style;in.signature=style.signature;
    in.timeZone=ZoneId.systemDefault().getId();in.now=now;in.initializedAt=t0-21*86_400_000L;in.remember=true;in.diary=true;in.feeling=db.mood(now);in.mood=in.feeling.optString("emotion","calm");in.games=games(games,outcomes,now);
    if(last[0]!=null){in.lastEvent=last[0];in.lastEventAt=lastAt[0];}
    // Older builds have neither input: set them only where they exist, so baselines run unchanged.
@@ -50,7 +50,7 @@ public final class ScenarioEval {
    if(doing[0]!=null)try{PromptBuilder.Inputs.class.getDeclaredField("doing").set(in,doing[0]);PromptBuilder.Inputs.class.getDeclaredField("doingAt").setLong(in,doingAt[0]);}catch(NoSuchFieldException absent){}
    String reply;JSONObject row=new JSONObject().put("user",user).put("minutes",t.getLong("minutes"));
    String raw=null;
-   try{raw=call(PromptBuilder.build(in,user,false,db.snapshot(),null),1.3,1200);AgentReply r=AgentReply.parse(raw);reply=r.reply;
+   try{raw=call(PromptBuilder.build(in,user,false,db.snapshot(),null),ModelPresets.DEEPSEEK_CHAT_TEMPERATURE,1200);AgentReply r=AgentReply.parse(raw);reply=r.reply;
     db.commit(db.epoch(),user,reply,r.emotion,r.memories,true,false,null,null,"turn"+i,now,r.self,false,null,null,r.moodLevel,r.moodCause,r.moodChanged);row.put("emotion",r.emotion);}
    catch(Exception e){reply=null;row.put("error",e.getClass().getSimpleName()+": "+e.getMessage());if(raw!=null)row.put("raw",raw);}
    row.put("reply",reply==null?JSONObject.NULL:reply);transcript.put(row);

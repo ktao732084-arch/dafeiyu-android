@@ -73,7 +73,7 @@ def main():
     if not key:
         sys.exit("Set DAFEIYU_API_KEY to your own API key.")
     host = urllib.parse.urlparse(args.url).hostname or ""
-    temperature = args.temperature if args.temperature is not None else (1.3 if host == "api.deepseek.com" else None)
+    temperature = args.temperature if args.temperature is not None else (1.0 if host == "api.deepseek.com" else None)
     data = json.load(open(args.requests, encoding="utf-8"))
     styles, cases = data["styles"], data["cases"]
     names = {s["id"]: s["name"] for s in styles}

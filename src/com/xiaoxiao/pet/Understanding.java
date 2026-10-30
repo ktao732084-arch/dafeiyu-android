@@ -52,7 +52,7 @@ final class Understanding {
         +"evidence 必须逐字摘自当天用户说的话。只写这一天确实能看出来的，不写性格标签、心理诊断、外貌、隐私或敏感信息，没有把握就留空。"
         +"your_understanding 是你以前形成的理解：当天原话支持某条时，放进 confirmed：{\"id\":\"…\",\"evidence\":\"原话片段\"}；当天原话明显说明某条不对时，放进 outdated，格式相同。没有就空数组。";
     /** The whole answer of the diary call when it also reads the user (Diary.request). */
-    static final String FORMAT="完整 JSON：{\"diary\":\"日记内容\",\"understanding\":[],\"confirmed\":[],\"outdated\":[],\"phrases\":[]}。";
+    static final String FORMAT="完整 JSON：{\"diary\":\"日记内容\",\"feeling\":\"\",\"understanding\":[],\"confirmed\":[],\"outdated\":[],\"phrases\":[]}。";
 
     /** What one diary answer changes, every step checked against the day's turns. */
     static final class Update {
