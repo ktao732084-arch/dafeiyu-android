@@ -1,0 +1,16 @@
+[Unit]
+Description=Back up Dafeiyu feedback database
+After=dafeiyu-feedback.service
+
+[Service]
+Type=oneshot
+User=dafeiyu-feedback
+Group=dafeiyu-feedback
+EnvironmentFile=/etc/dafeiyu-feedback.env
+ExecStart=/opt/dafeiyu-feedback/venv/bin/python /opt/dafeiyu-feedback/backup.py
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/dafeiyu-feedback

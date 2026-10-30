@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-30",
+  "scope": "PR 27 self-hosted feedback; unpublished Android preview",
+  "base_main": "632477e",
+  "apk_sha256": "a530f34466f8780c8c8824ff61898f99e32d0815ec4303fbe3196e08c34e771d",
+  "server_tests": 19,
+  "android_art_suites": 26,
+  "feedback_core_checks": 31,
+  "robolectric_ui_tests": 10,
+  "native_webview_checks": 16,
+  "android": "15 / API 35",
+  "server": "https://81.70.79.133/dafeiyu-feedback/",
+  "verified": [
+    "private text and screenshot submission",
+    "developer reply and user follow-up",
+    "cross-owner list and image isolation",
+    "restart persistence",
+    "SSH UTF-8 reply command",
+    "daily private backup",
+    "existing update health unchanged"
+  ],
+  "not_verified": [
+    "physical phones",
+    "all vendor image picker navigation",
+    "large-scale load",
+    "offsite backups or notifications"
+  ],
+  "server_files_sha256": {
+    "feedback_server.py": "1114e1015f79ea4d4475ae41c8b0e7c8fa81004d6b4d71917d5d73e13d2fe434",
+    "backup.py": "014c9616a97fdb481aa813b2c2a7728379d184a1718bc4c843fbe0e963a50675",
+    "web/app.js": "5acf8d0feb53f849da5d4640d79e6595281f3aebf07a56e780275311f791a5c3"
+  }
+}

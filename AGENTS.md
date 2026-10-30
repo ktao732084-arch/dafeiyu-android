@@ -47,6 +47,12 @@
 - 每个功能在 App 内只保留一个入口，放在它所属的分组：首页「我们」放关于你们俩的内容，「设置」放应用行为；桌宠长按菜单是另一块界面，可以有自己的快捷入口。新增功能先找现有分组，不在立绘卡片、首页列表和二级页面里重复放同一个入口。
 - 二级页面不互相链回形成循环（例如记忆手账与我们的故事），只显示数量或说明去哪里看。
 
+## 问题反馈
+
+- 2026-10-30 用户决定自建，替代 PR #27 的兔小巢方案。`update-channel.json` 的 `feedback_url` 指向自己的 HTTPS `/dafeiyu-feedback/`；App 内 WebView 保留免注册、选截图、看回复。禁止把管理员凭据打入 APK。
+- 随会话只传安装随机身份与 App/Android 版本、机型；不自动附带聊天、记忆、Key 或模型地址。反馈私有存储在北京服务器 SQLite，管理员通过 SSH 查看/回复；不要自动转发到公开 Issue、邮件或第三方。说明见 `docs/FEEDBACK.md`、`deploy/feedback/README.md`。
+- 服务端改动运行 `deploy/feedback/test_feedback.py`；客户端改动运行 `FeedbackTest`、对应 UI 和隔离 Android 检查，真实服务只提交明确标记的合成验收内容。服务部署不等于已发布新 App。
+
 ## 性格表达与状态分层
 
 - 人格在初次相遇时冻结，不提供重选；需要让性格更鲜明时，改`assets/personas.json`的性格细节、标志表达和示例（每次请求现读），不要改写已冻结的人格。五种风格保持同一组示例情境，修改后跑`CharacterTest`，有条件时用`tools/persona-eval.py`盲测辨识度。
