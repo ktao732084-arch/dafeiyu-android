@@ -19,11 +19,11 @@ final class ModelPresets {
             payload.put("thinking",new JSONObject().put("type","disabled"));
     }
     /**
-     * Companion replies only. DeepSeek's parameter guide suggests 1.3 for general conversation (its default is
-     * 1.0, which reads flatter in character); memory, diary and connection calls keep the default. Other
-     * providers use different temperature ranges, so they keep their own defaults.
+     * Keep companion generation at 1.0. A real-model long-chat follow-up found malformed wording at 1.3;
+     * same-context comparisons at 1.0 retained the persona without needing the extra sampling variance.
+     * Memory, diary and connection calls keep the default; other providers keep their own defaults.
      */
-    static final double DEEPSEEK_CHAT_TEMPERATURE=1.3;
+    static final double DEEPSEEK_CHAT_TEMPERATURE=1.0;
     static void chat(String host,String model,JSONObject payload)throws Exception {
         if("api.deepseek.com".equals(host)&&!AgentPolicy.reasoningModel(model))payload.put("temperature",DEEPSEEK_CHAT_TEMPERATURE);
     }

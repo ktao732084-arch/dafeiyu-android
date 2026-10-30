@@ -22,6 +22,7 @@ public final class DeviceCoreChecks {
         run("dated recall",()->HistoryRecallTest.main(new String[0]));
         run("episodic index",()->EpisodeRecallTest.main(new String[]{root+"/episodes"}));
         run("rule capture",()->MemoryCaptureTest.main(new String[]{root+"/memory-capture",root+"/memory-service"}));
+        run("rewrite fidelity",()->RewriteGuardTest.main(new String[0]));
         run("diary",()->DiaryTest.main(new String[]{root+"/diary"}));
         run("Unicode regex",NativeRegexTest::run);
         run("nickname and reply polish",()->ChatPolishRulesTest.main(new String[0]));

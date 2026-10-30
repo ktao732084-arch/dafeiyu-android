@@ -36,7 +36,7 @@ public final class CharacterTest {
   check("谁偷吃了，这叫品鉴。……你要的话，分你一半。".equals(AgentPolicy.compressReply("谁偷吃了，这叫品鉴。……你要的话，分你一半。下次给我留。")),"the second sentence, where her character often shows, survives compression");
 
   // Sampling: conversational temperature only for DeepSeek chat, never for memory calls or other providers.
-  JSONObject payload=new JSONObject();ModelPresets.chat("api.deepseek.com","deepseek-flash",payload);check(payload.optDouble("temperature")==1.3,"DeepSeek chat uses its conversational temperature");
+  JSONObject payload=new JSONObject();ModelPresets.chat("api.deepseek.com","deepseek-flash",payload);check(payload.optDouble("temperature")==1.0,"DeepSeek chat uses the evaluated fluent temperature");
   payload=new JSONObject();ModelPresets.chat("api.deepseek.com","deepseek-reasoner",payload);ModelPresets.chat("api.openai.com","gpt-5",payload);check(!payload.has("temperature"),"reasoning models and other providers keep their defaults");
 
   // Mood: strength and cause from the reply, fading a step every 40 minutes.
