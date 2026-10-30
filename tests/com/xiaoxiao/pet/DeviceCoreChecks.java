@@ -34,6 +34,7 @@ public final class DeviceCoreChecks {
 
         run("updates",()->UpdateCoreTest.main(new String[]{root+"/updates"}));
         run("character and mood",()->CharacterTest.main(new String[]{root+"/personas.json",root+"/character"}));
+        run("situation modules",()->SituationsTest.main(new String[]{root+"/personas.json"}));
         run("character state",()->CharacterStateTest.main(new String[]{root+"/character-state"}));
         run("touch reactions",()->TouchReplyTest.main(new String[0]));
         System.out.println("DEVICE SUITES: "+passed+" passed, "+failures+" failed");

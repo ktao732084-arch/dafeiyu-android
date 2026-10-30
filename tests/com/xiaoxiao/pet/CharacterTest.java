@@ -146,9 +146,8 @@ public final class CharacterTest {
   JSONObject many2=AgentStore.empty(0);List<JSONObject> lots=new java.util.ArrayList<>();for(int i=0;i<25;i++)lots.add(new JSONObject().put("phrase","说法"+i+"号").put("when","").put("evidence",new JSONObject().put("quote","说法"+i+"号").put("turn","t"+i).put("date","2026-10-28")));
   Phrases.apply(many2,lots,1);check(Phrases.entries(many2).length()==Phrases.KEEP,"at most twenty phrases");
   for(PersonaManager.Persona style:styles){
-   for(String event:new String[]{"greeting_morning","greeting_noon","greeting_afternoon","greeting_evening","greeting_night","feed","trip_depart","trip_back","trip_early","trip_tooEarly","trip_away"})
+   for(String event:new String[]{"greeting_morning","greeting_noon","greeting_afternoon","greeting_evening","greeting_night","feed"})
     check(!"missing".equals(PersonaManager.voice(style,event,"missing",new Random(1))),style.id+" supplies local event voice "+event);
-   check(PersonaManager.voice(style,"trip_depart","",new Random(1)).contains("{time}"),"departure retains actual return time placeholder");
    check(PersonaManager.voice(style,"feed","",new Random(1)).contains("{food}"),"feeding retains actual food placeholder");
    check(!PersonaManager.storyLine(style,"这个给你……是我写的信，不准笑。").isEmpty(),"chapter voice remains available");
    String quoted="里面是你说过的「{memory}」。";check(quoted.equals(PersonaManager.storyLine(style,quoted)),"unmapped factual quote remains exact");

@@ -19,7 +19,7 @@ public final class PersonaEvalDump {
   for(PersonaManager.Persona p:styles){
    meta.put(new JSONObject().put("id",p.id).put("name",p.name).put("description",p.description));
    for(String probe:PROBES){
-    PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona=PersonaManager.presetPrompt(p);in.guidance=PersonaManager.guidance(p);in.signature=p.signature;
+    PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona=PersonaManager.presetPrompt(p);in.guidance=PersonaManager.guidance(p);in.style=p;in.signature=p.signature;
     in.timeZone="Asia/Shanghai";in.now=now;in.initializedAt=now-21*86_400_000L;in.remember=true;in.diary=true;
     out.put(new JSONObject().put("style",p.id).put("probe",probe).put("messages",PromptBuilder.build(in,probe,false,state,null)));
    }

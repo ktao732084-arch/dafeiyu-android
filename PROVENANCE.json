@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "9eb19e7cf46dfee6f557e8de5c9f8fe67f7afe8a4583dab754d4ec1530881906"
+      "sha256": "07a905898118060e3c155bda8249273be5f7c4cc6f3d6e1741151889a0042873"
     },
     {
       "path": "LICENSE",
@@ -85,7 +85,7 @@
       "path": "SOURCE_MAP.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "dcbdc8adc4c087a0c0a7f739ae7984cea3e5bffce65e5366cb3ae434644a187d"
+      "sha256": "8b712d477a8c18e0edd13d83959995ca951df0202e71f591e18098d2759fc1e2"
     },
     {
       "path": "THIRD-PARTY-LICENSE.txt",
@@ -1198,7 +1198,7 @@
       "path": "assets/personas.json",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "fa8d6eed54096da97a7e853355902b11ef7a799aa71226407978099a9b1a63e2",
+      "sha256": "4bdd9fc5da61ee427fef8ff8e1a2dd9db685ecd38d031cb00ff89f3ee389ba24",
       "design_reference": "Five newly written styles; shared character style informed by dafeiyu-persona. Not five upstream plugins.",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
@@ -1290,7 +1290,7 @@
       "path": "docs/CHARACTER.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "4562c0747616daef1e6fa1d1d09d1b1db90dc88b8741fa0c2a1313f9acdddbe0"
+      "sha256": "67b5104c385619d984b9c414b18807132cfc308b2690b2c92c09029f3acc52ba"
     },
     {
       "path": "docs/CHARACTER_INTEGRATION.md",
@@ -1302,7 +1302,7 @@
       "path": "docs/CHARACTER_STATE.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "4909c373dcfdeecbe7d292e8aecf1fe42a33c566222775130bcfa0bb3fe5d13a"
+      "sha256": "f4a8909fc585759f0001612cc61391626a9df3db85e5b03985084ecf64348109"
     },
     {
       "path": "docs/CHAT_HISTORY.md",
@@ -2253,7 +2253,7 @@
       "path": "src/com/xiaoxiao/pet/AgentRuntime.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "9668cc0e5d2a28db7d9414f052346c06eb477ecd8688556e70aa1d285fbf0383",
+      "sha256": "45096c99a7fc90cd5a2c3f969a6cf70bbee6a283801f6a365b655d4e90c53c9b",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2663,7 +2663,7 @@
       "path": "src/com/xiaoxiao/pet/PersonaManager.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "f2c7a526ffa88140659d14b8701c895f7fc5afd4f4fb497cb848e7ad7f01bf3a",
+      "sha256": "4ea5abcd67c13693424d45c8c5c5b47be6ffa29fc204c036a7b067d7ef03067e",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2720,7 +2720,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "66eaf35aa50eef3b1af17fc2024a76e46d9728abf12b9add363649e0375f204b"
+      "sha256": "aa16231e0a14c902cfa4c96cacd1a5cc3252c25a64da9b001fd184e03944caa5"
     },
     {
       "path": "src/com/xiaoxiao/pet/ReplySegments.java",
@@ -2739,6 +2739,12 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "767dbb6df62035e83cc9c5df8fa835b24b3292a8d0f93c89e71e459d1fc5e027"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/Situations.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "48b7945350adc4ae3fbf8cedc1cc3fb503ac9a7fb993661828ed1f9bc9418e8c"
     },
     {
       "path": "src/com/xiaoxiao/pet/SizePanel.java",
@@ -2875,7 +2881,7 @@
       "path": "tests/com/xiaoxiao/pet/CharacterTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "bf651be96004c0e9d95fc3f8b0e225a88e4f5ec7f66ac72bdceb2b533df657e6"
+      "sha256": "c8256c64d1254d515950402c74225b5e21083dea4603fe5ef8bf0eecc1c2273f"
     },
     {
       "path": "tests/com/xiaoxiao/pet/ChatPolishRulesTest.java",
@@ -2905,7 +2911,7 @@
       "path": "tests/com/xiaoxiao/pet/DeviceCoreChecks.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "aea8fafe6bf66bf53c8824a540e02a78d4d5fee51e2458bbd25ef1d55b5b6257"
+      "sha256": "898be571f924e5af86f0fe560810f5abe2e345825f6e5dea8f5f4e173eee91a7"
     },
     {
       "path": "tests/com/xiaoxiao/pet/DiaryTest.java",
@@ -2974,7 +2980,7 @@
       "path": "tests/com/xiaoxiao/pet/PersonaEvalDump.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "1256c1efc9e724c8aaa18f71f5380e432575dadfbff54e953658580a8fd49c46"
+      "sha256": "e856eecf99ce0ff0a80042c899d8b9f53e19fe16d1749d1c509aa384e66ee2d0"
     },
     {
       "path": "tests/com/xiaoxiao/pet/ReplyHistoryTest.java",
@@ -2992,13 +2998,19 @@
       "path": "tests/com/xiaoxiao/pet/ScenarioEval.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "797a60c54972570d9d3507a8971e0ea400ef1021db855a0e8327600d5030f71b"
+      "sha256": "8cd406368d26d21f4fd3abbf9b55fe87b18f28d7a800d5b44507bd3254c9e008"
     },
     {
       "path": "tests/com/xiaoxiao/pet/SharedExperienceLiveEval.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "789185af7973b17c156aa1a8aae49237cfcd3eaeb5cb70f1d30522ea2651aa83"
+    },
+    {
+      "path": "tests/com/xiaoxiao/pet/SituationsTest.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "5884a64a60361e6704bbb7f167f501f7e6a3de160b735863b0e6b43b2b0f3f49"
     },
     {
       "path": "tests/com/xiaoxiao/pet/TouchReplyTest.java",
@@ -3234,7 +3246,7 @@
       "path": "tests/run-core.ps1",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "034c843b3f2845a344d82bbe7f3248397a184afad39ec3e1be0d5505159e6fca",
+      "sha256": "24d3aadc881a87932e0d1e858ca1f6e6f8711be793f10b1974abb6a47d23376f",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -3248,7 +3260,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "1a031f649a92296af4308d8631212e6a36757d49763cdd0c7f5fbae105f5ec82"
+      "sha256": "cf24f97eec155166dd4f9b0a6f95de6b6fbb54378f20e54ffb02fbb2ca26e2cf"
     },
     {
       "path": "tests/run-regex-device.ps1",
