@@ -163,11 +163,25 @@ Nickname、ChatPolishRulesTest和ChatPolishTest由本项目新增，称呼识别
 
 随后的角色状态层（`CharacterNow`、`CharacterStateTest`、`ScenarioEval` 与场景文件）同为本项目独立编写。只借鉴白艾莉公开工程方法论（MIT）与上述静态调研中“稳定底稿＋按状态装配、状态有结束、重复提醒后收住”的机制，未导入其代码、提示词或角色文案；场景验收参考了用户提供的调研结论。
 
+“学会的说法”（`Phrases`）与“连着发几句”同为本项目独立编写。前者只借鉴麦麦（MaiBot，GPL）“从真实聊天学习表达方式”的思路，后者借鉴 KouriChat “说话时加话打断”的交互，均未复制两者的代码、提示词或数据；实现沿用本项目相处理解的逐字依据与删除规则。
+
 后续 `release.ps1`、`release-sync.py`、`release-remote.py` 与同步测试为本项目新增发布编排，复用已有 prepare-update.py、GitHub CLI、OpenSSH 和 curl；不引入第三方 Python 库或服务器常驻程序。本次自动化不改变 App 版本或 APK。
 
 AppUpdate、UpdateTransport、UpdateApk、UpdateFileProvider、UpdateRuntime、UpdatePanel、prepare-update.py、部署模板及相应测试均为本项目新增实现。使用 Android 平台网络、包管理器、ContentProvider 和系统安装界面；没有引入第三方更新 SDK、动态服务端或外部 Agent 代码。合入当前主分支后以 0.4.9.2 发布，保留原产品与素材归属。
 
 公网 IP 接入的 Nginx 路径配置、北京构建入口与 UpdateNetworkInstrumentation 为本项目新增；复用用户已有北京服务器和 IP 证书续期配置。站点最初镜像 v0.4.7；本次以原签名发布 0.4.9.2，保留上游素材归属。UpgradeAcceptance 与 OfflineTestApplication 为本项目新增验证代码：前者仅在新建模拟器使用合成数据验证真实 APK 覆盖安装，后者阻止框架单测意外访问线上更新站点。
+
+## 拟人更新回归（2026-10-30，尚未发布）
+
+`InterjectionEdgeTest`、`PhraseUiTest`和`PersonaUpdateInstrumentation`为本轮AI辅助新增测试，覆盖Claude的连发与表达学习改动。`ChatPage`补齐草稿恢复，`Phrases`补齐敏感来源与常用语气词校验；沿用既有模块和PR #25的来源，不引入新SDK或模型调用。验收见`docs/PERSONA_UPDATE_ACCEPTANCE.md`。
+
+## 章节任务线（PR #24，尚未发布）
+
+任务规则、剧情配置、任务卡和棋局接入来自Claude的`feature/quest-line`分支（`4e193a9`），保留各模块原有来源。设计参考与边界见`docs/GROWTH_DESIGN.md`；本轮只做主分支整合与验证。`QuestLineInstrumentation.java`为本轮新增的独立Android任务卡、排版和真实本机记忆目标验收，没有引入第三方SDK或动画资源。
+
+## 首页动画（PR #22，尚未发布）
+
+`HeroPet.java`及首页接入、AlphaVideo首帧通知来自Claude分支提交`fceb2e5`，复用原有小小桌宠播放器、动作计划与动画素材。本轮合并补齐章节动作解锁刷新、生命周期设备验收和界面回归；`HeroPetInstrumentation.java`为本轮新增测试。没有新增动画素材或改变既有许可。
 
 ## 自然分段与棋局邀请修复（0.4.9.4）
 

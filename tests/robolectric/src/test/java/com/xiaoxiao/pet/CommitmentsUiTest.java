@@ -35,4 +35,11 @@ public class CommitmentsUiTest {
   assertEquals(2,Commitments.entries(db.snapshot()).length());confirm.getButton(-1).performClick();ShadowLooper.idleMainLooper();UiTest.storage();
   assertEquals(1,Commitments.entries(db.snapshot()).length());assertEquals(1,db.snapshot().getJSONArray("turns").length());
  }
+ @Test public void dreamPreservesUpstreamPhraseLearningAlongsidePromises()throws Exception{
+  LocalDate day=LocalDate.now().minusDays(1);long at=day.atTime(19,0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();String quote="这份资料我周末给你。";
+  db.commit(db.epoch(),quote+"先卷一点点。","好","calm",null,true,false,null,null,"both",at,null);
+  AgentRuntime.diaryModel=(m,t,p)->{assertTrue(m.toString().contains("phrases")&&m.toString().contains("commitments"));return "{\"diary\":\"记下了周末给资料这件事。\",\"phrases\":[{\"phrase\":\"先卷一点点\",\"when\":\"鼓励自己时\"}],\"commitments\":[{\"source_id\":\"chat:both\",\"speaker\":\"user\",\"quote\":\""+quote+"\"}]}";};
+  Data.prefs().edit().putBoolean("agent.diary",true).commit();AgentRuntime.writeDiaryIfDue();AgentRuntime.diaryWorker.submit(()->{}).get(10,TimeUnit.SECONDS);
+  assertEquals(1,Diary.entries(db.snapshot()).length());assertEquals(1,Phrases.entries(db.snapshot()).length());assertEquals(1,Commitments.entries(db.snapshot()).length());
+ }
 }

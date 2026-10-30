@@ -17,6 +17,14 @@ public class ConversationTest {
         TextView message=UiTest.find(page.rows,"历史回复0");assertNotNull(message);message.performLongClick();PopupMenu menu=ShadowPopupMenu.getLatestPopupMenu();assertEquals("her reply offers copy only",1,menu.getMenu().size());Shadows.shadowOf(menu).getOnMenuItemClickListener().onMenuItemClick(menu.getMenu().getItem(0));android.content.ClipboardManager clipboard=(android.content.ClipboardManager)activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);assertEquals("历史回复0",clipboard.getPrimaryClip().getItemAt(0).getText().toString());
     }
     @Test public void shortHistoryHidesOlderButton()throws Exception{seed(5);open();assertNotEquals(android.view.View.VISIBLE,page.older.getVisibility());}
+    @Test public void touchRepliesAreHiddenFromPagingDatesAndHomeButStillRemembered()throws Exception{
+        seed(25);AgentStore db=AgentRuntime.store();long at=System.currentTimeMillis();
+        for(int i=0;i<25;i++)db.commit(db.epoch(),"","被轻点后的回应"+i,"playful",null,false,true,null,null,"touch"+i,at+i,null,false,null,null,1,"",new JSONObject().put("count",3));
+        open();assertEquals(20,page.records.length());assertFalse(UiTest.texts(page.rows).contains("被轻点"));page.loadOlder();assertEquals(25,page.records.length());assertTrue(UiTest.texts(page.rows).contains("历史回复0"));
+        LinearLayout hero=new LinearLayout(activity);activity.recent(hero);assertTrue(UiTest.texts(hero).contains("历史回复24"));assertFalse(UiTest.texts(hero).contains("被轻点"));
+        page.from=at;page.to=at+100;page.loadLatest();assertEquals(0,page.records.length());assertTrue(UiTest.texts(page.rows).contains("没有聊天"));assertNotEquals(android.view.View.VISIBLE,page.older.getVisibility());
+        assertEquals(50,db.snapshot().getJSONArray("turns").length());assertEquals(0,db.searchChat("被轻点",40).length());assertTrue(AgentRuntime.context("刚才怎么了",false).toString().contains("被轻点后的回应"));
+    }
     @Test public void pagingMarksTheEarliestPage()throws Exception{
         seed(25);open();assertEquals(android.view.View.VISIBLE,page.older.getVisibility());page.loadOlder();assertFalse(page.older.isEnabled());assertEquals("已经翻到最早的聊天啦",page.older.getText().toString());
     }

@@ -32,6 +32,8 @@ final class GomokuPage {
     Button button(String title,View.OnClickListener click){Button b=new Button(activity);b.setText(title);b.setTextSize(13);Apple.button(b,false);b.setOnClickListener(click);return b;}
     void run(Task task){
         if(working)return;working=true;render();WORK.execute(()->{Gomoku g=null;Exception error=null;try{g=task.run();}catch(Exception e){error=e;}
+            // A finished game may complete the chapter goal (play or win one); growth reads the saved results itself.
+            if(g!=null&&g.over()){GrowthStore growth=GrowthStore.quiet();if(growth!=null)try{growth.sync();}catch(Exception e){Data.log("main","成长记录暂未同步");}}
             final Gomoku result=g;final Exception failure=error;main.post(()->{working=false;if(!dialog.isShowing()||activity.isFinishing()||activity.isDestroyed())return;if(failure!=null){status.setText("棋局没有保存成功");remark.setText(failure.getMessage());again.setEnabled(true);end.setEnabled(false);board.update();return;}game=result;if(pending>=0&&(game.over()||game.turn()!=1||game.board[pending]!=0))pending=-1;render();chooseLevel();if(!game.over()&&game.turn()==2)main.postDelayed(this::computer,450);});});
     }
     /** A tap on the board: preview the point first; tapping the previewed point again plays it. */

@@ -28,6 +28,15 @@ final class AgentRuntime {
     static synchronized AgentStore store()throws Exception{if(memory==null){memory=new AgentStore(new java.io.File(Data.app.getFilesDir(),"agent"));final AgentStore opened=memory;Thread warm=new Thread(opened::warm,"recall-index");warm.setDaemon(true);warm.setPriority(Thread.MIN_PRIORITY);warm.start();}return memory;}
     static synchronized boolean busy(){return active!=null;}
     static synchronized void cancel(){if(active!=null){AgentTransport.Token token=active;Listener l=activeListener;active=null;activeListener=null;activeProactive=false;activeTouch=null;if(token.completed!=null){main.post(token.completed);}else{token.cancel();if(l!=null)main.post(()->l.error("已停止回复"));}}}
+    /**
+     * The user sent another message while she was still answering: stop that answer quietly, without an error, so
+     * both messages can be answered together. False once the answer is saved (it is then delivered as usual), and
+     * for proactive or touch replies, which are not the user's chat.
+     */
+    static synchronized boolean interject(Listener listener){
+        if(active==null||activeListener!=listener||activeProactive||active.completed!=null)return false;
+        AgentTransport.Token token=active;active=null;activeListener=null;activeTouch=null;token.cancel();return true;
+    }
     static synchronized void interruptProactive(){if(activeProactive)cancel();}
     static synchronized void interruptTouch(PetService.Pet pet){if(activeTouch==pet)cancel();}
     static synchronized boolean current(AgentTransport.Token t){return active==t&&!t.cancelled;}
@@ -40,7 +49,7 @@ final class AgentRuntime {
     static void touch(String type){
         touch(type,"touch","main",System.currentTimeMillis());
     }
-    /** An experience of hers with its own kind (wake, trip, story), which CharacterNow and the diary read. */
+    /** An experience of hers with its own kind (wake, story), which CharacterNow and the diary read. */
     static void touch(String note,String kind){touch(note,kind,"main",System.currentTimeMillis());}
     static long touch(String note,String kind,String pet,long at){
         lastEventAt=at;lastEvent=note;touched=true;lastTouch=at;interruptProactive();
@@ -62,7 +71,7 @@ final class AgentRuntime {
                         if(text==null||SystemClock.uptimeMillis()-request.lastAt>TouchReply.EXPIRE_MS||memory!=db||db.epoch()!=request.epoch||!pet.touchReplies.current(request)||!TouchReply.allowed(service,pet)||!TouchReply.free(pet)){release(token);return;}
                         String id=UUID.randomUUID().toString();
                         synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(request.epoch,"",text,reply.emotion,null,rememberEnabled(),true,null,null,id,System.currentTimeMillis(),null,true,null,null,reply.moodLevel,rememberEnabled()?reply.moodCause:"",reply.moodChanged,request.evidence)){release(token);return;}}
-                        release(token);pet.speak(text,id);
+                        release(token);pet.speak(text,id,true);
                     }catch(Exception failed){release(token);Data.log(pet.role,"互动回应暂未保存");}
                 });
             }catch(Exception failed){release(token);Data.log(pet.role,"互动回应连接未完成，不自动重试");}
@@ -70,13 +79,18 @@ final class AgentRuntime {
     }
     /** Context for the next prompt only; unlike touch() it does not postpone proactive chat. */
     static void note(String type){lastEventAt=System.currentTimeMillis();lastEvent=type;touched=true;}
+    /** What she was visibly doing on screen, so "你在干嘛" gets what the user could actually see. */
+    static void onScreen(PromptBuilder.Inputs in){
+        PetService s=PetService.instance;PetService.Pet p=s==null?null:s.pets.get("main");
+        if(p!=null&&p.visible&&!p.docked&&p.doing!=null){in.doing=ActionPlan.doing(p.doing);in.doingAt=p.doingAt;}
+    }
     static String action(String emotion){switch(AgentPolicy.emotion(emotion)){
         case "happy":return "点击回应-开心跃动";case "shy":return "点击回应-害羞惊讶";
         case "curious":return "东张西望";case "concerned":return "碎碎念-对屏碎碎念";
         case "playful":return "鲸鱼吐泡泡特效";case "sleepy":return "原地小憩沉眠";default:return "碎碎念-发呆碎碎念";
     }}
     static void express(String instance,String emotion,String reply){express(instance,emotion,reply,null);}
-    static void express(String instance,String emotion,String reply,String turnId){PetService s=PetService.instance;if(s==null)return;PetService.Pet p=s.pets.get(instance);if(p!=null&&p.visible&&!p.docked){if(!p.dragging&&!p.moving)p.play(p.plan.emotion(AgentPolicy.emotion(emotion),action(emotion),Data.random));p.speak(reply,turnId);}}
+    static void express(String instance,String emotion,String reply,String turnId){PetService s=PetService.instance;if(s==null)return;PetService.Pet p=s.pets.get(instance);if(p!=null&&p.visible&&!p.docked){if(!p.dragging&&!p.moving){String said=ActionPlan.said(reply);p.play(said!=null&&p.plan.has(said)?said:p.plan.emotion(AgentPolicy.emotion(emotion),action(emotion),Data.random));}p.speak(reply,turnId);}}
     static JSONArray context(String user,boolean proactive)throws Exception {
         return context(user,proactive,store().snapshot(),null);
     }
@@ -89,7 +103,7 @@ final class AgentRuntime {
         in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.signature=PersonaManager.signature("main");in.nickname=Nickname.current();
         String requested=!proactive&&history==null?Nickname.requested(user):null;if(requested!=null)in.nickname=requested;
         in.feeling=store().mood(System.currentTimeMillis());in.mood=in.feeling.optString("emotion","calm");in.timeZone=TimeZone.getDefault().getID();in.now=System.currentTimeMillis();in.initializedAt=PersonaManager.initializedAt("main");
-        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}in.remember=rememberEnabled();in.diary=diaryEnabled();if(in.remember&&in.diary&&history==null)in.understanding=Understanding.context(s,proactive?"":user);
+        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}onScreen(in);in.remember=rememberEnabled();in.diary=diaryEnabled();if(in.remember&&in.diary&&history==null){in.understanding=Understanding.context(s,proactive?"":user);in.phrases=Phrases.context(s,proactive?"":user);}
         GrowthStore growth=GrowthStore.quiet();if(growth!=null){in.chapter=growth.chapter();in.lore=growth.lore();}
         if(in.remember&&history==null){
             try{in.games=GomokuPage.store().context();}catch(Exception unavailable){in.games=new JSONObject().put("status","unavailable");}
@@ -120,8 +134,8 @@ final class AgentRuntime {
             if(!Data.prefs().edit().putString("diary.attempted",day.toString()).putString("diary.attemptedOn",today.toString()).commit())return;
             String raw=diaryModel.generate(request,new AgentTransport.Token(),partial->{});
             if(!diaryEnabled()||!rememberEnabled()||memory!=db)return;
-            JSONObject entry=SharedExperience.entry(raw,day,material,System.currentTimeMillis());Understanding.Update update=Understanding.parse(raw,material.turns,before,day.toString());
-            if(entry!=null&&db.addDiary(epoch,entry,update))Data.log("main","共同经历已写好："+day+(update.empty()?"":"，相处理解已更新"));
+            JSONObject entry=SharedExperience.entry(raw,day,material,System.currentTimeMillis());Understanding.Update update=Understanding.parse(raw,material.turns,before,day.toString());List<JSONObject> phrases=Phrases.parse(raw,material.turns,day.toString());
+            if(entry!=null&&db.addDiary(epoch,entry,update,phrases))Data.log("main","共同经历已写好："+day+(update.empty()?"":"，相处理解已更新"));
             if(db.addDreamCommitments(epoch,Commitments.dream(raw,material.turns)))Data.log("main","双方约定已补记："+day);
         }catch(Exception e){Data.log("main","陪伴日记暂未写成");}finally{writingDiary.set(false);}});
     }

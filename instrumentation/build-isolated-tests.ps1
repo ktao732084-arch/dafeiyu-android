@@ -6,7 +6,7 @@ $out=Join-Path $PSScriptRoot 'build/isolated'
 New-Item -ItemType Directory -Force "$out/classes","$out/dex" | Out-Null
 function Run($Exe,$Arguments){& $Exe @Arguments;if($LASTEXITCODE -ne 0){throw "Failed: $Exe"}}
 $bt=Join-Path $Sdk 'build-tools/36.0.0';$jar=Join-Path $Sdk 'platforms/android-34/android.jar'
-Run "$Jdk/bin/javac.exe" @('-encoding','UTF-8','--release','8','-cp',"$jar;$root/build/classes",'-d',"$out/classes","$PSScriptRoot/AgentInstrumentation.java","$PSScriptRoot/UpdateInstrumentationChecks.java","$PSScriptRoot/UpdateNetworkInstrumentation.java","$PSScriptRoot/TouchReplyActivity.java","$PSScriptRoot/TouchReplyInstrumentation.java","$PSScriptRoot/ChatPresentationInstrumentation.java","$PSScriptRoot/ExperienceNotebookActivity.java","$PSScriptRoot/ExperienceInstrumentation.java")
+Run "$Jdk/bin/javac.exe" @('-encoding','UTF-8','--release','8','-cp',"$jar;$root/build/classes",'-d',"$out/classes","$PSScriptRoot/AgentInstrumentation.java","$PSScriptRoot/UpdateInstrumentationChecks.java","$PSScriptRoot/UpdateNetworkInstrumentation.java","$PSScriptRoot/TouchReplyActivity.java","$PSScriptRoot/TouchReplyInstrumentation.java","$PSScriptRoot/ChatPresentationInstrumentation.java","$PSScriptRoot/ExperienceNotebookActivity.java","$PSScriptRoot/ExperienceInstrumentation.java","$PSScriptRoot/HeroPetInstrumentation.java","$PSScriptRoot/QuestLineInstrumentation.java","$PSScriptRoot/PersonaUpdateInstrumentation.java")
 $classes=@(Get-ChildItem "$root/build/classes","$out/classes" -Recurse -Filter *.class | ForEach-Object FullName)
 $d8=@('-cp',"$bt/lib/d8.jar",'com.android.tools.r8.D8','--lib',$jar,'--min-api','26','--output',"$out/dex")+$classes
 [IO.File]::WriteAllLines("$out/d8.args",($d8 | ForEach-Object {'"'+$_.Replace('\','/')+'"'}),[Text.UTF8Encoding]::new($false))
@@ -25,6 +25,7 @@ $manifest=@'
   <provider android:name="com.xiaoxiao.pet.UpdateFileProvider" android:authorities="com.dafeiyu.compatchecks.updates" android:exported="false" android:grantUriPermissions="true"/>
   <activity android:name="com.xiaoxiao.pet.TouchReplyActivity" android:screenOrientation="portrait" android:configChanges="orientation|screenSize" android:exported="false"/>
   <activity android:name="com.xiaoxiao.pet.ExperienceNotebookActivity" android:screenOrientation="portrait" android:exported="false"/>
+  <activity android:name="com.xiaoxiao.pet.MainActivity" android:configChanges="orientation|screenSize" android:exported="false"/>
   <service android:name="com.xiaoxiao.pet.PetService" android:exported="false" android:foregroundServiceType="specialUse"><property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Isolated touch reply verification"/></service>
  </application>
  <instrumentation android:name="com.xiaoxiao.pet.AgentInstrumentation" android:targetPackage="com.dafeiyu.compatchecks" android:functionalTest="true"/>
@@ -32,6 +33,9 @@ $manifest=@'
  <instrumentation android:name="com.xiaoxiao.pet.TouchReplyInstrumentation" android:targetPackage="com.dafeiyu.compatchecks" android:functionalTest="true"/>
  <instrumentation android:name="com.xiaoxiao.pet.ChatPresentationInstrumentation" android:targetPackage="com.dafeiyu.compatchecks" android:functionalTest="true"/>
  <instrumentation android:name="com.xiaoxiao.pet.ExperienceInstrumentation" android:targetPackage="com.dafeiyu.compatchecks" android:functionalTest="true"/>
+ <instrumentation android:name="com.xiaoxiao.pet.PersonaUpdateInstrumentation" android:targetPackage="com.dafeiyu.compatchecks" android:functionalTest="true"/>
+ <instrumentation android:name="com.xiaoxiao.pet.QuestLineInstrumentation" android:targetPackage="com.dafeiyu.compatchecks" android:functionalTest="true"/>
+ <instrumentation android:name="com.xiaoxiao.pet.HeroPetInstrumentation" android:targetPackage="com.dafeiyu.compatchecks" android:functionalTest="true"/>
 </manifest>
 '@
 $manifest=$manifest.Replace('com.dafeiyu.compatchecks',$TestPackage)

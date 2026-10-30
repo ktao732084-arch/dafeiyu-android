@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 public class UsabilityUiTest {
     MainActivity a;
     @Before public void init()throws Exception{AgentRuntime.cancel();AgentRuntime.worker.submit(()->{}).get(10,TimeUnit.SECONDS);Data.app=null;Data.roles.clear();Data.init(RuntimeEnvironment.getApplication());Data.prefs().edit().clear().commit();TestKeyStore.install();AgentRuntime.memory=null;PetService.instance=null;a=UiTest.ready();}
-    @After public void cleanup()throws Exception{AgentRuntime.cancel();ShadowLooper.idleMainLooper();Data.logWriter.submit(()->{}).get(5,TimeUnit.SECONDS);}
+    @After public void cleanup()throws Exception{AgentRuntime.cancel();if(a!=null&&a.pet!=null)a.pet.release();ShadowLooper.idleMainLooper();Data.logWriter.submit(()->{}).get(5,TimeUnit.SECONDS);}
     View root(){return UiTest.dialog().getWindow().getDecorView();}
     @Test public void notebookSearchFiltersInPlaceAndPagesTheMatches()throws Exception{
         // This is a paging fixture, not a semantic-dedup test: near-identical numbered text is otherwise merged.
@@ -29,6 +29,21 @@ public class UsabilityUiTest {
         AgentPanel.memories(a);View notebook=root();assertNull(UiTest.find(notebook,"我们的故事"));assertNotNull(UiTest.find(notebook,"我们的经历"));assertNotNull(UiTest.find(notebook,"最近互动"));
         GrowthPanel.show(a);View story=root();assertTrue(UiTest.texts(story).contains("泡泡瓶"));assertFalse(UiTest.texts(story).contains("记忆泡泡"));assertNull(UiTest.find(story,"她的日记"));
         AgentPanel.settings(a);View settings=root();assertNotNull(UiTest.find(settings,"记忆引擎"));assertNull(UiTest.find(settings,"手机悬浮权限"));
+    }
+    /** The home portrait is her animated clip: one player kept across re-renders, the still portrait under it, a tap reaction. */
+    @Test public void homePortraitIsHerAnimatedClip()throws Exception{
+        a.render();a.render();assertEquals("one player across re-renders",1,UiTest.all(a.content,AlphaVideo.class).size());
+        AlphaVideo video=UiTest.all(a.content,AlphaVideo.class).get(0);assertSame(a.pet.video,video);assertEquals(Data.idle("main"),video.pending);
+        View stage=(View)video.getParent();assertEquals("蓝色鲸鱼娘大肥鱼",stage.getContentDescription());assertEquals(1,UiTest.all(stage,ImageView.class).size());
+        stage.performClick();CountDownLatch played=new CountDownLatch(1);video.queueEvent(played::countDown);assertTrue(played.await(5,TimeUnit.SECONDS));assertTrue(video.pending,ActionPlan.TAPS.contains(video.pending));
+        a.pet.pause();assertTrue(video.suspended);a.pet.resume();assertFalse(video.suspended);
+    }
+    @Test public void homePortraitRefreshesChapterUnlocksWithoutRestart()throws Exception{
+        GrowthStore store=GrowthStore.get();JSONObject fixture=store.snapshot().put("legacy",false).put("chapter",1);
+        org.robolectric.util.ReflectionHelpers.setField(store,"g",fixture);a.render();AlphaVideo video=a.pet.video;
+        String newlyUnlocked=null;java.util.Set<String> before=store.unlocked(Data.actions("main"));
+        fixture.put("chapter",5);for(String action:store.unlocked(Data.actions("main")))if(!before.contains(action)){newlyUnlocked=action;break;}
+        assertNotNull("chapter fixture has a newly unlocked clip",newlyUnlocked);assertFalse(a.pet.plan.has(newlyUnlocked));a.render();assertSame(video,a.pet.video);assertTrue(a.pet.plan.has(newlyUnlocked));
     }
     @Test public void clearingTheDiaryAsksFirst()throws Exception{
         java.time.LocalDate day=java.time.LocalDate.now().minusDays(1);assertTrue(AgentRuntime.store().addDiary(AgentRuntime.store().epoch(),Diary.entry(day,"今天陪他聊了晚饭。",new java.util.ArrayList<>(),System.currentTimeMillis())));

@@ -12,7 +12,7 @@ public class TouchReplyRuntimeTest {
    @Override void play(String action){current=action;}
    @Override void grow(String reaction){}
    @Override void dockAtEdge(boolean right,float center,float x,float y){docked=true;dragging=false;TouchReply.cancel(this);}
-   @Override void speak(String text,String id){spoken=text;TouchReply.cancel(this);try{AgentRuntime.store().shown(id,1);}catch(Exception e){throw new RuntimeException(e);}}
+   @Override void speak(String text,String id,boolean interaction){assertTrue(interaction);spoken=text;TouchReply.cancel(this);try{AgentRuntime.store().shown(id,1);}catch(Exception e){throw new RuntimeException(e);}}
   };pet.visible=true;pet.frame=new FrameLayout(Data.app);service.pets.put("main",pet);
   NotificationManager nm=Data.app.getSystemService(NotificationManager.class);Shadows.shadowOf(nm).setNotificationPolicyAccessGranted(true);nm.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);calls=new AtomicInteger();
   AgentRuntime.model=(m,t,p)->{calls.incrementAndGet();assertTrue(m.toString().contains("interaction_event"));assertTrue(m.toString().contains("鲸鱼娘"));return "{\"reply\":\"我在呢，慢点戳。\",\"emotion\":\"playful\"}";};

@@ -45,7 +45,7 @@ public final class CharacterStateTest {
   String serious=lines(chess.snapshot(),lost,"对了问你个正事，汇报 PPT 结构怎么安排比较好？",false,nine+4*M);
   check(serious.contains("先放一边")&&!serious.contains("五子棋"),"a serious turn sets the game aside: "+serious);
   check(lines(chess.snapshot(),lost,"",true,nine).contains("再来一局"),"a proactive chance may still use the wish");
-  chess.commit(chess.epoch(),"哈哈我赢了！","哼，再来一局五子棋，刚才是我让你的。","playful",null,true,false,null,null,"c1",nine,null,false,null,null,2,"输了不服",Boolean.TRUE);
+  chess.commit(chess.epoch(),"哈哈我赢了！","哼，再来一局五子棋！刚才是我让你的。","playful",null,true,false,null,null,"c1",nine,null,false,null,null,2,"输了不服",Boolean.TRUE);
   check(lines(chess.snapshot(),lost,"今天天气还挺凉快",false,nine+2*M).contains("已经邀请过再来一局，等对方决定"),"offered: wait, do not ask again");
   chess.commit(chess.epoch(),"不下了，有点累","好吧。","calm",null,true,false,null,null,"c2",nine+3*M,null,false,null,null,1,"",Boolean.TRUE);
   String dropped=lines(chess.snapshot(),lost,"今天上班真的好累啊",false,nine+5*M);
@@ -61,6 +61,21 @@ public final class CharacterStateTest {
   check(!lines(late.snapshot(),null,"我还是睡不着",false,t+22*M).contains("刚提醒过"),"the user brought sleep back: she may answer about it");
   check(!lines(late.snapshot(),null,"我在追剧",false,t+90*M).contains("刚提醒过"),"an old reminder no longer counts");
   check(CharacterNow.serious("工作被领导骂了，只想吐槽")&&CharacterNow.serious("帮我看看这个公式")&&!CharacterNow.serious("今天天气还挺凉快")&&!CharacterNow.serious(""),"serious turns: venting, advice and asking for help");
+
+  // What she was visibly doing on screen: said as it is, recent only, set aside for serious turns and by a wake-up.
+  String play=CharacterNow.of(AgentStore.empty(0),null,"你在干嘛呢",false,noon,"拉小提琴",noon-3*M).lines.toString();
+  check(play.contains("你3分钟前在屏幕上拉小提琴")&&play.contains("不另编别的事"),"what the user could see is what she says she was doing: "+play);
+  check(CharacterNow.of(AgentStore.empty(0),null,"你在干嘛呢",false,noon,"拉小提琴",noon-30*1000).lines.toString().contains("你正在屏幕上拉小提琴"),"just now: still doing it");
+  check(!CharacterNow.of(AgentStore.empty(0),null,"你在干嘛呢",false,noon,"拉小提琴",noon-21*M).lines.toString().contains("小提琴"),"twenty minutes later it is not news");
+  check(!CharacterNow.of(AgentStore.empty(0),null,"帮我看看这个公式",false,noon,"拉小提琴",noon-M).lines.toString().contains("小提琴"),"serious turns set it aside");
+  check(!CharacterNow.of(db.snapshot(),null,"还醒着吗",false,t+M,"打盹",t-M).lines.toString().contains("屏幕上打盹"),"dozing before a wake-up is the wake-up's story");
+  in=new PromptBuilder.Inputs();in.persona="你是大肥鱼。";in.now=noon;in.timeZone="Asia/Shanghai";in.doing="拉小提琴";in.doingAt=noon-2*M;
+  check(tail(PromptBuilder.build(in,"你在干嘛呢",false,AgentStore.empty(0),null)).contains("在屏幕上拉小提琴"),"the runtime's on-screen activity reaches the prompt");
+  check("拉小提琴".equals(ActionPlan.doing("小提琴演奏"))&&"吃冰淇淋".equals(ActionPlan.doing("吃冰淇淋融化"))&&ActionPlan.doing("点击回应-开心跃动")==null&&ActionPlan.doing("待机呼吸休闲")==null&&ActionPlan.doing(null)==null,"clips name activities; reactions and idling do not");
+  for(String clip:ActionPlan.DOING.keySet())check(!ActionPlan.DOING.get(clip).isEmpty(),"every activity has words: "+clip);
+  // Her body follows her words: first person, same clause, not negated.
+  check("小提琴演奏".equals(ActionPlan.said("等等，我去拉会儿小提琴。"))&&"吃冰淇淋融化".equals(ActionPlan.said("哼，我正在吃冰淇淋，别吵。"))&&"鲸鱼吐泡泡特效".equals(ActionPlan.said("我吐个泡泡给你看"))&&"原地专心玩魔方".equals(ActionPlan.said("我刚在玩魔方")),"she says she is doing it: the matching clip");
+  check(ActionPlan.said("你在吃西瓜吗？")==null&&ActionPlan.said("我不想吃冰淇淋")==null&&ActionPlan.said("我陪你吃西瓜")==null&&ActionPlan.said("小提琴好听吗")==null&&ActionPlan.said("我觉得，你该去放风筝")==null,"questions, negations, the user's doing and other clauses start nothing");
 
   // Her own experiences for the diary: that local day only, with times; taps are not experiences.
   JSONObject day=AgentStore.empty(0);
