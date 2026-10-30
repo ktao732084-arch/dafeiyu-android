@@ -22,6 +22,12 @@ final class AgentTransport {
     }
     /** chat: a companion reply, which may use the provider's conversational sampling (ModelPresets.chat). */
     static String request(ModelSettings.Config config,JSONArray messages,Token token,Progress progress,boolean streaming,int maxTokens,boolean chat)throws Exception {
+        return request(config,messages,token,progress,streaming,maxTokens,chat,false);
+    }
+    static String precise(ModelSettings.Config config,JSONArray messages,Token token,int maxTokens)throws Exception {
+        return request(config,messages,token,ignored->{},false,maxTokens,false,true);
+    }
+    private static String request(ModelSettings.Config config,JSONArray messages,Token token,Progress progress,boolean streaming,int maxTokens,boolean chat,boolean precise)throws Exception {
         token.check();
         String model=config.model,secret=config.secret;URL url=new URL(config.address.endpoint);
         HttpURLConnection con=(HttpURLConnection)url.openConnection();token.connection=con;
@@ -35,6 +41,7 @@ final class AgentTransport {
             boolean stream=streaming;
             JSONObject payload=new JSONObject().put("model",model).put("messages",messages).put("stream",stream).put("max_tokens",thinking?Math.max(maxTokens,8192):maxTokens);
             ModelPresets.apply(url.getHost(),model,payload);if(chat)ModelPresets.chat(url.getHost(),model,payload);
+            if(precise&&"api.deepseek.com".equals(url.getHost())&&!thinking)payload.put("temperature",0);
             try(OutputStream out=con.getOutputStream()){out.write(payload.toString().getBytes(StandardCharsets.UTF_8));}
             int code=con.getResponseCode();if(code<200||code>=300)throw new IOException("模型返回 HTTP "+code+errorDetail(con.getErrorStream(),secret)+"。"+ModelPresets.httpError(code));
             String type=con.getContentType();

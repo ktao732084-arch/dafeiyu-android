@@ -92,8 +92,25 @@ public class AgentInstrumentation extends Instrumentation {
     Reply carried=new Reply();AgentRuntime.send("嗯",false,carried);carried.await();
     JSONObject carriedMood=AgentRuntime.store().snapshot();check(carried.error==null&&carriedMood.getLong("emotionAt")==originalMoodAt,"unchanged mood does not renew its clock on Android");
     check("concerned".equals(carried.emotion)&&"concerned".equals(carriedMood.optString("emotion"))&&moodSource.equals(carriedMood.optString("moodSource")),"unchanged mood retains kind and causal source on Android");
+    Data.prefs().edit().putBoolean("agent.memory",false).putBoolean("agent.proactive",false).commit();
+    String rewriteUser="帮我润色：‘我明天搬去成都，我不吃辣。’只输出正文。",rewriteSource="我明天搬去成都，我不吃辣。";
+    AgentRuntime.model=(m,t,p)->{p.accept("{\"reply\":\"不太吃辣");return "{\"reply\":\"我明天搬去成都，我不太能吃辣。\",\"self\":[\"我不太能吃辣\"]}";};
+    RewriteGuard.reviewer=(m,t)->"{\"faithful\":true,\"replacement\":\"\"}";
+    Reply proofread=new Reply();check(AgentRuntime.send(rewriteUser,false,proofread),"rewrite starts");proofread.await();
+    check(rewriteSource.equals(proofread.text)&&proofread.error==null,"unsafe meaning rejected before delivery");
+    check(proofread.partial==null,"unverified rewrite is not streamed to listener");
+    JSONArray rewrittenHistory=AgentRuntime.store().snapshot().getJSONArray("turns");check(rewriteSource.equals(rewrittenHistory.getJSONObject(rewrittenHistory.length()-1).getString("reply")),"only faithful source persisted");
+    RewriteGuard.reviewer=(m,t)->{throw new java.io.IOException("offline reviewer");};Reply unavailable=new Reply();AgentRuntime.send(rewriteUser,false,unavailable);unavailable.await();check(rewriteSource.equals(unavailable.text),"review failure preserves source in real runtime");
+    int beforeProofCancel=AgentRuntime.history().length();CountDownLatch reviewing=new CountDownLatch(1),releaseReview=new CountDownLatch(1);
+    RewriteGuard.reviewer=(m,t)->{reviewing.countDown();releaseReview.await(10,TimeUnit.SECONDS);t.check();return "{\"faithful\":true,\"replacement\":\"\"}";};
+    Reply proofCancel=new Reply();AgentRuntime.send(rewriteUser,false,proofCancel);check(reviewing.await(5,TimeUnit.SECONDS),"review phase entered");AgentRuntime.cancel();proofCancel.await();releaseReview.countDown();AgentRuntime.worker.submit(()->{}).get(15,TimeUnit.SECONDS);
+    check(AgentRuntime.history().length()==beforeProofCancel,"cancelled proofreading cannot commit a fallback");
+    CountDownLatch deletingReview=new CountDownLatch(1),finishDeletedReview=new CountDownLatch(1);RewriteGuard.reviewer=(m,t)->{deletingReview.countDown();finishDeletedReview.await(10,TimeUnit.SECONDS);return "{\"faithful\":true,\"replacement\":\"\"}";};
+    Reply proofDeleted=new Reply();AgentRuntime.send(rewriteUser,false,proofDeleted);check(deletingReview.await(5,TimeUnit.SECONDS),"review before deletion entered");AgentRuntime.store().clear(true);finishDeletedReview.countDown();proofDeleted.await();
+    check(proofDeleted.error!=null&&AgentRuntime.history().length()==0,"deleted history cannot be restored by late proofreading");
+    RewriteGuard.reviewer=RewriteGuard::request;
     result.putString("stream","PASS: "+checks+" Android runtime checks\n");
-   }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;MemoryBridge.client=MemoryBridge::http;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}
+   }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;RewriteGuard.reviewer=RewriteGuard::request;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;MemoryBridge.client=MemoryBridge::http;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}
   }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e.toString());result.putString("stack",android.util.Log.getStackTraceString(e));}
   try{Data.logWriter.submit(()->{}).get(5,TimeUnit.SECONDS);}catch(Exception ignored){}
   if(originalContext!=null)Data.app=originalContext;AgentRuntime.memory=null;
