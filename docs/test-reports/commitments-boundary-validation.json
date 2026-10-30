@@ -1,0 +1,67 @@
+{
+  "product_commit": "04a87ec3c29ff236839ce71d6dda545e3c9b9f42",
+  "merge_commit": "14cdba661e32d50c74fc6af8312e007cc17cbe0a",
+  "merged_pr": "https://github.com/ktao732084-arch/dafeiyu-android/pull/32",
+  "followup_branch": "codex/commitment-evidence-boundaries",
+  "followup_merged": false,
+  "published": false,
+  "version_bumped": false,
+  "android": {
+    "runtime": "ART/Dalvik",
+    "api": 35,
+    "device": "MuMu Android 15 emulator; not a physical phone",
+    "test_package": "com.dafeiyu.commitmentchecks",
+    "core_suites": 24,
+    "commitment_checks": 126,
+    "runtime_checks": 78
+  },
+  "framework": {
+    "suites": 6,
+    "checks": 37,
+    "failures": 0,
+    "errors": 0
+  },
+  "logs": {
+    "core": {
+      "path": "build\\commitment-boundaries\\core-final.log",
+      "sha256": "6b5012c7e063618b17924c27971b4138cfd24c05ddaad1009f7d64f6ffbdcea3",
+      "result": "DEVICE SUITES: 24 passed, 0 failed"
+    },
+    "framework": {
+      "path": "build\\commitment-boundaries\\framework-final.log",
+      "sha256": "80d6cfd5501ef7803bd5de352424020dff1e3ae507ccd6c18ec833890ff9e707",
+      "result": "Tests run: 37, Failures: 0, Errors: 0, Skipped: 0"
+    },
+    "runtime": {
+      "path": "build\\commitment-boundaries\\runtime-release-candidate.log",
+      "sha256": "a29b876a090882920c022b65a871382552f6c15b5a26ba760fb1bb5741133001",
+      "result": "PASS: 78 Android runtime checks"
+    },
+    "build": {
+      "path": "build\\commitment-boundaries\\build-release-candidate.log",
+      "sha256": "a71f1cf78a4b24e28714385181e92033a2b8c20ad5ea796dd8c0a85af8c46372",
+      "result": "Verified using v3 scheme (APK Signature Scheme v3): true"
+    }
+  },
+  "product_dex_sha256": "178ca838a5f9f8e66415d797d4ccd91bcd1a4cc2d1f4fe95c53c8bffe55bb080",
+  "apk_dex_matches_product": true,
+  "apk_signing": "Local test key, v2/v3 verified; not a release artifact",
+  "dex_api_inspection": {
+    "log": "build\\commitment-boundaries\\final-dex-audit.txt",
+    "sha256": "0be8d093a8998dc16176659324f6e430f82baefb0c2c39099cb5efe96d46f3af",
+    "note": "Inspected final DEX for new JSONTokener.nextClean and local guard calls, exercised on Android API35; no new platform-version-specific API was introduced. Not a device-matrix certification."
+  },
+  "protected_files_equal_merged_main": [
+    "assets/personas.json",
+    "src/com/xiaoxiao/pet/PersonaManager.java",
+    "src/com/xiaoxiao/pet/Situations.java",
+    "src/com/xiaoxiao/pet/HerDay.java"
+  ],
+  "corpus_sha256_lf": "a6209edba846c41e3a7de0b9b25f2bc666b566220130364dd25ab276b084d116",
+  "limitations": [
+    "Optional full native notebook UI was not counted as passed after prior UiAutomation service conflict.",
+    "No physical handset or Android version matrix.",
+    "Prior timeout and fixture failures retained locally; final framework 37 and runtime 78 checks passed without relaxing product behavior.",
+    "Real-model eval uses host JVM product classes; Android runtime integration uses controlled model fixtures."
+  ]
+}

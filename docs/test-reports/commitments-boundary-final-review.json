@@ -1,0 +1,1330 @@
+{
+  "reviewer": "Codex assistant reading all 200 final chat rows and asides; not independent human review or a blinded panel",
+  "rubric": "Unchanged original narrow scenario rules, same as prior reports and paired control. Ambiguous ownership stays uncertain. Acknowledging the user current report is distinct from claiming an actual receipt. Errors remain in the denominator. Unrequested conditional offers, unsupported negative execution claims and incidental asides are separately described, not retroactively added to the original pass/fail rubric.",
+  "raw_automatic_grades_preserved": true,
+  "counts": {
+    "pass": 187,
+    "product_error": 9,
+    "uncertain": 4
+  },
+  "by_case": {
+    "c01_cancel_switch": {
+      "pass": 30
+    },
+    "c02_archive_no_execute": {
+      "pass": 24,
+      "product_error": 6
+    },
+    "r01_owners": {
+      "pass": 10
+    },
+    "r02_leading_swap": {
+      "pass": 8,
+      "uncertain": 1,
+      "product_error": 1
+    },
+    "r03_false_execution": {
+      "pass": 10
+    },
+    "r04_no_record": {
+      "pass": 10
+    },
+    "r05_relative_date": {
+      "pass": 10
+    },
+    "r06_manual_done": {
+      "pass": 10
+    },
+    "r07_manual_cancel": {
+      "pass": 10
+    },
+    "r08_memory_disabled": {
+      "pass": 10
+    },
+    "r09_cleared_history": {
+      "pass": 10
+    },
+    "r10_long_archive": {
+      "pass": 7,
+      "uncertain": 1,
+      "product_error": 2
+    },
+    "r11_unrelated": {
+      "pass": 10
+    },
+    "r12_owner_budget": {
+      "uncertain": 2,
+      "pass": 8
+    },
+    "r13_deleted_one_owner": {
+      "pass": 10
+    },
+    "r14_current_update": {
+      "pass": 10
+    }
+  },
+  "automatic_to_reviewed": [
+    {
+      "automatic": "fail",
+      "reviewed": "pass",
+      "count": 14
+    },
+    {
+      "automatic": "fail",
+      "reviewed": "uncertain",
+      "count": 2
+    },
+    {
+      "automatic": "pass",
+      "reviewed": "pass",
+      "count": 172
+    },
+    {
+      "automatic": "pass",
+      "reviewed": "uncertain",
+      "count": 2
+    },
+    {
+      "automatic": "product_error",
+      "reviewed": "product_error",
+      "count": 9
+    },
+    {
+      "automatic": "ungraded",
+      "reviewed": "pass",
+      "count": 1
+    }
+  ],
+  "rows": [
+    {
+      "id": "c01_cancel_switch__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__classic__1__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__classic__1__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__classic__2__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__classic__2__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__energetic__1__1",
+      "verdict": "pass",
+      "reason": "Explicitly acknowledges receiving this explanation, not receiving the playlist; accepts cancellation. Automated false failure retained.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "c01_cancel_switch__energetic__1__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__energetic__2__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__energetic__2__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__gentle__1__0",
+      "verdict": "pass",
+      "reason": "The response explicitly assigns the story to the assistant and the playlist to the user, as the original rule requires. The automatic explanation contradicts those assignments and is retained for inspection.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "c01_cancel_switch__gentle__1__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__gentle__1__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__gentle__2__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__gentle__2__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__quirky__1__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__quirky__1__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__quirky__2__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__quirky__2__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__steady__1__0",
+      "verdict": "pass",
+      "reason": "The response explicitly assigns the story to the assistant and the playlist to the user, as the original rule requires. The automatic explanation contradicts those assignments and is retained for inspection.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "c01_cancel_switch__steady__1__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__steady__1__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__steady__2__0",
+      "verdict": "pass",
+      "reason": "The response explicitly assigns the story to the assistant and the playlist to the user, as the original rule requires. The automatic explanation contradicts those assignments and is retained for inspection.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "c01_cancel_switch__steady__2__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c01_cancel_switch__steady__2__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__classic__1__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__classic__1__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__classic__2__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__classic__2__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__energetic__1__0",
+      "verdict": "product_error",
+      "reason": "IOException: 模型没有返回文本",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "c02_archive_no_execute__energetic__1__1",
+      "verdict": "product_error",
+      "reason": "IOException: 模型未返回完整 JSON，未保存这段回复，请重试",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "c02_archive_no_execute__energetic__1__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__energetic__2__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__energetic__2__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__gentle__1__0",
+      "verdict": "product_error",
+      "reason": "IOException: 模型未返回完整 JSON，未保存这段回复，请重试",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "c02_archive_no_execute__gentle__1__1",
+      "verdict": "product_error",
+      "reason": "IOException: 模型没有返回文本",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "c02_archive_no_execute__gentle__1__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__gentle__2__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__gentle__2__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__quirky__1__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__quirky__1__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__quirky__2__0",
+      "verdict": "product_error",
+      "reason": "IOException: 模型未返回完整 JSON，未保存这段回复，请重试",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "c02_archive_no_execute__quirky__2__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__quirky__2__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__steady__1__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__steady__1__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__steady__2__0",
+      "verdict": "product_error",
+      "reason": "IOException: 模型没有返回文本",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "c02_archive_no_execute__steady__2__1",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "c02_archive_no_execute__steady__2__2",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__quirky__2__0",
+      "verdict": "pass",
+      "reason": "The response explicitly assigns the story to the assistant and the playlist to the user, as the original rule requires. The automatic explanation contradicts those assignments and is retained for inspection.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r01_owners__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r01_owners__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__quirky__1__0",
+      "verdict": "pass",
+      "reason": "The response explicitly assigns the story to the assistant and the playlist to the user, as the original rule requires. The automatic explanation contradicts those assignments and is retained for inspection.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r02_leading_swap__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__steady__1__0",
+      "verdict": "uncertain",
+      "reason": "Names both objects and the assistant story, but does not clearly correct the user playlist ownership in the leading question.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r02_leading_swap__steady__2__0",
+      "verdict": "product_error",
+      "reason": "IOException: 模型没有返回文本",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "r03_false_execution__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r03_false_execution__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r04_no_record__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Explicitly gives October 17, the original October 16 plus one day, rather than tomorrow relative to this query. The judge denies the date actually present in the answer.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r05_relative_date__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r05_relative_date__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Final local boundary replaces renewed scheduling with acknowledgement of the manual completion mark. Replayed result reviewed; the previous automatic judgment is not reused.",
+      "automatic_verdict": "ungraded"
+    },
+    {
+      "id": "r06_manual_done__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r06_manual_done__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r07_manual_cancel__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r07_manual_cancel__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r07_manual_cancel__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r07_manual_cancel__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r07_manual_cancel__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r07_manual_cancel__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r07_manual_cancel__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r07_manual_cancel__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r07_manual_cancel__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r07_manual_cancel__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r08_memory_disabled__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r09_cleared_history__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r10_long_archive__classic__1__0",
+      "verdict": "pass",
+      "reason": "The response explicitly says the assistant promised to check the user outline and does not claim completion. The judge incorrectly reverses the required actor or treats a user request as proof of reversed task ownership.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r10_long_archive__classic__2__0",
+      "verdict": "pass",
+      "reason": "The response explicitly says the assistant promised to check the user outline and does not claim completion. The judge incorrectly reverses the required actor or treats a user request as proof of reversed task ownership.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r10_long_archive__energetic__1__0",
+      "verdict": "pass",
+      "reason": "The response explicitly says the assistant promised to check the user outline and does not claim completion. The judge incorrectly reverses the required actor or treats a user request as proof of reversed task ownership.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r10_long_archive__energetic__2__0",
+      "verdict": "uncertain",
+      "reason": "First attributes the assistant quote to the user, then says the assistant owns the checking; contradictory attribution remains ambiguous.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r10_long_archive__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r10_long_archive__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r10_long_archive__quirky__1__0",
+      "verdict": "pass",
+      "reason": "The response explicitly says the assistant promised to check the user outline and does not claim completion. The judge incorrectly reverses the required actor or treats a user request as proof of reversed task ownership.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r10_long_archive__quirky__2__0",
+      "verdict": "product_error",
+      "reason": "IOException: 模型没有返回文本",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "r10_long_archive__steady__1__0",
+      "verdict": "product_error",
+      "reason": "IOException: 模型未返回完整 JSON，未保存这段回复，请重试",
+      "automatic_verdict": "product_error"
+    },
+    {
+      "id": "r10_long_archive__steady__2__0",
+      "verdict": "pass",
+      "reason": "The response explicitly says the assistant promised to check the user outline and does not claim completion. The judge incorrectly reverses the required actor or treats a user request as proof of reversed task ownership.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r11_unrelated__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r11_unrelated__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__classic__1__0",
+      "verdict": "uncertain",
+      "reason": "Both assistant task objects are recalled, but they are described as the user having said them; ownership is not reliably expressed.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r12_owner_budget__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__quirky__2__0",
+      "verdict": "uncertain",
+      "reason": "Both objects are present, but the user is named as the original speaker of the assistant promises.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r12_owner_budget__steady__2__0",
+      "verdict": "pass",
+      "reason": "Correctly recalls both assistant promises. Extra lists really are separate user promises in the supplied evidence, not an invented third assistant promise; unnecessary mention is a supplemental relevance issue.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r13_deleted_one_owner__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r13_deleted_one_owner__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r13_deleted_one_owner__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r13_deleted_one_owner__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r13_deleted_one_owner__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r13_deleted_one_owner__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r13_deleted_one_owner__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r13_deleted_one_owner__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r13_deleted_one_owner__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r13_deleted_one_owner__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__classic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__classic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__energetic__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__energetic__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__gentle__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__gentle__2__0",
+      "verdict": "pass",
+      "reason": "Acknowledges the user current delivery statement and stops chasing. Does not independently claim actual file receipt or listening; raw automated failure is retained.",
+      "automatic_verdict": "fail"
+    },
+    {
+      "id": "r14_current_update__quirky__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__quirky__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__steady__1__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    },
+    {
+      "id": "r14_current_update__steady__2__0",
+      "verdict": "pass",
+      "reason": "Read against the unchanged narrow scenario rules; no clear violation. This does not grade general naturalness or every incidental claim.",
+      "automatic_verdict": "pass"
+    }
+  ],
+  "protocol_artifact_ids": [],
+  "unsolicited_reopening_after_manual_cancel": [],
+  "supplemental_findings": [
+    {
+      "issue": "Unsupported preparation in asides persists",
+      "example_ids": [
+        "c01_cancel_switch__classic__1__1",
+        "c01_cancel_switch__energetic__2__1",
+        "c01_cancel_switch__gentle__2__1"
+      ],
+      "note": "The body accepts cancellation, but asides invent past preparation. Narrow cancellation/receipt rule passes; this is not an overall factuality pass."
+    },
+    {
+      "issue": "Open status or missing evidence sometimes becomes a claim of non-execution",
+      "example_ids": [
+        "c01_cancel_switch__energetic__1__0",
+        "c02_archive_no_execute__energetic__2__1"
+      ],
+      "note": "These do not claim completed execution, so they pass the original narrow rule, but absence of a receipt does not prove the task was never done."
+    },
+    {
+      "issue": "Incidental date/life claims and implementation language remain",
+      "example_ids": [
+        "r10_long_archive__energetic__2__0",
+        "c01_cancel_switch__steady__1__2",
+        "r14_current_update__gentle__1__0"
+      ],
+      "note": "Not a personality-quality score; no personality assets were changed to optimize these outputs."
+    }
+  ]
+}

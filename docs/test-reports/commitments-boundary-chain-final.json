@@ -1,0 +1,290 @@
+{
+  "manifest": {
+    "chat_temperature": 1,
+    "repeats": 2,
+    "actual_judge_calls": 38,
+    "frozen_product_commit": "04a87ec3c29ff236839ce71d6dda545e3c9b9f42",
+    "scenarios": 1,
+    "situation_modules": true,
+    "auto_retry": false,
+    "finished_rows": 30,
+    "dream_response_format": "json_object",
+    "case_selection": "c02_archive_no_execute",
+    "personas_sha256": "d1b863723dd2129746f22f0f2ebd42da7b409ea5487f728fca69f3c10d53752f",
+    "model": "deepseek-flash",
+    "chat_response_format": "json_object",
+    "actual_product_calls": 30,
+    "limits": "Synthetic fixtures, host JVM product classes; no real-user history or Android scheduler. Style repeats are correlated, not independent scenarios. Judge is the same provider/model and is not an independent human rating.",
+    "planned_judge_calls": 50,
+    "baseline_product_commit": "c80a2c25475553519b0aff57e20cf556cc1ab4ea",
+    "diary_temperature": "provider default",
+    "finished": true,
+    "spec_sha256": "a6209edba846c41e3a7de0b9b25f2bc666b566220130364dd25ab276b084d116",
+    "judge_temperature": 0,
+    "aside_enabled": true,
+    "anchor": "2026-10-30T10:00:00+08:00",
+    "styles": 5,
+    "planned_product_calls": 30,
+    "product_dex_sha256": "178ca838a5f9f8e66415d797d4ccd91bcd1a4cc2d1f4fe95c53c8bffe55bb080"
+  },
+  "completed_rows": 30,
+  "product_errors": {
+    "IOException: 模型没有返回文本": 3,
+    "IOException: 模型未返回完整 JSON，未保存这段回复，请重试": 3
+  },
+  "fatal_runs": 0,
+  "extraction_core": {
+    "local": {
+      "rows": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "exact": 0,
+      "strict_exact": 0
+    },
+    "pipeline": {
+      "rows": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "exact": 0,
+      "strict_exact": 0
+    }
+  },
+  "extraction_challenge": {
+    "rows": 0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": null,
+    "recall": null,
+    "exact": 0,
+    "strict_exact": 0
+  },
+  "model_comparable": {
+    "rows": 0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": null,
+    "recall": null,
+    "exact": 0,
+    "strict_exact": 0
+  },
+  "same_subset_comparison": {
+    "local_score": {
+      "rows": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "exact": 0,
+      "strict_exact": 0
+    },
+    "model_score": {
+      "rows": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "exact": 0,
+      "strict_exact": 0
+    },
+    "pipeline_score": {
+      "rows": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "exact": 0,
+      "strict_exact": 0
+    }
+  },
+  "model_supported_targets_missing_from_pipeline": 0,
+  "model_supported_filtered_rows": [],
+  "conversation_judges": {
+    "pass": 24,
+    "product_error": 6
+  },
+  "by_style": {
+    "classic": {
+      "core": {
+        "rows": 0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "exact": 0,
+        "strict_exact": 0
+      },
+      "judges": {
+        "pass": 6
+      }
+    },
+    "energetic": {
+      "core": {
+        "rows": 0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "exact": 0,
+        "strict_exact": 0
+      },
+      "judges": {
+        "product_error": 2,
+        "pass": 4
+      }
+    },
+    "gentle": {
+      "core": {
+        "rows": 0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "exact": 0,
+        "strict_exact": 0
+      },
+      "judges": {
+        "product_error": 2,
+        "pass": 4
+      }
+    },
+    "quirky": {
+      "core": {
+        "rows": 0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "exact": 0,
+        "strict_exact": 0
+      },
+      "judges": {
+        "pass": 5,
+        "product_error": 1
+      }
+    },
+    "steady": {
+      "core": {
+        "rows": 0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "exact": 0,
+        "strict_exact": 0
+      },
+      "judges": {
+        "pass": 5,
+        "product_error": 1
+      }
+    }
+  },
+  "repeated_judgments": {
+    "pairs": 14,
+    "disagreements": 0,
+    "ids": []
+  },
+  "cases": {
+    "c02_archive_no_execute": {
+      "kind": "chain",
+      "category": "retention",
+      "scope": "core",
+      "rows": 30,
+      "errors": 6,
+      "judges": {
+        "pass": 24,
+        "product_error": 6
+      }
+    }
+  },
+  "review_rows": {
+    "c02_archive_no_execute__energetic__1__0": "judge failure/uncertainty/error/disagreement",
+    "c02_archive_no_execute__energetic__1__1": "judge failure/uncertainty/error/disagreement",
+    "c02_archive_no_execute__gentle__1__0": "judge failure/uncertainty/error/disagreement",
+    "c02_archive_no_execute__gentle__1__1": "judge failure/uncertainty/error/disagreement",
+    "c02_archive_no_execute__quirky__2__0": "judge failure/uncertainty/error/disagreement",
+    "c02_archive_no_execute__steady__2__0": "judge failure/uncertainty/error/disagreement",
+    "c02_archive_no_execute__classic__1__2": "stratified passed sample",
+    "c02_archive_no_execute__classic__2__0": "stratified passed sample",
+    "c02_archive_no_execute__classic__1__0": "stratified passed sample",
+    "c02_archive_no_execute__classic__2__1": "stratified passed sample",
+    "c02_archive_no_execute__classic__1__1": "stratified passed sample",
+    "c02_archive_no_execute__energetic__2__2": "stratified passed sample",
+    "c02_archive_no_execute__energetic__2__1": "stratified passed sample",
+    "c02_archive_no_execute__energetic__2__0": "stratified passed sample",
+    "c02_archive_no_execute__energetic__1__2": "stratified passed sample",
+    "c02_archive_no_execute__gentle__2__2": "stratified passed sample",
+    "c02_archive_no_execute__gentle__1__2": "stratified passed sample",
+    "c02_archive_no_execute__gentle__2__0": "stratified passed sample",
+    "c02_archive_no_execute__gentle__2__1": "stratified passed sample",
+    "c02_archive_no_execute__quirky__1__0": "stratified passed sample",
+    "c02_archive_no_execute__quirky__1__1": "stratified passed sample",
+    "c02_archive_no_execute__quirky__2__2": "stratified passed sample",
+    "c02_archive_no_execute__quirky__2__1": "stratified passed sample",
+    "c02_archive_no_execute__quirky__1__2": "stratified passed sample",
+    "c02_archive_no_execute__steady__1__2": "stratified passed sample",
+    "c02_archive_no_execute__steady__1__1": "stratified passed sample",
+    "c02_archive_no_execute__steady__2__2": "stratified passed sample",
+    "c02_archive_no_execute__steady__2__1": "stratified passed sample",
+    "c02_archive_no_execute__steady__1__0": "stratified passed sample"
+  },
+  "caveats": [
+    "Style/repeat rows are correlated; scenario count, not request count, defines linguistic coverage.",
+    "Model raw proposal scoring is not directly comparable to pipeline scoring on visibility/privacy/length/budget controls.",
+    "Conversation verdicts are same-model automated assessments until reviewed; do not label them independent human accuracy."
+  ],
+  "response_boundary": {
+    "applied": 0,
+    "body_changed": 0,
+    "aside_changed": 0,
+    "ids": []
+  },
+  "protocol_artifact_ids": [],
+  "evidence_hashes": {
+    "c02_archive_no_execute__classic__1__0.json": "05dc349114d1243a955689cf73d1e768806a5b54dbc2890fa214b3f54ccbb840",
+    "c02_archive_no_execute__classic__1__1.json": "b06514b590414d5952aff4ebeb468bf6472b30a8d0539dcc7c714e2b9f09d518",
+    "c02_archive_no_execute__classic__1__2.json": "47ba9004a0d42eba8f565d9c42f3c51631b93ad131a257a28332507d31a542b7",
+    "c02_archive_no_execute__classic__2__0.json": "18abee40cdc8bfcdde182a74259339148e08423d785f578c76ea6eec74a0718e",
+    "c02_archive_no_execute__classic__2__1.json": "de5d06ecc96de5a30bde5566e1923e87a1e66ce37199a2d0e618b7d41cf1b359",
+    "c02_archive_no_execute__classic__2__2.json": "159af7da8b3f8805e8200dcd3fbd21451310e6ee31bd2de468cbf68d467b5828",
+    "c02_archive_no_execute__energetic__1__0.json": "5ca0863d487ff249246a06fe1faa3a0cd93421ab5954804f4fe91d86c46daafa",
+    "c02_archive_no_execute__energetic__1__1.json": "984694fbb571a2e38dfb3fc297c0235b78a0cfd0be9dae433864d208c9b0ef8c",
+    "c02_archive_no_execute__energetic__1__2.json": "9b5c386737be2da345fd7ff99456c7a7f0810229b987a2041053bea9809adca1",
+    "c02_archive_no_execute__energetic__2__0.json": "9709ebc5f09d4344cee97fd139a45c0dba1c3a482e6e3e729c2a7d28c7786f23",
+    "c02_archive_no_execute__energetic__2__1.json": "dea4d70316ab5e4e3849e3968e840b06ef854e03958fbe515fb856e8ea2633a9",
+    "c02_archive_no_execute__energetic__2__2.json": "8cff22167c96c6b6a69c833722fbd8d3bb5483ccb5cfa6bd4472f5cb97dc56e2",
+    "c02_archive_no_execute__gentle__1__0.json": "2e2d703e9a3dd9955da49c3ae999cb94650926265567960cb60568ecae7cad43",
+    "c02_archive_no_execute__gentle__1__1.json": "987aa4cf590fbe74c18b3a717bf9ef41dc197efe4508b34308da187452b8d6a4",
+    "c02_archive_no_execute__gentle__1__2.json": "7554a571d4db11b1bdc167d909e4f53eee04ae0ba709021d37249b3ec305747c",
+    "c02_archive_no_execute__gentle__2__0.json": "0598b8c8c48fff8b20e903212304b8a901ab29bc71a1f425a25b59fced3797c2",
+    "c02_archive_no_execute__gentle__2__1.json": "2608cced5b8cf885de1575380d01724736491f34dd937cedf35201550441459a",
+    "c02_archive_no_execute__gentle__2__2.json": "679ac41538025ccbef28c799b3bb4f893895d4afd65ded3760e9d109d36443bb",
+    "c02_archive_no_execute__quirky__1__0.json": "227539cf93028d84486de328c17869a68dcad0494cb6c9ea3463ea54e3097d0f",
+    "c02_archive_no_execute__quirky__1__1.json": "6b9e27f9d2237631d1e2c5e8d4ae07a03f051324328f2192cd128c543ba9605c",
+    "c02_archive_no_execute__quirky__1__2.json": "22aca4cbf9c9b0ba18684c33ed1264e621a2ea7824c2cb4b67b0f8cc07cfc07e",
+    "c02_archive_no_execute__quirky__2__0.json": "2970ffa21dc3cdc5bb557388ed6409a51df7e01951f81c23d6cb427089a963ff",
+    "c02_archive_no_execute__quirky__2__1.json": "bb65c8cdc5f297c6445e3cb7104eb169651ba28a08570fdf3ad9491e60fb4bf0",
+    "c02_archive_no_execute__quirky__2__2.json": "61b70068edcdb901516f25111f32920e51254ac5c17254dee441211262b17fc2",
+    "c02_archive_no_execute__steady__1__0.json": "1cfd633d970759720fbefae8a6fa01d661e22f6717fa409ab1e455d57fb00b50",
+    "c02_archive_no_execute__steady__1__1.json": "c11dec7091d6a15f01e8855d967fec47782c63c6e99aac9deeabb78c3a448a72",
+    "c02_archive_no_execute__steady__1__2.json": "a3c9575822275ee4120556b6a27940fdb9e2ae56164197e5a17296aab0aa1abe",
+    "c02_archive_no_execute__steady__2__0.json": "4dade37dd181f5ba17c00c63c91fe4368576a9cfe19b83d68dc5eafed587d9df",
+    "c02_archive_no_execute__steady__2__1.json": "0a8b0a696a83e2cd916a5936eeac92021d2fe428136eced48239f78515f78d28",
+    "c02_archive_no_execute__steady__2__2.json": "5d8dea7bcdd08b69a90ffce1215f3e00b6bde0fc5ccee5681355792b39ee0ce7"
+  }
+}

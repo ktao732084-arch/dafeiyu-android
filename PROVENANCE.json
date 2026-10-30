@@ -1320,7 +1320,13 @@
       "path": "docs/COMMITMENTS.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "9a3f5d27f9b92f2b7a99fff9b575497897404be421a1805fec8c430fd3901982"
+      "sha256": "1fc359b14dc3d9738ddf88b66020c1f52994ca749c95794b3deeb59cee0668e2"
+    },
+    {
+      "path": "docs/COMMITMENTS_BOUNDARIES_EVAL.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "c72120114605d3ccfa91d2397206359b30665272f392485410fdbc931033342c"
     },
     {
       "path": "docs/COMMITMENTS_EXPANDED_EVAL.md",
@@ -1575,6 +1581,12 @@
       "sha256": "eb5975287e655906eb821d1e7e712253a7b0cf5a4cba45146955e25caa801547"
     },
     {
+      "path": "docs/test-reports/commitments-boundary-chain-final.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "d17699eb211c7b0d2a2bbb879871186c0ebf7eff57fdaf8f116deee85e0e85bd"
+    },
+    {
       "path": "docs/test-reports/commitments-boundary-control-review.json",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1593,10 +1605,34 @@
       "sha256": "3841fe510b019369dacaac389bdf7e4397cd9e82430c3f5d5fc1a0b6071b3399"
     },
     {
+      "path": "docs/test-reports/commitments-boundary-final-review.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "4ba272a6123d414e184857a11e248e64f86fda031705c054f2b5cc30d543c9de"
+    },
+    {
+      "path": "docs/test-reports/commitments-boundary-final.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "8e0f806201c86a95a206cfb7938ad1f6d35324fe64ec2dbbc77c5dbdd9a7a828"
+    },
+    {
+      "path": "docs/test-reports/commitments-boundary-guard-diagnostic.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "03bcea3a3f378e6ae3632255f10f0eeebddeea4d9b41eee985ec21113b6ca976"
+    },
+    {
       "path": "docs/test-reports/commitments-boundary-json-diagnostic.json",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "fe843a7c61780be5fe7e8a108c6ab59fb0129d5c8412a3ccd396afbc632fdc93"
+    },
+    {
+      "path": "docs/test-reports/commitments-boundary-validation.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "30eed8f9e323092cc89a8dd53b74f8b55adf562de9948155f8bb24297e82d93a"
     },
     {
       "path": "docs/test-reports/commitments-expanded-review.json",
