@@ -16,7 +16,7 @@ public final class HeroPetInstrumentation extends Instrumentation {
    activity=(MainActivity)startActivitySync(new Intent(getTargetContext(),MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));ready();AlphaVideo original=activity.pet.video;
    long before=video()[2];SystemClock.sleep(350);check(video()[2]!=before,"idle video advances");
    main(()->{activity.render();activity.render();check(activity.pet.video==original,"same video view after repeated render");});ready();
-   main(()->activity.pet.stage.performClick());SystemClock.sleep(250);check(ActionPlan.TAPS.contains(activity.pet.video.pending),"tap selects real reaction clip");
+   main(()->activity.pet.stage.performClick());SystemClock.sleep(250);check(ActionPlan.TAP_ACTIONS.contains(activity.pet.video.pending)&&activity.pet.plan.has(activity.pet.video.pending)&&!Data.file(HeroPet.ROLE,activity.pet.video.pending).isEmpty(),"tap selects an unlocked real reaction from the expanded pool: "+activity.pet.video.pending);
    cover=startActivitySync(new Intent(getTargetContext(),TouchReplyActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));SystemClock.sleep(200);
    main(()->check(!activity.pet.running&&activity.pet.video.suspended,"background pauses home animation"));check(video()[1]==0,"MediaPlayer actually paused");
    main(()->cover.finish());SystemClock.sleep(350);ready();check(activity.pet.video==original,"resume reuses video view");

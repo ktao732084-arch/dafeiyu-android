@@ -7,8 +7,9 @@ final class TouchReply {
     static final long BURST_MS=15000,SETTLE_MS=1800,EXPIRE_MS=30000,REQUEST_GAP_MS=20000;
     static final String HISTORY_EVENT="（用户对桌宠的触摸互动，不是文字发言）";
     static final class Request {
-        final long generation,epoch,lastAt;final JSONObject evidence;
-        Request(long generation,long epoch,long lastAt,JSONObject evidence){this.generation=generation;this.epoch=epoch;this.lastAt=lastAt;this.evidence=evidence;}
+        final long generation,epoch,lastAt,liftSerial;final JSONObject evidence;
+        Request(long generation,long epoch,long lastAt,JSONObject evidence){this(generation,epoch,lastAt,evidence,0);}
+        Request(long generation,long epoch,long lastAt,JSONObject evidence,long liftSerial){this.generation=generation;this.epoch=epoch;this.lastAt=lastAt;this.evidence=evidence;this.liftSerial=liftSerial;}
     }
     static final class Batch {
         JSONArray events=new JSONArray();long generation,epoch,firstAt,lastAt,lastAttempt=-REQUEST_GAP_MS;int count;
@@ -30,6 +31,7 @@ final class TouchReply {
     }
     static boolean enabled(){return Data.prefs().getBoolean("agent.touchReply",true);}
     static void cancel(PetService.Pet pet){
+        pet.lift.cancelReply();
         pet.touchReplies.clear();if(pet.touchReplyCheck!=null){pet.owner().handler.removeCallbacks(pet.touchReplyCheck);pet.touchReplyCheck=null;}
         AgentRuntime.interruptTouch(pet);
     }
@@ -49,6 +51,8 @@ final class TouchReply {
         try{return !AgentRuntime.store().snapshot().optBoolean("proactiveWaiting");}catch(Exception unavailable){return false;}
     }
     static boolean free(PetService.Pet pet){return !pet.dragging&&!pet.moving&&!pet.thrown&&!pet.busy&&pet.scene==null&&pet.bubble==null&&(pet.speech==null||!pet.speech.active);}
+    static boolean free(PetService.Pet pet,Request request){return request.liftSerial==0?free(pet):pet.lift.free();}
+    static boolean current(PetService.Pet pet,Request request){return pet.touchReplies.current(request)&&(request.liftSerial==0||pet.lift.current(request));}
     static void pump(PetService service,PetService.Pet pet){
         long now=SystemClock.uptimeMillis();
         if(pet.touchReplies.expired(now)||!allowed(service,pet)||!AgentRuntime.configured()||!PersonaManager.isInitialized(pet.role)){cancel(pet);return;}
@@ -63,6 +67,7 @@ final class TouchReply {
         JSONObject system=messages.getJSONObject(0),last=messages.getJSONObject(messages.length()-1);
         system.put("content",system.getString("content")+"\n本轮是用户刚刚通过轻点、挪动或喂食发起的互动回应，不是定时主动聊天。只针对interaction_event中实际发生的动作，用已确定的性格自然接一句短话（最多两句、80字），可以俏皮，也可以表达被连续碰到的感受；不要编造动作之外的经历，不追问新话题，不索取回复。不要改变用户忙闲或主动时间；本轮只读取reply和emotion/mood字段，memories与self留空。若确实不适合回应，reply为[安静陪伴]。");
         String context=last.getString("content");int end=context.indexOf("</背景>");
+        if(request.liftSerial!=0)system.put("content",system.getString("content")+"\n此刻用户仍在提着你；durationMs是这一次真实持续时间，grabRegion区分head（头部提起）和waist（拎住后腰衣服、身体向前垂下）。吐槽要符合实际提起部位，不要把腰部说成揪头发，也不虚构摸到其他部位。沿用上文已冻结的人格、说话节奏和你们的称呼，用你自己的口吻轻轻吐槽一句，尽量40字以内。不要套用统一卖萌台词，不要说已经放下，也不要把悬空演绎成真实受伤；不追问、不索取回复。这里只回应这一次提起，不重复多次催促。");
         if(end>=0)context=context.substring(0,end+5);
         last.put("content",context+"\n"+HISTORY_EVENT+"\n"+new JSONObject().put("interaction_event",request.evidence));return messages;
     }
