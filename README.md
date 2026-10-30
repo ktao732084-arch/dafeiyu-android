@@ -1,12 +1,12 @@
-# 大肥鱼 · 润色保真与记忆修正 0.4.9.5
+# 大肥鱼 · 记忆更正与桌宠互动 0.4.9.6
 
-[下载 APK](https://github.com/ktao732084-arch/dafeiyu-android/releases/tag/v0.4.9.5) · [来源清单](SOURCE_MAP.md) · [逐文件溯源](PROVENANCE.json) · [验证记录](VALIDATION.md)
+[下载 APK](https://github.com/ktao732084-arch/dafeiyu-android/releases/tag/v0.4.9.6) · [来源清单](SOURCE_MAP.md) · [逐文件溯源](PROVENANCE.json) · [验证记录](VALIDATION.md)
 
-0.4.9.5汇总润色保真、记忆修正、连续补话、表达学习、首页动画与章节任务线；沿用原签名覆盖安装，保留模型配置和已有数据。
+0.4.9.6修复更正记忆遗漏、乱码及嘀咕标签显示，并汇总新的桌宠气泡、提起互动、共同经历与模型连接页更新；沿用原签名覆盖安装，保留模型配置和已有数据。
 
 主分支另含尚未发布的逐句气泡、长按菜单、扩展点击动作及头部/后腰提起优化；整合范围与模拟器实测见 [桌宠交互合并验收](docs/PET_INTERACTION_INTEGRATION.md)。
 
-明确原句的润色在展示前核对原意，无法确认时保留原文。保留傲娇特色，减少代写素材和疑问进入用户记忆；桌面互动回应不再插入聊天。完整说明见 [本版更新](docs/RELEASE-0.4.9.5.md)。
+明确原句的润色在展示前核对原意，无法确认时保留原文。保留傲娇特色，减少代写素材和疑问进入用户记忆；桌面互动回应不再插入聊天。完整说明见 [本版更新](docs/RELEASE-0.4.9.6.md)。
 
 0.4.9.3新增真正可玩的五子棋：从首页或聊天邀请进入，支持胜负、保存继续、结束与再来一局。对局结果、时间和完整棋谱存在手机，模型可参考累计战绩和最近8局。下棋本身不消耗模型额度。详见[五子棋说明](docs/GOMOKU.md)。
 
@@ -26,7 +26,7 @@
 
 ## 安装与使用
 
-1. 在 Android 8.0+ 安装 `dafeiyu-android-0.4.9.5.apk`。沿用同一体验签名，可覆盖安装保留数据。
+1. 在 Android 8.0+ 安装 `dafeiyu-android-0.4.9.6.apk`。沿用同一体验签名，可覆盖安装保留数据。
 2. 初次相遇时，手动选择一种性格或随机一次。确认后固定，后期没有重选人格入口。
 3. 「模型连接」默认选择 **DeepSeek V4.1 Flash**。点「去 DeepSeek 官网获取 Key」，登录后创建并复制 API Key，回到 App 粘贴（或点输入框旁的「粘贴」），点「连接并保存」即可。地址和模型自动填写，测试成功才保存；API需有可用余额，测试与聊天会使用自己的额度。其他服务商选「其他模型 / 自定义」，旧配置保留。
 4. 「记忆手账」查看、搜索、编辑、固定或忘记记忆，可只看自己写的或聊天里自动记下的；「共同经历与记忆变化」查看历史。无需额外设置记忆服务器。
@@ -152,7 +152,7 @@ $env:XIAOXIAO_STORE_PASS='你的签名密码'
 ./tests/robolectric/run-tests.ps1 -AndroidRoot '.' -Sdk 'D:/Android/Sdk' -Jdk 'C:/Program Files/Java/jdk-17'
 ```
 
-产物为 `build/dafeiyu-0.4.9.5.apk`。原生规则由 `tools/generate-native-memory-rules.py` 从已固定的上游源码 AST 生成，不执行 Python 引擎；生成后的 Java 常量随 APK 编译。
+产物为 `build/dafeiyu-0.4.9.6.apk`。原生规则由 `tools/generate-native-memory-rules.py` 从已固定的上游源码 AST 生成，不执行 Python 引擎；生成后的 Java 常量随 APK 编译。
 
 `NativeMemoryTest` 在不启动Python服务的条件下运行84个共享场景，并覆盖默认设置、旧版升级、离线更正、模型配置复用、非法输出回退、批量原子性、时区和删除竞态。`MemoryIntegrationTest` 另保留Python HTTP对照；普通用户运行App不需要这些测试依赖。
 
