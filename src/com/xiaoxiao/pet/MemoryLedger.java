@@ -80,10 +80,11 @@ final class MemoryLedger {
     static JSONArray candidates(String user,JSONArray quotes,String explicit,String turn,long now)throws Exception {
         JSONArray a=new JSONArray();if(explicit!=null){if(explicit.trim().isEmpty()||explicit.length()>240||!user.contains(explicit)||AgentPolicy.sensitive(explicit))throw new java.io.IOException("请填写 1–240 字，不含密码或证件号码");a.put(record(UUID.randomUUID().toString(),explicit,turn,true,now));}
         else {
-            // The chat model's quotes first; then sentences the local rules recognise as facts, so a fact is kept
-            // even when the model forgot to quote it. At most three per turn (the service protocol's limit).
+            // Complete corrections precede model fragments so negation/scope stay attached. Otherwise model
+            // quotes come first, then local facts; at most three per turn (the service protocol's limit).
             List<String> kept=new ArrayList<>();
-            if(quotes!=null)for(int i=0;i<quotes.length()&&kept.size()<3;i++){String q=quotes.optString(i,"");if(MemoryCapture.eligible(user,q)&&!kept.contains(q))kept.add(q);}
+            for(String correction:MemoryCapture.corrections(user)){if(kept.size()<3)kept.add(correction);}
+            if(quotes!=null)for(int i=0;i<quotes.length()&&kept.size()<3;i++){String q=quotes.optString(i,"");boolean covered=false;for(String k:kept)if(k.contains(q))covered=true;if(MemoryCapture.eligible(user,q)&&!covered)kept.add(q);}
             for(String f:NativeMemoryEngine.autoFacts(user)){if(kept.size()>=3)break;boolean covered=false;for(String k:kept)if(k.contains(f)||f.contains(k))covered=true;if(!covered)kept.add(f);}
             for(String q:kept)a.put(record(UUID.randomUUID().toString(),q,turn,false,now));
         }

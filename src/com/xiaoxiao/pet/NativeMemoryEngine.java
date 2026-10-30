@@ -29,7 +29,7 @@ final class NativeMemoryEngine {
         +"|^你猜|(笑|气|累|困|饿|热|冷|烦|吓|乐|馋|美)死|叫我(吃|起|回|睡)|(这样|那样|随便|无所谓|一样|也是|还行|差不多)$");
     // Family, pets, abilities, habits and life events: what a friend would remember even without a fact marker.
     static final Pattern LIFE=Pattern.compile("(女儿|儿子|老公|老婆|男朋友|女朋友|对象|爸|妈|爷爷|奶奶|外公|外婆|姥姥|姥爷|哥哥|姐姐|弟弟|妹妹|亲戚|孩子|宝宝|闺蜜|室友|同事|同学|老师|领导|老板|猫|狗|宠物|养了|养只|养一只"
-        +"|读(研|博|大|高|初|小)|上(大学|高中|初中|小学|幼儿园)|身高|体重|离职|入职|辞职|跳槽|实习|平时|主力|经常|常常|一般都"
+        +"|读(研|博|大|高|初|小)|上(大学|高中|初中|小学|幼儿园)|身高|体重|离职|入职|辞职|跳槽|实习|平时|主力|经常|常常|一般都|最常|常买|常喝|通常"
         +"|会(弹|做|说|游|开|画|唱|写)|一直|从小|小时候|长大|住院|生病|搬到|搬家|毕业|工作|上学|读书|在学|学(吉他|钢琴|游泳|日语|英语|画画|编程|开车)|能吃|不能|爱吃|过敏|约好|约了)");
     static final Pattern PLAN=Pattern.compile("(要|得|准备|打算|计划|约了|约好|去|考|面试|开会|出差|搬|报名|体检|手术|复诊|答辩|上班|上课|交|出发|回家|回来|飞|见|过生日|结婚|入职|离职|放假)");
     static final Pattern SENTENCE=Pattern.compile("([^。！？!?；;\\n]+)([。！？!?；;\\n]*)"),ASKING=Pattern.compile("(什么|怎么|为什么|哪里|哪儿|哪个|哪些|多少|几点|几个|谁)|[吗呢么][\\s~～…]*$");
@@ -41,18 +41,19 @@ final class NativeMemoryEngine {
      * noise or momentary states. The memory engine still deduplicates and resolves corrections.
      */
     static List<String> autoFacts(String user){
-        List<String> out=new ArrayList<>();
+        List<String> out=new ArrayList<>(MemoryCapture.corrections(user));
         Matcher sentence=SENTENCE.matcher(user);
         while(sentence.find()){
             // Splitting drops the "？", so questions are recognised from their own end mark and question words.
-            if(sentence.group(2).matches(".*[?？].*")||ASKING.matcher(sentence.group(1)).find())continue;
+            if(sentence.group(2).matches(".*[?？].*")||MemoryCapture.question(sentence.group(1)))continue;
             String s=strip(sentence.group(1)).replaceAll("^[，,、~～\\s]+|[，,、~～…\\s]+$","");int n=s.codePointCount(0,s.length());
             if(n<4||n>240||!MemoryCapture.eligible(user,s)||noise(s)||TRANSIENT.matcher(s).find()||s.startsWith("你")&&!s.contains("我"))continue;
             String c;try{c=category(s);}catch(Exception e){continue;}
             boolean fact=contains(s,RULES.optJSONArray("FACT_MARKERS"))||c.equals("identity_health_safety")||c.equals("preference_relation_status")||c.equals("project_task_goal");
             boolean plan=NativeMemoryTime.TOKENS.matcher(s).find()&&PLAN.matcher(s).find();
             boolean firstPerson=s.contains("我")||s.contains("咱");if(!fact&&firstPerson&&LIFE.matcher(s).find()||CHANGE.matcher(s).find())fact=true;
-            if((fact||plan)&&!out.contains(s))out.add(s);if(out.size()==3)break;
+            boolean covered=false;for(String kept:out)if(kept.contains(s))covered=true;
+            if((fact||plan)&&!covered&&out.size()<3)out.add(s);if(out.size()>=3)break;
         }
         return out;
     }
@@ -100,7 +101,7 @@ final class NativeMemoryEngine {
         JSONArray rows=state.getJSONArray("memories");JSONObject target=null;double best=0;
         for(int i=0;i<rows.length();i++){JSONObject r=rows.getJSONObject(i);double score=similarity(content(row),content(r));if(score>best){best=score;target=r;}}
         if(target!=null&&normalize(content(row)).equals(normalize(content(target)))){merge(state,target,row,now,false);return "MERGE";}
-        boolean correction=contains(row.getString("text"),RULES.getJSONArray("OVERRIDE_SIGNALS_TIER1"))||contains(row.getString("text"),RULES.getJSONArray("OVERRIDE_SIGNALS_TIER2"));
+        boolean correction=MemoryCapture.correction(row.getString("text"))||contains(row.getString("text"),RULES.getJSONArray("OVERRIDE_SIGNALS_TIER1"))||contains(row.getString("text"),RULES.getJSONArray("OVERRIDE_SIGNALS_TIER2"));
         if(correction&&target!=null&&best>=0.3){supersede(state,target,row,now,false);MemoryLedger.expire(state,now);MemoryLedger.addLocal(state,row);return "CORRECT";}
         if(target!=null&&best>=0.6&&!substitution(content(row),content(target))){merge(state,target,row,now,false);return "MERGE";}
         MemoryLedger.addLocal(state,row);return "ADD";

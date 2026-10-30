@@ -47,11 +47,11 @@ final class AgentTransport {
             String type=con.getContentType();
             if(type!=null&&type.toLowerCase(java.util.Locale.ROOT).contains("text/event-stream")) {
                 StringBuilder answer=new StringBuilder();long start=System.currentTimeMillis();long last=0;boolean ended=false;int received=0;
-                try(BufferedReader in=new BufferedReader(new InputStreamReader(con.getInputStream(),StandardCharsets.UTF_8))) {
+                try(BufferedReader in=new BufferedReader(new InputStreamReader(con.getInputStream(),ReplyIntegrity.decoder()))) {
                     String line;while((line=in.readLine())!=null){
                         token.check();received+=line.length();if(received>1024*1024||System.currentTimeMillis()-start>(thinking?300000:90000))throw new IOException("回复过长或超时，请重试");
                         if(!line.startsWith("data:"))continue;String data=line.substring(5).trim();if(data.equals("[DONE]")){ended=true;break;}
-                        JSONObject event;try{event=new JSONObject(data);}catch(JSONException e){continue;}
+                        JSONObject event;try{event=new JSONObject(data);}catch(JSONException e){if(data.isEmpty())continue;throw new ReplyIntegrity.Corrupt();}
                         if(event.has("error"))throw new IOException("模型流式回复中断，请重试");
                         JSONArray choices=event.optJSONArray("choices");if(choices==null||choices.length()==0)continue;
                         JSONObject choice=choices.getJSONObject(0),delta=choice.optJSONObject("delta");
@@ -71,7 +71,7 @@ final class AgentTransport {
             JSONObject choice=new JSONObject(body).getJSONArray("choices").getJSONObject(0);
             if("length".equals(choice.optString("finish_reason"))||"content_filter".equals(choice.optString("finish_reason")))throw new IOException("模型回复不完整，请重试");
             String content=choice.getJSONObject("message").optString("content","");if(content.trim().isEmpty())throw new IOException("模型没有返回文本");return content;
-        } finally {token.connection=null;con.disconnect();}
+        } catch(java.nio.charset.CharacterCodingException invalid){throw new ReplyIntegrity.Corrupt();} finally {token.connection=null;con.disconnect();}
     }
     /** The provider's own error message ("model not found", "insufficient balance"), bounded and with the key masked. */
     static String errorDetail(InputStream stream,String secret) {
@@ -80,6 +80,6 @@ final class AgentTransport {
         catch(IOException e){return "";}
     }
     static String boundedRead(InputStream stream,int limit)throws IOException {
-        try(InputStream in=stream;ByteArrayOutputStream out=new ByteArrayOutputStream()){byte[] b=new byte[4096];int n,total=0;while((n=in.read(b))!=-1){total+=n;if(total>limit)throw new IOException("接口响应过大");out.write(b,0,n);}return out.toString("UTF-8");}
+        try(InputStream in=stream;ByteArrayOutputStream out=new ByteArrayOutputStream()){byte[] b=new byte[4096];int n,total=0;while((n=in.read(b))!=-1){total+=n;if(total>limit)throw new IOException("接口响应过大");out.write(b,0,n);}return ReplyIntegrity.decode(out.toByteArray());}
     }
 }

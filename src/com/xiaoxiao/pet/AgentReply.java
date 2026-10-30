@@ -4,6 +4,21 @@ import org.json.*;import java.io.IOException;
 /** The only model-produced fields accepted by the runtime. No executable tools. */
 final class AgentReply {
  String reply,emotion="calm",moodCause="",aside="";int moodLevel;Boolean moodChanged;int nextCheckMinutes=Initiative.DEFAULT_MINUTES;InitiativePlan plan=new InitiativePlan();JSONArray memories=new JSONArray(),self=new JSONArray();
+ /** Some providers return a trailing murmur tag instead of the JSON field. Never rewrite requested markup/code. */
+ static boolean literalMarkup(String user){return java.util.regex.Pattern.compile("(?i)<aside|html|代码|标签|源码|原样输出").matcher(user).find();}
+ void recoverAside(boolean literal){
+  if(literal||reply.contains("```")||reply.contains("~~~"))return;
+  java.util.regex.Matcher m=java.util.regex.Pattern.compile("(?s)^(.*\\S)\\s*\\n\\s*<aside>([^<>]*)(?:</aside>)?\\s*$").matcher(reply);
+  if(m.matches()){reply=m.group(1).trim();if(aside.isEmpty())aside=AgentPolicy.aside(m.group(2).trim(),reply);}
+ }
+ static String preview(String text,boolean literal){
+  if(literal||text.contains("```")||text.contains("~~~"))return text;
+  // Hide the tag from its opening prefix, before a streamed murmur can leak into the main bubble.
+  java.util.regex.Matcher full=java.util.regex.Pattern.compile("(?s)\\n\\s*<aside>.*$").matcher(text);if(full.find())return text.substring(0,full.start()).trim();
+  int line=text.lastIndexOf('\n');if(line<0)return text;String tail=text.substring(line+1).trim();
+  if(!tail.isEmpty()&&("<aside>".startsWith(tail)||tail.startsWith("<aside>")))return text.substring(0,line).trim();
+  return text;
+ }
  /** The reply string of a broken envelope, only when it comes first and is closed by a quote and then a comma or the brace. */
  static String complete(String json){
   int p=json.indexOf('{')+1;while(p<json.length()&&Character.isWhitespace(json.charAt(p)))p++;

@@ -1,0 +1,20 @@
+0.4.9.6 / code20
+APK SHA-256: 9959ba72e060c88d752c2cb3e9ef7aaa4296dc01647b92362d292678e014f435
+APK bytes: 92295699
+Framework final reports: 19 suites, 181 passed, 0 failed/errors/skipped
+Full-run outdated tap assertion corrected; UsabilityUiTest recheck: 10 passed.
+Android ART core: 27 suites passed
+AgentInstrumentation: 77 passed
+ChatPresentationInstrumentation: 36 passed
+TouchReplyInstrumentation: 19 passed
+BubbleInstrumentation: 69 passed
+LiftInstrumentation: 20 passed
+WaistLiftInstrumentation: 31 passed
+HeroPetInstrumentation: 24 passed
+QuestLineInstrumentation: 36 passed
+PersonaUpdateInstrumentation: 19 passed
+ExperienceInstrumentation: 33 passed
+Release prepare: 7; synchronization: 18; local feedback server: 19 passed
+Real-model final-APK smoke: 7 successful turns; correction state verified
+Upgrade settings/history/growth digests match before and after install
+Original display rotation settings restored; production data never cleared.

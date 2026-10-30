@@ -99,6 +99,29 @@ public class CompanionBehaviorTest {
             catch(IOException expected){assertTrue(expected.getMessage().contains("不完整"));}
         }finally{server.stop(0);}
     }
+    @Test public void damagedTransportRetriesIdenticalRequestAndNeverDropsBrokenSse()throws Exception {
+        for(String kind:new String[]{"utf8-json","utf8-sse","invalid-sse","escaped-replacement"}){
+            com.sun.net.httpserver.HttpServer server=com.sun.net.httpserver.HttpServer.create(new java.net.InetSocketAddress("127.0.0.1",0),0);
+            java.util.concurrent.atomic.AtomicInteger calls=new java.util.concurrent.atomic.AtomicInteger();List<String> requests=new ArrayList<>();
+            server.createContext("/v1/chat/completions",exchange->{try{
+                requests.add(AgentTransport.boundedRead(exchange.getRequestBody(),65536));int n=calls.incrementAndGet();
+                String reply=n==1&&kind.equals("escaped-replacement")?"{\"reply\":\"周日下\\ufffd\"}":"{\"reply\":\"哼，周日下午。\"}";
+                String body=new JSONObject().put("choices",new JSONArray().put(new JSONObject().put("message",new JSONObject().put("content",reply)).put("finish_reason","stop"))).toString();
+                boolean stream=n==1&&kind.endsWith("sse");
+                if(stream)body=kind.equals("invalid-sse")?"data: {broken\n\ndata: [DONE]\n\n":"data: {\"choices\":[{\"delta\":{\"content\":\"坏字\"}}]}\n\ndata: [DONE]\n\n";
+                byte[] bytes=body.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+                if(n==1&&kind.startsWith("utf8")){for(int i=0;i<bytes.length;i++)if((bytes[i]&0xff)>127){bytes[i]=(byte)0xff;break;}}
+                exchange.getResponseHeaders().add("Content-Type",stream?"text/event-stream":"application/json");exchange.sendResponseHeaders(200,bytes.length);
+                // Byte-by-byte writes also exercise UTF-8 characters split across reads.
+                for(byte b:bytes){exchange.getResponseBody().write(b);exchange.getResponseBody().flush();}
+            }catch(Exception e){throw new RuntimeException(e);}finally{exchange.close();}});server.start();
+            try{
+                ModelSettings.Config config=loopbackTransportConfig(server,"mock");AgentTransport.Token token=new AgentTransport.Token();
+                AgentReply result=ReplyIntegrity.generate(p->AgentTransport.request(config,new JSONArray().put(new JSONObject().put("role","user").put("content","什么时候")),token,p,true,1200),token,p->{assertFalse(p.contains("\ufffd"));},false);
+                assertEquals(kind,2,calls.get());assertEquals(requests.get(0),requests.get(1));assertEquals("哼，周日下午。",result.reply);
+            }finally{server.stop(0);}
+        }
+    }
     // Route only the test's already-validated config to its local fixture. Production continues to require HTTPS.
     static ModelSettings.Config loopbackTransportConfig(com.sun.net.httpserver.HttpServer server,String model)throws Exception {
         ModelSettings.Config config=new ModelSettings.Config("https://example.invalid/v1",model,"test-only-key",false,true);
