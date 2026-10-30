@@ -28,6 +28,15 @@ final class AgentRuntime {
     static synchronized AgentStore store()throws Exception{if(memory==null){memory=new AgentStore(new java.io.File(Data.app.getFilesDir(),"agent"));final AgentStore opened=memory;Thread warm=new Thread(opened::warm,"recall-index");warm.setDaemon(true);warm.setPriority(Thread.MIN_PRIORITY);warm.start();}return memory;}
     static synchronized boolean busy(){return active!=null;}
     static synchronized void cancel(){if(active!=null){AgentTransport.Token token=active;Listener l=activeListener;active=null;activeListener=null;activeProactive=false;activeTouch=null;if(token.completed!=null){main.post(token.completed);}else{token.cancel();if(l!=null)main.post(()->l.error("已停止回复"));}}}
+    /**
+     * The user sent another message while she was still answering: stop that answer quietly, without an error, so
+     * both messages can be answered together. False once the answer is saved (it is then delivered as usual), and
+     * for proactive or touch replies, which are not the user's chat.
+     */
+    static synchronized boolean interject(Listener listener){
+        if(active==null||activeListener!=listener||activeProactive||active.completed!=null)return false;
+        AgentTransport.Token token=active;active=null;activeListener=null;activeTouch=null;token.cancel();return true;
+    }
     static synchronized void interruptProactive(){if(activeProactive)cancel();}
     static synchronized void interruptTouch(PetService.Pet pet){if(activeTouch==pet)cancel();}
     static synchronized boolean current(AgentTransport.Token t){return active==t&&!t.cancelled;}
@@ -94,7 +103,7 @@ final class AgentRuntime {
         in.persona=Data.chatPrompt("main");in.guidance=PersonaManager.guidance("main");in.signature=PersonaManager.signature("main");in.nickname=Nickname.current();
         String requested=!proactive&&history==null?Nickname.requested(user):null;if(requested!=null)in.nickname=requested;
         in.feeling=store().mood(System.currentTimeMillis());in.mood=in.feeling.optString("emotion","calm");in.timeZone=TimeZone.getDefault().getID();in.now=System.currentTimeMillis();in.initializedAt=PersonaManager.initializedAt("main");
-        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}onScreen(in);in.remember=rememberEnabled();in.diary=diaryEnabled();if(in.remember&&in.diary&&history==null)in.understanding=Understanding.context(s,proactive?"":user);
+        if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}onScreen(in);in.remember=rememberEnabled();in.diary=diaryEnabled();if(in.remember&&in.diary&&history==null){in.understanding=Understanding.context(s,proactive?"":user);in.phrases=Phrases.context(s,proactive?"":user);}
         GrowthStore growth=GrowthStore.quiet();if(growth!=null){in.chapter=growth.chapter();in.lore=growth.lore();}
         if(in.remember&&history==null){
             try{in.games=GomokuPage.store().context();}catch(Exception unavailable){in.games=new JSONObject().put("status","unavailable");}
@@ -119,8 +128,8 @@ final class AgentRuntime {
             // The same call is her slow loop: besides the diary it may add, confirm or retire her understanding of the user.
             JSONObject games=null;try{games=GomokuPage.store().context();}catch(Exception unavailable){}
             String raw=AgentTransport.request(ModelSettings.read(),Diary.request(day,turns,Data.name("main"),Understanding.offered(before),PersonaManager.diaryGuidance("main"),CharacterNow.experiences(before,games,day,zone)),new AgentTransport.Token(),partial->{},false,Diary.MAX_TOKENS);
-            String text=Diary.parse(raw);Understanding.Update update=Understanding.parse(raw,turns,before,day.toString());
-            if(text!=null&&db.addDiary(epoch,Diary.entry(day,text,turns,System.currentTimeMillis()),update))Data.log("main","陪伴日记已写好："+day+(update.empty()?"":"，相处理解已更新"));
+            String text=Diary.parse(raw);Understanding.Update update=Understanding.parse(raw,turns,before,day.toString());List<JSONObject> phrases=Phrases.parse(raw,turns,day.toString());
+            if(text!=null&&db.addDiary(epoch,Diary.entry(day,text,turns,System.currentTimeMillis()),update,phrases))Data.log("main","陪伴日记已写好："+day+(update.empty()?"":"，相处理解已更新"));
         }catch(Exception e){Data.log("main","陪伴日记暂未写成");}finally{writingDiary.set(false);}});
     }
     static boolean send(String user,boolean proactive,Listener listener) {
