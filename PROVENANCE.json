@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "867a1700c5c7f077a22da3b2b72ccc9085db658a3aa3becbd66c10107c6a1812"
+      "sha256": "b8169b6968715966c1e4c316ac9c1480aab20d4e7d507a74aaacbfdf852e0590"
     },
     {
       "path": "LICENSE",
@@ -1198,7 +1198,7 @@
       "path": "assets/personas.json",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "97d704890dcc1e7b3960d8daf4a08de4fa8889bfd18ed66343294e1ad89a529c",
+      "sha256": "fa8d6eed54096da97a7e853355902b11ef7a799aa71226407978099a9b1a63e2",
       "design_reference": "Five newly written styles; shared character style informed by dafeiyu-persona. Not five upstream plugins.",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
@@ -1326,7 +1326,7 @@
       "path": "docs/GROWTH_DESIGN.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "6c7ef3193a74a98b90d6cb88d3121c99591cdd8377b73c4e0a1b4d17bede3ba4"
+      "sha256": "edb45917a45f25ffcfc21e5deb7d8fb6d0c5af18dde1f19327039dac08671921"
     },
     {
       "path": "docs/GROWTH_INTEGRATION.md",
@@ -2761,7 +2761,7 @@
       "path": "tests/com/xiaoxiao/pet/GrowthTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "4b7f11cf7f03b0eb6e931e180e270564f121a17427bb17dec0473b1dae6daa38"
+      "sha256": "eb8a7603b201d1c09afc343cd65475dc6abb3352375aa1fe45ae47547a226281"
     },
     {
       "path": "tests/com/xiaoxiao/pet/HistoryRecallTest.java",
