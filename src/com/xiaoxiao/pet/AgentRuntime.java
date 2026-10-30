@@ -159,8 +159,10 @@ final class AgentRuntime {
                     if(!configured())throw new IOException("我已经住进手机啦。去「模型连接」填好接口和 Key，我们就能真正聊天了。也可以先试试：记住：我喜欢蓝色。");
                     if(rememberEnabled()&&history==null){memoryPlan=MemoryBridge.evaluate(memoryConfig,contextState,new JSONArray(),user,observed,token);contextState=memoryPlan.state;recallHits=memoryPlan.hits;}
                     JSONArray request=context(user,proactive,contextState,recallHits,history);
-                    String raw=model.generate(request,token,partial->{String text=AgentPolicy.streamPreview(partial);if(!text.isEmpty())main.post(()->{if(current(token))listener.partial(text);});});
+                    RewriteGuard.Source rewrite=!proactive&&history==null?RewriteGuard.source(user):null;
+                    String raw=model.generate(request,token,partial->{if(rewrite!=null)return;String text=AgentPolicy.streamPreview(partial);if(!text.isEmpty())main.post(()->{if(current(token))listener.partial(text);});});
                     result=AgentReply.parse(raw);
+                    if(rewrite!=null){result.reply=RewriteGuard.enforce(rewrite,result.reply,token);result.self=new JSONArray();}
                     result.plan.ground(user,proactive);
                     if(history==null&&!result.plan.valid()&&!"busy".equals(result.plan.availability)&&(proactive||Data.prefs().getBoolean("agent.proactive",false))){
                         // One bounded repair, never an endless retry or an invented fifteen-minute choice.

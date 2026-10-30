@@ -24,6 +24,8 @@ final class MemoryLedger {
     static final int ALL=0,MANUAL=1,CAPTURED=2;
     /** Written or edited by hand in the notebook, as opposed to captured from what the user said in chat. */
     static boolean manual(JSONObject r){return r.optString("source").startsWith("你");}
+    /** Hide legacy auto-captured task instructions from recall, without deleting history or manual notes. */
+    static boolean reusable(JSONObject r){return r.optBoolean("pinned")||manual(r)||!MemoryCapture.instruction(r.optString("text"));}
     /** The notebook's list: newest first, optionally only hand-written or only captured ones, containing the text. */
     static List<JSONObject> browse(JSONArray memories,String query,int kind){
         String q=query==null?"":query.trim().toLowerCase(Locale.ROOT);List<JSONObject> out=new ArrayList<>();
@@ -81,7 +83,7 @@ final class MemoryLedger {
             // The chat model's quotes first; then sentences the local rules recognise as facts, so a fact is kept
             // even when the model forgot to quote it. At most three per turn (the service protocol's limit).
             List<String> kept=new ArrayList<>();
-            if(quotes!=null)for(int i=0;i<quotes.length()&&kept.size()<3;i++){String q=quotes.optString(i,"");if(AgentPolicy.validEvidence(user,q)&&!kept.contains(q))kept.add(q);}
+            if(quotes!=null)for(int i=0;i<quotes.length()&&kept.size()<3;i++){String q=quotes.optString(i,"");if(MemoryCapture.eligible(user,q)&&!kept.contains(q))kept.add(q);}
             for(String f:NativeMemoryEngine.autoFacts(user)){if(kept.size()>=3)break;boolean covered=false;for(String k:kept)if(k.contains(f)||f.contains(k))covered=true;if(!covered)kept.add(f);}
             for(String q:kept)a.put(record(UUID.randomUUID().toString(),q,turn,false,now));
         }
@@ -90,24 +92,45 @@ final class MemoryLedger {
     static Set<String> staleSources(JSONObject s,long now)throws Exception {
         Set<String> out=new HashSet<>();for(String pool:new String[]{"memories","archive"}){JSONArray a=s.optJSONArray(pool);if(a==null)continue;for(int i=0;i<a.length();i++){JSONObject r=a.getJSONObject(i);if(pool.equals("archive")||!current(r,now)){JSONArray sources=sources(r);for(int j=0;j<sources.length();j++)out.add(sources.optString(j));}}}return out;
     }
+    private static Set<String> correctionTerms(String text){
+        // Remove function words before forming bigrams, so "今天想" does not match via "天想".
+        Set<String> terms=AgentPolicy.tokens(text.replaceAll("纠正|更正|修正|今天|昨天|明天|现在|这个|那个|一下|因为|所以|怎么|什么|哪里|哪个|觉得|还是|已经|只是|不是|我们|你说|我说|[我你的了想]"," "));
+        terms.removeAll(Arrays.asList("不","没","是","有","在","要","会","吃","喝","去","好","说","i","not","the","is"));return terms;
+    }
+    static boolean correctionMatches(String query,String quote){
+        Set<String> other=correctionTerms(quote);for(String term:correctionTerms(query))if(other.contains(term)||term.length()==1&&term.charAt(0)>127&&quote.contains(term))return true;return false;
+    }
+    /** Relevant user corrections ride along even if semantic recall omitted their IDs. No invented facts. */
+    static List<JSONObject> corrections(JSONObject s,String query,long now)throws Exception {
+        List<JSONObject> out=new ArrayList<>();if(query==null||query.trim().isEmpty())return out;
+        Set<String> replacements=new HashSet<>();JSONArray archive=s.optJSONArray("archive");
+        if(archive!=null)for(int i=0;i<archive.length();i++){JSONObject e=archive.getJSONObject(i).optJSONObject("engine");if(e!=null&&!e.optString("superseded_by").isEmpty())replacements.add(e.optString("superseded_by"));}
+        JSONArray rows=s.getJSONArray("memories");
+        for(int i=0;i<rows.length();i++){JSONObject r=rows.getJSONObject(i);String quote=r.optString("text");
+            if(current(r,now)&&(replacements.contains(r.optString("id"))||quote.matches("(?s).*(纠正|更正|修正|你记错|你说错).*"))
+                &&!MemoryCapture.instruction(quote)&&correctionMatches(query,quote))out.add(r);
+        }
+        out.sort((a,b)->Double.compare(score(query,b,now),score(query,a,now)));return out.subList(0,Math.min(3,out.size()));
+    }
     static String context(JSONObject s,String query,JSONArray hits)throws Exception {
         JSONArray a=s.getJSONArray("memories");List<JSONObject> ranked=new ArrayList<>();long now=System.currentTimeMillis();
         Map<String,Integer> order=new HashMap<>();if(hits!=null)for(int i=0;i<hits.length();i++)order.put(hits.optString(i),i);
         List<JSONObject> core=new ArrayList<>();
-        for(int i=0;i<a.length();i++){JSONObject r=a.getJSONObject(i);if(!current(r,now))continue;if(hits==null||order.containsKey(r.optString("id")))ranked.add(r);if(core(r))core.add(r);}
+        for(int i=0;i<a.length();i++){JSONObject r=a.getJSONObject(i);if(!current(r,now)||!reusable(r))continue;if(hits==null||order.containsKey(r.optString("id")))ranked.add(r);if(core(r))core.add(r);}
         ranked.sort((x,y)->hits==null?Double.compare(score(query,y,now),score(query,x,now)):Integer.compare(order.get(x.optString("id")),order.get(y.optString("id"))));
         // Safety facts, identity and pinned notes ride along even when retrieval misses them:
         // "推荐个零食" shares no words with "我对花生过敏". Up to CORE of them, then the ranked hits.
         core.sort((x,y)->{int c=Boolean.compare(AgentPolicy.critical(y.optString("text")),AgentPolicy.critical(x.optString("text")));return c!=0?c:Double.compare(score(query,y,now),score(query,x,now));});
-        LinkedHashMap<String,JSONObject> chosen=new LinkedHashMap<>();
+        LinkedHashMap<String,JSONObject> chosen=new LinkedHashMap<>();Set<String> corrected=new HashSet<>();
         for(JSONObject r:core.subList(0,Math.min(CORE,core.size())))chosen.put(r.optString("id"),r);
+        for(JSONObject r:corrections(s,query,now)){chosen.put(r.optString("id"),r);corrected.add(r.optString("id"));}
         for(JSONObject r:ranked){if(chosen.size()>=CORE+10)break;chosen.putIfAbsent(r.optString("id"),r);}
         // When everything current fits, retrieval has nothing to choose: a memory sharing no words with the
         // question (and missed by the rules) still rides along, after the hits.
-        if(hits!=null&&currentCount(s,now)<=CORE+10){List<JSONObject> rest=new ArrayList<>();for(int i=0;i<a.length();i++){JSONObject r=a.getJSONObject(i);if(current(r,now)&&!chosen.containsKey(r.optString("id")))rest.add(r);}
+        if(hits!=null&&currentCount(s,now)<=CORE+10){List<JSONObject> rest=new ArrayList<>();for(int i=0;i<a.length();i++){JSONObject r=a.getJSONObject(i);if(current(r,now)&&reusable(r)&&!chosen.containsKey(r.optString("id")))rest.add(r);}
             rest.sort((x,y)->Double.compare(score(query,y,now),score(query,x,now)));for(JSONObject r:rest)chosen.put(r.optString("id"),r);}
         List<JSONObject> picked=new ArrayList<>(chosen.values());
-        JSONArray out=new JSONArray();for(int i=0;i<picked.size();i++){JSONObject r=picked.get(i),e=r.optJSONObject("engine");out.put(new JSONObject().put("quote",r.optString("text")).put("observed_at",r.optLong("at")).put("resolved",e==null?r.optString("text"):e.optString("content",r.optString("text"))).put("pinned",r.optBoolean("pinned")));}return out.toString();
+        JSONArray out=new JSONArray();for(int i=0;i<picked.size();i++){JSONObject r=picked.get(i),e=r.optJSONObject("engine");out.put(new JSONObject().put("quote",r.optString("text")).put("observed_at",r.optLong("at")).put("resolved",e==null?r.optString("text"):e.optString("content",r.optString("text"))).put("pinned",r.optBoolean("pinned")).put("user_correction",corrected.contains(r.optString("id"))));}return out.toString();
     }
     static final int CORE=5;
     static int currentCount(JSONObject s,long now)throws Exception{JSONArray a=s.getJSONArray("memories");int n=0;for(int i=0;i<a.length();i++)if(current(a.getJSONObject(i),now))n++;return n;}
