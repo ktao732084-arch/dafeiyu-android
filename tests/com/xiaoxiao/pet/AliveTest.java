@@ -6,7 +6,8 @@ import org.json.*;import java.io.File;
  * asked for only when switched on, and carried in her history only for fully shown turns. Her day (HerDay) comes
  * only from clips that really played and real feeding, resets each day, and hunger is said only when the body grumbles.
  * Her feeling about the relationship lately comes from the daily diary call, in words, carries on from the last one,
- * fades after a week, goes with the chats it came from and only colours how she talks.
+ * fades after a week, goes with the chats it came from and only colours how she talks. The bubble jar is told in
+ * words on the home screen and never reaches the request.
  * Usage: AliveTest <state directory>
  */
 public final class AliveTest {
@@ -17,6 +18,7 @@ public final class AliveTest {
   aside(args[0]);
   day(args[0]);
   feeling(args[0]);
+  numbers();
   System.out.println("PASS: "+checks+" alive checks");
  }
 
@@ -111,5 +113,13 @@ public final class AliveTest {
   check(with.contains("你最近对这段相处的感觉")&&with.contains("被夸了好几次，有点飘")&&with.contains("不影响你认不认真帮忙"),"the feeling colours how she talks, not whether she helps");
   in.diary=false;check(!PromptBuilder.build(in,"在吗",false,db.snapshot(),null).toString().contains("这段相处的感觉"),"diary off: no feeling");
   db.clearDiary();check(Diary.feeling(db.snapshot(),today).isEmpty(),"clearing the diary clears the feeling");
+ }
+
+ static void numbers()throws Exception{
+  check(Growth.jar(0,250).equals("刚开始装")&&Growth.jar(60,250).equals("装了一些")&&Growth.jar(180,250).equals("过半了")&&Growth.jar(230,250).equals("快满了")&&Growth.jar(250,250).equals("满了")&&Growth.jar(5,0).equals("满了"),"the jar in words");
+  for(int b=0;b<=300;b+=7)check(!Growth.jar(b,250).matches(".*\\d.*"),"no number in the jar words");
+  PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona="你是大肥鱼。";in.now=1_800_000_000_000L;in.chapter=3;in.initializedAt=in.now-20*86_400_000L;
+  String req=PromptBuilder.build(in,"我们现在算多熟",false,AgentStore.empty(0),null).toString();
+  check(!req.contains("羁绊")&&!req.contains("泡泡瓶")&&!req.contains("bond"),"the bond never reaches the request");
  }
 }
