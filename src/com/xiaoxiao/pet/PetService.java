@@ -202,9 +202,13 @@ public class PetService extends Service {
    if(scene==null)return;if(sceneNext!=null)handler.removeCallbacks(sceneNext);sceneStep++;
    if(sceneStep>=scene.steps.size()){endScene();fadeBubbles();return;}
    String[] step=scene.steps.get(sceneStep);if(!step[0].isEmpty()&&!Data.file(role,step[0]).isEmpty())play(step[0]);
-   appendBubble(step[1],()->{if(bubble!=null)bubble.setOnClickListener(v->nextLine());});
-   if(sceneStep==scene.steps.size()-1&&!sceneSaved){sceneSaved=true;final Growth.Scene done=scene;GrowthStore g=GrowthStore.quiet();
-    if(g!=null)try{g.shown(done);AgentRuntime.touch("你和用户一起经历了"+done.title,"story");}catch(Exception e){Data.log(role,"剧情记录暂未保存");}}
+   final Growth.Scene shownScene=scene;final boolean lastStep=sceneStep==scene.steps.size()-1;
+   appendBubble(step[1],()->{
+    if(scene!=shownScene)return;
+    if(bubble!=null)bubble.setOnClickListener(v->nextLine());
+    if(lastStep&&!sceneSaved){sceneSaved=true;GrowthStore g=GrowthStore.quiet();
+     if(g!=null)try{g.shown(shownScene);AgentRuntime.touch("你和用户一起经历了"+shownScene.title,"story");}catch(Exception e){Data.log(role,"剧情记录暂未保存");}}
+   });
    sceneNext=this::nextLine;handler.postDelayed(sceneNext,Math.max(3500,Math.min(10000,2200+step[1].length()*180)));
   }
   void endScene(){if(sceneNext!=null){handler.removeCallbacks(sceneNext);sceneNext=null;}scene=null;}

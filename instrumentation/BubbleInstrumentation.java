@@ -38,6 +38,10 @@ public final class BubbleInstrumentation extends Instrumentation {
    main(()->{pet.clearBubble();Data.prefs().edit().putString("appearance.mode","day").commit();Apple.load();pet.reply("好呀。明天见！");});settle();
    main(()->check(pet.bubbleStack.getChildCount()==1&&pet.bubble.getText().toString().equals("好呀。"),"local replies also start one sentence at a time"));SystemClock.sleep(4200);settle();
    main(()->{check(pet.bubbleStack.getChildCount()==2&&pet.bubble.getText().toString().equals("明天见！"),"local second sentence arrives separately");pet.clearBubble();});
+   final Growth.Scene scene=new Growth.Scene(1,"气泡整合验收");for(int i=1;i<=4;i++)scene.steps.add(new String[]{"","剧情第"+i+"句。"});
+   main(()->{pet.clearBubble();pet.playScene(scene);pet.nextLine();pet.nextLine();pet.nextLine();check(!pet.sceneSaved,"queued final scene line is not recorded before insertion");pet.clearBubble();});settle();
+   main(()->{check(!pet.sceneSaved,"cancelled final scene line remains unseen");pet.playScene(scene);pet.nextLine();pet.nextLine();pet.nextLine();});settle();
+   main(()->{check(pet.sceneSaved&&pet.bubble.getText().toString().equals("剧情第4句。"),"scene is recorded when final line really enters the stack");pet.clearBubble();});
    main(()->{pet.clearBubble();Data.prefs().edit().putBoolean("agent.aside",true).commit();AgentStore db=AgentRuntime.store();db.commit(db.epoch(),"你在吗","我在呢。","calm",null,false,false,null,null,"bubble-merge",System.currentTimeMillis(),null,true,null,null,0,"",Boolean.FALSE,null,"这句是小声嘀咕");pet.speak("我在呢。","bubble-merge");});settle();
    main(()->{check(pet.bubble.getText().toString().contains("小声嘀咕"),"latest-main aside survives the new sentence stack");check(!pet.bubble.getText().toString().contains("聊天记录"),"normal speech has no history footer");check(!pet.bubble.hasOnClickListeners(),"normal speech has no history jump");fit();});
    main(()->{pet.clearBubble();pet.x=service.sw()/2f-pet.width/2f;pet.y=service.sh()*.60f;pet.update();touch(MotionEvent.ACTION_DOWN);});SystemClock.sleep(500);main(()->touch(MotionEvent.ACTION_UP));settle();
