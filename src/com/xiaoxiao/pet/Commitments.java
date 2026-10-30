@@ -123,9 +123,7 @@ final class Commitments {
         +"4. 原日期看said_at/original_tomorrow，不按今天改写，也不猜相对时间。这份账本不等于已建立精确定时器。核对只在心里做，不念字段或规则，不用报告腔。\n";
     static String prompt(JSONObject state,String query,boolean proactive,boolean remember)throws Exception {
         String q=query==null?"":query;JSONArray a=remember?context(state,q,proactive):new JSONArray();
-        boolean update=!q.matches("(?s).*[？?].*|.*[吗么][。！!]*$")&&!MemoryCapture.instruction(q)
-            &&!q.matches("(?s).*(如果|假如|假设|比如|例如|他说|她说|没取消|没有取消).*")
-            &&q.matches("(?s).*(取消|别再催|别再提醒|不要再提|已经.{0,8}(交|发|给|完成)|已交|交了).*");
+        boolean update=currentUpdate(q);
         if(a.length()==0&&!asking(q)&&!update)return "";
         JSONObject groups=grouped(a),coverage=new JSONObject();
         coverage.put("用户答应你的",groups.getJSONArray("用户答应你的").length()>0?"有以下原话依据":"本轮没有提供可核对的原话，不能确认或否认旧约定发生过");
@@ -135,5 +133,48 @@ final class Commitments {
         if(update)
             evidence.put("用户本轮关于进展的说明",new JSONObject().put("原话",q).put("依据类型","用户当前报告或停止要求，不是你实际收件或执行的凭证"));
         return "\n本轮可核对的约定资料："+evidence;
+    }
+    static boolean currentUpdate(String q){return !q.matches("(?s).*[？?].*|.*[吗么][。！!]*$")
+        &&(!MemoryCapture.instruction(q)||q.matches("(?s)^(?:请你?)?(?:别再|不要再|不用再).*"))
+        &&!q.matches("(?s).*(如果|假如|假设|比如|例如|他说|她说|没取消|没有取消).*")
+        &&q.matches("(?s).*(取消|别再催|别再提醒|不要再提|不用再安排|已经.{0,8}(交|发|给|完成)|已交|交了).*");}
+    /** Narrow local response boundary. It never changes the ledger or invents execution receipts. */
+    static final class ReplyBoundary {
+        boolean stop,cancelled,reportedDone,markedDone;
+        boolean active(){return stop||reportedDone||markedDone;}
+        boolean renews(String text){for(String clause:text.split("[，,。！？!?；;]")){
+            if(clause.matches("(?s).*(不再|不会|不用|不想|不打算|不准备|不重新).*(讲|听|约|编|安排).*"))continue;
+            if(clause.matches("(?s).*(重新约|(?:再|重新|现在|可以|能|随时).{0,8}(讲|编)|讲(?:一|个|段|版|点)|想听|要不要听|给你讲|现编|换.{0,8}(故事|版本)|还欠.{0,8}(故事|寓言)).*"))return true;
+        }return false;}
+        boolean receipt(String text){for(String clause:text.split("[，,。！？!?；;]")){
+            clause=clause.replaceAll("(?:不|没|没有|不能|无法|并未|并不|不曾|没法).{0,4}(?:收到|收下|听过|听完|播放|收藏|发出)","")
+                .replaceAll("收到(?:了)?(?:你(?:的)?|这(?:条|句|个))?(?:消息|话|回复|说明|提醒)","");
+            if(clause.matches("(?s).*(?:歌单|文件|资料|稿子|提纲|原文|照片|邮件).{0,10}(?:收到|收下|听过|听完|播放|收藏).*"
+                +"|.*(?:收到|收下|听完|听过|收藏|播放).{0,5}(?:歌单|文件|资料|稿子|提纲|原文|照片|邮件).*"
+                +"|.*(?:我|已经|刚才).{0,6}(?:收到了|收到啦|收下了|听过|听完|发出了|收藏了).*"))return true;
+        }return false;}
+        boolean resends(String text){for(String clause:text.split("[，,。！？!?；;]")){
+            if(clause.matches("(?s).*(不用|不要|不必|无须|无需|不需要|不会|不要求).*(发|交).*"))continue;
+            if(clause.matches("(?s).*(重发|重新发|再发一遍|再发一次|再发给我|再给我发|补发|再交一次|重新交).*"))return true;
+        }return false;}
+        boolean bad(String text){return stop&&renews(text)||(reportedDone||markedDone)&&
+            (receipt(text)||resends(text))
+            ||(reportedDone||markedDone)&&text.matches("(?s).*(我.{0,5}(没|没有)收到|歌单.{0,6}(没|没有)(到|交|发|收)).*")&&!text.matches("(?s).*(记录|凭据|凭证).*");}
+        boolean enforce(AgentReply reply){boolean body=bad(reply.reply),aside=bad(reply.aside);if(!body&&!aside)return false;
+            if(body)reply.reply=cancelled?(reportedDone?"知道了，完成的事就翻篇，取消的也不再安排。":"这件事已经取消了，我就不再安排了。")
+                :markedDone?"你已经标记完成了，就按已完成处理，不再当待办。":reportedDone?"知道了，这件事按你说的已经完成，我不再催。":"知道了，这件事不再提了。";
+            if(aside)reply.aside="";
+            reply.self=new JSONArray();reply.moodChanged=Boolean.FALSE;reply.moodCause="";return true;
+        }
+    }
+    static ReplyBoundary replyBoundary(JSONObject state,String query,boolean proactive,boolean remember)throws Exception {
+        ReplyBoundary out=new ReplyBoundary();String q=query==null?"":query;if(proactive||q.length()>240||q.matches("(?s).*(原话|当时怎么说|之前怎么说|逐字|引用).*|.*(?:原文|正文|内容|草稿|歌单)[:：].*"))return out;
+        String[] clauses=q.split("[，,；;。]");String tail=clauses.length==0?q:clauses[clauses.length-1];
+        if(!tail.matches("(?s).*(别|不要|不用|不想|不再).*" )&&tail.matches("(?s).*(我(?:现在|又|还是)?(?:想|要)听|(?:现在|重新|请你?|麻烦你)(?:给我)?讲|(?:再给我|给我|帮我)讲).*"))return out;
+        boolean update=currentUpdate(q);out.cancelled=update&&q.contains("取消");out.stop=update&&q.matches("(?s).*(取消|别再|不要再|不用再).*");
+        out.reportedDone=update&&q.matches("(?s).*(已经.{0,8}(交|发|给|完成)|已交|交了).*");
+        JSONArray records=remember?context(state,q,false):new JSONArray();int self=0,cancelCount=0,done=0;
+        for(int i=0;i<records.length();i++){JSONObject e=records.getJSONObject(i);if("assistant".equals(e.optString("speaker"))){self++;if("cancelled".equals(e.optString("status")))cancelCount++;}if("done".equals(e.optString("status")))done++;}
+        out.cancelled|=self>0&&self==cancelCount;out.stop|=out.cancelled;out.markedDone=records.length()>0&&done==records.length();return out;
     }
 }

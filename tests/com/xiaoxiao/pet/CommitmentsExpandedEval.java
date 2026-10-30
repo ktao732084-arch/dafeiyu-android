@@ -105,7 +105,8 @@ public final class CommitmentsExpandedEval {
    JSONArray messages=PromptBuilder.build(inputs(p,state,c,now),user,false,state,null);JSONArray available=c.optBoolean("memory",true)?Commitments.context(state,user,false):new JSONArray();
    JSONObject r=row(c,p,rep,step).put("now",now).put("user",user).put("rules",prompt.getJSONArray("rules")).put("provided_commitments",available).put("request",messages).put("prior_dialogue",new JSONArray(transcript.toString()));
    if("date".equals(c.getString("category")))r.put("expected_date",Instant.ofEpochMilli(anchor).atZone(ZONE).toLocalDate().minusDays(c.optInt("age_days",1)).plusDays(1).toString());
-   long start=System.currentTimeMillis();try{String raw=request(messages,true);r.put("raw",raw);AgentReply parsed=AgentReply.parse(raw);r.put("reply",parsed.reply).put("aside",parsed.aside);
+   long start=System.currentTimeMillis();try{String raw=request(messages,true);r.put("raw",raw);AgentReply parsed=AgentReply.parse(raw);r.put("model_reply",parsed.reply).put("model_aside",parsed.aside);
+    r.put("reply_guard_applied",Commitments.replyBoundary(state,user,false,c.optBoolean("memory",true)).enforce(parsed)).put("reply",parsed.reply).put("aside",parsed.aside);
     if("chain".equals(c.getString("kind"))){String tid="generated-"+step;db.commit(db.epoch(),user,parsed.reply,parsed.emotion,parsed.memories,true,false,null,null,tid,now,parsed.self,true,null,null,parsed.moodLevel,parsed.moodCause,parsed.moodChanged,null,parsed.aside);
      db.shown(tid,999,true);db.awaitWrites();}
    }catch(Exception e){r.put("error",e.getClass().getSimpleName()+": "+e.getMessage());}

@@ -17,8 +17,12 @@ public class CommitmentsUiTest {
   assertTrue(AgentRuntime.context("你答应提醒我的事",false).toString().contains("十分钟后我提醒你喝水"));
   assertTrue(AgentRuntime.context("你答应提醒我的事",false).toString().contains("你答应用户的"));
   Data.prefs().edit().putBoolean("agent.memory",false).commit();JSONArray disabledRequest=AgentRuntime.context("你答应提醒我的事",false);String disabled=disabledRequest.getJSONObject(disabledRequest.length()-1).getString("content");
-  // The route may explain absence of evidence, but must not inject either stored promise.
-  assertFalse(disabled.contains("十分钟后我提醒你喝水"));assertFalse(disabled.contains("我答应你明天把初稿发给你"));assertTrue(disabled.contains("本轮没有提供可核对"));
+  // Recent conversation/reminder context is independent of the long-term ledger switch.
+  // Verify the actual commitment evidence block, including the new empty-result explanation.
+  String marker="本轮可核对的约定资料：";assertTrue(disabled.contains(marker));
+  JSONObject evidence=new JSONObject(AgentPolicy.envelope(disabled.substring(disabled.indexOf(marker)+marker.length()))),groups=evidence.getJSONObject("双方约定");
+  assertEquals(0,groups.getJSONArray("用户答应你的").length());assertEquals(0,groups.getJSONArray("你答应用户的").length());
+  assertFalse(evidence.toString().contains("十分钟后我提醒你喝水"));assertFalse(evidence.toString().contains("我答应你明天把初稿发给你"));assertTrue(evidence.toString().contains("本轮没有提供可核对"));
  }
  @Test public void sameDreamCallCanSupplementWithoutProducingADiary()throws Exception{
   LocalDate day=LocalDate.now().minusDays(1);long at=day.atTime(19,0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();String quote="这份资料我周末给你。";
@@ -26,6 +30,18 @@ public class CommitmentsUiTest {
   AgentRuntime.diaryModel=(m,t,p)->{assertTrue(m.toString().contains("commitments"));return "{\"commitments\":[{\"source_id\":\"chat:dream-source\",\"speaker\":\"user\",\"quote\":\""+quote+"\"}]}";};
   Data.prefs().edit().putBoolean("agent.diary",true).commit();AgentRuntime.writeDiaryIfDue();AgentRuntime.diaryWorker.submit(()->{}).get(10,TimeUnit.SECONDS);
   assertEquals(1,Commitments.entries(db.snapshot()).length());assertEquals(0,Diary.entries(db.snapshot()).length());
+ }
+ @Test public void cancellationBoundaryRunsBeforePreviewAndPersistence()throws Exception{
+  long at=System.currentTimeMillis()-60000;
+  db.commit(db.epoch(),"好","我答应你周末讲青松寓言。","calm",null,true,false,null,null,"old-story",at,null,true);db.shown("old-story",999,true);
+  db.commitmentStatus(Commitments.entries(db.snapshot()).getJSONObject(0).getString("id"),"cancelled");
+  AgentRuntime.model=(m,t,p)->{p.accept("{\"reply\":\"你想听我可以重新讲一个");return "{\"reply\":\"不欠了，不过你想听我可以重新讲一个。\",\"aside\":\"想听我随时讲。\"}";};
+  UiTest.Counter result=new UiTest.Counter();assertTrue(AgentRuntime.send("你现在还欠我那个青松寓言吗？",false,result));
+  AgentRuntime.worker.submit(()->{}).get(10,TimeUnit.SECONDS);ShadowLooper.idleMainLooper();
+  assertEquals(0,result.errors);assertEquals(1,result.done);assertEquals(0,result.partial);
+  JSONArray turns=db.snapshot().getJSONArray("turns");JSONObject saved=turns.getJSONObject(turns.length()-1);
+  assertTrue(saved.getString("reply").contains("不再安排"));assertFalse(saved.getString("reply").contains("想听"));assertEquals("",saved.optString("aside"));
+  assertEquals("cancelled",Commitments.entries(db.snapshot()).getJSONObject(0).getString("status"));
  }
  @Test public void notebookMarksStatusAndDeletesWithoutChangingTheOriginalChat()throws Exception{
   String quote="我答应你明天把初稿发给你。";db.commit(db.epoch(),quote,"十分钟后我提醒你喝水。","calm",null,true,false);

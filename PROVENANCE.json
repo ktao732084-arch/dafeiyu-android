@@ -1575,6 +1575,30 @@
       "sha256": "eb5975287e655906eb821d1e7e712253a7b0cf5a4cba45146955e25caa801547"
     },
     {
+      "path": "docs/test-reports/commitments-boundary-control-review.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "6f772117a7d880dfafa09e71e2514d664b505217d0364abb3a2d30b39a8627bf"
+    },
+    {
+      "path": "docs/test-reports/commitments-boundary-control.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "1b17f7771047e538cd1689de13f166b23fad066d29c142933e3ef6bf06a0ff1f"
+    },
+    {
+      "path": "docs/test-reports/commitments-boundary-diagnostic.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "3841fe510b019369dacaac389bdf7e4397cd9e82430c3f5d5fc1a0b6071b3399"
+    },
+    {
+      "path": "docs/test-reports/commitments-boundary-json-diagnostic.json",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "fe843a7c61780be5fe7e8a108c6ab59fb0129d5c8412a3ccd396afbc632fdc93"
+    },
+    {
       "path": "docs/test-reports/commitments-expanded-review.json",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -2253,7 +2277,7 @@
       "path": "src/com/xiaoxiao/pet/AgentRuntime.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "cfbfa5e52cbd89a66e5ff244f4d733022c113e63c4507efef641b2f12d216179",
+      "sha256": "e98da6a22def0accdb5bcb0d65597800a8ec7b0f2c9e1ff9d20d24a2f8cab2df",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2377,7 +2401,7 @@
       "path": "src/com/xiaoxiao/pet/Commitments.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "d74649bc827ea0f8b370205edf2b67136eb2552ad3193444474d75dc1fad543a"
+      "sha256": "c3c025803305d8d3c7f8da783c83309361fc2d29160ab81c7fdef0566d6acee1"
     },
     {
       "path": "src/com/xiaoxiao/pet/CompactPanel.java",
@@ -2905,7 +2929,7 @@
       "path": "tests/com/xiaoxiao/pet/CommitmentsExpandedEval.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "3f0113f222a163ff3c8c7227a5af75835462e2c294cf718aadd729e511aac275"
+      "sha256": "15a8060596de212ff48deaa0c729497ee0a0f04b1c7477d3019a53d83c9b735c"
     },
     {
       "path": "tests/com/xiaoxiao/pet/CommitmentsLiveEval.java",
@@ -2917,7 +2941,7 @@
       "path": "tests/com/xiaoxiao/pet/CommitmentsTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "51d22dbac6ed93201d13286134528b7fca284a29a26e990253c91be5e8ec57d7"
+      "sha256": "d9a1f2e863a8ad1c3ca1cc099c5ae1709dd6ed58b07571764e54492c4103bcce"
     },
     {
       "path": "tests/com/xiaoxiao/pet/DeviceCoreChecks.java",
@@ -3104,7 +3128,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/CommitmentsUiTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "6b31c5c81d80a2b4cfeafe13d994bbde8de2ed835b9bfe83fcd144a45c45a377"
+      "sha256": "8ead59d82f0d6f034d7fed5f9c8338b8ff4d66774ec9f6e07594523203981674"
     },
     {
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/CompanionBehaviorTest.java",
@@ -3338,7 +3362,7 @@
       "path": "tools/summarize-commitment-eval.py",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "ef5fc34ddbc28ed2eddded2f7612ccd5c8cddfa8690b4a9a31c67f241e33376f"
+      "sha256": "80d7a2b789e7e7aa0a39cd68d2d4d0c53385c1d06efbd1fb23541c8ccabcf4c1"
     },
     {
       "path": "tools/sync-memory-service.py",

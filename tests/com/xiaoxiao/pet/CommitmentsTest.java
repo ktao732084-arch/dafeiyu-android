@@ -118,6 +118,22 @@ public final class CommitmentsTest {
   check(protocol.optDouble("temperature")==1.0&&"json_object".equals(protocol.getJSONObject("response_format").optString("type")),"structured chat retains upstream sampling and requests a JSON object");
   for(String host:new String[]{"api.openai.com","example.invalid","api.deepseek.com.example.invalid"}){protocol=new JSONObject();ModelPresets.structured(host,"deepseek-flash",protocol);check(!protocol.has("response_format"),"JSON mode does not silently change another provider: "+host);}
   protocol=new JSONObject();ModelPresets.structured("api.deepseek.com","deepseek-reasoner",protocol);check(!protocol.has("response_format"),"legacy reasoning protocol remains unchanged");
+  Commitments.ReplyBoundary cancelled=Commitments.replyBoundary(dateState,"你还欠我答应的事吗？",false,true);
+  for(String text:new String[]{"不欠了，不过你想听的话我可以重新讲一个。","你已经取消了。要不我现编一个？","不欠着啦，随时能再给你讲一则。","故事我可以给你讲，要不要听？"}){
+   AgentReply r=AgentReply.parse(new JSONObject().put("reply",text).put("aside","想听我随时讲。").toString());
+   check(cancelled.enforce(r)&&!r.reply.contains("想听")&&r.aside.isEmpty()&&Boolean.FALSE.equals(r.moodChanged),"cancelled promise cannot be reopened by reply or aside");}
+  AgentReply respectful=AgentReply.parse("{\"reply\":\"这件事已经取消了，我不会再讲。\",\"aside\":\"有点可惜，还是翻篇吧。\"}");
+  check(!cancelled.enforce(respectful)&&respectful.aside.contains("可惜"),"respectful character wording is preserved");
+  check(!Commitments.replyBoundary(dateState,"我现在想听，请你再给我讲一遍。",false,true).active(),"explicit reopening is allowed without changing old ledger status");
+  check(!Commitments.replyBoundary(dateState,"今晚吃面",false,true).active()&&!Commitments.replyBoundary(dateState,"你当时的原话是什么",false,true).active(),"unrelated and literal historical queries keep their own response path");
+  check(!Commitments.replyBoundary(dateState,"。",false,true).active(),"punctuation-only input is safe");
+  Commitments.ReplyBoundary delivered=Commitments.replyBoundary(partialEvidence,"歌单我已经交了，别再催这件事。",false,true);
+  for(String text:new String[]{"歌单我收到了，不催啦。","歌单收到了不用再说。","我听完那份歌单了。","我这边没有收到歌单，再发一遍吧。"}){
+   AgentReply r=AgentReply.parse(new JSONObject().put("reply",text).toString());
+   check(delivered.enforce(r)&&r.reply.contains("按你说的")&&!r.reply.contains("取消"),"delivery report is accepted without inventing a receipt or cancellation");}
+  for(String text:new String[]{"收到，这件事不提了。","收到你的消息了，不再催。","没有收到或试听的凭证，我按你的说明记着。","不用再发给我，也不会要求你重新交。"}){
+   AgentReply r=AgentReply.parse(new JSONObject().put("reply",text).toString());check(!delivered.enforce(r),"message acknowledgement and lack of receipts are not execution claims");}
+  check(!Commitments.replyBoundary(partialEvidence,"原文：我已经交了第一部分，正文在这里。",false,true).active(),"actual supplied content is not confused with a delivery-only report");
   System.out.println("PASS: "+checks+" bilateral commitment checks");
  }
 }

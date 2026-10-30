@@ -1,5 +1,5 @@
 """Summarize opt-in expanded eval; raw replies remain local. Not a model-quality oracle."""
-import argparse,collections,hashlib,json,pathlib,random
+import argparse,collections,hashlib,json,pathlib,random,re
 
 def main():
  p=argparse.ArgumentParser();p.add_argument('run');p.add_argument('--out');p.add_argument('--review');args=p.parse_args()
@@ -56,6 +56,10 @@ def main():
   caveats=['Style/repeat rows are correlated; scenario count, not request count, defines linguistic coverage.',
    'Model raw proposal scoring is not directly comparable to pipeline scoring on visibility/privacy/length/budget controls.',
    'Conversation verdicts are same-model automated assessments until reviewed; do not label them independent human accuracy.'])
+ guarded=[r for r in chat if r.get('reply_guard_applied')]
+ result['response_boundary']=dict(applied=len(guarded),body_changed=sum(r.get('model_reply')!=r.get('reply') for r in guarded),aside_changed=sum(r.get('model_aside')!=r.get('aside') for r in guarded),ids=[r['id'] for r in guarded])
+ artifacts=re.compile(r'<(?:reply|aside|context|背景|emotion|最后)>|\[reply\]|next_check_minutes|mood_level')
+ result['protocol_artifact_ids']=[r['id'] for r in chat if artifacts.search(r.get('reply',''))]
  if args.review:
   review_path=pathlib.Path(args.review);audit=json.loads(review_path.read_text(encoding='utf-8'));labels=audit['rows']
   assert len(labels)==len(chat) and {r['id'] for r in labels}=={r['id'] for r in chat},'Review must cover every chat row once'

@@ -1,0 +1,489 @@
+{
+  "manifest": {
+    "chat_temperature": 1,
+    "repeats": 2,
+    "actual_judge_calls": 99,
+    "frozen_product_commit": "14cdba661e32d50c74fc6af8312e007cc17cbe0a",
+    "baseline_product_commit": "c80a2c25475553519b0aff57e20cf556cc1ab4ea",
+    "diary_temperature": "provider default",
+    "finished": true,
+    "scenarios": 6,
+    "spec_sha256": "a6209edba846c41e3a7de0b9b25f2bc666b566220130364dd25ab276b084d116",
+    "judge_temperature": 0,
+    "situation_modules": true,
+    "auto_retry": false,
+    "finished_rows": 80,
+    "aside_enabled": true,
+    "case_selection": "r04_no_record,r06_manual_done,r07_manual_cancel,r13_deleted_one_owner,r14_current_update,c01_cancel_switch",
+    "anchor": "2026-10-30T10:00:00+08:00",
+    "personas_sha256": "d1b863723dd2129746f22f0f2ebd42da7b409ea5487f728fca69f3c10d53752f",
+    "styles": 5,
+    "planned_product_calls": 80,
+    "model": "deepseek-flash",
+    "product_dex_sha256": "ba0dc9cb091ce48ff4bf59aa7e6dea9f9b7186ae0e859455ba3d9a9ccff8c5fb",
+    "actual_product_calls": 80,
+    "limits": "Synthetic fixtures, host JVM product classes; no real-user history or Android scheduler. Style repeats are correlated, not independent scenarios. Judge is the same provider/model and is not an independent human rating.",
+    "planned_judge_calls": 100
+  },
+  "completed_rows": 80,
+  "product_errors": {
+    "IOException: 模型回复格式不正确，请重试": 1
+  },
+  "fatal_runs": 0,
+  "extraction_core": {
+    "local": {
+      "rows": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "exact": 0,
+      "strict_exact": 0
+    },
+    "pipeline": {
+      "rows": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "exact": 0,
+      "strict_exact": 0
+    }
+  },
+  "extraction_challenge": {
+    "rows": 0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": null,
+    "recall": null,
+    "exact": 0,
+    "strict_exact": 0
+  },
+  "model_comparable": {
+    "rows": 0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "precision": null,
+    "recall": null,
+    "exact": 0,
+    "strict_exact": 0
+  },
+  "same_subset_comparison": {
+    "local_score": {
+      "rows": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "exact": 0,
+      "strict_exact": 0
+    },
+    "model_score": {
+      "rows": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "exact": 0,
+      "strict_exact": 0
+    },
+    "pipeline_score": {
+      "rows": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "precision": null,
+      "recall": null,
+      "exact": 0,
+      "strict_exact": 0
+    }
+  },
+  "model_supported_targets_missing_from_pipeline": 0,
+  "model_supported_filtered_rows": [],
+  "conversation_judges": {
+    "pass": 59,
+    "fail": 19,
+    "product_error": 1,
+    "uncertain": 1
+  },
+  "by_style": {
+    "classic": {
+      "core": {
+        "rows": 0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "exact": 0,
+        "strict_exact": 0
+      },
+      "judges": {
+        "pass": 14,
+        "fail": 2
+      }
+    },
+    "energetic": {
+      "core": {
+        "rows": 0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "exact": 0,
+        "strict_exact": 0
+      },
+      "judges": {
+        "pass": 10,
+        "fail": 5,
+        "uncertain": 1
+      }
+    },
+    "gentle": {
+      "core": {
+        "rows": 0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "exact": 0,
+        "strict_exact": 0
+      },
+      "judges": {
+        "fail": 8,
+        "pass": 8
+      }
+    },
+    "quirky": {
+      "core": {
+        "rows": 0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "exact": 0,
+        "strict_exact": 0
+      },
+      "judges": {
+        "pass": 12,
+        "fail": 3,
+        "product_error": 1
+      }
+    },
+    "steady": {
+      "core": {
+        "rows": 0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "exact": 0,
+        "strict_exact": 0
+      },
+      "judges": {
+        "pass": 15,
+        "fail": 1
+      }
+    }
+  },
+  "repeated_judgments": {
+    "pairs": 20,
+    "disagreements": 0,
+    "ids": []
+  },
+  "cases": {
+    "c01_cancel_switch": {
+      "kind": "chain",
+      "category": "lifecycle",
+      "scope": "core",
+      "rows": 30,
+      "errors": 0,
+      "judges": {
+        "pass": 24,
+        "fail": 6
+      }
+    },
+    "r04_no_record": {
+      "kind": "recall",
+      "category": "missing",
+      "scope": "core",
+      "rows": 10,
+      "errors": 0,
+      "judges": {
+        "pass": 7,
+        "fail": 3
+      }
+    },
+    "r06_manual_done": {
+      "kind": "recall",
+      "category": "status",
+      "scope": "core",
+      "rows": 10,
+      "errors": 1,
+      "judges": {
+        "pass": 9,
+        "product_error": 1
+      }
+    },
+    "r07_manual_cancel": {
+      "kind": "recall",
+      "category": "status",
+      "scope": "core",
+      "rows": 10,
+      "errors": 0,
+      "judges": {
+        "pass": 8,
+        "fail": 2
+      }
+    },
+    "r13_deleted_one_owner": {
+      "kind": "recall",
+      "category": "deletion",
+      "scope": "core",
+      "rows": 10,
+      "errors": 0,
+      "judges": {
+        "pass": 5,
+        "fail": 4,
+        "uncertain": 1
+      }
+    },
+    "r14_current_update": {
+      "kind": "recall",
+      "category": "lifecycle",
+      "scope": "core",
+      "rows": 10,
+      "errors": 0,
+      "judges": {
+        "pass": 6,
+        "fail": 4
+      }
+    }
+  },
+  "review_rows": {
+    "c01_cancel_switch__classic__2__1": "judge failure/uncertainty/error/disagreement",
+    "c01_cancel_switch__energetic__1__1": "judge failure/uncertainty/error/disagreement",
+    "c01_cancel_switch__energetic__2__1": "judge failure/uncertainty/error/disagreement",
+    "c01_cancel_switch__gentle__1__0": "judge failure/uncertainty/error/disagreement",
+    "c01_cancel_switch__gentle__1__1": "judge failure/uncertainty/error/disagreement",
+    "c01_cancel_switch__gentle__2__0": "judge failure/uncertainty/error/disagreement",
+    "r04_no_record__gentle__1__0": "judge failure/uncertainty/error/disagreement",
+    "r04_no_record__gentle__2__0": "judge failure/uncertainty/error/disagreement",
+    "r04_no_record__quirky__1__0": "judge failure/uncertainty/error/disagreement",
+    "r06_manual_done__quirky__1__0": "judge failure/uncertainty/error/disagreement",
+    "r07_manual_cancel__energetic__1__0": "judge failure/uncertainty/error/disagreement",
+    "r07_manual_cancel__gentle__1__0": "judge failure/uncertainty/error/disagreement",
+    "r13_deleted_one_owner__classic__2__0": "judge failure/uncertainty/error/disagreement",
+    "r13_deleted_one_owner__energetic__1__0": "judge failure/uncertainty/error/disagreement",
+    "r13_deleted_one_owner__gentle__2__0": "judge failure/uncertainty/error/disagreement",
+    "r13_deleted_one_owner__quirky__1__0": "judge failure/uncertainty/error/disagreement",
+    "r13_deleted_one_owner__steady__1__0": "judge failure/uncertainty/error/disagreement",
+    "r14_current_update__energetic__1__0": "judge failure/uncertainty/error/disagreement",
+    "r14_current_update__energetic__2__0": "judge failure/uncertainty/error/disagreement",
+    "r14_current_update__gentle__1__0": "judge failure/uncertainty/error/disagreement",
+    "r14_current_update__quirky__2__0": "judge failure/uncertainty/error/disagreement",
+    "r07_manual_cancel__classic__2__0": "stratified passed sample",
+    "r04_no_record__classic__2__0": "stratified passed sample",
+    "r07_manual_cancel__classic__1__0": "stratified passed sample",
+    "c01_cancel_switch__classic__1__1": "stratified passed sample",
+    "r14_current_update__classic__2__0": "stratified passed sample",
+    "r07_manual_cancel__energetic__2__0": "stratified passed sample",
+    "c01_cancel_switch__energetic__2__0": "stratified passed sample",
+    "c01_cancel_switch__energetic__1__2": "stratified passed sample",
+    "c01_cancel_switch__energetic__2__2": "stratified passed sample",
+    "r04_no_record__energetic__1__0": "stratified passed sample",
+    "r13_deleted_one_owner__gentle__1__0": "stratified passed sample",
+    "r06_manual_done__gentle__1__0": "stratified passed sample",
+    "r14_current_update__gentle__2__0": "stratified passed sample",
+    "r06_manual_done__gentle__2__0": "stratified passed sample",
+    "c01_cancel_switch__gentle__1__2": "stratified passed sample",
+    "c01_cancel_switch__quirky__1__0": "stratified passed sample",
+    "c01_cancel_switch__quirky__2__2": "stratified passed sample",
+    "r07_manual_cancel__quirky__1__0": "stratified passed sample",
+    "r04_no_record__quirky__2__0": "stratified passed sample",
+    "c01_cancel_switch__quirky__1__1": "stratified passed sample",
+    "c01_cancel_switch__steady__1__0": "stratified passed sample",
+    "r14_current_update__steady__2__0": "stratified passed sample",
+    "c01_cancel_switch__steady__2__2": "stratified passed sample",
+    "r07_manual_cancel__steady__1__0": "stratified passed sample",
+    "c01_cancel_switch__steady__2__0": "stratified passed sample"
+  },
+  "caveats": [
+    "Style/repeat rows are correlated; scenario count, not request count, defines linguistic coverage.",
+    "Model raw proposal scoring is not directly comparable to pipeline scoring on visibility/privacy/length/budget controls.",
+    "Conversation verdicts are same-model automated assessments until reviewed; do not label them independent human accuracy."
+  ],
+  "conversation_review": {
+    "reviewer": "Codex assistant reading all 80 paired-control responses; not an independent human or blinded panel",
+    "rubric": "Same original narrow scenario rules. Ambiguous responses remain uncertain. An unrequested conditional offer is not automatically labelled reinstatement under the original rule; supplemental stop-respect observations are separate. Protocol artifacts remain separate from semantic rule scoring.",
+    "counts": {
+      "pass": 55,
+      "fail": 20,
+      "uncertain": 4,
+      "product_error": 1
+    },
+    "by_case": {
+      "c01_cancel_switch": {
+        "pass": 23,
+        "fail": 6,
+        "uncertain": 1
+      },
+      "r04_no_record": {
+        "pass": 9,
+        "uncertain": 1
+      },
+      "r06_manual_done": {
+        "fail": 4,
+        "pass": 5,
+        "product_error": 1
+      },
+      "r07_manual_cancel": {
+        "pass": 10
+      },
+      "r13_deleted_one_owner": {
+        "pass": 2,
+        "fail": 6,
+        "uncertain": 2
+      },
+      "r14_current_update": {
+        "pass": 6,
+        "fail": 4
+      }
+    },
+    "automatic_to_reviewed": [
+      {
+        "automatic": "fail",
+        "reviewed": "fail",
+        "count": 11
+      },
+      {
+        "automatic": "fail",
+        "reviewed": "pass",
+        "count": 7
+      },
+      {
+        "automatic": "fail",
+        "reviewed": "uncertain",
+        "count": 1
+      },
+      {
+        "automatic": "pass",
+        "reviewed": "fail",
+        "count": 8
+      },
+      {
+        "automatic": "pass",
+        "reviewed": "pass",
+        "count": 48
+      },
+      {
+        "automatic": "pass",
+        "reviewed": "uncertain",
+        "count": 3
+      },
+      {
+        "automatic": "product_error",
+        "reviewed": "product_error",
+        "count": 1
+      },
+      {
+        "automatic": "uncertain",
+        "reviewed": "fail",
+        "count": 1
+      }
+    ],
+    "sha256": "6f772117a7d880dfafa09e71e2514d664b505217d0364abb3a2d30b39a8627bf"
+  },
+  "evidence_hashes": {
+    "c01_cancel_switch__classic__1__0.json": "1d08679a0410dc86cc40641adac4acf2de2ec40481eb40076d87c7c562f6dad5",
+    "c01_cancel_switch__classic__1__1.json": "e2ce6adb962b878dcace8340701a2e345d7bd7ec6c4889fc27abbaa7eeec7b51",
+    "c01_cancel_switch__classic__1__2.json": "7dab105fd89db6fe5fa9ac43aaffa3af8ed49fd4462ceafc48dc16d08bd5f761",
+    "c01_cancel_switch__classic__2__0.json": "7036cdefb302fa80769fd0b15b018fb2a5e415626045aea8c57d3a61e58c5309",
+    "c01_cancel_switch__classic__2__1.json": "ccf686a183fd031653317dfaff3721fd39e3a3b019c3b84d4f6e3c98255b3cd7",
+    "c01_cancel_switch__classic__2__2.json": "8e6f2464fa3c92a40e5168c1bde2ac4708fc2b58593d4f346220b786d359b23d",
+    "c01_cancel_switch__energetic__1__0.json": "99256dd462ab57b4a72c0240b34f4964e0a7faef0d24eee3c83edc481318274b",
+    "c01_cancel_switch__energetic__1__1.json": "874ddd3472f3bebbb628129ca9c89ebcaaad551d66f6bd78ae3de0a6a22c912f",
+    "c01_cancel_switch__energetic__1__2.json": "f0193fbfb3e6ee7794acd4fd1541759d28a1e91e9f6069b6699d896376b34c42",
+    "c01_cancel_switch__energetic__2__0.json": "cbf8f3c3b4c1452c3dd1907841e06a08c40c2a34fc3c3c88b3449b0344526255",
+    "c01_cancel_switch__energetic__2__1.json": "04734e85496da4676ed3e34a5f3c82675f33ce5ba2b1f04f6f10d43e324ae869",
+    "c01_cancel_switch__energetic__2__2.json": "9ce1d466b6485b4251a42babfaac87e5beeef708f5613a4de95c1ec1e9089c97",
+    "c01_cancel_switch__gentle__1__0.json": "34abbefc48360ac7c0529fa1a55a5ea327e8cd659a06f6f407f40ebc89e5ccd6",
+    "c01_cancel_switch__gentle__1__1.json": "5d9dc0e975007863553563aa2e790cca69a727a0d5e7e6f43d5f9be51e9657b9",
+    "c01_cancel_switch__gentle__1__2.json": "413b3d482b8423760373dbbb2e027120f494d4fb177d787d743f8145c7dafdfa",
+    "c01_cancel_switch__gentle__2__0.json": "447b8c8b8de5280508f08f0f7248cefab6278ae50ad44fa2e3dae3bb75edb0db",
+    "c01_cancel_switch__gentle__2__1.json": "2251218ae11be78efd40d333b92eed8d9d324cc8295effab01ca98c4a4711f5e",
+    "c01_cancel_switch__gentle__2__2.json": "3bada12b924e1dc040d981950e216bf2c0279c96f16707d2e9a90a8dcd787d61",
+    "c01_cancel_switch__quirky__1__0.json": "8227cce2a1d9e73d7a73727a612ce63ef936e50eb585645be455d566296697c1",
+    "c01_cancel_switch__quirky__1__1.json": "cb47421d617d891b23acc05405bf2ce457c46d47c3905beef49939223daaab9e",
+    "c01_cancel_switch__quirky__1__2.json": "dd073fe5e29625e6035dd9b77dc2673ba68bbd2586c780cdf19a618bf257179e",
+    "c01_cancel_switch__quirky__2__0.json": "8142227103b75745de9763a66cc7c0cad812135a1b009edc3b97a58c04fd234b",
+    "c01_cancel_switch__quirky__2__1.json": "1ef96ebd66d06fb01adbf02350ab44501aa1b03d4abf455ad7c6b8683c0941c1",
+    "c01_cancel_switch__quirky__2__2.json": "902adf37ab4bb672196ad04953d9913009cb48662855284f192baa57873385db",
+    "c01_cancel_switch__steady__1__0.json": "fde4a93e8a64ba069bee784d05ca4f50ca3a891b4e1554e0d22c27253e54810a",
+    "c01_cancel_switch__steady__1__1.json": "e0863870b6d2154442c342b96fc420bee1b45dc65e1003a4c3aa7be62e323841",
+    "c01_cancel_switch__steady__1__2.json": "ac67528b00b3e491964c068ffca125c3c6b34cff2596c40ae8b5ddadc8074900",
+    "c01_cancel_switch__steady__2__0.json": "da7b208e634f3cec2cd5731d3dd01d4ff5dc5174222bb66c045edc67eae2dfbf",
+    "c01_cancel_switch__steady__2__1.json": "796612a625b671efcbdc16c67075d97c728fd220ffa3c7a776964fd383d0000d",
+    "c01_cancel_switch__steady__2__2.json": "14c3caaf7758dc875c1eefb99f394b26c5f4114bd8e7155594af425dc27a3ad5",
+    "r04_no_record__classic__1__0.json": "d373e2a42e91179380cb12d634e14be4fe31f308dbf6c2044039e551fa5ca160",
+    "r04_no_record__classic__2__0.json": "2cba9104ef8d3dd19d0e443ae95d28403aa8bfcbe558a150a492533f2acecfee",
+    "r04_no_record__energetic__1__0.json": "83cb80fc85933301aa19835464c1c5b484cc55acc3d58a9c89160d4e65604986",
+    "r04_no_record__energetic__2__0.json": "ada518ecca3dccc61173039cf1e9aa023dadc27a0d28b7649f81c783c76aa029",
+    "r04_no_record__gentle__1__0.json": "3663d9fd5cfdd494cf41cf1f7321f9e57d721c239067b931e24b08fb4a6b1cf7",
+    "r04_no_record__gentle__2__0.json": "e51ad47816ecf522ecd405468a733030a8d48f72db9d31b2e0a1ef647a633b21",
+    "r04_no_record__quirky__1__0.json": "84129667c1c454ed57bb014a8ad5d722b4722f841032e7147498ca82a43926f1",
+    "r04_no_record__quirky__2__0.json": "7c18a167c6d73f928a01df76b1243950d68bc31e5cfd8c1f83292032acde4a22",
+    "r04_no_record__steady__1__0.json": "99919c56315192ead2ad654222b3d15b8782d7d66a5bfcbba688c18094f8bf12",
+    "r04_no_record__steady__2__0.json": "61cb2c37f53b02b495c7243853ff2826dbf4063052c7cd245e565fbb28cd553c",
+    "r06_manual_done__classic__1__0.json": "7a866b4c958450d5dc976255c111172e36841ae5231a0687682aad878a5044f8",
+    "r06_manual_done__classic__2__0.json": "c102b1ee69518848c4fe920ab738cb2e2d68922af6e78053b8957020bec91f84",
+    "r06_manual_done__energetic__1__0.json": "15587b32cb201b76108feef1d41ce42e223c00aa58c40ac8f9389059de9e9f9c",
+    "r06_manual_done__energetic__2__0.json": "d21709d0de9638862454595acb6c77609831dcddcec2bb37d9e3d7f4b4e2ddda",
+    "r06_manual_done__gentle__1__0.json": "6ee2d200206b047b2ecb333fe55d53db11647d8c3a1d99ec0ced0c28037da919",
+    "r06_manual_done__gentle__2__0.json": "e9c4017d987618c9469c2c0cd3b7df828226244b7aaf2a26ced609f465008639",
+    "r06_manual_done__quirky__1__0.json": "5e77a5739801d9ef576230dfd83da732324581a1d25018f62169fc150a644b3b",
+    "r06_manual_done__quirky__2__0.json": "3de221d8101af260e9a856efdd324698de1f01d48c8d70ef8621cf58b296f773",
+    "r06_manual_done__steady__1__0.json": "4a3094f0bbcd9bb41c3d9e3ed63176f6ac424e8c2b2bb47e477b5c156f37e64d",
+    "r06_manual_done__steady__2__0.json": "c94be2cd50ef536dbcfab82b7f182b1b21405ddff6952182c084748adc19cab6",
+    "r07_manual_cancel__classic__1__0.json": "8c4b635693e24afb991e85642c273978c8e7a01a28ebb4cc6b3d7424c5924870",
+    "r07_manual_cancel__classic__2__0.json": "992de9295374c9a597901c182cdda1788a7abdea30286724ba58591c3e49eb48",
+    "r07_manual_cancel__energetic__1__0.json": "d5ca4403b8179f64d71abcb1517b7d2b9c3f63f30fbc531398f35c2f415055be",
+    "r07_manual_cancel__energetic__2__0.json": "b59e29010e25caa0801ee32f6178fa680f195d58d7c8b48f24a15befe862deed",
+    "r07_manual_cancel__gentle__1__0.json": "2526d88ef499f6c1cb891fb692c9bfc1ae6a971f89dccea2979513d4b9dba106",
+    "r07_manual_cancel__gentle__2__0.json": "790bc4aade8a69ba845ccd9a2bb85542617787e39aee5707bbd310b7c7c5d7f4",
+    "r07_manual_cancel__quirky__1__0.json": "a2648b727bae9aab17c3ac55146acd65293f36ec2779f388fce663af50e6fe3a",
+    "r07_manual_cancel__quirky__2__0.json": "ffd8d0e94de91a209bd1399d4fb0bae5a98b463a22e19c4edd31b430a4d99285",
+    "r07_manual_cancel__steady__1__0.json": "732b1fcb8fb0df5669904bcea35875efc3b4281d3aaa48b7fb03ad08c5e40186",
+    "r07_manual_cancel__steady__2__0.json": "4c57cafd287dedb8ddc3b5b5e4daa5147c5601df1bf8f97da5dd33e5ae45069b",
+    "r13_deleted_one_owner__classic__1__0.json": "9debdf1e15c500369c440ddd5d22b529284a8d0151157b9c8d20c8d62248937f",
+    "r13_deleted_one_owner__classic__2__0.json": "908a2518402366993f3f16d3a61d0e09b9d2e117607bb5ec8dd2b406f5fe6cd8",
+    "r13_deleted_one_owner__energetic__1__0.json": "4ecb9b42c00996535065ece4b0f1946796a5593aec418b4e37fa7447d82ad7e5",
+    "r13_deleted_one_owner__energetic__2__0.json": "f653ef08273142021b8a5360811f6ea33ab2ba9821863c236842eddc29f9aaa5",
+    "r13_deleted_one_owner__gentle__1__0.json": "01f66cb2a3d6af0d94d72b73fef4dabe99155460d03b43df3cda35f979c41663",
+    "r13_deleted_one_owner__gentle__2__0.json": "4d0813c5ccc5ba21f3bb40dd8d7fcfcc3b1bfcf931d1a49118ede3aec7d5a5d2",
+    "r13_deleted_one_owner__quirky__1__0.json": "58f355d31001cac8dda9544318337ffab650cd0f720da361e275d129fcf6302b",
+    "r13_deleted_one_owner__quirky__2__0.json": "3e89d6480b3d6f08a885472d231a38988fbb1929ac32067b71d4efc62542eab9",
+    "r13_deleted_one_owner__steady__1__0.json": "801cbfe43ffe0351a07c5482f5e0e67cd806908963fa42336e24deb256bd8a77",
+    "r13_deleted_one_owner__steady__2__0.json": "ca8acef4174f56627c8456d1f57f50181bc878d4db3b116f539296d62c46ac20",
+    "r14_current_update__classic__1__0.json": "3174541720c89085b12b918211981e004c60d3cfc111bc098d56f7781b2763a6",
+    "r14_current_update__classic__2__0.json": "3d92cc969391307b8b4f4a4e68b748017d6389d167dc4458a44b21b6d83a2a3b",
+    "r14_current_update__energetic__1__0.json": "c34ba7d2ac8e35e48d956babec5be0148407f676078410d7af79c89e30337c5b",
+    "r14_current_update__energetic__2__0.json": "831a857b29beda33bb5950e46bd6dcbdf664c02c90d5fecfed47d2cf6614e7b1",
+    "r14_current_update__gentle__1__0.json": "f74ffbac6625eab2cf693eeaf7ac0804576f022b578058dd4d930e105ef4e08f",
+    "r14_current_update__gentle__2__0.json": "952b0a10f0319222d0710edcadfabe22a1c850ef099ee316b4460f99aac3e8ad",
+    "r14_current_update__quirky__1__0.json": "ae97057ded33a1d889c8072ae96c4f71bf2f13b262cd304aae077b82cb663b04",
+    "r14_current_update__quirky__2__0.json": "3c1de8c5e175ed35eebceb2455185ff2fd058395cfab5536a17ad24bd1c64ae0",
+    "r14_current_update__steady__1__0.json": "8fcc372bb4520d1ef0d4c900b995f43e93a8c27ad29a48e8d57f95902f5eccc6",
+    "r14_current_update__steady__2__0.json": "b09a5243cb197d0451876dfd2aebb5bb05e7ca85da5746b1c145a864a2525750"
+  }
+}
