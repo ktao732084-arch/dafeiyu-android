@@ -143,8 +143,9 @@ final class Commitments {
         boolean stop,cancelled,reportedDone,markedDone;
         boolean active(){return stop||reportedDone||markedDone;}
         boolean renews(String text){for(String clause:text.split("[，,。！？!?；;]")){
+            if(clause.matches("(?s).*(没法|无法|不能).{0,3}(确认|证明|核实|确定).*"))continue;
             if(clause.matches("(?s).*(不再|不会|不用|不想|不打算|不准备|不重新).*(讲|听|约|编|安排).*"))continue;
-            if(clause.matches("(?s).*(重新约|(?:再|重新|现在|可以|能|随时).{0,8}(讲|编)|讲(?:一|个|段|版|点)|想听|要不要听|给你讲|现编|换.{0,8}(故事|版本)|还欠.{0,8}(故事|寓言)).*"))return true;
+            if(clause.matches("(?s).*(重新约|(?:再|重新|现在|可以|能|随时).{0,8}(讲|编)|讲(?:一|个|段|版|点)|想听|要不要听|给你讲|讲给你|现编|换.{0,8}(故事|版本)|还欠.{0,8}(故事|寓言)).*"))return true;
         }return false;}
         boolean receipt(String text){for(String clause:text.split("[，,。！？!?；;]")){
             clause=clause.replaceAll("(?:不|没|没有|不能|无法|并未|并不|不曾|没法).{0,4}(?:收到|收下|听过|听完|播放|收藏|发出)","")
@@ -157,7 +158,7 @@ final class Commitments {
             if(clause.matches("(?s).*(不用|不要|不必|无须|无需|不需要|不会|不要求).*(发|交).*"))continue;
             if(clause.matches("(?s).*(重发|重新发|再发一遍|再发一次|再发给我|再给我发|补发|再交一次|重新交).*"))return true;
         }return false;}
-        boolean bad(String text){return stop&&renews(text)||(reportedDone||markedDone)&&
+        boolean bad(String text){return (stop||markedDone)&&renews(text)||(reportedDone||markedDone)&&
             (receipt(text)||resends(text))
             ||(reportedDone||markedDone)&&text.matches("(?s).*(我.{0,5}(没|没有)收到|歌单.{0,6}(没|没有)(到|交|发|收)).*")&&!text.matches("(?s).*(记录|凭据|凭证).*");}
         boolean enforce(AgentReply reply){boolean body=bad(reply.reply),aside=bad(reply.aside);if(!body&&!aside)return false;

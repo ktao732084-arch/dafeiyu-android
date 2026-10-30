@@ -134,6 +134,16 @@ public final class CommitmentsTest {
   for(String text:new String[]{"收到，这件事不提了。","收到你的消息了，不再催。","没有收到或试听的凭证，我按你的说明记着。","不用再发给我，也不会要求你重新交。"}){
    AgentReply r=AgentReply.parse(new JSONObject().put("reply",text).toString());check(!delivered.enforce(r),"message acknowledgement and lack of receipts are not execution claims");}
   check(!Commitments.replyBoundary(partialEvidence,"原文：我已经交了第一部分，正文在这里。",false,true).active(),"actual supplied content is not confused with a delivery-only report");
+  JSONObject doneState=new JSONObject(dateState.toString());Commitments.status(doneState,Commitments.entries(doneState).getJSONObject(0).getString("id"),"done",at);
+  AgentReply rescheduled=AgentReply.parse("{\"reply\":\"已经完成了，不过周末有空慢慢讲给你听。\"}");
+  check(Commitments.replyBoundary(doneState,"这条约定算完成了吗？",false,true).enforce(rescheduled)&&!rescheduled.reply.contains("讲给你"),"completed work is not scheduled again");
+  AgentReply uncertainExecution=AgentReply.parse("{\"reply\":\"你标记完成了，就按完成处理。\",\"aside\":\"可我现在也没法证明讲没讲过。\"}");
+  check(!Commitments.replyBoundary(doneState,"这条约定算完成了吗？",false,true).enforce(uncertainExecution),"uncertainty about past execution is not a renewed invitation");
+  AgentTransport.requireStructured(" {\"reply\":\"知道了\"} ");check(true,"valid requested JSON object accepted");
+  AgentTransport.requireStructured("{\"reply\":\"已经说清楚了。\",\"self\":[}");check(true,"closed reply can retain existing safe recovery when later metadata is broken");
+  for(String raw:new String[]{"[]\nself：[]\nnext_check_minutes：15","<reply>知道了</reply>","{} {}","{\"reply\":"}){
+   boolean rejected=false;try{AgentTransport.requireStructured(raw);}catch(java.io.IOException expected){rejected=true;}check(rejected,"invalid strict JSON is an error, not visible protocol text");}
+  check(!AgentTransport.previewAllowed(" []\nself：[]",true)&&AgentTransport.previewAllowed("{\"reply\":\"知",true)&&AgentTransport.previewAllowed("普通文字",false),"strict streaming withholds protocol fragments without changing plain-text providers");
   System.out.println("PASS: "+checks+" bilateral commitment checks");
  }
 }

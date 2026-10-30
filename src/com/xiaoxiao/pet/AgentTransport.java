@@ -45,6 +45,7 @@ final class AgentTransport {
             JSONObject payload=new JSONObject().put("model",model).put("messages",messages).put("stream",stream).put("max_tokens",thinking?Math.max(maxTokens,8192):maxTokens);
             ModelPresets.apply(url.getHost(),model,payload);if(chat)ModelPresets.chat(url.getHost(),model,payload);
             if(structured)ModelPresets.structured(url.getHost(),model,payload);
+            boolean strictJson=payload.has("response_format");
             if(precise&&"api.deepseek.com".equals(url.getHost())&&!thinking)payload.put("temperature",0);
             try(OutputStream out=con.getOutputStream()){out.write(payload.toString().getBytes(StandardCharsets.UTF_8));}
             int code=con.getResponseCode();if(code<200||code>=300)throw new IOException("模型返回 HTTP "+code+errorDetail(con.getErrorStream(),secret)+"。"+ModelPresets.httpError(code));
@@ -65,17 +66,26 @@ final class AgentTransport {
                         if("content_filter".equals(finish))throw new IOException("本次回复不完整，请缩短问题后重试");
                         if("stop".equals(finish))ended=true;
                         if(answer.length()>16000)throw new IOException("模型回复超过本轮长度限制");
-                        long now=System.currentTimeMillis();if(now-last>100){progress.accept(answer.toString());last=now;}
+                        long now=System.currentTimeMillis();if(now-last>100){if(previewAllowed(answer.toString(),strictJson))progress.accept(answer.toString());last=now;}
                     }
                 }
                 token.check();if(!ended)throw new IOException("连接中断，未保存不完整回复，请重试");
-                if(answer.toString().trim().isEmpty())throw new IOException("模型没有返回文本");return answer.toString();
+                if(answer.toString().trim().isEmpty())throw new IOException("模型没有返回文本");if(strictJson)requireStructured(answer.toString());return answer.toString();
             }
             String body=boundedRead(con.getInputStream(),1024*1024);token.check();
             JSONObject choice=new JSONObject(body).getJSONArray("choices").getJSONObject(0);
             if("length".equals(choice.optString("finish_reason"))||"content_filter".equals(choice.optString("finish_reason")))throw new IOException("模型回复不完整，请重试");
-            String content=choice.getJSONObject("message").optString("content","");if(content.trim().isEmpty())throw new IOException("模型没有返回文本");return content;
+            String content=choice.getJSONObject("message").optString("content","");if(content.trim().isEmpty())throw new IOException("模型没有返回文本");if(strictJson)requireStructured(content);return content;
         } finally {token.connection=null;con.disconnect();}
+    }
+    static boolean previewAllowed(String text,boolean strictJson){return !strictJson||text.trim().startsWith("{");}
+    static void requireStructured(String text)throws IOException {
+        try{JSONTokener parser=new JSONTokener(text.trim());if(!(parser.nextValue() instanceof JSONObject)||parser.nextClean()!=0)throw new JSONException("object required");}
+        catch(JSONException invalid){
+            // Preserve the existing safe, closed-reply fallback; never display metadata fragments as prose.
+            String json=AgentPolicy.envelope(AgentPolicy.replyText(text.trim()));if(json!=null&&AgentReply.complete(json)!=null)return;
+            throw new IOException("模型未返回完整 JSON，未保存这段回复，请重试");
+        }
     }
     /** The provider's own error message ("model not found", "insufficient balance"), bounded and with the key masked. */
     static String errorDetail(InputStream stream,String secret) {

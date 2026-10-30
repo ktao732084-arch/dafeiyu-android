@@ -1716,7 +1716,7 @@
       "path": "instrumentation/AgentInstrumentation.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "70520bca5a6725d427eed18439e4a7f70bec4e28ad724507091cbed5f523a594",
+      "sha256": "9c47a1df6c57f2415776a59f2f510a4bce48aa6e686d5954981df837b6301c85",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2297,7 +2297,7 @@
       "path": "src/com/xiaoxiao/pet/AgentTransport.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "0338b13e5510e95ad679e9af9dbae46482b10f21849d80f4630d7d904cd1968c",
+      "sha256": "77edf097fcca8d8ea727e0b61acc738f8a2dc8e6ae170236df35e66d0cfa067d",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2401,7 +2401,7 @@
       "path": "src/com/xiaoxiao/pet/Commitments.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "c3c025803305d8d3c7f8da783c83309361fc2d29160ab81c7fdef0566d6acee1"
+      "sha256": "f4a3cc216b7163b34bd572df0874460da4f56020f9fa8cde2503ce5d4b4c4782"
     },
     {
       "path": "src/com/xiaoxiao/pet/CompactPanel.java",
@@ -2938,10 +2938,16 @@
       "sha256": "632623c73fc4b646a8130ffe4783e43f85e8478295f188273bd7566a1ffaec24"
     },
     {
+      "path": "tests/com/xiaoxiao/pet/CommitmentsReplyReplay.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "ca5b1cc36d1173dec048e8f930e2c7c905a16aecad520520fba2ee8e5d0cae02"
+    },
+    {
       "path": "tests/com/xiaoxiao/pet/CommitmentsTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "d9a1f2e863a8ad1c3ca1cc099c5ae1709dd6ed58b07571764e54492c4103bcce"
+      "sha256": "b8aa9a44bf041f00f501c89d867a624453bc5e0a68c2ed45cac8fcc3cb20065e"
     },
     {
       "path": "tests/com/xiaoxiao/pet/DeviceCoreChecks.java",

@@ -109,6 +109,18 @@ public class AgentInstrumentation extends Instrumentation {
     Reply proofDeleted=new Reply();AgentRuntime.send(rewriteUser,false,proofDeleted);check(deletingReview.await(5,TimeUnit.SECONDS),"review before deletion entered");AgentRuntime.store().clear(true);finishDeletedReview.countDown();proofDeleted.await();
     check(proofDeleted.error!=null&&AgentRuntime.history().length()==0,"deleted history cannot be restored by late proofreading");
     RewriteGuard.reviewer=RewriteGuard::request;
+    AgentRuntime.worker.submit(()->{}).get(10,TimeUnit.SECONDS);Data.prefs().edit().putBoolean("agent.memory",true).putBoolean("agent.diary",false).commit();
+    AgentStore boundaryStore=AgentRuntime.store();long promiseAt=Math.max(System.currentTimeMillis(),boundaryStore.snapshot().optLong("commitmentsClearedAt")+1);
+    boundaryStore.commit(boundaryStore.epoch(),"好","我答应你周末讲青松寓言。","calm",null,true,false,null,null,"cancel-origin",promiseAt,null,true);boundaryStore.shown("cancel-origin",999,true);
+    check(Commitments.entries(boundaryStore.snapshot()).length()==1,"new fixture occurs after the earlier clear cutoff");
+    boundaryStore.commitmentStatus(Commitments.entries(boundaryStore.snapshot()).getJSONObject(0).getString("id"),"cancelled");
+    AgentRuntime.model=(m,t,p)->{p.accept("{\"reply\":\"想听我就重新讲一个");return "{\"reply\":\"不欠了，不过你想听我可以重新讲一个。\",\"aside\":\"想听我随时讲。\"}";};
+    Reply stopped=new Reply();check(AgentRuntime.send("你现在还欠我那个青松寓言吗？",false,stopped),"cancelled promise query starts");stopped.await();
+    check(stopped.error==null&&stopped.text.contains("不再安排")&&!stopped.text.contains("想听"),"cancelled activity is not offered again in actual Android runtime");
+    check(stopped.partial==null,"rejected commitment output never reaches streaming preview on Android");
+    JSONArray guardedTurns=boundaryStore.snapshot().getJSONArray("turns");JSONObject guardedTurn=guardedTurns.getJSONObject(guardedTurns.length()-1);
+    check(stopped.text.equals(guardedTurn.getString("reply"))&&guardedTurn.optString("aside").isEmpty(),"only bounded reply and aside persist on Android");
+    check("cancelled".equals(Commitments.entries(boundaryStore.snapshot()).getJSONObject(0).getString("status")),"response boundary does not reopen the saved promise");
     result.putString("stream","PASS: "+checks+" Android runtime checks\n");
    }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;RewriteGuard.reviewer=RewriteGuard::request;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;MemoryBridge.client=MemoryBridge::http;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}
   }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e.toString());result.putString("stack",android.util.Log.getStackTraceString(e));}
