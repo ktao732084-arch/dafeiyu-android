@@ -213,3 +213,12 @@ Gomoku.java（自由规则、入门棋形策略）、GomokuStore.java（棋谱/�
 ### 自建问题反馈（2026-10-30，PR #27）
 
 客户端入口、WebView、随机安装身份及系统图片选择回调沿用 `feature/feedback` 的 `381e743`，按用户要求替换兔小巢登录与域名规则。服务端借鉴该分支早期 `4702c2e` 的 HTTPS 中转部署布局、字段边界和反馈限流思路，改为本项目实现的私有 SQLite 反馈页，不复制 GitHub Token 中转路径。新增服务、前端页面、去重/身份隔离及管理/备份脚本均为本项目实现。截图解码使用 [Pillow](https://github.com/python-pillow/Pillow)（requirements 固定版本，许可随该依赖发布）；没有引入其他桌面、视觉或未来能力代码。
+
+## 桌面气泡、点击与提起互动（同批未发布）
+
+`PetBubbles.java` 和 `LiftInteraction.java` 为本项目新增：独立逐句气泡及持续提起状态；在原 `PetService`、`PetMenu`、`ActionPlan`、`AlphaVideo`、`TouchReply` 和 `AgentRuntime` 上接线。复用现有拖拽悬空视频 `assets/main/093.mp4` 及其原有素材归属，不增加第三方运行库、不替换动画素材。`BubbleInstrumentation`、`LiftInstrumentation` 和相关核心/框架测试为受控验证工具。范围与结果见 `docs/PET_BUBBLES.md`、`docs/PET_LIFT.md`。
+
+
+后续同批新增 `WaistLiftView.java` 与 `assets/main/waist-lift-v1.png`：依据手势按下部位，在头部视频与后腰悬吊姿态之间选择；PNG使用内置image_gen参考原角色图生成，应用以网格与摆动呈现动画。原106段视频未修改。素材生成记录见 `docs/WAIST_LIFT_ASSET.md`，交互验收见 `docs/WAIST_LIFT.md`。
+
+`SuspensionMotion.java` 为本轮新增的二维阻尼悬吊反馈，配套 Android ART 数值测试；`LiftInteraction` 增加默认视频的进入/退出混合与生命周期清理。验收与录像范围见 `docs/WAIST_LIFT.md`。

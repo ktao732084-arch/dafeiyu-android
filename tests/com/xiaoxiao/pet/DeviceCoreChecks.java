@@ -15,6 +15,7 @@ public final class DeviceCoreChecks {
         System.out.println("Android core audit: "+System.getProperty("java.vm.name")+"; SDK "+android.os.Build.VERSION.SDK_INT);
         run("core",()->AgentCoreTest.main(new String[]{root+"/core"}));
         run("physics",()->MotionEngineTest.main(new String[0]));
+        run("suspension physics",()->SuspensionMotionTest.main(new String[0]));
         run("API addresses",()->ApiEndpointTest.main(new String[0]));
         run("actions",()->ActionPlanTest.main(new String[0]));
         run("history and segments",()->ReplyHistoryTest.main(new String[0]));

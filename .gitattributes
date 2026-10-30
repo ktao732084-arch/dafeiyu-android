@@ -9,3 +9,6 @@
 *.png -text
 *.jpg -text
 *.webp -text
+
+# Feedback deploy scripts are executed by Linux even when checked out on Windows.
+deploy/feedback/** text eol=lf

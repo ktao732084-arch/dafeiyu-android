@@ -8,7 +8,7 @@
       "path": ".gitattributes",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "917535508726abbe6359f6e82cdb94923868a0e93cb5ecf535c4a24d928c489e"
+      "sha256": "deccf1f442f619d06c24cdb7eedcd43039d9a5815a0a563093242c34281fbad2"
     },
     {
       "path": ".github/workflows/check.yml",
@@ -36,7 +36,7 @@
       "path": "ASSET_LICENSE.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "3bdf8415be9d95d07feef760cf74c131c3e846e71bf4c144963a507c7e504807"
+      "sha256": "e9abbc5b32b1e9ad8bf5f3bed39c4d4e7fd664ff0bed8362f7943d34cc8cbe8d"
     },
     {
       "path": "AndroidManifest.xml",
@@ -51,7 +51,7 @@
       "path": "CHANGELOG.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "99f9ab04753764484d38bc1b70c6efa1547f7db2c7d38ff996156aa1ee3c354e"
+      "sha256": "5fc1650d8b1930ff310887820f95fbf5190ca56bd304178c81def2c8444090dc"
     },
     {
       "path": "LICENSE",
@@ -78,14 +78,14 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/README.md",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "c3a05d1ed9d99d6ab966ebd55d289e384d8cb734",
-      "sha256": "9bb264768acc74cc9147729bb3ae893f724667a634c01beb50a98b94639883da",
+      "sha256": "adbd6e8f86837ba8d8127ab144c3eb24d5ead2adf78c045ebfe2c96af92d6636",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
       "path": "SOURCE_MAP.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "e06ce2d5b84887281eef04d2219baa07f9c47fd79ee16587bee154c5bee90212"
+      "sha256": "30acdb30c41a8610ecd414a2d5d6b65f4e960bbd16852200c3de6323ac12a9e8"
     },
     {
       "path": "THIRD-PARTY-LICENSE.txt",
@@ -1188,6 +1188,12 @@
       "upstream_asset_project": "https://github.com/PC2005-cloud/dsh-pet"
     },
     {
+      "path": "assets/main/waist-lift-v1.png",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "201880773edf0484eb635ba4e63bcbfbcda301b8d8c9d3eed07d321f78a2a971"
+    },
+    {
       "path": "assets/persona-default.txt",
       "relationship": "persona-adaptation",
       "direct_source": "https://github.com/ERUIHNIYHBKBNF/dafeiyu-persona/blob/5b08af8353fcfcc1378ea73f33686d669d61703f/dafeiyu/SKILL.md",
@@ -1404,7 +1410,7 @@
       "path": "docs/CHAT_HISTORY.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "13931e19574c9a909714b476d85c3afab9d5061ac616cda053682fd8aa82031c"
+      "sha256": "68b862d50e1208f40f4958da48810e46a5384320535d6888853f18ac93e860e9"
     },
     {
       "path": "docs/CHAT_PRESENTATION_ACCEPTANCE.md",
@@ -1446,7 +1452,7 @@
       "path": "docs/GOMOKU.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "f50e3554a7d17ae49778800c5cec4bd587cada7547924a23d18e3bfb07d8e28c"
+      "sha256": "39de281fe1433fb32b43aaee510d8daf5c2e3e1c36c0c534e71ced5357e340e2"
     },
     {
       "path": "docs/GROWTH_DESIGN.md",
@@ -1491,6 +1497,24 @@
       "sha256": "4788884626058a516b57a940e48a63347fa6a4116c24f82fce49b24d79afe8fd"
     },
     {
+      "path": "docs/PET_BUBBLES.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "696130c08b0ce177a60f087102c5892c0d85b75376af0b837d9981e45c5a5994"
+    },
+    {
+      "path": "docs/PET_INTERACTION_INTEGRATION.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "a72e1ee66916a9b0e5dff2a673687a06e29ce391bed375b6d9db84b97d5f0c2e"
+    },
+    {
+      "path": "docs/PET_LIFT.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "ffb364fb5abd70e9111da1d28788f632781e3754c0dbb52d11975720417187c2"
+    },
+    {
       "path": "docs/PROACTIVE_COMPANION.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1530,13 +1554,13 @@
       "path": "docs/TOUCH_CHAT_VISIBILITY.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "7e55bb2b45286151ffe05de3b576fa089f6694ff124b54f31fffd6ed971aa609"
+      "sha256": "e99932ceafce501ba17e1f8f2107e01f215f32008d3205bb4fa01858a34a6afd"
     },
     {
       "path": "docs/TOUCH_REPLIES.md",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "b7924f5e0dbad0cedecf428bfde3e0d0515e714e02d17c0e409d338a8ee66150"
+      "sha256": "0299893146033f4b943644bc9e974c8a1be75cac0d96bdcfa30f7f009d8067ea"
     },
     {
       "path": "docs/TOUCH_REPLY_ACCEPTANCE.md",
@@ -1639,6 +1663,18 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "5c9855a53916f973c5cb82c56572452d0a060fe921dc910ee74554c1f62f0bf3"
+    },
+    {
+      "path": "docs/WAIST_LIFT.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "112e23af29dd1859b12965f9f19065e0ed9c7e30bb166f46938cedbba17791b5"
+    },
+    {
+      "path": "docs/WAIST_LIFT_ASSET.md",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "2f2e8c5300714c5710bd28c454304ac5ac9da010c986afe24cfbc04e1a465bc4"
     },
     {
       "path": "docs/native-rules-source.json",
@@ -1813,6 +1849,12 @@
       "sha256": "d4eacc85b321f7612777b9d9add3c68e21f506c0d3832cc64cca59c572575587"
     },
     {
+      "path": "instrumentation/BubbleInstrumentation.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "a1ffa07cb46553363c121302ea0638a982aaa4ca6983f30a5a9bb467e39e491c"
+    },
+    {
       "path": "instrumentation/ChatPresentationInstrumentation.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
@@ -1840,7 +1882,13 @@
       "path": "instrumentation/HeroPetInstrumentation.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "be5d3bee791052a5612e014a6ec61a9000b760ef2b77494528d8727881125de8"
+      "sha256": "81560dc8253ee279ac1c6d92eb05b1f8fbbd360fee30a78b8c2d9c602825fcd9"
+    },
+    {
+      "path": "instrumentation/LiftInstrumentation.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "665db107f9f0136a182462d62b3b0e5ab64b52746e2e88157c36ca0953b954d0"
     },
     {
       "path": "instrumentation/PersonaChecks.java",
@@ -1891,10 +1939,16 @@
       "sha256": "9fce06517b07be5240091420a2d59487d94d94d49db42b08d1b822f4c1fe474e"
     },
     {
+      "path": "instrumentation/WaistLiftInstrumentation.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "8b0941b23d9056522bf5a2b03c66ffdb5095842066a381b3558d8dec3b29bbb9"
+    },
+    {
       "path": "instrumentation/build-isolated-tests.ps1",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "2a4a4d8acc02bb85b692c54921c49fce3d0e1007430c94bb439c4b25f1d4e0f0"
+      "sha256": "6c82f719f1b92b537f46050b701def82ef5a4a36f16d9f2ea78f60d785903374"
     },
     {
       "path": "instrumentation/build-tests.ps1",
@@ -2322,7 +2376,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "757647eb40435960d7fe9f47b3f9465a859018fa0e78b13af656809fc1571014"
+      "sha256": "93009b0107054c7d3710f222266e7cd78b84b0f80eacc07bb642229606dcf6c1"
     },
     {
       "path": "src/com/xiaoxiao/pet/ActionSheet.java",
@@ -2337,7 +2391,7 @@
       "path": "src/com/xiaoxiao/pet/AgentPanel.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "ca2520bae7975d1880f332050445312788874ade9362d95b58f749a9941f4862",
+      "sha256": "2e09926516bcf641b8d0b20e0c41145212315e6b1ea88f1b714fa4c29903a830",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2367,7 +2421,7 @@
       "path": "src/com/xiaoxiao/pet/AgentRuntime.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "0ed765bb12530ebf1eaa880c01478e107409d6a8bbc404f73562bac33f140de1",
+      "sha256": "411ed3d2fff09020d131bf58c0f95eef90ed773e0e53244038f8548fa4024788",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -2399,7 +2453,7 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/AlphaVideo.java",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "aba95b5e0e981cd82ba8d1feb5db3bbb8b2dfe17",
-      "sha256": "cd6e37b6a873d2da7809d4e5c549cd095ab492b12bb334369e1de42248475649",
+      "sha256": "efd5da09b59464d76ba215f698fc75b8965f954e1b9756aaa25b55327a2d732c",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
@@ -2663,6 +2717,12 @@
       "sha256": "139fd7a81dc0d1e1c36d17a4b35015447ed940c5b02f9390f17f71e695a35f42"
     },
     {
+      "path": "src/com/xiaoxiao/pet/LiftInteraction.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "9a044e0ebb4d301451147513c3c29681a279ce2f8521d1f3199c984b4f19cd42"
+    },
+    {
       "path": "src/com/xiaoxiao/pet/MainActivity.java",
       "relationship": "adapted",
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/MainActivity.java",
@@ -2723,7 +2783,7 @@
       "path": "src/com/xiaoxiao/pet/ModelSetup.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "6bd13464952cd2fe8f1a38039adfc3b5d5cfae021daa21fcfa7c759ea0ee5f2e"
+      "sha256": "69aaf9f73ba8eb1e33553d8c8c9d12fba4d24be1e926e6c8434a0c8b5b04910e"
     },
     {
       "path": "src/com/xiaoxiao/pet/MotionEngine.java",
@@ -2808,12 +2868,18 @@
       "sha256": "3b97a5a005952af1a651aa6a98f9b4123d34d7ccbfafbdb16a38aeaa1775e5ee"
     },
     {
+      "path": "src/com/xiaoxiao/pet/PetBubbles.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "bd14473e8070f94edc82c1327244d731d8facc91fb5c61a600fda19910c7baa1"
+    },
+    {
       "path": "src/com/xiaoxiao/pet/PetMenu.java",
       "relationship": "adapted",
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/PetMenu.java",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "e8ecb1b64ddb34aa42d87ab02298e7b1f9baf15c",
-      "sha256": "04a1117b373f36fa4a5c004caa7ef924953931faa011b3d2bfffd996cc9025f1",
+      "sha256": "3f2e753bb3f215eb98294fe1b9a05d6b595b361bf52604a4d20de6090923f397",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
     },
     {
@@ -2822,7 +2888,7 @@
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/src/com/xiaoxiao/pet/PetService.java",
       "source_commit": "ccdeb610972723ad11e9b4d4794292be138d21b6",
       "source_blob": "d07c4c284c5ce664dc28768d11499529d80a50cb",
-      "sha256": "317289fc75783fc6b23b617b04f812ec41b00bb7d8f528af41f1d1ac9d604f99",
+      "sha256": "7f493a784149cf9dbca93f7df703636617f144b836ed3f2740900542df35ceee",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
@@ -2858,7 +2924,7 @@
       "path": "src/com/xiaoxiao/pet/ReplySegments.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "3f8613b81dc8e0fbb0f528103f71b5483eb2423a9da4f4ef406feac31e67f328"
+      "sha256": "91032268121e36f3d6ae22f4ddc8a456661569a7f8e8529aac0d20866b12ef97"
     },
     {
       "path": "src/com/xiaoxiao/pet/RewriteGuard.java",
@@ -2891,7 +2957,7 @@
       "path": "src/com/xiaoxiao/pet/SpeechQueue.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "4fdd28fe012a485265ef78a7aba3a0d1243c1cf7bf67fd6d88491826d3a86856"
+      "sha256": "6ce58aaeb0feb5414846355a06a5486f1c7ea8790f1044a114a2cad975033de2"
     },
     {
       "path": "src/com/xiaoxiao/pet/SpringScrollView.java",
@@ -2901,6 +2967,12 @@
       "source_blob": "190b8f5980c42117b0c1243ca8139a9d972fd304",
       "sha256": "643423b2bc463ce9071ebc3cf9e6957913194e2c48715e19a013e9b1fcab93ba",
       "license_scope": "MIT code/documentation notice retained; resource-specific exceptions take precedence"
+    },
+    {
+      "path": "src/com/xiaoxiao/pet/SuspensionMotion.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "9bf638ccbb78431abdd4ade8a651ce2f99860ad27b84c357618242936d3f0d30"
     },
     {
       "path": "src/com/xiaoxiao/pet/SwitchRow.java",
@@ -2915,7 +2987,7 @@
       "path": "src/com/xiaoxiao/pet/TouchReply.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "893730833636628d4bbda9d5df098eb5eedc6ca927835f444b94d45e75e25a2a"
+      "sha256": "813a11f06ce757011b3779cb67f6244eb426e5d38d459a24b0f8041710b2e859"
     },
     {
       "path": "src/com/xiaoxiao/pet/UiMotion.java",
@@ -2969,6 +3041,12 @@
       "sha256": "84028961f3f3d56e385a25666eed602e3e1ebba1e4c7e35700671695b035c289"
     },
     {
+      "path": "src/com/xiaoxiao/pet/WaistLiftView.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "de9176dd7446969dee2bf4bf8bebf85f7aaa9d11f529bf24811b4bbcd98402ce"
+    },
+    {
       "path": "tests/check_action_return.py",
       "relationship": "copied",
       "direct_source": "https://github.com/yshuang722-spec/xiaoxiao-zhuochong/blob/ccdeb610972723ad11e9b4d4794292be138d21b6/android/tests/check_action_return.py",
@@ -2985,7 +3063,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "319af6966e559d9d5afadddbee2aaac0cd1cb5c8610470e28811a003c462a94c"
+      "sha256": "378c1c8a0b79694dd4f5f5a4153bed0e9f3bb83075f29e73bfe08880c238b628"
     },
     {
       "path": "tests/com/xiaoxiao/pet/AgentCoreTest.java",
@@ -3049,7 +3127,7 @@
       "path": "tests/com/xiaoxiao/pet/DeviceCoreChecks.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "bb78de3a65797266e0c667bf8da8f4e0a11fad952d1e18be6133dcb3bc7df6c0"
+      "sha256": "a59bdcb347b7adda0c9fbe2cce772125e9d07cd044a41cae269d71c6ac431a1e"
     },
     {
       "path": "tests/com/xiaoxiao/pet/DiaryTest.java",
@@ -3130,7 +3208,7 @@
       "path": "tests/com/xiaoxiao/pet/ReplyHistoryTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "67004cd55a84f1240087a25065eb208a1319cccc87fa7cabf797b632455a1c6c"
+      "sha256": "eeabef14a77d33f398a51ff72e351ba4e48f8c33e72090d742dc1a9d542a7cff"
     },
     {
       "path": "tests/com/xiaoxiao/pet/RewriteGuardTest.java",
@@ -3155,6 +3233,12 @@
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
       "sha256": "ef4aa12251db62e4a303dd87c271abd5a24f4b4c7e813adc81924cf69854f6d5"
+    },
+    {
+      "path": "tests/com/xiaoxiao/pet/SuspensionMotionTest.java",
+      "relationship": "project-added",
+      "direct_source": "This project, AI-assisted integration and implementation",
+      "sha256": "95374c30cff53b7517720b5cc4c9e5c60da9e1157da8d1cf14638d585cd2eb46"
     },
     {
       "path": "tests/com/xiaoxiao/pet/TouchReplyTest.java",
@@ -3296,7 +3380,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/ModelSetupTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "44d2936a7ab3f7e9aba1c28305389ac6e0f3c4b31afcd5e3b4f54f3d83a9c293"
+      "sha256": "879a8b2be74b87dce0883faac30208cd57463ce378caaa92a2fd8f42a6706eb7"
     },
     {
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/NativeMemoryTest.java",
@@ -3344,7 +3428,7 @@
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/TouchReplyRuntimeTest.java",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "a9056cde7e90ba085fd311f42f494d9e9635da4d6ae899b2659545ecc5423cc7"
+      "sha256": "793e178cc1b74b7aaf179377cfac3053f80dfb0aabbb35b54d6684c4bdd3ef39"
     },
     {
       "path": "tests/robolectric/src/test/java/com/xiaoxiao/pet/UiTest.java",
@@ -3390,7 +3474,7 @@
       "path": "tests/run-core.ps1",
       "relationship": "project-added",
       "direct_source": "This project, AI-assisted integration and implementation",
-      "sha256": "d3a643df626dace85972b33e9f5f0b7b97598fc37f82d31cb80a17496cf420c4",
+      "sha256": "7c2b57afeb7e0017b6543a1d3eb3b4b869262e8f0eef747ed7bbe4d908301f77",
       "integration_sources": [
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
@@ -3404,7 +3488,7 @@
         "https://github.com/ktao732084-arch/dafeiyu-android/commit/8e34e3322565b4c5769133a1f3e3f11604e44c2a"
       ],
       "integration_note": "Includes Claude-assisted optimization branch changes; adapted during native-memory merge. Original source attribution remains applicable.",
-      "sha256": "bee3986ea7c7b5292ef989753a18609f617359170fed801e76885642eb8828b8"
+      "sha256": "f643b624608020121028b1c2dd1fca9519f2fa3bde8d00679827453e505e076c"
     },
     {
       "path": "tests/run-regex-device.ps1",
