@@ -208,7 +208,23 @@ class Ocean:
         rng = random.Random(7)
         self.bubbles = [(rng.uniform(0, W), rng.uniform(0, H + 200), rng.uniform(3, 13),
                          rng.uniform(30, 90), rng.uniform(0, 6.28)) for _ in range(46)]
+        self.sprites = {}
         self.rays = [(rng.uniform(80, W - 80), rng.uniform(60, 160), rng.uniform(0, 6.28)) for _ in range(5)]
+
+    def bubble(self, k, r, fx, fy, ss=4):
+        """An antialiased bubble drawn at 4x and shrunk, offset by a quarter-pixel fraction so rising
+        bubbles glide instead of stepping a whole pixel at a time."""
+        key = (k, fx, fy)
+        if key not in self.sprites:
+            size = math.ceil(2 * r + 8)
+            big = Image.new('RGBA', (size * ss, size * ss), (0, 0, 0, 0))
+            d = ImageDraw.Draw(big)
+            cx, cy = (r + 3 + fx) * ss, (r + 3 + fy) * ss
+            R = r * ss
+            d.ellipse([cx - R, cy - R, cx + R, cy + R], outline=(200, 236, 255, 120), width=int(1.6 * ss))
+            d.ellipse([cx - R * 0.45, cy - R * 0.6, cx - R * 0.05, cy - R * 0.2], fill=(230, 247, 255, 130))
+            self.sprites[key] = big.resize((size, size), Image.LANCZOS)
+        return self.sprites[key]
 
     def frame(self, t, depth):
         """depth 1 = the dark sea floor of the opening, 0 = near the surface."""
@@ -223,12 +239,14 @@ class Ocean:
         light = light.filter(ImageFilter.GaussianBlur(28))
         img.paste(light, (0, 0), light)
         bub = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-        d = ImageDraw.Draw(bub)
-        for x, y0, r, speed, phase in self.bubbles:
+        for k, (x, y0, r, speed, phase) in enumerate(self.bubbles):
             y = (y0 - t * speed) % (H + 200) - 100
             bx = x + math.sin(t * 1.3 + phase) * 10
-            d.ellipse([bx - r, y - r, bx + r, y + r], outline=(200, 236, 255, 110), width=2)
-            d.ellipse([bx - r * 0.45, y - r * 0.6, bx - r * 0.05, y - r * 0.2], fill=(230, 247, 255, 120))
+            left, top = bx - r - 3, y - r - 3
+            ox, oy = math.floor(left), math.floor(top)
+            sprite = self.bubble(k, r, round((left - ox) * 4) / 4, round((top - oy) * 4) / 4)
+            bub.alpha_composite(sprite, (ox, oy)) if 0 <= ox <= W - sprite.width and 0 <= oy <= H - sprite.height \
+                else bub.paste(sprite, (ox, oy), sprite)
         img.paste(bub, (0, 0), bub)
         if depth > 0:
             img = Image.blend(img, Image.new('RGB', (W, H), (2, 8, 22)), depth * 0.82)
@@ -578,8 +596,9 @@ def render(fonts, out_mp4, phone=(), beat=0.0):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--font-dir', required=True)
-    ap.add_argument('--preview-width', type=int, default=800)
-    ap.add_argument('--preview-fps', type=int, default=15)
+    ap.add_argument('--preview-width', type=int, default=720)
+    ap.add_argument('--preview-fps', type=int, default=24)
+    ap.add_argument('--preview-quality', type=int, default=60)
     ap.add_argument('--phone-dir', help='real-phone screen recordings, cut and placed after the title per --phone-cut')
     ap.add_argument('--phone-cut', default=PHONE_CUT)
     ap.add_argument('--out', default=OUT)
@@ -609,11 +628,18 @@ def main():
     os.remove(silent)
     os.remove(wav)
     cover.convert('RGB').save(os.path.join(out, 'cover.png'), optimize=True)
-    # Animated WebP rather than GIF: a GIF of the same cut is three times the size and banded.
+    # Animated WebP rather than GIF: a GIF of the same cut is three times the size and banded. Encoded with
+    # Pillow (libwebp's WebPAnimEncoder): ffmpeg's libwebp_anim leaves stale dark blocks from the opening
+    # sea in later frames.
     preview = os.path.join(out, 'dafeiyu-promo.webp')
-    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', mp4, '-vf',
-                    f'fps={args.preview_fps},scale={args.preview_width}:-1:flags=lanczos',
-                    '-c:v', 'libwebp_anim', '-quality', '62', '-compression_level', '6', '-loop', '0', preview], check=True)
+    pw = args.preview_width
+    ph = round(pw * H / W / 2) * 2
+    raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', mp4, '-vf', f'fps={args.preview_fps},scale={pw}:{ph}:flags=lanczos',
+                          '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'], capture_output=True, check=True).stdout
+    n = pw * ph * 3
+    frames = [Image.frombuffer('RGB', (pw, ph), raw[i:i + n]) for i in range(0, len(raw) - n + 1, n)]
+    frames[0].save(preview, save_all=True, append_images=frames[1:], duration=round(1000 / args.preview_fps),
+                   loop=0, quality=args.preview_quality, method=4)
     for p in (mp4, preview, os.path.join(out, 'cover.png')):
         print(p, round(os.path.getsize(p) / 1e6, 2), 'MB')
 
