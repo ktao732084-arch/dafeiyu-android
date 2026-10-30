@@ -42,7 +42,7 @@ public final class ScenarioEval {
    }}
   JSONArray turns=sc.getJSONArray("turns");
   for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i);long now=t0+t.getLong("minutes")*60000;String user=t.getString("user");
-   PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona=PersonaManager.presetPrompt(style);in.guidance=PersonaManager.guidance(style);in.signature=style.signature;
+   PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona=PersonaManager.presetPrompt(style);in.guidance=PersonaManager.guidance(style);in.style=style;in.signature=style.signature;
    in.timeZone=ZoneId.systemDefault().getId();in.now=now;in.initializedAt=t0-21*86_400_000L;in.remember=true;in.diary=true;in.feeling=db.mood(now);in.mood=in.feeling.optString("emotion","calm");in.games=games(games,outcomes,now);
    if(last[0]!=null){in.lastEvent=last[0];in.lastEventAt=lastAt[0];}
    // Older builds have neither input: set them only where they exist, so baselines run unchanged.
