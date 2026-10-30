@@ -1,0 +1,139 @@
+{
+  "version": "0.4.9.4",
+  "version_code": 18,
+  "apk_sha256": "f1956ac9c546b3a2c5fc98206896c3f04ff50d274494a6b62cc6133295f6542d",
+  "apk_size": 91558344,
+  "framework_unique_passed": 145,
+  "framework_failed": 0,
+  "framework_failed_final_reports": 0,
+  "framework_skipped": 0,
+  "final_build_framework_rechecked": 145,
+  "framework_suites": [
+    {
+      "suite": "com.xiaoxiao.pet.ChatPolishTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.CompanionBehaviorTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.ConversationTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.GomokuUiTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.GrowthUiTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.HistoryRecallIntegrationTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.InitiativeRuntimeTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.MemoryIntegrationTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.ModelSetupTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.NativeMemoryTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.TouchReplyRuntimeTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.UiTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.UpdateTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.xiaoxiao.pet.UsabilityUiTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "android_art_core_suites": 19,
+  "android_runtime_instrumentation_checks": 61,
+  "android_touch_checks": 12,
+  "android_chat_presentation_checks": 36,
+  "history_checks": 635,
+  "gomoku_checks": 530,
+  "growth_checks": 3596,
+  "character_checks": 217,
+  "update_checks": 30,
+  "release_sync_checks": 18,
+  "release_prepare_checks": 7,
+  "live_smoke": {
+    "device": "MuMu emulator-5554 / Android15 API35 x86_64",
+    "upgrade": "Signed final 0.4.9.4/code18 installed with -r over local 0.4.9.3/code17. Existing conversations and configured state retained; no data clear or uninstall.",
+    "chat": "Original user history visibly reflowed into natural short bubbles. Synthetic score/invitation checks passed in portrait and landscape.",
+    "touch": "Three real touch events produced one controlled model reply in the real product overlay, with display receipt; switch-off stopped further requests."
+  },
+  "distribution": {
+    "method": "release.ps1 -Publish, final verification required",
+    "github": "v0.4.9.4",
+    "domestic_manifest": "https://81.70.79.133/dafeiyu-updates/stable.json"
+  },
+  "limits": [
+    "Controlled model checks; no new real-provider quality evaluation.",
+    "Android15 emulator only, not a physical-phone matrix.",
+    "Gomoku invitation detection is conservative local phrasing; ambiguous wording can use the home entry.",
+    "Established native memory baseline retains 21 known unmet assertions; no new improvement is claimed."
+  ]
+}
