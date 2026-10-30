@@ -129,9 +129,9 @@ final class AgentRuntime {
             long epoch=db.epoch();List<JSONObject> turns=db.dayTurns(day,zone);if(turns.isEmpty())return;JSONObject before=db.snapshot();
             // The same call is her slow loop: besides the diary it may add, confirm or retire her understanding of the user.
             JSONObject games=null;try{games=GomokuPage.store().context();}catch(Exception unavailable){}
-            String raw=AgentTransport.request(ModelSettings.read(),Diary.request(day,turns,Data.name("main"),Understanding.offered(before),PersonaManager.diaryGuidance("main"),CharacterNow.experiences(before,games,day,zone)),new AgentTransport.Token(),partial->{},false,Diary.MAX_TOKENS);
+            String raw=AgentTransport.request(ModelSettings.read(),Diary.request(day,turns,Data.name("main"),Understanding.offered(before),PersonaManager.diaryGuidance("main"),CharacterNow.experiences(before,games,day,zone),Diary.feeling(before,day)),new AgentTransport.Token(),partial->{},false,Diary.MAX_TOKENS);
             String text=Diary.parse(raw);Understanding.Update update=Understanding.parse(raw,turns,before,day.toString());List<JSONObject> phrases=Phrases.parse(raw,turns,day.toString());
-            if(text!=null&&db.addDiary(epoch,Diary.entry(day,text,turns,System.currentTimeMillis()),update,phrases))Data.log("main","陪伴日记已写好："+day+(update.empty()?"":"，相处理解已更新"));
+            if(text!=null&&db.addDiary(epoch,Diary.entry(day,text,turns,System.currentTimeMillis(),Diary.feeling(raw)),update,phrases))Data.log("main","陪伴日记已写好："+day+(update.empty()?"":"，相处理解已更新"));
         }catch(Exception e){Data.log("main","陪伴日记暂未写成");}finally{writingDiary.set(false);}});
     }
     static boolean send(String user,boolean proactive,Listener listener) {

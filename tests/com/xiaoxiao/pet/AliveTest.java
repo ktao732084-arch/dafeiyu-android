@@ -5,6 +5,8 @@ import org.json.*;import java.io.File;
  * The 活人感 additions (docs/CHARACTER.md): her murmur beside the reply (小声嘀咕) is cleaned, saved with the turn,
  * asked for only when switched on, and carried in her history only for fully shown turns. Her day (HerDay) comes
  * only from clips that really played and real feeding, resets each day, and hunger is said only when the body grumbles.
+ * Her feeling about the relationship lately comes from the daily diary call, in words, carries on from the last one,
+ * fades after a week, goes with the chats it came from and only colours how she talks.
  * Usage: AliveTest <state directory>
  */
 public final class AliveTest {
@@ -14,6 +16,7 @@ public final class AliveTest {
  public static void main(String[] args)throws Exception{
   aside(args[0]);
   day(args[0]);
+  feeling(args[0]);
   System.out.println("PASS: "+checks+" alive checks");
  }
 
@@ -84,5 +87,29 @@ public final class AliveTest {
   check(PromptBuilder.build(in,"",true,db.snapshot(),null).toString().contains("你的今天（"),"and in a proactive turn, as something to share");
   check(!PromptBuilder.build(in,"帮我看看这份报告怎么写",false,db.snapshot(),null).toString().contains("你的今天（"),"not when the user is on something serious");
   in.historyRecall=new JSONObject().put("records",new JSONArray());check(!PromptBuilder.build(in,"昨天聊了什么",false,db.snapshot(),null).toString().contains("你的今天（"),"not for history questions");
+ }
+
+ static void feeling(String dir)throws Exception{
+  java.time.LocalDate today=java.time.LocalDate.of(2026,10,30),yesterday=today.minusDays(1);
+  // Asked for in the diary call, with the last feeling to carry on from; never as a score.
+  java.util.List<JSONObject> turns=java.util.Collections.singletonList(new JSONObject().put("id","f1").put("at",1_800_000_000_000L).put("user","你今天好可爱").put("reply","哼，那当然。"));
+  String req=Diary.request(yesterday,turns,"大肥鱼",new JSONArray(),"",new JSONArray(),"这两天话有点多").toString();
+  check(req.contains("feeling")&&req.contains("不用分数")&&req.contains("your_last_feeling")&&req.contains("这两天话有点多"),"the diary call asks for a feeling and carries the last one");
+  String plain=Diary.request(yesterday,turns,"大肥鱼",null).getJSONObject(0).getString("content");check(!Diary.request(yesterday,turns,"大肥鱼",null).getJSONObject(1).getString("content").contains("your_last_feeling")&&plain.contains(Diary.FEELING)&&plain.contains("\"feeling\":\"\""),"without a last feeling the field is still asked for: "+plain);
+  check(Diary.feeling("{\"diary\":\"今天被夸可爱了。\",\"feeling\":\"被夸了好几次，有点飘，说话可以更活泼\"}").equals("被夸了好几次，有点飘，说话可以更活泼"),"a feeling is parsed");
+  check(Diary.feeling("{\"diary\":\"x\",\"feeling\":\"好感度 80 分\"}").isEmpty()&&Diary.feeling("{\"diary\":\"x\",\"feeling\":\"心情 75%\"}").isEmpty(),"a score is not a feeling");
+  check(Diary.feeling("{\"diary\":\"x\"}").isEmpty()&&Diary.feeling("只是一句话").isEmpty()&&Diary.feeling(null).isEmpty(),"no field, no feeling");
+  check(Diary.feeling("{\"diary\":\"x\",\"feeling\":\""+"长".repeat(60)+"\"}").isEmpty(),"too long is dropped");
+  // Stored on the diary entry, the latest of the past week reaches the prompt, and it leaves with its chats.
+  AgentStore db=new AgentStore(new File(dir,"feeling"));
+  check(db.addDiary(db.epoch(),Diary.entry(today.minusDays(3),"聊了天气。",java.util.Collections.singletonList(new JSONObject().put("id","old").put("user","x")),1L,"有点生疏")),"older entry");
+  check(db.addDiary(db.epoch(),Diary.entry(yesterday,"今天被夸可爱了。",turns,2L,"被夸了好几次，有点飘")),"newer entry");
+  check(Diary.feeling(db.snapshot(),today).equals("被夸了好几次，有点飘"),"the latest feeling wins");
+  check(Diary.feeling(db.snapshot(),today.plusDays(9)).isEmpty(),"a feeling fades after a week");
+  PromptBuilder.Inputs in=new PromptBuilder.Inputs();in.persona="你是大肥鱼。";in.now=java.time.LocalDateTime.of(2026,10,30,12,0).atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();in.remember=true;in.diary=true;
+  String with=PromptBuilder.build(in,"在吗",false,db.snapshot(),null).toString();
+  check(with.contains("你最近对这段相处的感觉")&&with.contains("被夸了好几次，有点飘")&&with.contains("不影响你认不认真帮忙"),"the feeling colours how she talks, not whether she helps");
+  in.diary=false;check(!PromptBuilder.build(in,"在吗",false,db.snapshot(),null).toString().contains("这段相处的感觉"),"diary off: no feeling");
+  db.clearDiary();check(Diary.feeling(db.snapshot(),today).isEmpty(),"clearing the diary clears the feeling");
  }
 }

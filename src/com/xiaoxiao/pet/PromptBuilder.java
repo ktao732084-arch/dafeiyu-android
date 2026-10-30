@@ -88,6 +88,8 @@ final class PromptBuilder {
             if(due.length()>0){JSONArray quotes=new JSONArray();for(int i=0;i<due.length();i++)quotes.put(due.getJSONObject(i).optString("when")+"："+due.getJSONObject(i).optString("quote"));
                 background.append(proactive?"\n用户提过的、昨天或今天的事（可以自然关心一句进展或结果，只挑一件，不追问细节）：":"\n用户提过的近期安排（日期已换算，需要时自然想起，不必主动列出）：").append(quotes);}
             if(in.diary){JSONArray diary=Diary.context(s,user,today);if(diary.length()>0)background.append("\n你的日记（你自己写的概括，可能不准；与用户原话或记忆冲突时以它们为准）：").append(diary);}
+            // Her sense of the relationship lately, from her own diary: it colours how she talks, never whether she helps.
+            String lately=in.diary?Diary.feeling(s,today):"";if(!lately.isEmpty())background.append("\n你最近对这段相处的感觉（你自己在日记里写的）：").append(lately).append("。它只影响你说话的语气和分寸，不说出来，也不影响你认不认真帮忙；这一轮对方的表现优先。");
             if(in.diary&&in.understanding!=null&&in.understanding.length()>0)background.append("\n你对 TA 的相处理解（你根据以前真实的对话慢慢形成的，可能不准，seen_days 是得到印证的天数）：只用来拿捏语气、分寸和时机，不要把它当成事实说出来，也不要给 TA 贴标签；TA 这一次的表现和说法优先。").append(in.understanding);
             if(in.diary&&in.phrases!=null&&in.phrases.length()>0)background.append("\n对方常用的说法（从你们真实聊天里学来的口头禅或梗，when 是 TA 什么时候这么说）：合适时可以自然地用上一次，像朋友之间互相学来的口头禅；不用每句都用，也别刻意模仿。").append(in.phrases);
             JSONArray self=AgentStore.selfContext(s,user);if(self.length()>0)background.append("\n你以前说过的关于自己的话，保持一致：").append(self);
