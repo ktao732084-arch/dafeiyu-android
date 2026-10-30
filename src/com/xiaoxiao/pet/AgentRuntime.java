@@ -64,7 +64,7 @@ final class AgentRuntime {
             try{
                 AgentStore db=store();if(db.epoch()!=request.epoch){release(token);return;}token.check();
                 JSONArray messages=TouchReply.prompt(context("",true,db.snapshot(),null),request);
-                AgentReply reply=AgentReply.parse(model.generate(messages,token,ignored->{}));token.check();String text=TouchReply.text(reply.reply);
+                AgentReply reply=ReplyIntegrity.generate(progress->model.generate(messages,token,progress),token,ignored->{},false);reply.recoverAside(false);token.check();String text=TouchReply.text(reply.reply);
                 main.post(()->{
                     if(!current(token))return;
                     try{
@@ -169,9 +169,9 @@ final class AgentRuntime {
                     if(rememberEnabled()&&history==null){memoryPlan=MemoryBridge.evaluate(memoryConfig,contextState,new JSONArray(),user,observed,token);contextState=memoryPlan.state;recallHits=memoryPlan.hits;}
                     JSONArray request=context(user,proactive,contextState,recallHits,history);
                     RewriteGuard.Source rewrite=!proactive&&history==null?RewriteGuard.source(user):null;
-                    String raw=model.generate(request,token,partial->{if(rewrite!=null)return;String text=AgentPolicy.streamPreview(partial);if(!text.isEmpty())main.post(()->{if(current(token))listener.partial(text);});});
-                    result=AgentReply.parse(raw);
-                    if(rewrite!=null){result.reply=RewriteGuard.enforce(rewrite,result.reply,token);result.self=new JSONArray();}
+                    result=ReplyIntegrity.generate(progress->model.generate(request,token,progress),token,partial->{if(rewrite!=null)return;String text=AgentReply.preview(AgentPolicy.streamPreview(partial),AgentReply.literalMarkup(user));if(!text.isEmpty()&&!ReplyIntegrity.damaged(text,user.contains("\ufffd")))main.post(()->{if(current(token))listener.partial(text);});},user.contains("\ufffd"));
+                    result.recoverAside(AgentReply.literalMarkup(user));
+                    if(rewrite!=null){result.reply=RewriteGuard.enforce(rewrite,result.reply,token);ReplyIntegrity.validate(result.reply,user.contains("\ufffd"));result.self=new JSONArray();}
                     result.plan.ground(user,proactive);
                     if(history==null&&!result.plan.valid()&&!"busy".equals(result.plan.availability)&&(proactive||Data.prefs().getBoolean("agent.proactive",false))){
                         // One bounded repair, never an endless retry or an invented fifteen-minute choice.
@@ -179,7 +179,7 @@ final class AgentRuntime {
                         try{
                             request.put(new JSONObject().put("role","assistant").put("content",new JSONObject().put("reply",result.reply).toString()));
                             request.put(new JSONObject().put("role","user").put("content","应用格式补齐请求（不是新用户消息）：上条正文已收到，不改正文。请按系统要求返回完整JSON，必须有next_check_minutes整数、availability及其本轮用户原话依据、initiative、topic。当前缺少有效主动时间，请依据原用户消息和背景重新安排，不要填固定默认值。"));
-                            AgentReply repaired=AgentReply.parse(model.generate(request,token,ignored->{}));
+                            AgentReply repaired=ReplyIntegrity.generate(progress->model.generate(request,token,progress),token,ignored->{},user.contains("\ufffd"));
                             repaired.plan.ground(user,proactive);repaired.plan.repaired=true;
                             if(repaired.plan.valid()){repaired.plan.source="model_repair";result.plan=repaired.plan;}
                         }catch(Exception repairFailed){token.check();result.plan.repaired=true;}
