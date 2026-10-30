@@ -13,6 +13,20 @@ final class AgentPolicy {
      * of continuity, not an appraisal engine: the cause is her reading of this turn, never a memory.
      */
     static final int MOOD_FADE_MINUTES=40;
+    /** Carrying a mood never restarts its fade clock. Older models may change type, not refresh the same type. */
+    static void carryMood(JSONObject next,JSONObject previous,String proposed,int strength,String cause,Boolean changed,String turn,long now,boolean remember)throws Exception {
+        String emotion=emotion(proposed);boolean had=previous.optLong("emotionAt")>0;
+        boolean keep=had&&(Boolean.FALSE.equals(changed)||changed==null&&emotion.equals(emotion(previous.optString("emotion"))));
+        if(keep){for(String key:new String[]{"emotion","emotionAt","moodLevel","moodCause","moodSource"}){if(previous.has(key))next.put(key,previous.get(key));else next.remove(key);}}
+        else{
+            if(Boolean.FALSE.equals(changed))emotion="calm";
+            next.put("emotion",emotion).put("emotionAt",now).put("moodLevel",strength>=1&&strength<=3?strength:1);
+            String clean="calm".equals(emotion)?"":moodCause(cause);
+            if(clean.isEmpty())next.remove("moodCause");else next.put("moodCause",clean);
+            if("calm".equals(emotion))next.remove("moodSource");else next.put("moodSource",turn);
+        }
+        if(!remember){next.remove("moodCause");next.remove("moodSource");}
+    }
     static String moodName(String emotion){switch(emotion(emotion)){case "happy":return "开心";case "shy":return "害羞";case "curious":return "好奇";case "concerned":return "担心";case "playful":return "想闹一闹";case "sleepy":return "犯困";default:return "平静";}}
     static int moodLevel(Object value){int n=value instanceof Number?((Number)value).intValue():0;if(value instanceof String)try{n=Integer.parseInt(((String)value).trim());}catch(NumberFormatException e){n=0;}return n>=1&&n<=3?n:0;}
     static String moodCause(String value){
@@ -72,6 +86,19 @@ final class AgentPolicy {
         return open>=0&&close>open&&text.indexOf("\"reply\"",open)>open?text.substring(open,close+1):null;
     }
     /** What the bubble may show while streaming: the reply field, or plain text when the model ignored JSON. */
+    static final int ASIDE_MAX=30;
+    /**
+     * Her murmur (docs/CHARACTER.md, 小声嘀咕): one short line beside the reply, or "" when there is none, it is
+     * too long, repeats the reply, carries a channel label or something sensitive. Markdown italics and brackets
+     * the model may wrap it in are removed; the app renders it small and in italics itself.
+     */
+    static String aside(Object value,String reply){
+        if(!(value instanceof String))return "";
+        String t=((String)value).replaceAll("[\\p{Cntrl}\\s]+"," ").trim().replaceAll("^[*_（(「“\"]+|[*_）)」”\"]+$","").trim();
+        int n=t.codePointCount(0,t.length());if(n<2||n>ASIDE_MAX||sensitive(t)||!replyText(t).equals(t))return "";
+        String bare=t.replaceAll("[\\p{P}\\s~～…]+","");if(bare.isEmpty()||reply!=null&&reply.replaceAll("[\\p{P}\\s~～…]+","").contains(bare))return "";
+        return t;
+    }
     static String replyText(String text){return text.replaceFirst("(?i)^(?:\\s*\\[(?:tool|assistant)\\]\\s*)+","");}
     static String streamPreview(String raw) {
         String text=raw.replaceAll("(?s)<think>.*?</think>","").trim();
@@ -129,8 +156,15 @@ final class AgentPolicy {
         if(brackets>=3)notes.add("最近括号里的动作描写多了，这次不用或只用一处。");
         if(length/n>140)notes.add("最近回复偏长，日常闲聊一到三句就好。");
         if(emoji>=3)notes.add("表情符号用得多了，这次少用。");
+        // Handing every turn back with a question, and stock comfort, are what make a reply read like an assistant.
+        int asked=0;for(int i=Math.max(0,n-3);i<n;i++)if(asks(replies.get(i)))asked++;
+        if(asked>=2)notes.add("最近几句都用问句收尾，这次说完自己的话就停，不用再问对方。");
+        for(String stock:STOCK){int used=0;for(String r:replies)if(r.contains(stock))used++;if(used>=2){notes.add("「"+stock+"」这类安慰的套话最近说过了，这次换成具体的反应。");break;}}
         return notes;
     }
+    static final String[] STOCK={"听起来","我在这儿","我在这里","我在呢","抱抱","辛苦了","你已经很棒","我理解你","我懂你","别太累"};
+    /** A reply that ends by handing the turn back with a question, ignoring trailing tildes, ellipses and brackets. */
+    static boolean asks(String reply){String t=reply.trim().replaceAll("[～~…。）)\\s]+$","");return t.endsWith("？")||t.endsWith("?");}
     /** A 3–6 character phrase (not mere punctuation) that appears in at least three of the replies. */
     static String catchphrase(List<String> replies) {
         String best=null;for(Map.Entry<String,Integer> e:phrases(replies).entrySet())if(e.getValue()>=3&&(best==null||e.getKey().length()>best.length()))best=e.getKey();

@@ -26,6 +26,8 @@ final class ActionPlan {
         boolean lunar(int month,int fromDay,int toDay){ return !leapMonth && lunarMonth==month && lunarDay>=fromDay && lunarDay<=toDay; }
         boolean solar(int month,int fromDay,int toDay){ return time.getMonthValue()==month && time.getDayOfMonth()>=fromDay && time.getDayOfMonth()<=toDay; }
         boolean weekend(){ DayOfWeek d=time.getDayOfWeek(); return d==DayOfWeek.SATURDAY||d==DayOfWeek.SUNDAY; }
+        /** Meal times when an unfed whale grumbles on screen; HerDay says so in words at the same times. */
+        boolean peckish(){ return between(11,0,11,30)||between(15,0,16,30)||between(17,0,17,30); }
         boolean night(){ return between(0,0,6,0); }
         boolean late(){ return between(22,30,24,0); }
     }
@@ -213,7 +215,7 @@ final class ActionPlan {
             if(m.between(8,0,22,30)) add(pools,weights,festival(m),3,now);
             add(pools,weights,slot(m),m.late()?6:4,now);
             if(m.between(8,0,22,30)) add(pools,weights,season(m),1,now);
-            if(hungry&&(m.between(11,0,11,30)||m.between(15,0,16,30)||m.between(17,0,17,30))) add(pools,weights,HUNGRY,3,now);
+            if(hungry&&m.peckish()) add(pools,weights,HUNGRY,3,now);
             if(fedAt>0&&now>=fedAt&&now-fedAt<30*MINUTE) add(pools,weights,FULL,4,now);
             add(pools,weights,m.weekend()||m.between(19,30,22,30)?merge(EVERYDAY,PLAY):EVERYDAY,3,now);
             if(annoyedAt>=0&&now-annoyedAt<SULKS_FOR) add(pools,weights,SULKING,8,now);
@@ -254,6 +256,22 @@ final class ActionPlan {
         lastTap=pick;return remember(pick,now);
     }
     static boolean eating(String action){ return action.startsWith("吃")||MEALS.contains(action)||SNACKS.contains(action)||action.equals("涮火锅"); }
+    /** What a clip shows her doing, in words the model can use ("拉小提琴"); null for reactions, idling and UI feedback. */
+    static final Map<String,String> DOING=new HashMap<>();
+    static{String[] pairs={"悠闲哼歌","哼歌","超大伸懒腰","伸懒腰","原地敲击桌面互动","敲着桌子玩","哈欠连天","打哈欠","原地小憩沉眠","打盹","偷吃零食被抓住","偷吃零食","用鲸鱼尾巴拍打地面","用尾巴拍着地面玩","照镜子","照镜子","整体换装试色","试新衣服的颜色","轻快记录","记东西","写代码","写代码","摇扇纳凉","摇扇子乘凉","晨间刷牙","刷牙","原地专心玩魔方","玩魔方","原地蹲下玩玩具汽车","玩玩具汽车","鲸鱼吐泡泡特效","吐泡泡","原地跳跃抓碎头顶物品","跳起来抓头顶的东西","玩游戏气急败坏","玩游戏，玩得气急败坏","玩水枪","玩水枪","小提琴演奏","拉小提琴","优雅女仆舞","跳舞","轻快摇摆舞","跳舞","可爱宅舞","跳舞","吹气球","吹气球","动物环绕","和一群小动物待在一起","放风筝","放风筝","拆礼物","拆礼物","变鸽子","变鸽子魔术","扑克魔术","变扑克魔术","抽陀螺","抽陀螺","吹笛子","吹笛子","蝴蝶蜜蜂环绕头顶开花","头顶开花，引来蝴蝶蜜蜂","撸猫","撸猫","凭空生花","变出花来","骑木马","骑木马","三球抛接","抛球杂耍","踢毽子","踢毽子","下五子棋","一个人摆弄五子棋（只是小动作，不是和用户的对局）","荡秋千","荡秋千","吃白饭","吃白饭","大口吃零食","吃零食","吃Token","吃 Token","吃早餐","吃早餐","吃午餐","吃午餐","吃晚餐","吃晚餐","吃冰淇淋融化","吃冰淇淋","吃大闸蟹","吃大闸蟹","吃糖葫芦","吃糖葫芦","吃长寿面","吃长寿面","吃西瓜","吃西瓜","涮火锅","涮火锅","被落叶淹没","在落叶堆里玩","中秋赏月吃月饼","赏月吃月饼","堆雪人","堆雪人","放烟花","放烟花","吃粽子","吃粽子","吃年糕","吃年糕","吃青团","吃青团","吃腊八粥","喝腊八粥","吃重阳糕","吃重阳糕","收红包","收红包","写福字","写福字","穿针乞巧","穿针乞巧","舞狮头","舞狮","讨糖南瓜灯","提着南瓜灯讨糖","插茱萸赏菊","插茱萸赏菊","放河灯","放河灯","萌化小幽灵","扮小幽灵","装点圣诞树","装点圣诞树","放孔明灯","放孔明灯","吃汤圆","吃汤圆","吃饺子","吃饺子"};for(int i=0;i<pairs.length;i+=2)DOING.put(pairs[i],pairs[i+1]);}
+    static String doing(String clip){return clip==null?null:DOING.get(clip);}
+    /**
+     * The clip for something she says she is doing ("我去拉会儿小提琴"), so her body follows her words. Only first-person
+     * statements count, within one clause and not negated; "你在吃西瓜吗" or "我不想吃冰淇淋" never start a clip.
+     */
+    private static final String[][] SAID={{"(拉|练)[^，。！？!?\\n]{0,3}小提琴","小提琴演奏"},{"吹[^，。！？!?\\n]{0,3}笛子","吹笛子"},{"(玩|拧|转)[^，。！？!?\\n]{0,3}魔方","原地专心玩魔方"},{"吃[^，。！？!?\\n]{0,3}冰淇淋","吃冰淇淋融化"},{"吃[^，。！？!?\\n]{0,3}西瓜","吃西瓜"},{"吃[^，。！？!?\\n]{0,3}糖葫芦","吃糖葫芦"},{"吃[^，。！？!?\\n]{0,3}零食","大口吃零食"},{"放[^，。！？!?\\n]{0,3}风筝","放风筝"},{"踢[^，。！？!?\\n]{0,3}毽子","踢毽子"},{"荡[^，。！？!?\\n]{0,3}秋千","荡秋千"},{"吹[^，。！？!?\\n]{0,3}气球","吹气球"},{"抽[^，。！？!?\\n]{0,3}陀螺","抽陀螺"},{"吐[^，。！？!?\\n]{0,3}泡泡","鲸鱼吐泡泡特效"},{"哼[^，。！？!?\\n]{0,3}歌","悠闲哼歌"},{"伸[^，。！？!?\\n]{0,2}懒腰","超大伸懒腰"},{"写[^，。！？!?\\n]{0,3}代码","写代码"},{"跳[^，。！？!?\\n]{0,3}舞","轻快摇摆舞"},{"照[^，。！？!?\\n]{0,2}镜子","照镜子"},{"摇[^，。！？!?\\n]{0,2}扇子","摇扇纳凉"}};
+    private static final java.util.regex.Pattern[] SAID_PATTERNS=new java.util.regex.Pattern[SAID.length];
+    static{for(int i=0;i<SAID.length;i++)SAID_PATTERNS[i]=java.util.regex.Pattern.compile("(?:我|咱)(?:先|去|来|正|正在|在|要|想|继续|接着|刚|刚刚|刚才)?[^，。！？!?你不没别\\n]{0,4}"+SAID[i][0]);}
+    static String said(String reply){
+        if(reply==null)return null;
+        for(int i=0;i<SAID.length;i++)if(SAID_PATTERNS[i].matcher(reply).find())return SAID[i][1];
+        return null;
+    }
     /** What the model is told about a tap, so her next words can follow from it. */
     static String tapNote(String before,String reaction) {
         if(dozing(before)) return "你在打盹时被用户戳醒了，还有点迷糊";

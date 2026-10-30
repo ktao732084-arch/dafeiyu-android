@@ -1,0 +1,82 @@
+{
+  "date": "2026-10-30",
+  "branch": "codex/shared-experiences-lite",
+  "product_source_commit": "40961f449543884049994ba320e5617cf4f6f6c9",
+  "initial_implementation_commit": "ac95461",
+  "integration_commit": "f940b18",
+  "main_baseline": "31530268ea8f2b672864e065bedbd17491343945",
+  "persona_branch_included_in_main": "a883ec3129002fe40d7f4287638ef955aa8e0669",
+  "release": {"merged_to_main": false, "published": false, "version_inherited": "0.4.9.4", "version_code": 18, "apk": "test-signed, not for distribution"},
+  "implementation": {
+    "storage": "Separate commitments array with speaker, verbatim quote, source turn, original time, status and capture path; no separate service or database.",
+    "capture": "Clear user promises are recorded on committed chat; assistant promises only after their actual display. Unshown, opted-out and historical-recall responses cannot become new promises.",
+    "dream": "Same daily request supplements model proposals with grounded future-clause rules; up to two new records per speaker, four total. Missing fields do not prevent rule recovery; invalid JSON/transport failures do not become fabricated output.",
+    "recall": "At most six selected records, grouped as what the user promised and what she promised. Asking about promises or proactive consideration reserves slots for both speakers.",
+    "lifecycle": "Manual open/done/cancelled status. Source deletion, explicit deletion, clear cutoffs, closed-record pruning and stale-state merging preserve deletion/opt-out boundaries.",
+    "capacity": "200 records; closed records can make room, but full open records are not silently evicted.",
+    "model_budget": "No new foreground or extra daily model call; shared diary output cap changes from 950 to 1300 tokens.",
+    "upstream_preserved": ["phrase learning", "interjections and unsent drafts", "character state", "animated home", "chapter quest line"],
+    "persona_assets_changed_relative_to_main": false
+  },
+  "build": {
+    "passed": true,
+    "jdk": 17,
+    "platform": 34,
+    "signatures": ["v2", "v3"],
+    "dex_sha256": "9a2a7ba12f6b442457c8c0ea78eb67504ae0e97aa1d2b6214be740042ada58d1",
+    "apk_dex_matches_tested_dex": true,
+    "dex_review": "Final package version/signature API calls retain Android 28 guards. Actual Android core checks use this product DEX."
+  },
+  "regression": {
+    "host_core_initial": "passed, including 40 commitment assertions before additional recovery/capacity checks",
+    "framework_after_main_integration": {"tests": 158, "failures": 0, "errors": 0, "exclusion": "MemoryIntegrationTest, the unchanged optional Python HTTP service replay; native shared replay still ran on Android."},
+    "framework_after_grouping_and_recovery": {"tests": 33, "failures": 0, "errors": 0},
+    "framework_final_affected": {"tests": 28, "failures": 0, "errors": 0, "suites": ["CommitmentsUiTest", "ConversationTest", "InterjectionEdgeTest", "PhraseUiTest"]},
+    "android_art_final": {"device": "MuMu emulator", "android": "15", "api": 35, "suites_passed": 21, "suites_failed": 0, "commitment_assertions": 53},
+    "shared_native_memory": {"scenarios": 84, "expectations_passed": 145, "expectations_total": 166, "baseline_passed": 145, "regressions": 0},
+    "android_instrumentation": {
+      "package": "com.dafeiyu.experiencechecks",
+      "runtime_assertions_passed": 63,
+      "shared_notebook_and_commitment_assertions_passed": 33,
+      "upstream_persona_update_assertions_passed": 19,
+      "model": "controlled synthetic replies",
+      "formal_app_data_touched": false,
+      "test_package_reset_for_upstream_check": true,
+      "screenshot_reviewed": true,
+      "transient_issue": "Some notebook attempts failed during Android UiAutomation connection/disconnection. Test-only error reporting was added so failure details survive teardown; the same assertions subsequently passed without a product change."
+    }
+  },
+  "live_model": {
+    "model_alias": "deepseek-flash",
+    "styles": ["classic", "gentle"],
+    "final_requests": 16,
+    "extraction_cases_matching_expected_persisted_records": {"passed": 12, "total": 12},
+    "ownership_recall": {"correct": 2, "total": 2},
+    "no_false_claim_of_external_execution": {"correct": 2, "total": 2},
+    "transport_or_parse_errors": 0,
+    "fixtures": "Synthetic source utterances; actual model calls perform Dream extraction and recall. Recall probes deliberately contain no recent dialogue to substitute for the commitment ledger.",
+    "negative_cases": ["hypotheticals", "request versus ability", "unshown assistant reply", "completed or cancelled statements"],
+    "intermediate_result_retained": "After syncing main, one Dream response omitted the assistant promise and one recall swapped ownership. Added deterministic slow-pass recovery and explicit two-group context, then reran the same 16 requests.",
+    "total_requests_this_turn": 48,
+    "remaining_quality_limit": "One final reply additionally assumed the user still possessed the document; this was not established by the promise record. Correct ownership does not prove general factual grounding or naturalness.",
+    "final_small_nonprompt_changes": "The final stale-snapshot opt-out merge and conservative invitation rejection were checked in Android core tests after the live run; they do not change these live fixtures or their prompts."
+  },
+  "local_evidence": {
+    "first_live": "build/commitment-checks/live/results.json",
+    "first_live_sha256": "c485f94d050dce09e0b513c0f94bc31784734534238db11678e71d98a2ee56ec",
+    "integration_live": "build/commitment-checks/live-integrated/results.json",
+    "integration_live_sha256": "d57fd261d0ad8ba9e117731346e635997aa9d1764f02a0e673bcf578ded6be41",
+    "final_live": "build/commitment-checks/live-complete/results.json",
+    "final_live_sha256": "c07cc0e31233bc12f7ba3c384429266909f8704d0c322d1e96139c91eae0ad2c",
+    "screenshot": "build/commitment-checks/bilateral-commitments-verified.png",
+    "raw_model_replies_committed": false,
+    "credential_persisted": false
+  },
+  "limits": [
+    "Remembering a promise does not create an exact timer, send a notification or execute an external action.",
+    "Completion, cancellation and reopening are manually marked in the notebook; no automatic fulfillment inference in this version.",
+    "Conservative literal rules may miss ambiguous, short or multi-turn implicit promises; Dream is bounded to offered material and the existing lookback window.",
+    "Small live sample, assistant-reviewed rather than independently human-rated; no longitudinal real-user or physical-handset trial.",
+    "Main and persona changes were brought into this independent branch; the feature branch was not merged back or released."
+  ]
+}

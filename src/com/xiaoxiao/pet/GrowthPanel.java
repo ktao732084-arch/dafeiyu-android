@@ -2,11 +2,15 @@ package com.xiaoxiao.pet;
 
 import android.app.*;import android.content.res.ColorStateList;import android.widget.*;import org.json.*;import java.util.*;
 
-/** 「我们的故事」: chapter progress, the bubble jar, chapter cards, the two collections and the bond record. */
+/** 「我们的故事」: this chapter's goal and bubble jar, chapter cards, the two collections and the bond record. */
 final class GrowthPanel {
  static String fmt(long at,String pattern){return new java.text.SimpleDateFormat(pattern,Locale.CHINA).format(new Date(at));}
- /** One line for the home screen, e.g. 第2章「熟悉」 · 羁绊 120/250. */
- static String summary(JSONObject s){Growth.Story story=GrowthStore.story();int ch=Growth.chapter(s);String next=ch<Growth.MAX_CHAPTER?"/"+story.chapter(ch+1).bond:"";return story.chapter(ch).title()+" · 羁绊 "+Growth.bond(s)+next;}
+ /** One line for the home screen: the chapter, what to do next and the jar in words, e.g. 第2章「熟悉」 · 下一步：陪她下完 1 局五子棋 0/1… · 泡泡瓶过半了. */
+ static String summary(JSONObject s){
+  Growth.Story story=GrowthStore.story();int ch=Growth.chapter(s);String title=story.chapter(ch).title();
+  if(ch>=Growth.MAX_CHAPTER)return title+" · 主线已完成 · 泡泡都放进了我们的海";
+  return title+" · 下一步："+Growth.nextStep(s,story)+" · 泡泡瓶"+Growth.jar(Growth.bond(s),story.chapter(ch+1).bond);
+ }
  static String today(JSONObject s){
   JSONObject d=s.optJSONObject("daily");if(d==null||!d.optString("date").equals(Growth.date(System.currentTimeMillis(),java.time.ZoneId.systemDefault())))return "今天还没见面";
   List<String> parts=new ArrayList<>();parts.add(d.optInt("met")>0?"已见面":"还没见面");if(d.optInt("turns")>0)parts.add("聊了 "+d.optInt("turns")+" 轮");if(d.optInt("feed")>0)parts.add("喂过 "+d.optInt("feed")+" 次");if(d.optInt("touch")>0)parts.add("摸摸 "+d.optInt("touch")+" 次");
@@ -19,16 +23,20 @@ final class GrowthPanel {
   LinearLayout l=a.column();l.setPadding(a.dp(18),a.dp(4),a.dp(18),a.dp(18));
   TextView title=Apple.label(a,c.title(),20,true);title.setPadding(a.dp(6),a.dp(6),0,0);l.addView(title);
   if(!custom)GroupedList.note(l,c.lore);
-  String progress;int pct;
-  if(ch<Growth.MAX_CHAPTER){Growth.Chapter next=story.chapter(ch+1);pct=Math.min(100,Growth.bond(s)*100/Math.max(1,next.bond));
-   progress="羁绊 "+Growth.bond(s)+" / "+next.bond+" · 相识第 "+Math.max(1,day)+" 天"+(day<next.day?"（下一章需第 "+next.day+" 天）":"")+"\n下一章："+next.title()+"，解锁"+next.unlocks;}
-  else{pct=100;progress="羁绊 "+Growth.bond(s)+" · 相识第 "+Math.max(1,day)+" 天\n主线已经走完。泡泡瓶变成了「我们的海」，可以一直攒下去。";}
-  ProgressBar bar=new ProgressBar(a,null,android.R.attr.progressBarStyleHorizontal);bar.setMax(100);bar.setProgress(pct);bar.setProgressTintList(ColorStateList.valueOf(Apple.BLUE));LinearLayout.LayoutParams bp=new LinearLayout.LayoutParams(-1,a.dp(10));bp.topMargin=a.dp(10);l.addView(bar,bp);
-  GroupedList.note(l,progress);GroupedList.note(l,today(s)+"\n一共喂过 "+s.optInt("feeds")+" 次");
-  // Bubbles only point at real records, so the jar is a count, not a second list of the notebook.
+  // This chapter as one quest card: what she asked for (intro), the goals with their counts, and the jar.
+  if(ch<Growth.MAX_CHAPTER){Growth.Chapter next=story.chapter(ch+1);String via=Growth.done(s,story,ch);boolean full=Growth.bond(s)>=next.bond;
+   GroupedList.section(l,"这一章要一起做的事");
+   if(!custom&&!c.intro.isEmpty())GroupedList.note(l,"「"+PersonaManager.storyLine(PersonaManager.activeStyle("main"),c.intro.get(0)[1]).replace("{you}",PetService.you())+"」");
+   StringBuilder goals=new StringBuilder(c.goals.size()>1?"做到其中一项就行：":"");
+   for(Growth.Goal x:c.goals){int n=Math.min(Growth.progress(s,x.kind),x.count);boolean ok=x.kind.equals(via)||via!=null&&!Arrays.asList(Growth.KINDS).contains(via)||n>=x.count;
+    goals.append(goals.length()>0?"\n":"").append(ok?"✓ ":"○ ").append(x.text).append("  ").append(n).append("/").append(x.count).append(x.kind.equals("games")||x.kind.equals("wins")?"（首页「我们」里的「一起下五子棋」）":"");}
+   goals.append("\n").append(full?"✓ ":"○ ").append("泡泡瓶装到 ").append(next.bond).append("  ").append(Math.min(Growth.bond(s),next.bond)).append("/").append(next.bond);
+   GroupedList.note(l,goals.toString());
+   ProgressBar bar=new ProgressBar(a,null,android.R.attr.progressBarStyleHorizontal);bar.setMax(100);bar.setProgress(Math.min(100,Growth.bond(s)*100/Math.max(1,next.bond)));bar.setProgressTintList(ColorStateList.valueOf(Apple.BLUE));LinearLayout.LayoutParams bp=new LinearLayout.LayoutParams(-1,a.dp(10));bp.topMargin=a.dp(6);l.addView(bar,bp);
+   GroupedList.note(l,(via!=null&&full?"都做到了，她空下来时会和你一起进入下一章：":"两项都做到，就进入下一章：")+next.title()+"，解锁"+next.unlocks+"。");}
+  else GroupedList.note(l,"主线已经走完。泡泡瓶变成了「我们的海」，以后的泡泡都会放进去。");
+  GroupedList.note(l,today(s)+" · 相识第 "+Math.max(1,day)+" 天 · 一起见过 "+Growth.progress(s,"metDays")+" 面");
   JSONArray cards=s.optJSONArray("cards");
-  GroupedList.note(l,(ch>=Growth.MAX_CHAPTER?"我们的海":"泡泡瓶")+"里有 "+Growth.bubbles(s)+" 个泡泡：每条记忆、每篇日记和每段章节回忆都是一个。记忆和日记在「记忆手账」里看。"
-   +(s.optInt("popped")>0?"\n有 "+s.optInt("popped")+" 个泡泡破了：对应的记忆或日记已经删除，内容不会留在这里，羁绊和章节不受影响。":""));
   GroupedList.section(l,"收藏");LinearLayout collect=GroupedList.group(l);
   GroupedList.row(collect,"章节回忆 · "+cards.length(),GroupedList.HEART,GroupedList.PINK,v->cards(a));
   Set<String> all=Data.actions("main"),open=g.unlocked(all);
@@ -36,7 +44,7 @@ final class GrowthPanel {
   int seasonal=0;for(String x:seasonal())if(s.optJSONObject("seen").has(x))seasonal++;
   GroupedList.row(collect,"时令图鉴 · 见过 "+seasonal+"/"+seasonal().size(),GroupedList.CLOCK,GroupedList.MINT,v->seasonal(a));
   GroupedList.row(collect,"成长记录",GroupedList.SLIDERS,GroupedList.GREY,v->ledger(a));
-  GroupedList.note(l,"怎么变亲近：每天第一次见面、聊满3轮、喂食（每天3次）、摸摸（每天5次）、新记下的事（每天3条）、每一章的剧情。聊得再多，一天也只算一次，不会因为多聊多花钱。离开不会扣分，羁绊值只增不减。模型的回复不会改变这些数。");
+  GroupedList.note(l,"泡泡瓶装的就是你们的羁绊：每天第一次见面、聊满3轮、喂食（每天3次）、摸摸（每天5次）、新记下的事（每天3条）、每一章的剧情都会往里放泡泡。聊得再多，一天也只算一次，不会因为多聊多花钱。离开不会扣分，泡泡只增不减。模型的回复不会改变这些数，也不会替你完成一章的事。");
   ScrollView scroll=new SpringScrollView(a);scroll.addView(l);new Apple.Builder(a).setTitle("我们的故事").setView(scroll).setPositiveButton("合上",null).show();
  }catch(Exception e){AgentPanel.fail(a,e);}}
 
@@ -72,9 +80,9 @@ final class GrowthPanel {
  static final Map<String,String> LABELS=new HashMap<>();
  static{String[] pairs={"met","今天第一次见面","chat","今天聊满3轮","feed","喂食","touch","摸摸","memory","新记下一件事","chapter","章节剧情","postcard","看明信片（旧版）","migrated","升级时按已有记录估算","earlier","更早的记录合计"};for(int i=0;i<pairs.length;i+=2)LABELS.put(pairs[i],pairs[i+1]);}
  static void ledger(MainActivity a){try{
-  JSONArray rows=GrowthStore.get().snapshot().optJSONArray("ledger");StringBuilder text=new StringBuilder("每一笔都来自这台手机上的真实互动，最多显示最近80笔。\n\n");int shown=0;
+  JSONArray rows=GrowthStore.get().snapshot().optJSONArray("ledger");StringBuilder text=new StringBuilder("往泡泡瓶里放过泡泡的事，每一件都来自这台手机上的真实互动，最多显示最近80件。\n\n");int shown=0;
   for(int i=rows.length()-1;i>=0&&shown<80;i--){JSONObject r=rows.getJSONObject(i);if(r.optInt("bond")==0)continue;shown++;String label=LABELS.containsKey(r.optString("type"))?LABELS.get(r.optString("type")):r.optString("type");
-   text.append(fmt(r.optLong("at"),"MM-dd HH:mm")).append("  ").append(label).append(r.has("ref")&&!"migrated".equals(r.optString("type"))?"（"+r.optString("ref")+"）":"").append("  羁绊 +").append(r.optInt("bond")).append("\n");}
+   text.append(fmt(r.optLong("at"),"MM-dd HH:mm")).append("  ").append(label).append(r.has("ref")&&!"migrated".equals(r.optString("type"))?"（"+r.optString("ref")+"）":"").append("\n");}
   new Apple.Builder(a).setTitle("成长记录").setMessage(text.toString().trim()).setPositiveButton("好的",null).show();
  }catch(Exception e){AgentPanel.fail(a,e);}}
 }

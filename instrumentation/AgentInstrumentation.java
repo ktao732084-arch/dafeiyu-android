@@ -74,7 +74,7 @@ public class AgentInstrumentation extends Instrumentation {
     check(AgentRuntime.context("刚才五子棋谁赢了",false).toString().contains(game.id),"actual Android model context receives completed game");
     check(new GomokuStore(new java.io.File(isolatedFiles,"agent")).load().outcome().equals(game.outcome()),"terminal game survives Android store reopen");
     AgentRuntime.store().clear(true);check(games.context().getJSONArray("recent_results").length()==0,"forget all also clears game history on Android");
-    AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"好，等你忙完。\",\"emotion\":\"concerned\",\"mood_level\":2,\"mood_cause\":\"想让你安心忙完\",\"next_check_minutes\":45,\"availability\":\"busy\",\"availability_evidence\":\"我在忙，等忙完再聊\",\"initiative\":\"speak\",\"topic\":\"等你回来\"}";
+    AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"好，等你忙完。\",\"emotion\":\"concerned\",\"mood_level\":2,\"mood_cause\":\"想让你安心忙完\",\"mood_changed\":true,\"next_check_minutes\":45,\"availability\":\"busy\",\"availability_evidence\":\"我在忙，等忙完再聊\",\"initiative\":\"speak\",\"topic\":\"等你回来\"}";
     Reply combined=new Reply();AgentRuntime.send("我在忙，等忙完再聊",false,combined);combined.await();
     check(combined.error==null,"character reply keeps initiative protocol on Android");
     JSONObject mergedState=AgentRuntime.store().snapshot();check(mergedState.optInt("moodLevel")==2&&"想让你安心忙完".equals(mergedState.optString("moodCause")),"mood strength and cause saved beside schedule");
@@ -87,8 +87,30 @@ public class AgentInstrumentation extends Instrumentation {
     check(!growth.hungry(),"feeding state is visible to pet actions");
     check(new org.json.JSONObject(new String(java.nio.file.Files.readAllBytes(growth.file.toPath()),"UTF-8")).optInt("feeds")==priorFeeds+1,"growth writer persists on Android filesystem");
     check(growth.unlocked(Data.actions("main")).contains(Data.idle("main")),"idle animation remains available");
+    long originalMoodAt=AgentRuntime.store().snapshot().getLong("emotionAt");String moodSource=AgentRuntime.store().snapshot().optString("moodSource");
+    AgentRuntime.model=(messages,token,progress)->"{\"reply\":\"嗯，听你说。\",\"emotion\":\"playful\",\"mood_level\":3,\"mood_cause\":\"只是在改写\",\"mood_changed\":false,\"next_check_minutes\":30}";
+    Reply carried=new Reply();AgentRuntime.send("嗯",false,carried);carried.await();
+    JSONObject carriedMood=AgentRuntime.store().snapshot();check(carried.error==null&&carriedMood.getLong("emotionAt")==originalMoodAt,"unchanged mood does not renew its clock on Android");
+    check("concerned".equals(carried.emotion)&&"concerned".equals(carriedMood.optString("emotion"))&&moodSource.equals(carriedMood.optString("moodSource")),"unchanged mood retains kind and causal source on Android");
+    Data.prefs().edit().putBoolean("agent.memory",false).putBoolean("agent.proactive",false).commit();
+    String rewriteUser="帮我润色：‘我明天搬去成都，我不吃辣。’只输出正文。",rewriteSource="我明天搬去成都，我不吃辣。";
+    AgentRuntime.model=(m,t,p)->{p.accept("{\"reply\":\"不太吃辣");return "{\"reply\":\"我明天搬去成都，我不太能吃辣。\",\"self\":[\"我不太能吃辣\"]}";};
+    RewriteGuard.reviewer=(m,t)->"{\"faithful\":true,\"replacement\":\"\"}";
+    Reply proofread=new Reply();check(AgentRuntime.send(rewriteUser,false,proofread),"rewrite starts");proofread.await();
+    check(rewriteSource.equals(proofread.text)&&proofread.error==null,"unsafe meaning rejected before delivery");
+    check(proofread.partial==null,"unverified rewrite is not streamed to listener");
+    JSONArray rewrittenHistory=AgentRuntime.store().snapshot().getJSONArray("turns");check(rewriteSource.equals(rewrittenHistory.getJSONObject(rewrittenHistory.length()-1).getString("reply")),"only faithful source persisted");
+    RewriteGuard.reviewer=(m,t)->{throw new java.io.IOException("offline reviewer");};Reply unavailable=new Reply();AgentRuntime.send(rewriteUser,false,unavailable);unavailable.await();check(rewriteSource.equals(unavailable.text),"review failure preserves source in real runtime");
+    int beforeProofCancel=AgentRuntime.history().length();CountDownLatch reviewing=new CountDownLatch(1),releaseReview=new CountDownLatch(1);
+    RewriteGuard.reviewer=(m,t)->{reviewing.countDown();releaseReview.await(10,TimeUnit.SECONDS);t.check();return "{\"faithful\":true,\"replacement\":\"\"}";};
+    Reply proofCancel=new Reply();AgentRuntime.send(rewriteUser,false,proofCancel);check(reviewing.await(5,TimeUnit.SECONDS),"review phase entered");AgentRuntime.cancel();proofCancel.await();releaseReview.countDown();AgentRuntime.worker.submit(()->{}).get(15,TimeUnit.SECONDS);
+    check(AgentRuntime.history().length()==beforeProofCancel,"cancelled proofreading cannot commit a fallback");
+    CountDownLatch deletingReview=new CountDownLatch(1),finishDeletedReview=new CountDownLatch(1);RewriteGuard.reviewer=(m,t)->{deletingReview.countDown();finishDeletedReview.await(10,TimeUnit.SECONDS);return "{\"faithful\":true,\"replacement\":\"\"}";};
+    Reply proofDeleted=new Reply();AgentRuntime.send(rewriteUser,false,proofDeleted);check(deletingReview.await(5,TimeUnit.SECONDS),"review before deletion entered");AgentRuntime.store().clear(true);finishDeletedReview.countDown();proofDeleted.await();
+    check(proofDeleted.error!=null&&AgentRuntime.history().length()==0,"deleted history cannot be restored by late proofreading");
+    RewriteGuard.reviewer=RewriteGuard::request;
     result.putString("stream","PASS: "+checks+" Android runtime checks\n");
-   }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;MemoryBridge.client=MemoryBridge::http;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}
+   }finally{AgentRuntime.cancel();AgentRuntime.model=AgentTransport::request;RewriteGuard.reviewer=RewriteGuard::request;NativeMemoryIntelligence.transport=NativeMemoryIntelligence::request;MemoryBridge.client=MemoryBridge::http;AgentRuntime.memory=null;Data.prefs().edit().putString("api.url",originalUrl).putString("api.model",originalModel).putString("api.secret",originalSecret).putBoolean("agent.memory",originalMemory).commit();}
   }catch(Throwable e){code=Activity.RESULT_CANCELED;result.putString("stream","FAIL: "+e.toString());result.putString("stack",android.util.Log.getStackTraceString(e));}
   try{Data.logWriter.submit(()->{}).get(5,TimeUnit.SECONDS);}catch(Exception ignored){}
   if(originalContext!=null)Data.app=originalContext;AgentRuntime.memory=null;

@@ -1,0 +1,15 @@
+0.4.9.5 / versionCode 19
+APK SHA256: 49b99f189797b9ddc8e8f39a8dde690131f33a8a44e8faf96295ad3e5cf9b43a
+APK size: 91582920
+Framework: 17 suites / 161 tests / 0 failures / 0 errors / 0 skipped
+Android ART: 21 suites / 0 failed
+AgentInstrumentation: 72 passed
+ChatPresentationInstrumentation: 36 passed
+TouchReplyInstrumentation: 19 passed
+HeroPetInstrumentation: 24 passed
+QuestLineInstrumentation: 34 passed
+PersonaUpdateInstrumentation: 19 passed
+RewriteGuard: 27 deterministic checks
+Real model: 12 UI turns + 8 deliberately changed candidate checks; 0 fidelity failures in this sample
+Release tools: 7 preparation + 18 synchronization tests passed
+Raw replies/screenshots are private; the release receipts are generated only after publishing.

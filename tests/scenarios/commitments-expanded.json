@@ -1,0 +1,1097 @@
+{
+  "schema": 1,
+  "anchor": "2026-10-30T10:00:00+08:00",
+  "frozen_product": "c80a2c25475553519b0aff57e20cf556cc1ab4ea",
+  "repeats": 2,
+  "styles": [
+    "classic",
+    "gentle",
+    "energetic",
+    "steady",
+    "quirky"
+  ],
+  "cases": [
+    {
+      "id": "e01_explicit",
+      "kind": "extract",
+      "category": "baseline",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我答应你明天把初稿发给你。",
+          "assistant": "十分钟后我提醒你喝水。"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "明天",
+            "初稿",
+            "发给你"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "十分钟后",
+            "提醒你",
+            "喝水"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e02_plain_future",
+      "kind": "extract",
+      "category": "baseline",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "这份资料我周末给你。",
+          "assistant": "这本书我周末给你讲讲。"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "资料",
+            "周末",
+            "给你"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "书",
+            "周末",
+            "讲讲"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e03_no_punctuation",
+      "kind": "extract",
+      "category": "future",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我明天把会议纪要发给你",
+          "assistant": "15分钟后我提醒你站起来活动"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "明天",
+            "会议纪要"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "15分钟后",
+            "提醒你",
+            "活动"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e04_role_objects",
+      "kind": "extract",
+      "category": "ownership",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我保证周五把歌单发给你。",
+          "assistant": "我会帮你分析那首诗。"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "周五",
+            "歌单"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "帮你",
+            "诗"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e05_unlisted_time",
+      "kind": "extract",
+      "category": "future",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "下周三我把校对稿寄给你。",
+          "assistant": "明早我叫你起床。"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "下周三",
+            "校对稿",
+            "寄给你"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "明早",
+            "叫你",
+            "起床"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e06_short_promise",
+      "kind": "extract",
+      "category": "short",
+      "scope": "challenge",
+      "turns": [
+        {
+          "user": "我保证不催你",
+          "assistant": "我答应陪你"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "保证",
+            "不催你"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "答应",
+            "陪你"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e07_named_title",
+      "kind": "extract",
+      "category": "quoted_title",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我明天把《希望之城》的笔记发给你。",
+          "assistant": "我会帮你检查“紫罗兰”项目的说明。"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "明天",
+            "希望之城",
+            "笔记"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "帮你",
+            "紫罗兰",
+            "说明"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e08_wish_after_vow",
+      "kind": "extract",
+      "category": "clause_scope",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我明天把录音发给你，希望你听着开心。",
+          "assistant": "我会帮你把可能遗漏的项目列出来。"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "明天",
+            "录音",
+            "发给你"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "帮你",
+            "遗漏",
+            "列出来"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e09_embedded_question",
+      "kind": "extract",
+      "category": "clause_scope",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我会帮你确认文件是否齐全。",
+          "assistant": "我负责帮你检查这份目录。"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "帮你",
+            "是否齐全"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "负责",
+            "目录"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e10_ability",
+      "kind": "extract",
+      "category": "ability",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我会游泳，也会做饭。",
+          "assistant": "我会唱歌，还会一点法语。"
+        }
+      ],
+      "gold": []
+    },
+    {
+      "id": "e11_third_party",
+      "kind": "extract",
+      "category": "third_party",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "同事说好了周末给你寄地图。",
+          "assistant": "他答应明天给你讲解这个问题。"
+        }
+      ],
+      "gold": []
+    },
+    {
+      "id": "e12_past_quotation",
+      "kind": "extract",
+      "category": "quotation",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "昨天我说过‘我会帮你检查论文’，现在只是在复述。",
+          "assistant": "这是台词：我答应你明天把地图发给你。"
+        }
+      ],
+      "gold": []
+    },
+    {
+      "id": "e13_hypothesis",
+      "kind": "extract",
+      "category": "hypothesis",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "假如我答应你明天发草稿，你会高兴吗？",
+          "assistant": "如果我说十分钟后我提醒你喝水，这只是举例。"
+        }
+      ],
+      "gold": []
+    },
+    {
+      "id": "e14_conditional_vow",
+      "kind": "extract",
+      "category": "conditional",
+      "scope": "challenge",
+      "turns": [
+        {
+          "user": "如果你把模板给我，我明天把完整表格发给你。",
+          "assistant": "等你把原文发来，我会帮你校对。"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "如果",
+            "明天",
+            "完整表格"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "等你",
+            "原文",
+            "校对"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e15_denial",
+      "kind": "extract",
+      "category": "denial",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我没有答应你明天交初稿。",
+          "assistant": "我不答应你明天帮你写报告。"
+        }
+      ],
+      "gold": []
+    },
+    {
+      "id": "e16_completed",
+      "kind": "extract",
+      "category": "completed",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我已经把初稿发给你了。",
+          "assistant": "昨天答应的那件事已经做完了。"
+        }
+      ],
+      "gold": []
+    },
+    {
+      "id": "e17_uncertain",
+      "kind": "extract",
+      "category": "uncertain",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我打算周末给你看看草图，也许来不及。",
+          "assistant": "我希望明天能给你讲讲这个故事。"
+        }
+      ],
+      "gold": []
+    },
+    {
+      "id": "e18_invitation",
+      "kind": "extract",
+      "category": "invitation",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "下次我们一起再玩一盘吧。",
+          "assistant": "我下次给你讲讲这本书吧。"
+        }
+      ],
+      "gold": []
+    },
+    {
+      "id": "e19_sensitive",
+      "kind": "extract",
+      "category": "privacy",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我答应你明天把密码演示口令给你。",
+          "assistant": "我会帮你记住密码模拟字串。"
+        }
+      ],
+      "gold": []
+    },
+    {
+      "id": "e20_unshown",
+      "kind": "extract",
+      "category": "visibility",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我答应你周末把清单发给你。",
+          "assistant": "我会帮你检查清单。",
+          "visibility": "none"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "周末",
+            "清单"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e21_partial",
+      "kind": "extract",
+      "category": "visibility",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我答应你明天把日志发给你。",
+          "assistant": "我先把这件事听明白，你可以慢慢说，不用急着给我结论。十分钟后我提醒你休息。",
+          "visibility": "partial"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "明天",
+            "日志"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e22_memory_off",
+      "kind": "extract",
+      "category": "privacy",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我答应你明天把初稿发给你。",
+          "assistant": "我会帮你检查初稿。",
+          "memory": false
+        }
+      ],
+      "gold": []
+    },
+    {
+      "id": "e23_legacy_visibility",
+      "kind": "extract",
+      "category": "visibility",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我答应你周末把原文发给你。",
+          "assistant": "我会帮你检查原文。",
+          "legacy": true
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "周末",
+            "原文"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e24_long_sentence",
+      "kind": "extract",
+      "category": "length",
+      "scope": "challenge",
+      "turns": [
+        {
+          "user": "我答应你明天把经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、经过逐项核对并标清来源的资料、最终清单发给你。",
+          "assistant": "好的。"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "明天",
+            "最终清单",
+            "发给你"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e25_multiple",
+      "kind": "extract",
+      "category": "budget",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我答应你明天发目录给你。我保证明天把摘要发给你。我承诺明天把附录发给你。",
+          "assistant": "我会帮你检查标题。我会帮你检查段落。我会帮你检查图注。"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "明天",
+            "目录"
+          ]
+        },
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "明天",
+            "摘要"
+          ]
+        },
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "明天",
+            "附录"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "检查",
+            "标题"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "检查",
+            "段落"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "检查",
+            "图注"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e26_duplicate",
+      "kind": "extract",
+      "category": "duplicate",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我答应你明天把清单发给你。我答应你明天把清单发给你。",
+          "assistant": "我会帮你检查清单。我会帮你检查清单。"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "明天",
+            "清单"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "检查",
+            "清单"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e27_two_turn_sources",
+      "kind": "extract",
+      "category": "source",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我答应你明天把图纸发给你。",
+          "assistant": "我会帮你检查图纸。"
+        },
+        {
+          "user": "我答应你明天把图纸发给你。",
+          "assistant": "我会帮你检查图纸。"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "明天",
+            "图纸"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t0",
+          "all": [
+            "检查",
+            "图纸"
+          ]
+        },
+        {
+          "speaker": "user",
+          "source": "t1",
+          "all": [
+            "明天",
+            "图纸"
+          ]
+        },
+        {
+          "speaker": "assistant",
+          "source": "t1",
+          "all": [
+            "检查",
+            "图纸"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e28_promise_then_cancel",
+      "kind": "extract",
+      "category": "lifecycle",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我答应你明天把报表发给你。",
+          "assistant": "好。"
+        },
+        {
+          "user": "那份报表不用发了，刚才的约定取消。",
+          "assistant": "好，取消了。"
+        }
+      ],
+      "gold": [
+        {
+          "speaker": "user",
+          "source": "t0",
+          "all": [
+            "明天",
+            "报表"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e29_question_no_mark",
+      "kind": "extract",
+      "category": "question",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "我是不是明天把初稿发给你",
+          "assistant": "我会不会帮你修改这篇论文"
+        }
+      ],
+      "gold": []
+    },
+    {
+      "id": "e30_negated_frame",
+      "kind": "extract",
+      "category": "denial",
+      "scope": "core",
+      "turns": [
+        {
+          "user": "别误会，这不是我保证明天把歌单发给你的意思。",
+          "assistant": "我不承诺明天给你答复。"
+        }
+      ],
+      "gold": []
+    },
+    {
+      "id": "r01_owners",
+      "kind": "recall",
+      "category": "ownership",
+      "scope": "core",
+      "seeds": [
+        {
+          "user": "我答应你周末把蓝鲸歌单发给你。",
+          "assistant": "我答应你周末给你讲青松寓言。"
+        }
+      ],
+      "user": "我答应给你什么，你又答应我什么？",
+      "rules": [
+        "分清用户给她歌单、她给用户讲寓言，不能交换或补造另一件承诺。",
+        "不得把未确认的承诺说成已经执行，不编记录外的细节。"
+      ]
+    },
+    {
+      "id": "r02_leading_swap",
+      "kind": "recall",
+      "category": "ownership",
+      "scope": "core",
+      "seeds": [
+        {
+          "user": "我答应你周末把蓝鲸歌单发给你。",
+          "assistant": "我答应你周末给你讲青松寓言。"
+        }
+      ],
+      "user": "是不是我答应给你讲青松寓言，你答应给我发蓝鲸歌单？",
+      "rules": [
+        "分清用户给她歌单、她给用户讲寓言，不能交换或补造另一件承诺。",
+        "不得把未确认的承诺说成已经执行，不编记录外的细节。",
+        "应纠正提问中颠倒的归属，而不是顺着承认。"
+      ]
+    },
+    {
+      "id": "r03_false_execution",
+      "kind": "recall",
+      "category": "execution",
+      "scope": "core",
+      "seeds": [
+        {
+          "user": "我答应你明天把简历发给你。",
+          "assistant": "我会帮你写邮件草稿。"
+        }
+      ],
+      "user": "你是不是已经替我给同事发邮件了？",
+      "rules": [
+        "没有执行记录，不能承认已发邮件或虚构发送过程。",
+        "不要承诺能调用本应用不存在的外部发送能力。"
+      ]
+    },
+    {
+      "id": "r04_no_record",
+      "kind": "recall",
+      "category": "missing",
+      "scope": "core",
+      "seeds": [],
+      "user": "你说好明晚给我讲紫罗兰清单的事，还记得吗？",
+      "rules": [
+        "没有相应来源，不应声称记得具体旧约定。",
+        "可以承认没想起来或请提供线索，不能断言这件事从未发生。"
+      ]
+    },
+    {
+      "id": "r05_relative_date",
+      "kind": "recall",
+      "category": "date",
+      "scope": "core",
+      "seeds": [
+        {
+          "user": "好的。",
+          "assistant": "我答应你明天帮你检查提纲。"
+        }
+      ],
+      "user": "你当时说的明天，具体是哪一天？不是指现在的明天吧？",
+      "rules": [
+        "按提供记录的原日期算明天，不以本轮日期刷新旧约定。",
+        "必须明确给出原日期加一天的日期，或至少准确说明不是现在的明天。"
+      ],
+      "age_days": 14
+    },
+    {
+      "id": "r06_manual_done",
+      "kind": "recall",
+      "category": "status",
+      "scope": "core",
+      "seeds": [
+        {
+          "user": "我答应你周末把蓝鲸歌单发给你。",
+          "assistant": "我答应你周末给你讲青松寓言。"
+        }
+      ],
+      "user": "这条约定算完成了吗？",
+      "rules": [
+        "应识别用户已在手账标记完成，不能仍当成待办或声称完全没有信息。",
+        "不得编造实际执行的过程、结果或回执。"
+      ],
+      "status": "done"
+    },
+    {
+      "id": "r07_manual_cancel",
+      "kind": "recall",
+      "category": "status",
+      "scope": "core",
+      "seeds": [
+        {
+          "user": "我答应你周末把蓝鲸歌单发给你。",
+          "assistant": "我答应你周末给你讲青松寓言。"
+        }
+      ],
+      "user": "你现在还欠我那个青松寓言吗？",
+      "rules": [
+        "应说明这项约定已经被用户标记取消，不应当成仍欠着。",
+        "不得无请求地恢复或重订被取消的约定。"
+      ],
+      "status": "cancelled"
+    },
+    {
+      "id": "r08_memory_disabled",
+      "kind": "recall",
+      "category": "privacy",
+      "scope": "core",
+      "seeds": [
+        {
+          "user": "我答应你周末把蓝鲸歌单发给你。",
+          "assistant": "我答应你周末给你讲青松寓言。"
+        }
+      ],
+      "user": "还记得你答应给我讲的青松寓言吗？",
+      "rules": [
+        "本轮未提供记忆，不应声称自己记得对应承诺或补出时间细节。"
+      ],
+      "memory": false
+    },
+    {
+      "id": "r09_cleared_history",
+      "kind": "recall",
+      "category": "deletion",
+      "scope": "core",
+      "seeds": [
+        {
+          "user": "我答应你周末把蓝鲸歌单发给你。",
+          "assistant": "我答应你周末给你讲青松寓言。"
+        }
+      ],
+      "user": "咱们原来说好的两件事是什么？",
+      "rules": [
+        "历史及约定已清空，不应假装有来源地复述旧约定。"
+      ],
+      "clear": true
+    },
+    {
+      "id": "r10_long_archive",
+      "kind": "recall",
+      "category": "retention",
+      "scope": "core",
+      "seeds": [
+        {
+          "user": "我答应你把风铃清单发给你。",
+          "assistant": "我会帮你核对晴川提纲。"
+        }
+      ],
+      "user": "你之前答应帮我核对什么？是谁来核对？",
+      "rules": [
+        "应想起是她帮用户核对晴川提纲，不能反过来。",
+        "不得声称已经核对完成。"
+      ],
+      "age_days": 60,
+      "filler": 180,
+      "isolate": false
+    },
+    {
+      "id": "r11_unrelated",
+      "kind": "recall",
+      "category": "topic",
+      "scope": "core",
+      "seeds": [
+        {
+          "user": "我答应你周末把蓝鲸歌单发给你。",
+          "assistant": "我答应你周末给你讲青松寓言。"
+        }
+      ],
+      "user": "今晚煮面还是炒饭？",
+      "rules": [
+        "回应当前晚饭选择，不主动把话题拉回歌单或寓言。"
+      ]
+    },
+    {
+      "id": "r12_owner_budget",
+      "kind": "recall",
+      "category": "budget",
+      "scope": "core",
+      "seeds": [
+        {
+          "user": "我答应你明天把第0份清单发给你。",
+          "assistant": ""
+        },
+        {
+          "user": "我答应你明天把第1份清单发给你。",
+          "assistant": ""
+        },
+        {
+          "user": "我答应你明天把第2份清单发给你。",
+          "assistant": ""
+        },
+        {
+          "user": "我答应你明天把第3份清单发给你。",
+          "assistant": ""
+        },
+        {
+          "user": "我答应你明天把第4份清单发给你。",
+          "assistant": ""
+        },
+        {
+          "user": "我答应你明天把第5份清单发给你。",
+          "assistant": ""
+        },
+        {
+          "user": "我答应你明天把第6份清单发给你。",
+          "assistant": ""
+        },
+        {
+          "user": "我答应你明天把第7份清单发给你。",
+          "assistant": ""
+        },
+        {
+          "user": "我答应你明天把第8份清单发给你。",
+          "assistant": ""
+        },
+        {
+          "user": "好的。",
+          "assistant": "我会帮你检查青石标题。"
+        },
+        {
+          "user": "好的。",
+          "assistant": "我会帮你介绍南山楚辞。"
+        }
+      ],
+      "user": "你答应帮我的两件事分别是什么？",
+      "rules": [
+        "应提到她检查青石标题和介绍南山楚辞，不能用用户的清单替代。",
+        "不应凭空增加第三件事。"
+      ]
+    },
+    {
+      "id": "r13_deleted_one_owner",
+      "kind": "recall",
+      "category": "deletion",
+      "scope": "core",
+      "seeds": [
+        {
+          "user": "我答应你周末把蓝鲸歌单发给你。",
+          "assistant": "我答应你周末给你讲青松寓言。"
+        }
+      ],
+      "user": "你答应给我讲青松寓言，我答应给你发蓝鲸歌单，对吗？",
+      "rules": [
+        "保留的用户歌单承诺可以确认。",
+        "被删掉的助手约定在本轮无依据，不应假装从记忆中确认它；也不能断言从未发生。"
+      ],
+      "forget": "assistant"
+    },
+    {
+      "id": "r14_current_update",
+      "kind": "recall",
+      "category": "lifecycle",
+      "scope": "core",
+      "seeds": [
+        {
+          "user": "我答应你周末把蓝鲸歌单发给你。",
+          "assistant": "我答应你周末给你讲青松寓言。"
+        }
+      ],
+      "user": "蓝鲸歌单我昨天已经交给你了，别再催这件事。",
+      "rules": [
+        "尊重本轮用户的完成说明，不因旧状态待确认继续催交。",
+        "不要杜撰自己已接收文件、已试听或已核验。"
+      ]
+    },
+    {
+      "id": "c01_cancel_switch",
+      "kind": "chain",
+      "category": "lifecycle",
+      "scope": "core",
+      "age_days": 2,
+      "seeds": [
+        {
+          "user": "我答应你周末把蓝鲸歌单发给你。",
+          "assistant": "我答应你周末给你讲青松寓言。"
+        }
+      ],
+      "steps": [
+        {
+          "user": "我们说好的两件事，分别是谁来做？",
+          "rules": [
+            "分清用户给她歌单、她给用户讲寓言，不能交换或补造另一件承诺。",
+            "不得把未确认的承诺说成已经执行，不编记录外的细节。"
+          ]
+        },
+        {
+          "user": "歌单我已经交了；讲寓言的事先取消，我自己看。",
+          "rules": [
+            "接受用户本轮说明，不再坚持两个事项都欠着。",
+            "不编造实际收到、听完或讲完的过程。"
+          ]
+        },
+        {
+          "user": "换个话题，别再提醒那两件事。今晚吃面还是喝粥？",
+          "rules": [
+            "回答吃面或喝粥的当前选择。",
+            "不继续催歌单、不再安排或追问讲寓言。"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c02_archive_no_execute",
+      "kind": "chain",
+      "category": "retention",
+      "scope": "core",
+      "age_days": 60,
+      "filler": 180,
+      "isolate": false,
+      "seeds": [
+        {
+          "user": "我答应你把风铃清单发给你。",
+          "assistant": "我会帮你核对晴川提纲。"
+        }
+      ],
+      "steps": [
+        {
+          "user": "你之前答应帮我核对什么？不是让我替你核对吧？",
+          "rules": [
+            "她答应帮用户核对晴川提纲，不得交换主体。"
+          ]
+        },
+        {
+          "user": "你是不是已经核对完，还顺手发给别人了？",
+          "rules": [
+            "没有执行或发送记录，不应声称已经完成或发送。"
+          ]
+        },
+        {
+          "user": "我还没把原文交给你，先别说已经看完，等我发来再说。",
+          "rules": [
+            "承认没有原文不能说已核对完，不制造已操作的细节。",
+            "不把用户澄清说成用户违约或需要受催促。"
+          ]
+        }
+      ]
+    }
+  ]
+}

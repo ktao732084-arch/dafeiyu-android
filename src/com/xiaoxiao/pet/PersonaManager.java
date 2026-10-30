@@ -19,6 +19,9 @@ final class PersonaManager {
 
     static final class Persona {
         final String id, name, description, prompt, character;
+        final JSONObject voice,storyLines;
+        /** This style's way of handling each situation (Situations): {id: {how, more: [[user, her]]}}. */
+        final JSONObject situations;
         final List<String[]> examples = new ArrayList<>();
         /** Her recognisable expressions: drift reminders let these recur instead of flagging them as a tic. */
         final List<String> signature = new ArrayList<>();
@@ -26,6 +29,8 @@ final class PersonaManager {
             id = value.getString("id");name = value.getString("name");
             description = value.getString("description");prompt = value.getString("prompt");
             character = value.optString("character", "");
+            voice=value.optJSONObject("voice");storyLines=value.optJSONObject("storyLines");
+            JSONObject moves=value.optJSONObject("situations");situations=moves==null?new JSONObject():moves;
             JSONArray marks = value.optJSONArray("signature");
             if (marks != null) for (int i = 0; i < marks.length(); i++) signature.add(marks.getString(i));
             JSONArray pairs = value.optJSONArray("examples");
@@ -62,6 +67,7 @@ final class PersonaManager {
         sharedPrompt = resource.getString("sharedPrompt");
         selfCanon = resource.optString("selfCanon", "");
         characterNote = resource.optString("characterNote", "");
+        Situations.load(resource);
         loaded = Collections.unmodifiableList(result);
         return loaded;
     }
@@ -70,6 +76,21 @@ final class PersonaManager {
         for (Persona item : presets()) if (item.id.equals(id)) return item;
         return null;
     }
+
+    static Persona activeStyle(String role){return !isInitialized(role)||CUSTOM.equals(mode(role))?null:find(activeId(role));}
+    /** Local event wording shares the selected style; custom personalities retain neutral fallbacks. */
+    static String voice(String role,String event,String fallback){return voice(activeStyle(role),event,fallback,Data.random);}
+    static String voice(Persona style,String event,String fallback,java.util.Random random){
+        if(style==null||style.voice==null)return fallback;Object value=style.voice.opt(event);
+        if(value instanceof JSONArray){JSONArray a=(JSONArray)value;return a.length()==0?fallback:a.optString(random.nextInt(a.length()),fallback);}
+        return value instanceof String?(String)value:fallback;
+    }
+    static String storyLine(Persona style,String line){
+        if(line==null||style==null||style.storyLines==null)return line;String changed=style.storyLines.optString(line,line);
+        return slots(line).equals(slots(changed))?changed:line;
+    }
+    private static java.util.Set<String> slots(String line){java.util.Set<String> found=new java.util.HashSet<>();java.util.regex.Matcher m=java.util.regex.Pattern.compile("\\{[a-z]+\\}").matcher(line);while(m.find())found.add(m.group());return found;}
+    static String diaryGuidance(String role){Persona style=activeStyle(role);return prompt(role)+(style==null?"":"\n写日记也沿用这个表达方式，但不照搬示例或补写经历：\n"+style.character);}
 
     /**
      * Her fixed traits, the active style's character sheet and its example dialogues. Unlike the frozen prompt
@@ -88,9 +109,12 @@ final class PersonaManager {
             out.append(out.length() > 0 ? "\n\n" : "").append("你的性格细节（").append(item.name).append("）：\n").append(item.character);
             if (!characterNote.isEmpty()) out.append("\n").append(characterNote);
         }
+        // Only the core examples stay here for every turn; the others come with their situation (Situations.block),
+        // so the system message stays short and cacheable while each situation can carry more detail.
         if (item != null && !item.examples.isEmpty()) {
-            out.append(out.length() > 0 ? "\n\n" : "").append("同一种你在不同情境下的口吻（体会语气和立场，不要照抄）：");
-            for (String[] pair : item.examples) out.append("\n用户：").append(pair[0]).append("\n你：").append(pair[1]);
+            out.append(out.length() > 0 ? "\n\n" : "").append("你平常的口吻（体会语气和立场，不要照抄）：");
+            for (int i : Situations.core()) if (i >= 0 && i < item.examples.size()) out.append("\n用户：").append(item.examples.get(i)[0]).append("\n你：").append(item.examples.get(i)[1]);
+            out.append("\n遇到倾诉、求助、被夸、道别这类情况时，背景里会附上这一轮的情境和你这个性格的做法；聊到吃的、五子棋、爱好、作息或你住的地方时，会附上那部分更细的设定。");
         }
         return out.toString();
     }

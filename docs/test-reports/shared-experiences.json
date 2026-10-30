@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-29",
+  "branch": "codex/shared-experiences-lite",
+  "source_commit": "63e05a373c85a40c2446f9898205826cf8fa429e",
+  "upstream_main": "805ea9d1d8920e5b08982abd4a8f7ab25423fa33",
+  "persona_branch_head": "1c6a86b654254ee1c891916d3d02032235980f91",
+  "upstream_tips_rechecked": true,
+  "release": {
+    "merged_to_main": false,
+    "published": false,
+    "version_inherited": "0.4.9.4",
+    "version_code": 18,
+    "apk": "test-signed, not for distribution"
+  },
+  "build": {
+    "passed": true,
+    "jdk": 17,
+    "platform": 34,
+    "build_tools": "36.0.0",
+    "signatures": ["v2", "v3"],
+    "dex_sha256": "f5651d9d53de2ea369aa97374ed5ca2c9192a3a36447337cbcf63fa73192b0a5",
+    "dex_review": "SharedExperience collection/request/entry paths and deletion cutoffs present. Existing API 28 package version/signing calls remain guarded. No String.isBlank/strip or List.of/Map.of references found."
+  },
+  "framework_full_initial": {
+    "robolectric_api": 34,
+    "tests": 154,
+    "failures": 2,
+    "errors": 0,
+    "skipped": 0,
+    "issues": [
+      "CompanionBehaviorTest matched old persona wording; updated assertion to the published persona branch wording, preserving the frozen-persona priority check.",
+      "MemoryIntegrationTest shared HTTP replay encountered a SocketTimeoutException. Service code, deadlines and benchmark expectations were not changed."
+    ],
+    "new_shared_experience_ui_tests": {"tests": 4, "failures": 0, "errors": 0},
+    "earlier_targeted_test_fix": "The deletion test now drains the posted dialog button callback before awaiting the storage executor; product behavior was unchanged."
+  },
+  "framework_recheck": {
+    "status": "passed",
+    "suites": ["CompanionBehaviorTest", "MemoryIntegrationTest"],
+    "tests": 19,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "python": "3.13, explicit interpreter",
+    "http_replay": "84 scenarios, 312 service requests, 145/166 product expectations; matches reviewed baseline",
+    "note": "Same product build and unchanged service, transport timeouts and benchmark assertions. Only the stale persona wording assertion changed."
+  },
+  "framework_final_aggregate": {
+    "suites": 16,
+    "tests": 154,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "note": "Full run plus the two affected suites rerun; this is an aggregate, not a claim that the initial full run had no failures."
+  },
+  "android_art": {
+    "device": "MuMu emulator",
+    "android": "15",
+    "api": 35,
+    "uses_final_product_dex": true,
+    "suites_passed": 20,
+    "suites_failed": 0,
+    "diary_assertions": 45,
+    "character_assertions": 310,
+    "character_state_assertions": 25,
+    "gomoku_assertions": 530,
+    "growth_assertions": 3596
+  },
+  "shared_memory_baseline": {
+    "scenarios": 84,
+    "native_expectations_passed": 145,
+    "total_expectations": 166,
+    "reviewed_python_baseline_passed": 145,
+    "regressions": 0,
+    "note": "Passing the regression harness means parity with the reviewed baseline, not 166/166 memory quality."
+  },
+  "android_instrumentation": {
+    "package": "com.dafeiyu.experiencechecks",
+    "runtime_assertions_passed": 63,
+    "shared_experience_assertions_passed": 19,
+    "model": "controlled synthetic responses; no live model API",
+    "history": "synthetic valid game with historical timestamp; device clock unchanged",
+    "screenshot_reviewed": true,
+    "screenshot_local": "build/experience-checks/shared-experiences.png",
+    "visual_result": "Event, retrospective feeling, search and source/delete controls visible with no observed text clipping.",
+    "initial_issue": "First accessibility lookup did not find the visible event. Capturing the screenshot before querying accessibility and rerunning the same assertions passed; product UI was unchanged.",
+    "formal_app_data_touched": false
+  },
+  "limits": [
+    "No physical handset or lower Android version was tested in this turn.",
+    "Controlled models verify protocol, storage, recall, deletion and UI; they do not establish real-model empathy or long-term companion quality.",
+    "Existing lexical retrieval and 400-page diary limit remain; physical interactions still retain only the most recent 200 events.",
+    "No main merge, version bump, production signing or release was performed."
+  ]
+}

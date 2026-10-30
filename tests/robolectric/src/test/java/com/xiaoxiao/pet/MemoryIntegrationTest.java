@@ -70,7 +70,11 @@ public class MemoryIntegrationTest {
     @Test public void onlyLoopbackAllowsHttp()throws Exception {
         assertEquals(base,new MemoryBridge.Address(base).base);for(String url:new String[]{"http://192.168.1.2:8787","http://example.com","https://user:pass@example.com","https://example.com?token=abc"})try{new MemoryBridge.Address(url);fail(url);}catch(Exception expected){}
     }
-    @Test public void unchanged84ScenarioProtocolReplayMatchesPython()throws Exception {MemoryReplay.run(config());}
+    @Test public void unchanged84ScenarioProtocolReplayMatchesPython()throws Exception {
+        // Preserve the real transport and deadlines, but make infrastructure failures distinguishable.
+        MemoryBridge.client=(c,p,b,t)->{try{return MemoryBridge.http(c,p,b,t);}catch(Exception error){System.out.println("Replay HTTP failure: "+error.getClass().getSimpleName()+": "+error.getMessage());throw error;}};
+        MemoryReplay.run(config());
+    }
     @Test public void historicalEntryIsReadOnlyAndCannotRestoreAnOldFact()throws Exception {
         MainActivity a=UiTest.ready();JSONObject old=row("old","我以前喜欢红色",System.currentTimeMillis());String before=AgentRuntime.store().snapshot().toString();MemoryPanel.historicalEntry(a,old);AlertDialog dialog=(AlertDialog)UiTest.dialog();assertEquals(0,UiTest.all(dialog.getWindow().getDecorView(),EditText.class).size());assertEquals("忘记相关版本",dialog.getButton(-1).getText().toString());dialog.getButton(-2).performClick();assertEquals(before,AgentRuntime.store().snapshot().toString());
     }

@@ -47,7 +47,7 @@ final class NativeMemoryEngine {
             // Splitting drops the "？", so questions are recognised from their own end mark and question words.
             if(sentence.group(2).matches(".*[?？].*")||ASKING.matcher(sentence.group(1)).find())continue;
             String s=strip(sentence.group(1)).replaceAll("^[，,、~～\\s]+|[，,、~～…\\s]+$","");int n=s.codePointCount(0,s.length());
-            if(n<4||n>240||!AgentPolicy.validEvidence(user,s)||noise(s)||TRANSIENT.matcher(s).find()||s.startsWith("你")&&!s.contains("我"))continue;
+            if(n<4||n>240||!MemoryCapture.eligible(user,s)||noise(s)||TRANSIENT.matcher(s).find()||s.startsWith("你")&&!s.contains("我"))continue;
             String c;try{c=category(s);}catch(Exception e){continue;}
             boolean fact=contains(s,RULES.optJSONArray("FACT_MARKERS"))||c.equals("identity_health_safety")||c.equals("preference_relation_status")||c.equals("project_task_goal");
             boolean plan=NativeMemoryTime.TOKENS.matcher(s).find()&&PLAN.matcher(s).find();
