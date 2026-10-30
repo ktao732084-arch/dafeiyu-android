@@ -45,8 +45,52 @@ public class TouchReplyRuntimeTest {
   Data.prefs().edit().putBoolean("agent.touchReply",false).putBoolean("physics",false).commit();motion(MotionEvent.ACTION_DOWN,200,200);motion(MotionEvent.ACTION_UP,200,200);
   motion(MotionEvent.ACTION_DOWN,200,200);motion(MotionEvent.ACTION_MOVE,300,230);motion(MotionEvent.ACTION_UP,300,230);
   motion(MotionEvent.ACTION_DOWN,900,200);motion(MotionEvent.ACTION_MOVE,1,200);motion(MotionEvent.ACTION_UP,1,200);
-  AgentRuntime.worker.submit(()->{}).get(5,TimeUnit.SECONDS);JSONArray events=AgentRuntime.store().snapshot().getJSONArray("interactions");assertEquals(3,events.length());assertEquals("tap",events.getJSONObject(0).getString("kind"));assertEquals("drag",events.getJSONObject(1).getString("kind"));assertEquals("dock",events.getJSONObject(2).getString("kind"));assertEquals(0,calls.get());
+  AgentRuntime.worker.submit(()->{}).get(5,TimeUnit.SECONDS);JSONArray events=AgentRuntime.store().snapshot().getJSONArray("interactions");assertEquals(5,events.length());assertEquals("tap",events.getJSONObject(0).getString("kind"));assertEquals("lift",events.getJSONObject(1).getString("kind"));assertEquals("drag",events.getJSONObject(2).getString("kind"));assertEquals("lift",events.getJSONObject(3).getString("kind"));assertEquals("dock",events.getJSONObject(4).getString("kind"));assertEquals(0,calls.get());
  }
- @Test public void cancelledDragIsRecordedWithoutPretendingItCompleted()throws Exception{motion(MotionEvent.ACTION_DOWN,200,200);motion(MotionEvent.ACTION_MOVE,300,200);motion(MotionEvent.ACTION_CANCEL,300,200);AgentRuntime.worker.submit(()->{}).get(5,TimeUnit.SECONDS);assertEquals("cancel",AgentRuntime.store().snapshot().getJSONArray("interactions").getJSONObject(0).getString("kind"));assertEquals(0,pet.touchReplies.count);}
+ @Test public void cancelledDragIsRecordedWithoutPretendingItCompleted()throws Exception{motion(MotionEvent.ACTION_DOWN,200,200);motion(MotionEvent.ACTION_MOVE,300,200);motion(MotionEvent.ACTION_CANCEL,300,200);AgentRuntime.worker.submit(()->{}).get(5,TimeUnit.SECONDS);assertEquals("cancel",AgentRuntime.store().snapshot().getJSONArray("interactions").getJSONObject(1).getString("kind"));assertEquals(0,pet.touchReplies.count);}
  @Test public void quietModelAndOverlongReplyStaySilent()throws Exception{AgentRuntime.model=(m,t,p)->"[安静陪伴]";gestures();settle();assertNull(spoken);assertEquals(0,AgentRuntime.history().length());}
+ @Test public void holdingSpeaksInFrozenPersonaBeforeReleaseAndOnlyOnce()throws Exception{
+  final String persona=PersonaManager.prompt("main");
+  AgentRuntime.model=(messages,t,p)->{calls.incrementAndGet();String prompt=messages.toString();assertTrue(prompt.contains("durationMs"));assertTrue(prompt.contains("仍在提着"));assertTrue(messages.getJSONObject(0).getString("content").contains(persona));return "先把本鲸放下来，我又不是钥匙扣。";};
+  motion(MotionEvent.ACTION_DOWN,200,200);motion(MotionEvent.ACTION_MOVE,300,250);pet.busy=true;
+  ShadowLooper.idleMainLooper(4900,TimeUnit.MILLISECONDS);assertEquals(0,calls.get());
+  ShadowLooper.idleMainLooper(200,TimeUnit.MILLISECONDS);UiTest.awaitIdle();assertEquals(1,calls.get());assertTrue(pet.dragging&&pet.lift.active);assertEquals("先把本鲸放下来，我又不是钥匙扣。",spoken);
+  JSONObject state=AgentRuntime.store().snapshot(),evidence=state.getJSONArray("turns").getJSONObject(0).getJSONObject("interaction");assertEquals("holding",evidence.getString("phase"));assertTrue(evidence.getLong("durationMs")>=5000);assertEquals(1,evidence.getInt("count"));assertEquals(0,state.optInt("userTurns"));assertEquals(persona,PersonaManager.prompt("main"));
+  ShadowLooper.idleMainLooper(30,TimeUnit.SECONDS);assertEquals(1,calls.get());
+ }
+ @Test public void briefLiftDoesNotCallTheModel()throws Exception{
+  motion(MotionEvent.ACTION_DOWN,200,200);motion(MotionEvent.ACTION_MOVE,300,250);ShadowLooper.idleMainLooper(2,TimeUnit.SECONDS);motion(MotionEvent.ACTION_UP,300,250);settle();assertEquals(0,calls.get());assertFalse(pet.lift.active);
+ }
+ @Test public void threeShortDragsStillBuildTheOriginalInteractionBurst()throws Exception{
+  Data.prefs().edit().putBoolean("physics",false).commit();
+  for(int i=0;i<3;i++){motion(MotionEvent.ACTION_DOWN,200,200);motion(MotionEvent.ACTION_MOVE,240,210);motion(MotionEvent.ACTION_UP,240,210);}
+  assertEquals(3,pet.touchReplies.count);settle();assertEquals(1,calls.get());
+  assertEquals(3,AgentRuntime.store().snapshot().getJSONArray("turns").getJSONObject(0).getJSONObject("interaction").getInt("count"));
+ }
+ @Test public void releaseCancelsPendingHoldingReply()throws Exception{
+  CountDownLatch entered=new CountDownLatch(1),done=new CountDownLatch(1);AgentRuntime.model=(m,t,p)->{entered.countDown();done.await(5,TimeUnit.SECONDS);return "仍然提着我的迟到回复";};
+  motion(MotionEvent.ACTION_DOWN,200,200);motion(MotionEvent.ACTION_MOVE,300,250);ShadowLooper.idleMainLooper(5100,TimeUnit.MILLISECONDS);assertTrue(entered.await(3,TimeUnit.SECONDS));motion(MotionEvent.ACTION_UP,300,250);done.countDown();UiTest.awaitIdle();assertNull(spoken);assertEquals(0,AgentRuntime.history().length());
+ }
+ @Test public void disabledSettingAlsoSilencesHolding()throws Exception{
+  Data.prefs().edit().putBoolean("agent.touchReply",false).commit();motion(MotionEvent.ACTION_DOWN,200,200);motion(MotionEvent.ACTION_MOVE,300,250);ShadowLooper.idleMainLooper(10,TimeUnit.SECONDS);UiTest.awaitIdle();assertEquals(0,calls.get());assertTrue(pet.lift.active);
+ }
+ @Test public void typingPreemptsTheHoldingReply()throws Exception{
+  CountDownLatch entered=new CountDownLatch(1),done=new CountDownLatch(1);AtomicInteger n=new AtomicInteger();AgentRuntime.model=(m,t,p)->{if(n.incrementAndGet()==1){entered.countDown();done.await(5,TimeUnit.SECONDS);return "迟到提起回复";}return "好，继续聊。";};
+  motion(MotionEvent.ACTION_DOWN,200,200);motion(MotionEvent.ACTION_MOVE,300,250);ShadowLooper.idleMainLooper(5100,TimeUnit.MILLISECONDS);assertTrue(entered.await(3,TimeUnit.SECONDS));UiTest.Counter response=new UiTest.Counter();assertTrue(AgentRuntime.send("继续聊正事",false,response));done.countDown();UiTest.awaitIdle();assertNull(spoken);assertEquals(1,response.done);assertEquals(1,AgentRuntime.store().snapshot().getJSONArray("turns").length());
+ }
+
+ @Test public void grabRegionIsChosenOnDownAndStaysFixedDuringDrag()throws Exception{
+  float px=pet.x+pet.width*.5f,head=pet.y+(pet.normT+.25f*(pet.normB-pet.normT))*pet.width*.75f;
+  motion(MotionEvent.ACTION_DOWN,px,head);motion(MotionEvent.ACTION_MOVE,px+50,head+100);assertEquals("head",pet.lift.region);motion(MotionEvent.ACTION_CANCEL,px+50,head+100);
+  float waist=pet.y+(pet.normT+.8f*(pet.normB-pet.normT))*pet.width*.75f;px=pet.x+pet.width*.5f;
+  motion(MotionEvent.ACTION_DOWN,px,waist);motion(MotionEvent.ACTION_MOVE,px+50,waist-100);assertEquals("waist",pet.lift.region);
+  motion(MotionEvent.ACTION_MOVE,px+60,waist-200);assertEquals("waist",pet.lift.region);
+ }
+ @Test public void waistHoldPromptCarriesTheActualGrabRegion()throws Exception{
+  AgentRuntime.model=(messages,t,p)->{calls.incrementAndGet();String body=messages.toString();assertTrue(body.contains("grabRegion"));assertTrue(body.contains("waist"));assertTrue(body.contains("后腰"));return "别拎我的围裙后面啦。";};
+  float px=pet.x+pet.width*.5f,py=pet.y+(pet.normT+.8f*(pet.normB-pet.normT))*pet.width*.75f;
+  motion(MotionEvent.ACTION_DOWN,px,py);motion(MotionEvent.ACTION_MOVE,px+30,py-40);ShadowLooper.idleMainLooper(5100,TimeUnit.MILLISECONDS);UiTest.awaitIdle();
+  assertEquals(1,calls.get());JSONObject interaction=AgentRuntime.store().snapshot().getJSONArray("turns").getJSONObject(0).getJSONObject("interaction");assertEquals("waist",interaction.getString("grabRegion"));assertEquals("waist",interaction.getJSONArray("events").getJSONObject(0).getString("grabRegion"));
+ }
+
 }

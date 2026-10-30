@@ -12,6 +12,14 @@ public final class ActionPlanTest {
  static ActionPlan.Moment at(int y,int mo,int d,int h,int mi,int lm,int ld){return new ActionPlan.Moment(LocalDateTime.of(y,mo,d,h,mi),lm,ld,false,false);}
  public static void main(String[] args){
   Random r=new Random(7);
+  ActionPlan varied=new ActionPlan(ActionPlan.TAP_ACTIONS);Set<String> tapped=new HashSet<>();Deque<String> tapWindow=new ArrayDeque<>();
+  for(int i=0;i<200;i++){String clip=varied.tap(i*6000L,ActionPlan.IDLE,r);check(!tapWindow.contains(clip),"no repeated tap clip in recent eight");tapped.add(clip);tapWindow.addLast(clip);if(tapWindow.size()>8)tapWindow.removeFirst();}
+  check(tapped.size()>=40,"broad tap repertoire: "+tapped.size());
+  varied.available(Arrays.asList(ActionPlan.IDLE,"鲸鱼吐泡泡特效"));
+  check("鲸鱼吐泡泡特效".equals(varied.tap(2000000,ActionPlan.IDLE,r)),"chapter-limited repertoire respected");
+  check(ActionPlan.IDLE.equals(new ActionPlan(Collections.singleton(ActionPlan.IDLE)).tap(0,ActionPlan.IDLE,r)),"missing tap clips fall back to idle, never empty");
+  for(String clip:ActionPlan.TAP_ACTIONS)check(!ActionPlan.eating(clip)&&!ActionPlan.FESTIVALS.contains(clip)&&!ActionPlan.SLEEP.contains(clip)&&!clip.startsWith("余额")&&!ActionPlan.DRAG.equals(clip),"tap cannot fabricate a meal, balance or hold: "+clip);
+  System.out.println("TAP REPERTOIRE: "+ActionPlan.TAP_ACTIONS.size()+" eligible clips");
   // 2026-10-28 is a Wednesday, lunar 9/18.
   ActionPlan p=new ActionPlan(all());
   for(int i=0;i<200;i++)check(ActionPlan.SLEEP.contains(p.idle(at(2026,10,28,2,i%60,9,18),r)),"small hours are sleepy only");
@@ -37,9 +45,9 @@ public final class ActionPlanTest {
   for(int i=0;i<50;i++)check(few.contains(p.idle(at(2026,10,28,12,0,9,18),r)),"only clips in the catalog");
   for(int i=0;i<200;i++){long g=ActionPlan.gapMillis(at(2026,10,28,14,0,9,18),r),n=ActionPlan.gapMillis(at(2026,10,28,3,0,9,18),r);check(g>=25_000&&g<55_000&&n>=180_000&&n<360_000,"gaps: day half a minute, night minutes");}
   p=new ActionPlan(all());check(ActionPlan.WOKEN.equals(p.tap(0,"原地小憩沉眠",r)),"tap wakes a dozing pet");
-  p=new ActionPlan(all());String prev=null;for(int i=0;i<3;i++){String a=p.tap(i*10_000L,ActionPlan.IDLE,r);check(ActionPlan.TAPS.contains(a)&&!a.equals(prev),"varied tap reactions");prev=a;}
+  p=new ActionPlan(all());String prev=null;for(int i=0;i<3;i++){String a=p.tap(i*10_000L,ActionPlan.IDLE,r);check(ActionPlan.TAP_ACTIONS.contains(a)&&!a.equals(prev),"varied tap reactions");prev=a;}
   p=new ActionPlan(all());String a=null;for(int i=0;i<4;i++)a=p.tap(i*500L,ActionPlan.IDLE,r);check(ActionPlan.ANNOYED.equals(a),"poking four times annoys her");
-  check(ActionPlan.TAPS.contains(p.tap(2500,ActionPlan.IDLE,r)),"annoyance resets after showing");
+  check(ActionPlan.TAP_ACTIONS.contains(p.tap(2500,ActionPlan.IDLE,r)),"annoyance resets after showing");
   p=new ActionPlan(all());prev=null;for(int i=0;i<40;i++){String e=p.emotion("happy","点击回应-开心跃动",r);check(ActionPlan.EMOTIONS.get("happy").contains(e)&&!e.equals(prev),"emotion varies within its family");prev=e;}
   check("点击回应-开心跃动".equals(new ActionPlan(few).emotion("happy","点击回应-开心跃动",r)),"canonical clip when no variants exist");
   for(int month=1;month<=12;month++)for(int lm=1;lm<=12;lm++)for(int ld=1;ld<=30;ld+=1){ActionPlan.Moment m=new ActionPlan.Moment(LocalDateTime.of(2026,month,month==2?28:30,12,0),lm,ld,false,ld>=29);

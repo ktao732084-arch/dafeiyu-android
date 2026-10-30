@@ -179,3 +179,13 @@ Gomoku.java（自由规则、入门棋形策略）、GomokuStore.java（棋谱/�
 发布前合入[10c1a8d](https://github.com/ktao732084-arch/dafeiyu-android/commit/10c1a8d)及养成主线，保留章节、喂食出门与统一发布实现；五子棋入口独立存在，模型背景同时携带经过来源区分的养成背景和真实棋局结果。
 
 同时保留[278fca4](https://github.com/ktao732084-arch/dafeiyu-android/commit/278fca4)的自然分段、旧展示状态兼容和养成时机修复；相关框架与Android检查在最终DEX上复验。
+
+
+## 桌面气泡、点击与提起互动（同批未发布）
+
+`PetBubbles.java` 和 `LiftInteraction.java` 为本项目新增：独立逐句气泡及持续提起状态；在原 `PetService`、`PetMenu`、`ActionPlan`、`AlphaVideo`、`TouchReply` 和 `AgentRuntime` 上接线。复用现有拖拽悬空视频 `assets/main/093.mp4` 及其原有素材归属，不增加第三方运行库、不替换动画素材。`BubbleInstrumentation`、`LiftInstrumentation` 和相关核心/框架测试为受控验证工具。范围与结果见 `docs/PET_BUBBLES.md`、`docs/PET_LIFT.md`。
+
+
+后续同批新增 `WaistLiftView.java` 与 `assets/main/waist-lift-v1.png`：依据手势按下部位，在头部视频与后腰悬吊姿态之间选择；PNG使用内置image_gen参考原角色图生成，应用以网格与摆动呈现动画。原106段视频未修改。素材生成记录见 `docs/WAIST_LIFT_ASSET.md`，交互验收见 `docs/WAIST_LIFT.md`。
+
+`SuspensionMotion.java` 为本轮新增的二维阻尼悬吊反馈，配套 Android ART 数值测试；`LiftInteraction` 增加默认视频的进入/退出混合与生命周期清理。验收与录像范围见 `docs/WAIST_LIFT.md`。

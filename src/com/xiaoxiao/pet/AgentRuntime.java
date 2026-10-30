@@ -46,7 +46,7 @@ final class AgentRuntime {
     }
     /** One model call for a user gesture burst. Shares cancellation with chat, but never changes idle plans. */
     static boolean respondToTouch(PetService service,PetService.Pet pet,TouchReply.Request request){
-        if(!TouchReply.allowed(service,pet)||!TouchReply.free(pet)||!configured()||!pet.touchReplies.current(request))return false;
+        if(!TouchReply.allowed(service,pet)||!TouchReply.free(pet,request)||!configured()||!TouchReply.current(pet,request))return false;
         final AgentTransport.Token token;
         synchronized(AgentRuntime.class){if(active!=null)return false;token=new AgentTransport.Token();active=token;activeListener=null;activeProactive=true;activeTouch=pet;}
         worker.execute(()->{
@@ -57,7 +57,7 @@ final class AgentRuntime {
                 main.post(()->{
                     if(!current(token))return;
                     try{
-                        if(text==null||SystemClock.uptimeMillis()-request.lastAt>TouchReply.EXPIRE_MS||memory!=db||db.epoch()!=request.epoch||!pet.touchReplies.current(request)||!TouchReply.allowed(service,pet)||!TouchReply.free(pet)){release(token);return;}
+                        if(text==null||SystemClock.uptimeMillis()-request.lastAt>TouchReply.EXPIRE_MS||memory!=db||db.epoch()!=request.epoch||!TouchReply.current(pet,request)||!TouchReply.allowed(service,pet)||!TouchReply.free(pet,request)){release(token);return;}
                         String id=UUID.randomUUID().toString();
                         synchronized(AgentRuntime.class){if(!current(token))return;if(!db.commit(request.epoch,"",text,reply.emotion,null,false,true,null,null,id,System.currentTimeMillis(),null,true,null,null,reply.moodLevel,rememberEnabled()?reply.moodCause:"",request.evidence)){release(token);return;}}
                         release(token);pet.speak(text,id);
