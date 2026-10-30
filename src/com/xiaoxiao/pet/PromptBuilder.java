@@ -29,6 +29,8 @@ final class PromptBuilder {
         PersonaManager.Persona style;
         /** What she was visibly doing on screen (ActionPlan.doing) and when; null when hidden or unknown. */
         String doing;long doingAt;
+        /** Her day so far (HerDay.today) and whether she has not eaten yet today (GrowthStore.hungry). */
+        JSONObject day;boolean hungry;
     }
     static JSONArray build(Inputs in,String user,boolean proactive,JSONObject s,JSONArray hits)throws Exception {
         long nowMillis=in.now;
@@ -71,6 +73,8 @@ final class PromptBuilder {
         background.append("\n").append(AgentPolicy.moodLine(feeling,in.remember));
         // What she is in the middle of: woken, what just happened to her, a short-lived wish, reminders already given.
         CharacterNow.Result present=in.historyRecall==null?CharacterNow.of(s,in.games,user,proactive,nowMillis,in.doing,in.doingAt):new CharacterNow.Result();background.append(CharacterNow.block(present));
+        // Her day so far from real playback and feeding, so "今天干嘛了" and her hungry grumbling match the screen.
+        if(in.historyRecall==null&&(proactive||!CharacterNow.serious(user)))background.append(HerDay.block(in.day,s,in.hungry,nowMillis,ZoneId.systemDefault()));
         // This turn's situation and the matching part of her bible, chosen locally from the user's words; only what applies.
         if(!proactive&&in.historyRecall==null)background.append(Situations.block(in.style,user,nowMillis,ZoneId.systemDefault(),s.optLong("lastUser")));
         long last=s.optLong("lastUser");if(last>0)background.append("\n距离上次对话约 ").append(Math.max(0,(nowMillis-last)/60000)).append(" 分钟。不要编造这期间的经历。");

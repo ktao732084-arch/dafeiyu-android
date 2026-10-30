@@ -26,6 +26,8 @@ final class ActionPlan {
         boolean lunar(int month,int fromDay,int toDay){ return !leapMonth && lunarMonth==month && lunarDay>=fromDay && lunarDay<=toDay; }
         boolean solar(int month,int fromDay,int toDay){ return time.getMonthValue()==month && time.getDayOfMonth()>=fromDay && time.getDayOfMonth()<=toDay; }
         boolean weekend(){ DayOfWeek d=time.getDayOfWeek(); return d==DayOfWeek.SATURDAY||d==DayOfWeek.SUNDAY; }
+        /** Meal times when an unfed whale grumbles on screen; HerDay says so in words at the same times. */
+        boolean peckish(){ return between(11,0,11,30)||between(15,0,16,30)||between(17,0,17,30); }
         boolean night(){ return between(0,0,6,0); }
         boolean late(){ return between(22,30,24,0); }
     }
@@ -203,7 +205,7 @@ final class ActionPlan {
             if(m.between(8,0,22,30)) add(pools,weights,festival(m),3,now);
             add(pools,weights,slot(m),m.late()?6:4,now);
             if(m.between(8,0,22,30)) add(pools,weights,season(m),1,now);
-            if(hungry&&(m.between(11,0,11,30)||m.between(15,0,16,30)||m.between(17,0,17,30))) add(pools,weights,HUNGRY,3,now);
+            if(hungry&&m.peckish()) add(pools,weights,HUNGRY,3,now);
             if(fedAt>0&&now>=fedAt&&now-fedAt<30*MINUTE) add(pools,weights,FULL,4,now);
             add(pools,weights,m.weekend()||m.between(19,30,22,30)?merge(EVERYDAY,PLAY):EVERYDAY,3,now);
             if(annoyedAt>=0&&now-annoyedAt<SULKS_FOR) add(pools,weights,SULKING,8,now);

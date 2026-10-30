@@ -104,7 +104,7 @@ final class AgentRuntime {
         String requested=!proactive&&history==null?Nickname.requested(user):null;if(requested!=null)in.nickname=requested;
         in.feeling=store().mood(System.currentTimeMillis());in.mood=in.feeling.optString("emotion","calm");in.timeZone=TimeZone.getDefault().getID();in.now=System.currentTimeMillis();in.initializedAt=PersonaManager.initializedAt("main");
         if(touched){in.lastEvent=lastEvent;in.lastEventAt=lastEventAt;}onScreen(in);in.remember=rememberEnabled();in.diary=diaryEnabled();in.aside=asideEnabled();if(in.remember&&in.diary&&history==null){in.understanding=Understanding.context(s,proactive?"":user);in.phrases=Phrases.context(s,proactive?"":user);}
-        GrowthStore growth=GrowthStore.quiet();if(growth!=null){in.chapter=growth.chapter();in.lore=growth.lore();}
+        GrowthStore growth=GrowthStore.quiet();if(growth!=null){in.chapter=growth.chapter();in.lore=growth.lore();in.hungry=growth.hungry();}in.day=HerDay.today();
         if(in.remember&&history==null){
             try{in.games=GomokuPage.store().context();}catch(Exception unavailable){in.games=new JSONObject().put("status","unavailable");}
             // Whole-conversation recall, minus what the history window already carries and corrected sources.
