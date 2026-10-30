@@ -15,7 +15,8 @@ public class CommitmentsUiTest {
   assertEquals(1,Commitments.entries(db.snapshot()).length());JSONObject turn=db.snapshot().getJSONArray("turns").getJSONObject(0);db.shown(turn.getString("id"),999,true);db.awaitWrites();
   JSONArray promises=Commitments.entries(db.snapshot());assertEquals(2,promises.length());assertEquals("user",promises.getJSONObject(0).getString("speaker"));assertEquals("assistant",promises.getJSONObject(1).getString("speaker"));
   assertTrue(AgentRuntime.context("你答应提醒我的事",false).toString().contains("十分钟后我提醒你喝水"));
-  Data.prefs().edit().putBoolean("agent.memory",false).commit();assertFalse(AgentRuntime.context("你答应提醒我的事",false).toString().contains("双方约定（"));
+  assertTrue(AgentRuntime.context("你答应提醒我的事",false).toString().contains("你答应用户的"));
+  Data.prefs().edit().putBoolean("agent.memory",false).commit();assertFalse(AgentRuntime.context("你答应提醒我的事",false).toString().contains("你答应用户的"));
  }
  @Test public void sameDreamCallCanSupplementWithoutProducingADiary()throws Exception{
   LocalDate day=LocalDate.now().minusDays(1);long at=day.atTime(19,0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();String quote="这份资料我周末给你。";

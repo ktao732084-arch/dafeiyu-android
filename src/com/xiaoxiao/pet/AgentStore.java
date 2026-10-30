@@ -162,7 +162,7 @@ final class AgentStore {
         JSONArray turns=next.getJSONArray("turns");
         // Presentation may advance while the model works on an older memory snapshot.
         JSONArray live=state.getJSONArray("turns");Map<String,JSONObject> presentation=new HashMap<>();for(int i=0;i<live.length();i++)presentation.put(ChatArchive.id(live.getJSONObject(i)),live.getJSONObject(i));
-        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i),current=presentation.get(ChatArchive.id(t));if(current!=null)for(String field:new String[]{"displayed","displayedAt","lastDisplayedAt","segmentDisplayedAt","displayTimeZone"})if(current.has(field))t.put(field,current.get(field));}
+        for(int i=0;i<turns.length();i++){JSONObject t=turns.getJSONObject(i),current=presentation.get(ChatArchive.id(t));if(current!=null)for(String field:new String[]{"displayed","displayedAt","lastDisplayedAt","segmentDisplayedAt","displayTimeZone","assistantCommitmentsAllowed"})if(current.has(field))t.put(field,current.get(field));}
         JSONArray pendingSelf=next.optJSONArray("self"),liveSelf=state.optJSONArray("self");if(pendingSelf!=null&&liveSelf!=null)for(int i=0;i<pendingSelf.length();i++)for(int j=0;j<liveSelf.length();j++){JSONObject pending=pendingSelf.getJSONObject(i),current=liveSelf.getJSONObject(j);if(pending.optString("source").equals(current.optString("source"))&&pending.optString("text").equals(current.optString("text"))&&current.optBoolean("shown",true))pending.put("shown",true);}
         // The diary is written beside chat by its own thread; the live state's copy is the current one.
         if(state.has("diary"))next.put("diary",state.getJSONArray("diary"));else next.remove("diary");
