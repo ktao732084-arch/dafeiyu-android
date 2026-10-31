@@ -7,7 +7,9 @@ python3 tools/promo/render_promo.py --font-dir <字体目录> [--phone-dir <真�
 ```
 
 - 字体目录里放同一套中文字体的 400 / 700 / 900 三个字重（文件名含 `400`、`700`、`900`，woff2/ttf/otf 均可），例如 Noto Sans SC。缺字会直接报错。
-- 输出到 `docs/promo/`：`dafeiyu-promo.mp4`（1280×720，带声音）、`dafeiyu-promo.webp`（README 用的无声动图）、`cover.png`。
+- 输出到 `docs/promo/`：`dafeiyu-promo.mp4`（默认 1920×1080、60 帧/秒，H.264 High + AAC 192k，可直接上传各平台）、`dafeiyu-promo.webp`（README 用的无声动图）、`cover.png`。
+- 画面按 1280×720 排版，`--scale` 决定输出倍数（1.5 即 1080p，1 即 720p），`--fps` 设帧率，`--crf` 设画质（越小越清晰，默认 16）。`--jobs` 按 CPU 核数并行分段渲染后无损拼接。
+- 角色动画原片每半边 640×480、30 帧/秒，放大时用 Lanczos 并对彩色半边轻微锐化；1080p 下角色仍会比文字略软。录屏片段不做补帧：试过运动补偿插帧，她切换动作时会出现重影。
 - 依赖 ffmpeg、numpy、Pillow。
 
 ## 加入真机录屏

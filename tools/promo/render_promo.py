@@ -10,17 +10,18 @@ image for the README.
 
 The soundtrack is synthesised by soundtrack.py, so the video carries no third-party music.
 
-Outputs docs/promo/dafeiyu-promo.mp4, docs/promo/dafeiyu-promo.webp (animated, for the README) and
-docs/promo/cover.png.
+Outputs docs/promo/dafeiyu-promo.mp4 (1920x1080 at 60 fps by default; see --scale and --fps),
+docs/promo/dafeiyu-promo.webp (animated, for the README) and docs/promo/cover.png.
 Needs ffmpeg, numpy and Pillow. Fonts are not bundled; any CJK font with three weights works.
 """
 import argparse
 import glob
 import json
+import math
+import multiprocessing
+import os
 import shutil
 import tempfile
-import math
-import os
 import random
 import subprocess
 import sys
@@ -35,7 +36,16 @@ import soundtrack  # noqa: E402
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 CLIPS = os.path.join(ROOT, 'assets', 'main')
 OUT = os.path.join(ROOT, 'docs', 'promo')
-W, H, FPS = 1280, 720, 30
+W, H = 1280, 720  # layout units; every coordinate in the scenes is written in these
+S, FPS = 1.0, 30  # render scale and frame rate, set from the command line
+
+
+def px(v):
+    return int(round(v * S))
+
+
+def size():
+    return px(W) // 2 * 2, px(H) // 2 * 2
 DURATION = 36.0  # without phone footage
 PHONE_AT = 9.6  # real-phone footage starts here, right after the title
 PHONE_CUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'phone_cut.json')
@@ -96,7 +106,7 @@ class Clip:
 
     def __init__(self, name, height, start=0.0):
         self.path = os.path.join(CLIPS, name + '.mp4')
-        self.h = int(height)
+        self.h = px(height)
         self.w = int(round(self.h * 640 / 480))
         self.start = start
         self.proc = None
@@ -104,7 +114,9 @@ class Clip:
     def _open(self):
         self.proc = subprocess.Popen(
             ['ffmpeg', '-v', 'error', '-ss', str(self.start), '-i', self.path,
-             '-vf', f'fps={FPS},scale={self.w * 2}:{self.h}:flags=lanczos',
+             # Colour and mask are scaled separately so the sharpening only touches the colour half.
+             '-vf', f'split[a][b];[a]crop=640:480:0:0,scale={self.w}:{self.h}:flags=lanczos,unsharp=5:5:{0.5 if S > 1 else 0}[c];'
+                    f'[b]crop=640:480:640:0,scale={self.w}:{self.h}:flags=lanczos[m];[c][m]hstack,fps={FPS}',
              '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'],
             stdout=subprocess.PIPE)
 
@@ -142,11 +154,11 @@ class PhoneClip:
         vw, vh = (int(v) for v in probe[0].split(',')[:2])
         if any(abs(int(float(r))) in (90, 270) for r in probe[1:] if r.lstrip('-').replace('.', '').isdigit()):
             vw, vh = vh, vw
-        self.h = self.SCREEN_H
+        self.h = px(self.SCREEN_H) // 2 * 2
         self.w = int(round(self.h * vw / vh / 2) * 2)
-        self.outer_w = self.w + 2 * self.BEZEL
+        self.outer_w = self.w / S + 2 * self.BEZEL  # layout units
         mask = Image.new('L', (self.w, self.h), 0)
-        ImageDraw.Draw(mask).rounded_rectangle([0, 0, self.w - 1, self.h - 1], 26, fill=255)
+        ImageDraw.Draw(mask).rounded_rectangle([0, 0, self.w - 1, self.h - 1], px(26), fill=255)
         self.mask = mask
         self.proc = None
 
@@ -201,10 +213,11 @@ class Ocean:
     """Deep-sea backdrop that runs across every scene so the cuts feel like one dive."""
 
     def __init__(self):
-        y = np.linspace(0, 1, H)[:, None, None]
+        self.pw, self.ph = size()
+        y = np.linspace(0, 1, self.ph)[:, None, None]
         top, mid, bottom = np.array([34, 108, 176]), np.array([10, 50, 104]), np.array([3, 14, 38])
         grad = np.where(y < 0.45, top + (mid - top) * (y / 0.45), mid + (bottom - mid) * ((y - 0.45) / 0.55))
-        self.base = Image.fromarray(np.repeat(grad, W, axis=1).astype(np.uint8), 'RGB')
+        self.base = Image.fromarray(np.repeat(grad, self.pw, axis=1).astype(np.uint8), 'RGB')
         rng = random.Random(7)
         self.bubbles = [(rng.uniform(0, W), rng.uniform(0, H + 200), rng.uniform(3, 13),
                          rng.uniform(30, 90), rng.uniform(0, 6.28)) for _ in range(46)]
@@ -216,12 +229,13 @@ class Ocean:
         bubbles glide instead of stepping a whole pixel at a time."""
         key = (k, fx, fy)
         if key not in self.sprites:
+            r *= S
             size = math.ceil(2 * r + 8)
             big = Image.new('RGBA', (size * ss, size * ss), (0, 0, 0, 0))
             d = ImageDraw.Draw(big)
             cx, cy = (r + 3 + fx) * ss, (r + 3 + fy) * ss
             R = r * ss
-            d.ellipse([cx - R, cy - R, cx + R, cy + R], outline=(200, 236, 255, 120), width=int(1.6 * ss))
+            d.ellipse([cx - R, cy - R, cx + R, cy + R], outline=(200, 236, 255, 120), width=int(1.6 * S * ss))
             d.ellipse([cx - R * 0.45, cy - R * 0.6, cx - R * 0.05, cy - R * 0.2], fill=(230, 247, 255, 130))
             self.sprites[key] = big.resize((size, size), Image.LANCZOS)
         return self.sprites[key]
@@ -229,28 +243,53 @@ class Ocean:
     def frame(self, t, depth):
         """depth 1 = the dark sea floor of the opening, 0 = near the surface."""
         img = self.base.copy()
-        light = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        # The rays are a soft blur anyway, so draw them at quarter size and scale up: same look, far cheaper.
+        q = 4
+        light = Image.new('RGBA', (self.pw // q, self.ph // q), (0, 0, 0, 0))
         d = ImageDraw.Draw(light)
+        k = S / q
         for x, width, phase in self.rays:
             sway = math.sin(t * 0.35 + phase) * 60
             a = int(26 + 12 * math.sin(t * 0.8 + phase))
-            d.polygon([(x - width / 2 + sway, -10), (x + width / 2 + sway, -10),
-                       (x + width * 1.6 + sway * 2, H), (x - width * 0.4 + sway * 2, H)], fill=(170, 225, 255, a))
-        light = light.filter(ImageFilter.GaussianBlur(28))
+            d.polygon([((x - width / 2 + sway) * k, -10 * k), ((x + width / 2 + sway) * k, -10 * k),
+                       ((x + width * 1.6 + sway * 2) * k, H * k), ((x - width * 0.4 + sway * 2) * k, H * k)],
+                      fill=(170, 225, 255, a))
+        light = light.filter(ImageFilter.GaussianBlur(28 * k)).resize((self.pw, self.ph), Image.BILINEAR)
         img.paste(light, (0, 0), light)
-        bub = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+        bub = Image.new('RGBA', (self.pw, self.ph), (0, 0, 0, 0))
         for k, (x, y0, r, speed, phase) in enumerate(self.bubbles):
             y = (y0 - t * speed) % (H + 200) - 100
             bx = x + math.sin(t * 1.3 + phase) * 10
-            left, top = bx - r - 3, y - r - 3
+            left, top = bx * S - r * S - 3, y * S - r * S - 3
             ox, oy = math.floor(left), math.floor(top)
             sprite = self.bubble(k, r, round((left - ox) * 4) / 4, round((top - oy) * 4) / 4)
-            bub.alpha_composite(sprite, (ox, oy)) if 0 <= ox <= W - sprite.width and 0 <= oy <= H - sprite.height \
+            bub.alpha_composite(sprite, (ox, oy)) if 0 <= ox <= self.pw - sprite.width and 0 <= oy <= self.ph - sprite.height \
                 else bub.paste(sprite, (ox, oy), sprite)
         img.paste(bub, (0, 0), bub)
         if depth > 0:
-            img = Image.blend(img, Image.new('RGB', (W, H), (2, 8, 22)), depth * 0.82)
+            img = Image.blend(img, Image.new('RGB', img.size, (2, 8, 22)), depth * 0.82)
         return img.convert('RGBA')
+
+
+class Scaled:
+    """ImageDraw that takes layout units, so scene code can draw shapes without knowing the render scale."""
+
+    def __init__(self, draw):
+        self.raw = draw
+
+    @staticmethod
+    def _box(box):
+        return [v * S for v in box]
+
+    @staticmethod
+    def _w(width):
+        return max(1, px(width))
+
+    def rounded_rectangle(self, box, radius, fill=None, outline=None, width=1):
+        self.raw.rounded_rectangle(self._box(box), px(radius), fill=fill, outline=outline, width=self._w(width))
+
+    def ellipse(self, box, fill=None, outline=None, width=1):
+        self.raw.ellipse(self._box(box), fill=fill, outline=outline, width=self._w(width))
 
 
 class Canvas:
@@ -261,48 +300,49 @@ class Canvas:
     def layer(self, alpha, draw_fn):
         if alpha <= 0.01:
             return
-        layer = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-        draw_fn(ImageDraw.Draw(layer), layer)
+        layer = Image.new('RGBA', self.img.size, (0, 0, 0, 0))
+        draw_fn(Scaled(ImageDraw.Draw(layer)), layer)
+        box = layer.getbbox()
+        if not box:
+            return
+        layer = layer.crop(box)  # only blend the part that was drawn on
         if alpha < 0.999:
-            a = layer.getchannel('A').point(lambda v: int(v * alpha))
-            layer.putalpha(a)
-        self.img.alpha_composite(layer)
+            layer.putalpha(layer.getchannel('A').point(lambda v: int(v * alpha)))
+        self.img.alpha_composite(layer, box[:2])
 
     def text(self, xy, s, size, weight=400, fill=INK, alpha=1.0, anchor='la', shadow=True, dy=0.0):
         x, y = xy
         y += (1 - alpha) * dy
 
         def draw(d, _):
-            f = self.fonts(size, weight)
+            f = self.fonts(px(size), weight)
             if shadow:
-                d.text((x, y + 3), s, font=f, fill=(0, 10, 30, 150), anchor=anchor)
-            d.text((x, y), s, font=f, fill=fill, anchor=anchor)
+                d.raw.text((x * S, (y + 3) * S), s, font=f, fill=(0, 10, 30, 150), anchor=anchor)
+            d.raw.text((x * S, y * S), s, font=f, fill=fill, anchor=anchor)
         self.layer(alpha, draw)
 
-    def sprite(self, frame, foot_xy, alpha=1.0, scale=1.0):
+    def sprite(self, frame, foot_xy, alpha=1.0):
         """Place a clip frame so her feet (about 400/480 down, centred) land on foot_xy."""
         if alpha <= 0.01:
             return
-        if scale != 1.0:
-            frame = frame.resize((int(frame.width * scale), int(frame.height * scale)), Image.LANCZOS)
         if alpha < 0.999:
             frame = frame.copy()
             frame.putalpha(frame.getchannel('A').point(lambda v: int(v * alpha)))
-        x = int(foot_xy[0] - frame.width / 2)
-        y = int(foot_xy[1] - frame.height * 400 / 480)
-        self.img.alpha_composite(frame, (x, y)) if x >= 0 and y >= 0 and x + frame.width <= W and y + frame.height <= H \
-            else self._clipped(frame, x, y)
-
-    def _clipped(self, frame, x, y):
-        layer = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-        layer.paste(frame, (x, y), frame)
-        self.img.alpha_composite(layer)
+        x = int(round(foot_xy[0] * S - frame.width / 2))
+        y = int(round(foot_xy[1] * S - frame.height * 400 / 480))
+        iw, ih = self.img.size
+        if x >= 0 and y >= 0 and x + frame.width <= iw and y + frame.height <= ih:
+            self.img.alpha_composite(frame, (x, y))
+        else:
+            layer = Image.new('RGBA', self.img.size, (0, 0, 0, 0))
+            layer.paste(frame, (x, y), frame)
+            self.img.alpha_composite(layer)
 
     def phone(self, screen, xy, alpha=1.0):
         """A handset with screen inside; xy is its top-left corner."""
         b = PhoneClip.BEZEL
         x, y = xy
-        w, h = screen.width + 2 * b, screen.height + 2 * b
+        w, h = screen.width / S + 2 * b, screen.height / S + 2 * b
         if alpha < 0.999:
             screen = screen.copy()
             screen.putalpha(screen.getchannel('A').point(lambda v: int(v * alpha)))
@@ -312,7 +352,7 @@ class Canvas:
             d.rounded_rectangle([x + 4, y + 10, x + w + 4, y + h + 10], 38, fill=(0, 6, 20, 120))
             d.rounded_rectangle([x, y, x + w, y + h], 36, fill=(18, 24, 36, 255), outline=(120, 150, 190, 255), width=2)
         self.layer(alpha, body)
-        self.img.alpha_composite(screen, (int(x + b), int(y + b)))
+        self.img.alpha_composite(screen, (px(x + b), px(y + b)))
 
     def card(self, box, alpha=1.0, radius=22, fill=CARD, opacity=200, outline=(120, 190, 255, 70)):
         def draw(d, _):
@@ -320,7 +360,7 @@ class Canvas:
         self.layer(alpha, draw)
 
     def bubble(self, x, y, s, mine, alpha, size=26, max_w=420):
-        """A chat bubble; mine = the user's (right-aligned) side."""
+        """A chat bubble; mine = the user's (right-aligned) side. Measured in layout units."""
         f = self.fonts(size, 400)
         lines, cur = [], ''
         for ch in s:
@@ -340,10 +380,20 @@ class Canvas:
             fill = (92, 176, 255, 235) if mine else (240, 247, 255, 235)
             color = (255, 255, 255) if mine else (20, 44, 80)
             d.rounded_rectangle([bx, y, bx + bw, y + bh], 20, fill=fill)
+            fs = self.fonts(px(size), 400)
             for i, l in enumerate(lines):
-                d.text((bx + 18, y + 11 + i * lh), l, font=f, fill=color)
+                d.raw.text(((bx + 18) * S, (y + 11 + i * lh) * S), l, font=fs, fill=color)
         self.layer(alpha, draw)
         return bh
+
+
+class Skip:
+    """Stands in for Canvas on frames another worker draws: clips still advance, nothing is painted."""
+
+    img = None
+
+    def __getattr__(self, name):
+        return lambda *a, **k: 0
 
 
 # ---------------------------------------------------------------------------------------------
@@ -400,8 +450,11 @@ def cues(phone_len, beat=0.0):
     return scenes, out
 
 
-def render(fonts, out_mp4, phone=(), beat=0.0):
+def render(fonts, out_mp4, phone=(), beat=0.0, lo=0, hi=None, cover_path=None, crf=16):
+    """Draw frames lo..hi into out_mp4. Every worker walks the whole timeline so the clips stay in step,
+    but only paints its own frames."""
     ocean = Ocean()
+    skip = Skip()
     clips = {}
 
     def clip(key, name, height, start=0.0):
@@ -414,19 +467,20 @@ def render(fonts, out_mp4, phone=(), beat=0.0):
             if k in clips:
                 clips.pop(k).close()
 
+    pw, ph = size()
     enc = subprocess.Popen(
-        ['ffmpeg', '-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{W}x{H}', '-r', str(FPS),
-         '-i', '-', '-c:v', 'libx264', '-preset', 'slow', '-crf', '20', '-pix_fmt', 'yuv420p',
-         '-movflags', '+faststart', out_mp4], stdin=subprocess.PIPE)
+        ['ffmpeg', '-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{pw}x{ph}', '-r', str(FPS),
+         '-i', '-', '-c:v', 'libx264', '-preset', 'slow', '-crf', str(crf), '-profile:v', 'high',
+         '-pix_fmt', 'yuv420p', '-threads', '2', out_mp4], stdin=subprocess.PIPE)
 
     phone_len = beat * len(phone)
     total = int((DURATION + phone_len) * FPS)
-    cover = None
-    for i in range(total):
+    hi = total if hi is None else hi
+    for i in range(min(hi, total)):
         t = i / FPS
         u = t - phone_len  # clock for every scene after the phone footage
         depth = 1 - ease((t - 2.5) / 3.0)
-        c = Canvas(ocean.frame(t, depth), fonts)
+        c = Canvas(ocean.frame(t, depth), fonts) if i >= lo else skip
 
         # 1. 0–5.2s  the deep sea
         if t < 5.4:
@@ -455,8 +509,8 @@ def render(fonts, out_mp4, phone=(), beat=0.0):
                 c.card([x, 450, x + tw, 494], ta, radius=22, fill=(30, 90, 160), opacity=210, outline=(140, 210, 255, 120))
                 c.text((x + tw / 2, 472), tag, 24, 700, alpha=ta, anchor='mm', shadow=False)
                 x += tw + 12
-            if i == int(7.6 * FPS):
-                cover = c.img.copy()
+            if i == int(7.6 * FPS) and c is not skip and cover_path:
+                c.img.convert('RGB').save(cover_path, optimize=True)
         else:
             drop('s2')
 
@@ -581,7 +635,8 @@ def render(fonts, out_mp4, phone=(), beat=0.0):
             for k, s in enumerate(CREDIT):
                 c.text((W / 2, 642 + k * 30), s, 17, 400, fill=MUTED, alpha=e * 0.9, anchor='mm', shadow=False)
 
-        enc.stdin.write(c.img.convert('RGB').tobytes())
+        if c is not skip:
+            enc.stdin.write(c.img.convert('RGB').tobytes())
 
     enc.stdin.close()
     enc.wait()
@@ -590,7 +645,7 @@ def render(fonts, out_mp4, phone=(), beat=0.0):
     for _, pcs in phone:
         for pc in pcs:
             pc.close()
-    return cover
+    return total
 
 
 def main():
@@ -602,7 +657,13 @@ def main():
     ap.add_argument('--phone-dir', help='real-phone screen recordings, cut and placed after the title per --phone-cut')
     ap.add_argument('--phone-cut', default=PHONE_CUT)
     ap.add_argument('--out', default=OUT)
+    ap.add_argument('--scale', type=float, default=1.5, help='1.5 renders 1920x1080')
+    ap.add_argument('--fps', type=int, default=60)
+    ap.add_argument('--crf', type=int, default=16)
+    ap.add_argument('--jobs', type=int, default=os.cpu_count())
     args = ap.parse_args()
+    global S, FPS
+    S, FPS = args.scale, args.fps
     out = args.out
     os.makedirs(out, exist_ok=True)
     fonts = Fonts(args.font_dir)
@@ -613,7 +674,24 @@ def main():
     fonts.check([line for spec, _ in phone for line in spec['title'] + spec['sub']])
     mp4 = os.path.join(out, 'dafeiyu-promo.mp4')
     silent = mp4 + '.video.mp4'
-    cover = render(fonts, silent, phone, beat)
+    cover = os.path.join(out, 'cover.png')
+    total = int((DURATION + phone_len) * FPS)
+    bounds = [round(total * k / args.jobs) for k in range(args.jobs + 1)]
+    parts = [os.path.join(tmp, f'part{k}.mp4') for k in range(args.jobs)]
+    ctx = multiprocessing.get_context('fork')
+    workers = [ctx.Process(target=render, args=(fonts, parts[k], phone, beat, bounds[k], bounds[k + 1], cover, args.crf))
+               for k in range(args.jobs)]
+    for w in workers:
+        w.start()
+    for w in workers:
+        w.join()
+        if w.exitcode:
+            raise SystemExit('a render worker failed')
+    listing = os.path.join(tmp, 'parts.txt')
+    with open(listing, 'w') as f:
+        f.writelines(f"file '{p}'\n" for p in parts)
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', listing, '-c', 'copy', silent],
+                   check=True)
     shutil.rmtree(tmp)
     music = soundtrack.build(DURATION + phone_len, *cues(phone_len, beat))
     wav = mp4 + '.wav'
@@ -623,11 +701,10 @@ def main():
         w.setframerate(soundtrack.SR)
         w.writeframes((music * 32767).astype('<i2').tobytes())
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', silent, '-i', wav, '-map', '0:v', '-map', '1:a', '-c:v', 'copy',
-                    '-c:a', 'aac', '-b:a', '160k', '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11', '-shortest',
+                    '-c:a', 'aac', '-b:a', '192k', '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11', '-ar', '48000', '-shortest',
                     '-movflags', '+faststart', mp4], check=True)
     os.remove(silent)
     os.remove(wav)
-    cover.convert('RGB').save(os.path.join(out, 'cover.png'), optimize=True)
     # Animated WebP rather than GIF: a GIF of the same cut is three times the size and banded. Encoded with
     # Pillow (libwebp's WebPAnimEncoder): ffmpeg's libwebp_anim leaves stale dark blocks from the opening
     # sea in later frames.
@@ -640,7 +717,7 @@ def main():
     frames = [Image.frombuffer('RGB', (pw, ph), raw[i:i + n]) for i in range(0, len(raw) - n + 1, n)]
     frames[0].save(preview, save_all=True, append_images=frames[1:], duration=round(1000 / args.preview_fps),
                    loop=0, quality=args.preview_quality, method=4)
-    for p in (mp4, preview, os.path.join(out, 'cover.png')):
+    for p in (mp4, preview, cover):
         print(p, round(os.path.getsize(p) / 1e6, 2), 'MB')
 
 
