@@ -6,7 +6,7 @@
 
 会记得你说过的话，有自己的性格，在桌面上过着自己的小日子。
 
-[![Release](https://img.shields.io/github/v/release/ktao732084-arch/dafeiyu-android?label=%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC&color=2b7fc4)](https://github.com/ktao732084-arch/dafeiyu-android/releases/latest)
+[![Release](https://img.shields.io/github/v/release/ktao732084-arch/dafeiyu-android?include_prereleases&label=%E6%9C%80%E6%96%B0%E7%89%88%E6%9C%AC&color=2b7fc4)](https://github.com/ktao732084-arch/dafeiyu-android/releases)
 [![Android](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)](#快速开始)
 [![Check](https://github.com/ktao732084-arch/dafeiyu-android/actions/workflows/check.yml/badge.svg)](https://github.com/ktao732084-arch/dafeiyu-android/actions/workflows/check.yml)
 [![Code License](https://img.shields.io/badge/%E4%BB%A3%E7%A0%81-MIT-blue)](LICENSE)
@@ -16,7 +16,7 @@
 
 <sub>▲ 宣传片（55 秒，含真机实拍）· 动图无声，点击观看带原创配乐的 <a href="docs/promo/dafeiyu-promo.mp4">高清 MP4</a></sub>
 
-[**下载 APK**](https://github.com/ktao732084-arch/dafeiyu-android/releases/latest) · [快速开始](#快速开始) · [功能细节](docs/FEATURES.md) · [更新记录](CHANGELOG.md) · [验证记录](VALIDATION.md)
+[**下载 APK**](https://github.com/ktao732084-arch/dafeiyu-android/releases) · [快速开始](#快速开始) · [功能细节](docs/FEATURES.md) · [更新记录](CHANGELOG.md) · [验证记录](VALIDATION.md)
 
 </div>
 
@@ -53,7 +53,7 @@
 
 **系统要求**：Android 8.0（API 26）及以上。
 
-1. **安装**：从 [Releases](https://github.com/ktao732084-arch/dafeiyu-android/releases/latest) 下载 `dafeiyu-android-<版本>.apk` 安装。各版本使用同一签名，覆盖安装会保留聊天、记忆、人格、模型配置和棋局。
+1. **安装**：从 [Releases](https://github.com/ktao732084-arch/dafeiyu-android/releases) 下载 `dafeiyu-android-<版本>.apk` 安装。各版本使用同一签名，覆盖安装会保留聊天、记忆、人格、模型配置和棋局。
 2. **初次相遇**：手动选择一种性格或随机一次。确认后固定，之后不提供重选。
 3. **连接模型**：在「模型连接」保持默认的 **DeepSeek V4.1 Flash**，点「去 DeepSeek 官网获取 Key」，创建并复制 API Key 后粘贴，点「连接并保存」。连接测试成功才会保存，并显示账户余额。
 4. **让她住到屏幕上**：授予「显示在其他应用上层」和通知权限，点「让她住到屏幕上」。
